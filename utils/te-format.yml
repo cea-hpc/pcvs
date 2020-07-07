@@ -1,0 +1,65 @@
+.this_is_a_job:
+    id_name: "optional name"
+    build:
+        # define a Makefile-based compilation
+        make_target: all
+        # dependency scheme
+        depends_on: ["this_is_another_test"]
+        # program binary (if needed)
+        binary: "binary_name"
+        # source files to include (if needed)
+        source_files: "path/to/files"
+        # extra cflags
+        cflags: "extra cflags"
+        # extra ldflags
+        ldflags: "extra ldflags"
+        # directory where program should be built
+        cwd: "dir/to/build"
+        # compilation iterators
+        flags: ["-pedantic", "-Werror"]
+        # variants describing the job
+        variants:
+            - openmp
+            - tbb
+            - accel
+
+    run: &run_part
+        # expected returun code
+        expect_rc: 0
+        # program arguments (full list, not an iterable)
+        args: ["-iter 1000", "-fast"]
+        # autokill from JCHRONOSS after X seconds (to implement)
+        kill_after: 0p
+        # Expected time for the job to be successful
+        mean_time: 0.0
+        # acceptance, around the mean_time
+        tolerance: 0.0
+        # runtime iterators
+        n_mpi: [2, 4]
+        n_omp: ["1:4"]
+        # directory where program should be built
+        cwd: "dir/to/build"
+        # dependency scheme
+        depends_on: ["this_is_another_run_test"]
+        # external modules (suppose a support for modules)
+        modules:
+            - protobuf
+            - gnu/gcc/7.3.0
+        # extra env vars to export before running the job
+        env:
+            MY_VAR: 1000.0
+            MY_OTHER_VAR: 2
+
+    #this is a copy/paste from pav2
+    results:
+        parse:
+            regex:
+
+#########################################################
+
+# depicts an inheritance mechanism.
+real_test:
+    build:
+        make_target: all
+    run:
+        <<: *run_part
