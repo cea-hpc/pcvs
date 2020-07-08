@@ -1,0 +1,22 @@
+---
+commands:
+    cc: "/path/to/cc"
+    cxx: "/pat/to/cxx"
+    fc: "/path/to/fc"
+    # optional if fc is defined
+    f77: "/path/to/f77"
+    f90: "/path/to/f90"
+
+variants:
+    openmp:
+        args: "-fopenmp"
+    tbb:
+        args: "-ltbb -ltbbmalloc -ldl"
+    cuda:
+        args: ""
+    strict:
+        args: "-Werror -Wall -Wextra"
+
+package_manager:
+    spack: "name@version+variants"
+    module: "group/flavor/version"

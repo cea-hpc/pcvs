@@ -1,3 +1,4 @@
+---
 .this_is_a_job:
     id_name: "optional name"
     build:
@@ -15,8 +16,6 @@
         ldflags: "extra ldflags"
         # directory where program should be built
         cwd: "dir/to/build"
-        # compilation iterators
-        flags: ["-pedantic", "-Werror"]
         # variants describing the job
         variants:
             - openmp
@@ -24,36 +23,37 @@
             - accel
 
     run: &run_part
-        # expected returun code
-        expect_rc: 0
-        # program arguments (full list, not an iterable)
-        args: ["-iter 1000", "-fast"]
-        # autokill from JCHRONOSS after X seconds (to implement)
-        kill_after: 0p
-        # Expected time for the job to be successful
-        mean_time: 0.0
-        # acceptance, around the mean_time
-        tolerance: 0.0
-        # runtime iterators
-        n_mpi: [2, 4]
-        n_omp: ["1:4"]
+        iterate:
+            # runtime iterators
+            n_mpi: [2, 4]
+            n_omp: ["1:4"]
+            program:
+                # user-defined program arguments
+                args: ["-iter 1000", "-fast"]
         # directory where program should be built
         cwd: "dir/to/build"
         # dependency scheme
-        depends_on: ["this_is_another_run_test"]
+        depends_on: ["this_is_another_run_test_in_the_same_file"]
         # external modules (suppose a support for modules)
         modules:
             - protobuf
             - gnu/gcc/7.3.0
         # extra env vars to export before running the job
-        env:
+        environment:
             MY_VAR: 1000.0
             MY_OTHER_VAR: 2
 
-    #this is a copy/paste from pav2
-    results:
+    # this is a copy/paste from pav2
+    validate:
+        expect_exit: 0
+        time:
+            mean_time: 10.0
+            tolerance: 2.0
+            kill_after: 20
         parse:
-            regex:
+            regex: '^\d+(\.\d+) received$'
+            script:
+                path: "/path/to/script"
 
 #########################################################
 

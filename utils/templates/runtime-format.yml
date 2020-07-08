@@ -1,0 +1,22 @@
+---
+program: "/path/to/command"
+args: "--verbose"
+
+# WIP for this one
+module: "MPC"
+
+iterators:
+    iterator_name:
+        option: ""
+        numeric: true
+        type: "argument|environment"
+        position: "before|after"
+        values:
+            ib: "openib"
+            tcp: "tcp"
+            shmem: "sm"
+            ptl: "portals"
+
+package_manager:
+    spack: "name@version+variants"
+    module: "group/flavor/version"
