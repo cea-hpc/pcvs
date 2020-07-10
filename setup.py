@@ -4,20 +4,23 @@ import subprocess
 current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE) 
 
 setup(
-    name="PCVS-rt",
+    name="pcvs-rt",
     version=current_version.stdout.decode("utf-8"),
     license="CeCILL-C",
-    scripts=["scripts/cmd"],
-    packages=find_packages(),
-
     author="Julien Adam",
     author_email="adamj@paratools.com",
     keywords="validation hpc test-suite",
     url="",
 
-    
+    packages=find_packages(),
+    entry_points='''
+        [console_scripts]
+        pcvs=pcvsrt.scripts.cmd:cli
+    ''',
+
     install_requires=[
         "PyYAML",
+        "Click",
         "jsonschema"
     ],
 )

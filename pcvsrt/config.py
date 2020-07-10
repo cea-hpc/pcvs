@@ -1,6 +1,14 @@
 import yaml
 import os
+import utils
 
+PCVS_HOME = os.path.join(os.path.dirname(__file__), "../test")
+PCVS_CONFIG_PATH = os.path.abspath(os.path.join(PCVS_HOME, "saves"))
+
+
+def retrieve_list_of(domain):
+    # prune '.yml' -> 4 characters
+    return [filename[:-4] for filename in os.listdir(os.path.join(PCVS_CONFIG_PATH, domain))]
 
 class Configuration:
 
@@ -16,7 +24,7 @@ class Configuration:
             file = open(filepath, 'r')
             content = yaml.load(file, Loader=yaml.Loader)
         except IOError:
-            print("Unable to open file %s" % filepath)
+            utils.err("Unable to open file %s" % filepath)
         except yaml.scanner.ScannerError:
             print("Badly formatted file: %s" % filepath)
         else:
@@ -34,12 +42,13 @@ class Configuration:
         self.env_filepath = filepath
         self.__config['env'] = self.__load_yaml_file(filepath)
 
-    def dumpToDisk(self):
+    def flushToDisk(self):
         filepath = self.__config['buildpath']
         try:
             file = open(filepath, 'w')
             yaml.dump(self.__config, file, Dumper=yaml.Dumper)
         except IOError:
+            
             pass
         else:
             pass
@@ -49,10 +58,5 @@ class Configuration:
 
 
 if __name__ == '__main__':
-    test = Configuration()
-    test.loadRuntime("../build_scripts/configuration/runtimes/mpc.yml")
-    test.loadCompiler("../build_scripts/configuration/compilers/mpc.yml")
-    test.loadEnv("../build_scripts/configuration/environment/inti.yml")
-
-    for i, j in test.getConfig().items():
-        print(i, j)
+    
+    print(retrieve_list_of("compilers"))
