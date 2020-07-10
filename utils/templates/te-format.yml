@@ -28,8 +28,10 @@
             n_mpi: [2, 4]
             n_omp: ["1:4"]
             program:
-                # user-defined program arguments
-                args: ["-iter 1000", "-fast"]
+                #name will be used as part of final test-name
+                give_it_a_name:
+                    type": argument|environment"
+                    values: ["-iter 1000", "-fast"]
         # directory where program should be built
         cwd: "dir/to/build"
         # dependency scheme
@@ -42,6 +44,12 @@
         environment:
             MY_VAR: 1000.0
             MY_OTHER_VAR: 2
+
+    artifacts:
+        #relative to $BUILDPATH
+        paths:
+            - "./path/1"
+            - "./path/2"
 
     # this is a copy/paste from pav2
     validate:

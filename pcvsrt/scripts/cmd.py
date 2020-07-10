@@ -6,7 +6,14 @@ from .config import commands as cmdConfig
 from .profile import commands as cmdProfile
 from .run import commands as cmdRun
 
-@click.group(name="cli")
+
+CONTEXT_SETTINGS = dict(
+                        help_option_names=['-h', '--help'],
+                        ignore_unknown_options=True,
+                        allow_interspersed_args=False
+                        )
+
+@click.group(context_settings=CONTEXT_SETTINGS, name="cli")
 @click.pass_context
 def cli(ctx):
     pass

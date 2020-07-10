@@ -1,0 +1,10 @@
+---
+fail_on_error: true
+tee: true
+verbose: true
+scheduling:
+    model: 2
+    sched_on: "n_node"
+result:
+    log: 2
+    format: ["junit", "json"] 

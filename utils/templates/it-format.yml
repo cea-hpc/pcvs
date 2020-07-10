@@ -1,0 +1,17 @@
+---
+iterators:
+    n_node:
+        values: [1, 2, 3, 4]
+        subtitle: "N"
+    n_proc:
+        values: [2, 4, 8]
+        subtitle: "p"
+    n_mpi:
+        values: [2, 32]
+        subtitle: "n"
+    n_omp:
+        values: [4, 8]
+        subtitle: "o"
+    n_core:
+        values: "n_mpi * 4"
+        subtitle: "c"

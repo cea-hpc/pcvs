@@ -1,5 +1,7 @@
 import sys
+import os
 import logging
+import tempfile
 
 FORMAT = "%(levelname)s(%(module)s): %(message)s"
 logging.basicConfig(format=FORMAT)
@@ -30,6 +32,11 @@ def warn(*msg):
 def err(*msg):
     log(*msg, func=logging.error)
     abort()
+
+
+def open_in_editor(filepath):
+    # create a backup to make edition atomic
+    os.system('{} {}'.format(os.getenv('EDITOR'), filepath))
 
 
 if __name__ == '__main__':
