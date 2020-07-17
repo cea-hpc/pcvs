@@ -11,6 +11,7 @@ from pcvsrt import utils
 def profile(ctx, scope):
     pass
 
+
 @profile.command(name="list",
                  short_help="List available profiles")
 @click.pass_context
@@ -61,7 +62,6 @@ def profile_destroy(ctx, name, force):
               help="Open file with EDITOR")
 @click.pass_context
 def profile_alter(ctx, name, editor):
-    utils.open_in_editor(name)
     pass
 
 

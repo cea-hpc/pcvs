@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import subprocess
 
-current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE) 
+current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE)
 
 setup(
     name="pcvs-rt",
@@ -10,7 +10,7 @@ setup(
     author="Julien Adam",
     author_email="adamj@paratools.com",
     keywords="validation hpc test-suite",
-    url="",
+    url="https://github.com/cea-hpc/pcvs.git",
 
     packages=find_packages(),
     entry_points='''

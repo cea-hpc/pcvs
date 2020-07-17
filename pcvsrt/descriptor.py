@@ -2,7 +2,7 @@ import logging
 import utils
 
 
-class TestDescription:
+class TEDescriptor:
     def __init__(self, node):
         if not isinstance(node, dict):
             logging.critical(
@@ -14,5 +14,5 @@ class TestDescription:
 
 
 if __name__ == '__main__':
-    test = TestDescription(4)
+    test = TEDescriptor(4)
     pass

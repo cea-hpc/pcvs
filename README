@@ -1,0 +1,7 @@
+enable completion:
+
+	eval "$(_PCVS_COMPLETE=source_<sh> pcvs)"
+
+where `sh` is a valid Shell (bash, zsh...). It will generate the shell-valid
+function called when the completion keystrokes are invoked (generally the <tab>
+twice).

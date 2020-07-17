@@ -1,62 +1,56 @@
 import yaml
 import os
-import utils
-
-PCVS_HOME = os.path.join(os.path.dirname(__file__), "../test")
-PCVS_CONFIG_PATH = os.path.abspath(os.path.join(PCVS_HOME, "saves"))
+from pcvsrt.utils import logs
 
 
-def retrieve_list_of(domain):
-    # prune '.yml' -> 4 characters
-    return [filename[:-4] for filename in os.listdir(os.path.join(PCVS_CONFIG_PATH, domain))]
+PREFIXPATH = "../.."
+BASEPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), PREFIXPATH))
+CONFPATHS = {
+    'global': BASEPATH + "/share/saves/",
+    'user': os.environ['HOME'] + "/.pcvsrt/saves/",
+    'local': os.getcwd() + "/.pcvsrt/saves/"
+}
 
-class Configuration:
+CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 
-    def __init__(self, buildpath="."):
-        self.__config = dict()
-        self.__config['buildpath'] = buildpath
-        self.__runtime_filepath = None
-        self.__compiler_filepath = None
-        self.__env_filepath = None
+def check_valid_subgroup_name(s):
+    if s not in CONFIG_BLOCKS:
+        logs.err("Invalid SUBGROUP '{}'".format(s),
+                 "See --help for more information",
+                 abort=1)
 
-    def __load_yaml_file(self, filepath):
-        try:
-            file = open(filepath, 'r')
-            content = yaml.load(file, Loader=yaml.Loader)
-        except IOError:
-            utils.err("Unable to open file %s" % filepath)
-        except yaml.scanner.ScannerError:
-            print("Badly formatted file: %s" % filepath)
+
+class ConfigurationBlock:
+    def __init__(self, configType):
+        check_valid_subgroup_name(configType)
+        self._type = configType
+        self._files = {}
+        self._files['global'] = ConfigurationBlock.list_config_files("global", configType)
+        self._files['user'] = ConfigurationBlock.list_config_files("user", configType)
+        self._files['local'] = ConfigurationBlock.list_config_files("local", configType)
+
+        self._alias = {}
+        for (name, path) in self._files['global']:
+            self._alias[name] = path
+        for (name, path) in self._files['user']:
+            self._alias[name] = path
+        for (name, path) in self._files['local']:
+            self._alias[name] = path
+
+    def get_file_from_name(self, name, scope=None):
+        if scope is None:
+            return self._alias[name]
         else:
-            return content
+            return self._files[scope]
 
-    def loadRuntime(self, filepath):
-        self.runtime_filepath = filepath
-        self.__config['runtime'] = self.__load_yaml_file(filepath)
+    def get_type(self):
+        return self._type
 
-    def loadCompiler(self, filepath):
-        self.compiler_filepath = filepath
-        self.__config['compiler'] = self.__load_yaml_file(filepath)
+    def get_configs(self):
+        return self._files
 
-    def loadEnv(self, filepath):
-        self.env_filepath = filepath
-        self.__config['env'] = self.__load_yaml_file(filepath)
-
-    def flushToDisk(self):
-        filepath = self.__config['buildpath']
-        try:
-            file = open(filepath, 'w')
-            yaml.dump(self.__config, file, Dumper=yaml.Dumper)
-        except IOError:
-            
-            pass
-        else:
-            pass
-
-    def getConfig(self):
-        return self.__config
-
-
-if __name__ == '__main__':
-    
-    print(retrieve_list_of("compilers"))
+    @staticmethod
+    def list_config_files(scope, subpath):
+        prefix = os.path.join(CONFPATHS[scope], subpath)
+        if prefix:
+            return {os.path.basename(elt): elt for elt in os.listdir(prefix)}
