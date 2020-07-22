@@ -1,6 +1,7 @@
 ---
 .this_is_a_job:
     id_name: "optional name"
+    kind: "GRPSERIAL"
     build:
         # define a Makefile-based compilation
         make_target: all
@@ -30,7 +31,7 @@
             program:
                 #name will be used as part of final test-name
                 give_it_a_name:
-                    type": argument|environment"
+                    type: "argument|environment"
                     values: ["-iter 1000", "-fast"]
         # directory where program should be built
         cwd: "dir/to/build"

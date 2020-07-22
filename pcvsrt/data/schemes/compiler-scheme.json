@@ -1,0 +1,303 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "package_manager": {
+                "spack": "name@version+variants",
+                "module": "group/flavor/version"
+            },
+            "variants": {
+                "openmp": {
+                    "args": "-fopenmp"
+                },
+                "cuda": {
+                    "args": ""
+                },
+                "strict": {
+                    "args": "-Werror -Wall -Wextra"
+                },
+                "tbb": {
+                    "args": "-ltbb -ltbbmalloc -ldl"
+                }
+            },
+            "commands": {
+                "f77": "/path/to/f77",
+                "cc": "/path/to/cc",
+                "f90": "/path/to/f90",
+                "fc": "/path/to/fc",
+                "cxx": "/pat/to/cxx"
+            }
+        }
+    ],
+    "required": [
+        "package_manager",
+        "variants",
+        "commands"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "package_manager": {
+            "$id": "#/properties/package_manager",
+            "type": "object",
+            "title": "The package_manager schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "spack": "name@version+variants",
+                    "module": "group/flavor/version"
+                }
+            ],
+            "required": [
+                "spack",
+                "module"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "spack": {
+                    "$id": "#/properties/package_manager/properties/spack",
+                    "type": "string",
+                    "title": "The spack schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "name@version+variants"
+                    ]
+                },
+                "module": {
+                    "$id": "#/properties/package_manager/properties/module",
+                    "type": "string",
+                    "title": "The module schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "group/flavor/version"
+                    ]
+                }
+            }
+        },
+        "variants": {
+            "$id": "#/properties/variants",
+            "type": "object",
+            "title": "The variants schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "openmp": {
+                        "args": "-fopenmp"
+                    },
+                    "cuda": {
+                        "args": ""
+                    },
+                    "strict": {
+                        "args": "-Werror -Wall -Wextra"
+                    },
+                    "tbb": {
+                        "args": "-ltbb -ltbbmalloc -ldl"
+                    }
+                }
+            ],
+            "required": [
+                "openmp",
+                "cuda",
+                "strict",
+                "tbb"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "openmp": {
+                    "$id": "#/properties/variants/properties/openmp",
+                    "type": "object",
+                    "title": "The openmp schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "args": "-fopenmp"
+                        }
+                    ],
+                    "required": [
+                        "args"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "args": {
+                            "$id": "#/properties/variants/properties/openmp/properties/args",
+                            "type": "string",
+                            "title": "The args schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "-fopenmp"
+                            ]
+                        }
+                    }
+                },
+                "cuda": {
+                    "$id": "#/properties/variants/properties/cuda",
+                    "type": "object",
+                    "title": "The cuda schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "args": ""
+                        }
+                    ],
+                    "required": [
+                        "args"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "args": {
+                            "$id": "#/properties/variants/properties/cuda/properties/args",
+                            "type": "string",
+                            "title": "The args schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                ""
+                            ]
+                        }
+                    }
+                },
+                "strict": {
+                    "$id": "#/properties/variants/properties/strict",
+                    "type": "object",
+                    "title": "The strict schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "args": "-Werror -Wall -Wextra"
+                        }
+                    ],
+                    "required": [
+                        "args"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "args": {
+                            "$id": "#/properties/variants/properties/strict/properties/args",
+                            "type": "string",
+                            "title": "The args schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "-Werror -Wall -Wextra"
+                            ]
+                        }
+                    }
+                },
+                "tbb": {
+                    "$id": "#/properties/variants/properties/tbb",
+                    "type": "object",
+                    "title": "The tbb schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "args": "-ltbb -ltbbmalloc -ldl"
+                        }
+                    ],
+                    "required": [
+                        "args"
+                    ],
+                    "additionalProperties": true,
+                    "properties": {
+                        "args": {
+                            "$id": "#/properties/variants/properties/tbb/properties/args",
+                            "type": "string",
+                            "title": "The args schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "-ltbb -ltbbmalloc -ldl"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "commands": {
+            "$id": "#/properties/commands",
+            "type": "object",
+            "title": "The commands schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "f77": "/path/to/f77",
+                    "cc": "/path/to/cc",
+                    "f90": "/path/to/f90",
+                    "fc": "/path/to/fc",
+                    "cxx": "/pat/to/cxx"
+                }
+            ],
+            "required": [
+                "cc",
+                "fc",
+                "cxx"
+            ],
+            "additionalProperties": true,
+            "properties": {
+                "f77": {
+                    "$id": "#/properties/commands/properties/f77",
+                    "type": "string",
+                    "title": "The f77 schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/path/to/f77"
+                    ]
+                },
+                "cc": {
+                    "$id": "#/properties/commands/properties/cc",
+                    "type": "string",
+                    "title": "The cc schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/path/to/cc"
+                    ]
+                },
+                "f90": {
+                    "$id": "#/properties/commands/properties/f90",
+                    "type": "string",
+                    "title": "The f90 schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/path/to/f90"
+                    ]
+                },
+                "fc": {
+                    "$id": "#/properties/commands/properties/fc",
+                    "type": "string",
+                    "title": "The fc schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/path/to/fc"
+                    ]
+                },
+                "cxx": {
+                    "$id": "#/properties/commands/properties/cxx",
+                    "type": "string",
+                    "title": "The cxx schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/pat/to/cxx"
+                    ]
+                }
+            }
+        }
+    }
+}
