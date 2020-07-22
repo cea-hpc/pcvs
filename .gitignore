@@ -1,0 +1,23 @@
+# Compiled source #
+###################
+*.exe
+*.o
+*.so
+*.py[cod]
+*/__pycache__/
+*.egg-info/
+.pcvsrt/
+
+# Temporary files #
+###################
+*.project
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# others #
+##########
+tags
+build/
+.vscode/
