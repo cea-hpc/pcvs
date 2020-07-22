@@ -3,11 +3,9 @@ import os
 import logging
 import textwrap
 
-PREFIXPATH = "/../"
-BASEPATH = os.path.abspath(os.path.join(os.path.dirname(__file__) + PREFIXPATH))
 FORMAT = "%(levelname)s: %(message)s"
 
-LINELENGTH=80
+LINELENGTH=93
 colors = {}
 glyphs = {
     'copy': '(c)',
@@ -54,7 +52,7 @@ def __set_encoding(e):
         glyphs['copy'] = '\u00A9'
         glyphs['item'] = '\u27E2'
         glyphs['sec'] = '\u2756'
-        glyphs['hdr'] = '\u2015'
+        glyphs['hdr'] = '\u23BC'
         glyphs['star'] = '\u2605'
         glyphs['fail'] = '\u2717'
         glyphs['succ'] = '\u2713'
@@ -92,14 +90,14 @@ def print_header(s):
 
 def print_section(s):
     print("{}{} {}{}".format(cl('y'), utf('sec'),
-                               textwrap.fill(s.title(), width=LINELENGTH),
+                               textwrap.fill(s, width=LINELENGTH),
                                cl('reset')))
 
 
 def print_item(s, depth=1):
     print(("   " * depth) + "{}{}{} {}".format(cl('r'),
                                                utf('item'), cl('reset'),
-                                               textwrap.fill(s.capitalize(),
+                                               textwrap.fill(s,
                                                              width=LINELENGTH)))
     pass
 
@@ -127,10 +125,16 @@ def err(*msg, abort=0):
         logging.error(cl('r', 1)+"Now going to abort."+cl('reset'))
         sys.exit(42)
 
+def nimpl(*msg):
+    warn("Not implemented! (WIP)")
+
+
+def nreach(*msg):
+    err("Should not be reached!", abort=1)
+
+
 def set_tee():
     pass
-
-
 
 
 def banner():

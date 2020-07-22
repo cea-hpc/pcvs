@@ -1,6 +1,21 @@
 import os
-from filelock import FileLock
+import subprocess
+from contextlib import contextmanager
 
+@contextmanager
+def cwd(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
+
+def open_in_editor(path, e=None):
+    editor = e if e is not None else os.environ['EDITOR']
+    subprocess.run([editor, path])
 
 class FileManager:
     """Manage a file from PCVS scope.
@@ -20,21 +35,3 @@ class FileManager:
 
     def __del__(self):
         self._fd.close()
-
-
-class LockFileManager(FileManager):
-    """Manage a file against concurrent accessses.
-    """
-    def __init__(self, filepath, mode):
-        self._filelock = os.path.join(".", os.path.basename(filepath), ".lock")
-        self._lock = FileLock(self._lock, timeout=1)
-        self._lock.acquire()
-        FileManager.__init__(self, filepath, mode)
-
-    def edit(self):
-        os.system('{} {}'.format(os.getenv('EDITOR'), self._filepath))
-        self.__init__(self._filepath, self._mode)
-
-    def __fini__(self):
-        FileManager.__del__(self)
-        self._lock.release()
