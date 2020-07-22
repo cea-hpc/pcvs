@@ -1,5 +1,9 @@
 import click
-from pcvsrt import utils
+import yaml
+import os
+import pcvsrt
+from pcvsrt import utils, profile
+from pcvsrt.utils import logs
 
 
 @click.group(name="profile", short_help="profile")
@@ -9,14 +13,37 @@ from pcvsrt import utils
               help="Scope where this command applies")
 @click.pass_context
 def profile(ctx, scope):
-    pass
+    ctx.obj['scope'] = scope.lower() if scope is not None else None
 
 
 @profile.command(name="list",
                  short_help="List available profiles")
 @click.pass_context
 def profile_list(ctx):
-    pass
+    logs.print_header("Profile View")
+    scope = ctx.obj['scope']
+    profiles = pcvsrt.profile.list_profiles(scope)
+    if not profiles:
+        logs.print_item("None")
+        return
+    elif scope is None:  # if no scope has been provided by the user
+        for sc in pcvsrt.profile.scope_order():
+            # aggregate names for each sccope
+            names = [elt[0] for elt in [array for array in profiles[sc]]]
+            if not names:
+                logs.print_item("{: <6s}: {}None".format(sc.upper(),
+                                                         logs.cl('grey')))
+            else:
+                logs.print_item("{: <6s}: {}".format(sc.upper(),
+                                                     ", ".join(names)))
+    else:
+        names = [x[0] for x in profiles]
+        logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+    
+    # in case verbosity is enabled, add scope paths
+    logs.info("Scopes are labeled as follows:")
+    for scope, prefix in pcvsrt.profile.PROFILE_STORAGES.items():
+        logs.info("- {}: {}".format(scope.upper(), prefix))
 
 
 @profile.command(name="show",
@@ -24,6 +51,9 @@ def profile_list(ctx):
 @click.argument("name", type=str)
 @click.pass_context
 def profile_show(ctx, name):
+    pf = pcvsrt.profile.Profile(name, ctx.obj['scope'])
+    pf.load_from_disk()
+    pf.display()
     pass
 
 
@@ -46,12 +76,14 @@ def profile_create(ctx, name, other):
 @click.argument("name", type=str)
 @click.pass_context
 def profile_destroy(ctx, name, force):
-    if not force:
-        if not click.confirm("Are you sure to delete '{}' ?".format(name)):
-            return
-
-    print("deleted")
-    pass
+    pf = pcvsrt.profile.Profile(name, ctx.obj['scope'])
+    if pf.is_found():
+        if not force:
+            if not click.confirm("Are you sure to delete '{}' ({}) ?".format(name, pf.scope)):
+                return
+        pf.delete()
+    else:
+        logs.err("Profile '{}' not found!".format(name), "Please check the 'list' command", abort=1)
 
 
 @profile.command(name="alter",
@@ -71,7 +103,10 @@ def profile_alter(ctx, name, editor):
 @click.argument("src_file", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, name, src_file):
-    pass
+    pf = pcvsrt.profile.Profile(name, ctx.obj['scope'])
+    if pf.is_found():
+        pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
+        pf.flush_to_disk()
 
 
 @profile.command(name="export",
@@ -80,4 +115,6 @@ def profile_import(ctx, name, src_file):
 @click.argument("dest_file", type=click.File('w'))
 @click.pass_context
 def profile_export(ctx, name, dest_file):
-    pass
+    pf = pcvsrt.profile.Profile(name, ctx.obj['scope'])
+    if pf.is_found():
+        dest_file.write(yaml.dump(pf.dump()))
