@@ -1,8 +1,6 @@
 from os import path
+import os
 from pcvsrt import config, profile
-
-
-ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
 
 config.init()
 profile.init()

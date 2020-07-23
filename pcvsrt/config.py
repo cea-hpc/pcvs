@@ -2,22 +2,15 @@ import yaml
 from os import path
 import os
 import pcvsrt
+from pcvsrt import globals
 import glob
 import shutil
 import jsonschema
 import json
 from pcvsrt.utils import logs, files
 
-ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
-
-CONFIG_STORAGES = {
-    'global': ROOTPATH + "/share/saves/",
-    'user': os.environ['HOME'] + "/.pcvsrt/saves/",
-    'local': os.getcwd() + "/.pcvsrt/saves/"
-}
-
-CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
-
+CONFIG_STORAGES = { k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
+CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
 CONFIG_EXISTING = {}
 
 
@@ -106,13 +99,15 @@ def compute_path(kind, name, scope):
 
 
 class ConfigurationScheme:
-    _scheme_prefix = os.path.join(ROOTPATH, "share/schemes")
+    _scheme_prefix = os.path.join(globals.ROOTPATH, "share/schemes")
 
     def __init__(self, kind):
         pass
 
     def validate(self, conf):
         assert (isinstance(conf, ConfigurationBlock))
+        # FIXME:
+        return
         if conf._kind != "compiler":
             logs.warn("VALIDATION: TODO: Scheme for KIND '{}'".format(conf._kind))
             return
@@ -123,7 +118,7 @@ class ConfigurationScheme:
 
 
 class ConfigurationBlock:
-    _template_path = os.path.join(ROOTPATH, "share/templates")
+    _template_path = os.path.join(globals.ROOTPATH, "share/templates")
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
         check_valid_scope(scope)
@@ -149,7 +144,7 @@ class ConfigurationBlock:
     
     def fill(self, raw):
         assert (isinstance(raw, dict))
-        #self._details = raw
+        self._details = raw
 
     def dump(self):
         self.load_from_disk()
@@ -170,7 +165,7 @@ class ConfigurationBlock:
             self.check()
 
     def load_template(self):
-        fp = os.path.join(self._template_path, self._kind + "-format.yml") 
+        fp = os.path.join(self._template_path, self._kind + "-format.yml")
         with open(fp, "r") as f:
             self.fill(yaml.load(f, Loader=yaml.FullLoader))
             
@@ -221,7 +216,6 @@ class ConfigurationBlock:
     def open_editor(self, e=None):
         assert (self._file is not None)
         assert (os.path.isfile(self._file))
-        
         files.open_in_editor(self._file, e)
         self.load_from_disk()
         self.check()

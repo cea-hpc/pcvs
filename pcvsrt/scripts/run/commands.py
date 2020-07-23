@@ -6,7 +6,7 @@ from pcvsrt import main
 
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename",
-              default="global.default", type=str, show_envvar=True,
+              default="default", type=str, show_envvar=True,
               help="an existing profile")
 @click.option("-o", "--output", "output",
               default="./build", type=click.Path(exists=False), show_envvar=True,
@@ -60,6 +60,8 @@ def run(ctx, profilename, output, log, detach, status,
     elif set_default:
         files.open_in_editor("defaults")
         exit(0)
+
+    
     
     # fill validation settings
     settings = {}

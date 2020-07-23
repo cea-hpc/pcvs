@@ -9,7 +9,7 @@ from tqdm import tqdm
 import pkg_resources
 import pcvsrt
 from pcvsrt.utils import logs, files
-from pcvsrt import config, profile, descriptor
+from pcvsrt import config, profile, descriptor, globals
 
 run_settings = {}
 list_of_tes = {}
@@ -30,9 +30,9 @@ def __build_jchronoss():
     archive_name = None
     archive_prefix = os.path.join(run_settings['output'], "cache/jchrns")
     # FIXME: Dirty way to locate the archive
-    for f in glob.glob(os.path.join(pcvsrt.ROOTPATH, "../**/jchronoss-*"), recursive=True):
+    for f in glob.glob(os.path.join(globals.ROOTPATH, "../**/jchronoss-*"), recursive=True):
         if 'jchronoss-' in f:
-            archive_name = os.path.join(pcvsrt.ROOTPATH, f)
+            archive_name = os.path.join(globals.ROOTPATH, f)
             break
     assert(archive_name)
     tarfile.open(os.path.join(archive_name)).extractall(archive_prefix)
@@ -74,8 +74,9 @@ def prepare(settings):
     os.mkdir(test_output_dir)
 
     logs.print_item("Load Profile {}".format(settings['pfname']))
-    pf = pcvsrt.profile.Profile()
-    run_settings['profile'] = pf.load(settings['pfname'])
+    pf = pcvsrt.profile.Profile(settings['pfname'])
+    pf.load_from_disk()
+    run_settings['profile'] = pf.dump()
     
     logs.print_item("Save current configuration")
     output_dir = settings['output']

@@ -51,7 +51,7 @@ def config_list_single_kind(kind, scope):
     elif scope is None:  # if no scope has been provided by the user
         for sc in pcvsrt.config.scope_order():
             # aggregate names for each sccope
-            names = [elt[0] for elt in [array for array in blocks[sc]]]
+            names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
                 logs.print_item("{: <6s}: {}None".format(sc.upper(),
                                                          logs.cl('grey')))
@@ -59,7 +59,7 @@ def config_list_single_kind(kind, scope):
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
                                                      ", ".join(names)))
     else:
-        names = [x[0] for x in blocks]
+        names = sorted([x[0] for x in blocks])
         logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
 
 
@@ -147,7 +147,6 @@ def config_create(ctx, token, clone):
     through the `pcvs config --help` command.
     """
     (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
-    
     if clone is not None:
         (c_scope, c_kind, c_label) = extract_config_from_token(clone, pair='span')
         if c_kind is not None and c_kind != kind:
@@ -212,10 +211,12 @@ def config_edit(ctx, token, editor):
     if block.is_found():
         if block.scope == 'global' and label == 'default':
             logs.err("No global default configuration can be deleted/altered from CLI! Sorry!", abort=1)
-        
         block.open_editor(editor)
         block.flush_to_disk()
-
+    else:
+        logs.err("Cannot open this configuration: does not exist!", abort=1)
+        
+    
 
 @config.command(name="import", short_help="Import config from a file")
 @click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
@@ -232,9 +233,11 @@ def config_import(ctx, token, in_file):
     (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
 
     obj = pcvsrt.config.ConfigurationBlock(kind, label, scope)
-    if obj.is_found():
+    if not obj.is_found():
         obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
         obj.flush_to_disk()
+    else:
+        logs.err("Cannot import into an already created conf. block!", abort=1)
 
 
 @config.command(name="export", short_help="Export config into a file")
