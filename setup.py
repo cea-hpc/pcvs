@@ -20,7 +20,7 @@ setup(
 
     install_requires=[
         "PyYAML",
-        "Click",
+        "Click>=7.0",
         "jsonschema"
     ],
 )
