@@ -1,0 +1,5 @@
+---
+.group_mpi: &GRPMPI
+    run:
+        iterate:
+            n_omp: ~

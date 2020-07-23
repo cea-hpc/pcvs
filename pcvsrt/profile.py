@@ -2,7 +2,7 @@ import yaml
 import os
 import glob
 from os import path
-from pcvsrt.utils import logs
+from pcvsrt.utils import logs, files
 from pcvsrt import config
 
 
@@ -40,7 +40,6 @@ def check_valid_scope(s):
 def check_existing_name(name, scope):
     path = None
     scopes = scope_order() if scope is None else [scope]
-
     for sc in scopes:
         for pair in PROFILE_EXISTING[sc]:
             if name == pair[0]:
@@ -67,7 +66,6 @@ def list_profiles(scope=None):
 
 
 class Profile:
-    
     def __init__(self, name, scope=None):
         self._name = name
         self._scope = scope
@@ -112,3 +110,10 @@ class Profile:
     def display(self):
         logs.print_header("Profile View")
         logs.print_section("Scope: {}".format(self._scope.capitalize()))
+    
+    def open_editor(self, e=None):
+        assert (self._file is not None)
+        assert (os.path.isfile(self._file))
+        
+        files.open_in_editor(self._file, e)
+        self.load_from_disk()
