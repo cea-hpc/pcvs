@@ -1,39 +1,39 @@
 import click
 import os
-import pcvsrt.utils.logs as logs
+from pcvsrt.utils import logs, files
 from pcvsrt import main
 
 
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename",
-              default=None, type=str,
+              default="global.default", type=str, show_envvar=True,
               help="an existing profile")
 @click.option("-o", "--output", "output",
-              default="./build", type=click.Path(exists=False),
+              default="./build", type=click.Path(exists=False), show_envvar=True,
               help="Where artefacts will be stored during/after the run")
-@click.option("-c", "--set-defaults", "set_default", 
-              default=False, is_flag=True,
+@click.option("-c", "--set-defaults", "set_default",
+              default=None, is_flag=True,
               help="Set default values for run options (WIP)")
-@click.option("-l", "--tee", "log",
-              default=True, is_flag=True,
+@click.option("-l", "--tee", "log", show_envvar=True,
+              default=False, is_flag=True,
               help="Log the whole stdout/stderr")
 @click.option("-d", "--detach", "detach",
-              default=True, is_flag=True,
+              default=True, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously")
 @click.option("--status", "status",
-              default=None, is_flag=True,
+              default=False, is_flag=True, show_envvar=True,
               help="Display current run progression")
 @click.option("-P", "--pause", "pause",
-              default=None, is_flag=True,
+              default=None, is_flag=True, show_envvar=True,
               help="Pause the current run")
 @click.option("-R", "--resume", "resume",
-              default=None, is_flag=True,
+              default=None, is_flag=True, show_envvar=True,
               help="Resume a previously paused run")
 @click.option("-b", "--bootstrap", "bootstrap",
-              default=False, is_flag=True,
+              default=False, is_flag=True, show_envvar=True,
               help="Initialize basic test templates in given dirs")
 @click.option("-f", "--override", "override",
-              default=False, is_flag=True,
+              default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output dir")
 @click.argument("list_of_dirs", nargs=-1, type=str)
 @click.pass_context
@@ -58,9 +58,9 @@ def run(ctx, profilename, output, log, detach, status,
         logs.info("Get status about the running validation")
         exit(0)
     elif set_default:
-        open_in_editor("defaults")
+        files.open_in_editor("defaults")
         exit(0)
-
+    
     # fill validation settings
     settings = {}
     # for any 'None' value, a load from default should be made

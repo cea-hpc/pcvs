@@ -74,7 +74,7 @@ def prepare(settings):
     os.mkdir(test_output_dir)
 
     logs.print_item("Load Profile {}".format(settings['pfname']))
-    pf = profile.Profile()
+    pf = pcvsrt.profile.Profile()
     run_settings['profile'] = pf.load(settings['pfname'])
     
     logs.print_item("Save current configuration")
