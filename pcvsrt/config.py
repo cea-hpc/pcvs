@@ -20,6 +20,32 @@ CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 
 CONFIG_EXISTING = {}
 
+
+def extract_config_from_token(s, pair="right", single="right"):
+    array = s.split(".")
+    if len(array) > 3:
+        logs.err("Invalid token", abort=1)
+    elif len(array) == 3:
+        return (array[0], array[1], array[2])
+    elif len(array) == 2:
+        # two cases: a.b or b.c
+        if pair == 'left':
+            return (array[0], array[1], None)
+        elif pair == 'span':
+            return (array[0], None, array[1])
+        else:
+            return (None, array[0], array[1])
+    elif len(array) == 1:
+        if single == "left":
+            return (s, None, None)
+        elif single == "center":
+            return (None, s, None)
+        else:
+            return (None, None, s)
+    else:
+        logs.nreach()
+
+
 def scope_order():
     return ['local', 'user', 'global']
 
@@ -113,11 +139,17 @@ class ConfigurationBlock:
     def scope(self):
         return self._scope
 
+    @property
+    def full_name(self):
+        return ".".join([self._scope, self._kind, self._name])
+    
+    @property
+    def short_name(self):
+        return self._name
+    
     def fill(self, raw):
         assert (isinstance(raw, dict))
-        
-        self._details = raw
-        self.check()
+        #self._details = raw
 
     def dump(self):
         self.load_from_disk()
@@ -149,7 +181,7 @@ class ConfigurationBlock:
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
         if not os.path.isdir(prefix_file):
-            os.mkdir(prefix_file)
+            os.makedirs(prefix_file, exist_ok=True)
             
         with open(self._file, 'w') as f:
             val = ConfigurationScheme(self._kind)

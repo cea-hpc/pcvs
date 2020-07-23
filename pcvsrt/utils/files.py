@@ -1,4 +1,6 @@
 import os
+import shutil
+from pcvsrt.utils import logs
 import subprocess
 from contextlib import contextmanager
 
@@ -13,9 +15,13 @@ def cwd(path):
     finally:
         os.chdir(oldpwd)
 
+
 def open_in_editor(path, e=None):
     editor = e if e is not None else os.environ['EDITOR']
+    if shutil.which(editor) is None:
+        logs.err("'{}' is not a valid editor. Please see the '-e' option!".format(editor), abort=1)
     subprocess.run([editor, path])
+
 
 class FileManager:
     """Manage a file from PCVS scope.
