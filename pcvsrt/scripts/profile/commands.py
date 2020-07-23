@@ -72,7 +72,7 @@ def profile_list(ctx, token):
     elif scope is None:  # if no scope has been provided by the user
         for sc in pcvsrt.profile.scope_order():
             # aggregate names for each sccope
-            names = [elt[0] for elt in [array for array in profiles[sc]]]
+            names = sorted([elt[0] for elt in [array for array in profiles[sc]]])
             if not names:
                 logs.print_item("{: <6s}: {}None".format(sc.upper(),
                                                          logs.cl('grey')))
@@ -80,7 +80,7 @@ def profile_list(ctx, token):
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
                                                      ", ".join(names)))
     else:
-        names = [x[0] for x in profiles]
+        names = sorted([x[0] for x in profiles])
         logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
     
     # in case verbosity is enabled, add scope paths
@@ -96,10 +96,12 @@ def profile_list(ctx, token):
 def profile_show(ctx, token):
     """Prints a detailed view of the NAME profile."""
     (scope, label) = extract_profile_from_token(token)
-
     pf = pcvsrt.profile.Profile(label, scope)
-    pf.load_from_disk()
-    pf.display()
+    if pf.is_found():
+        pf.load_from_disk()
+        pf.display()
+    else:
+        logs.err("Profile '{}' not found!".format(token))
     pass
 
 
@@ -121,10 +123,10 @@ def profile_interactive_select():
             logs.print_item("{}: {}".format(i + 1, cell))
         
         while idx < 0 or len(choices) < idx:
-            idx = click.prompt("Your selection", default, type=int)
-        (scope, _, label) = pcvsrt.config.extract_config_from_token(choices[idx-1])
+            idx = click.prompt("Your selection", default, type=int) - 1
+        (scope, _, label) = pcvsrt.config.extract_config_from_token(choices[idx], pair="span")
+        print(choices[idx], scope, label)
         composition[kind] = pcvsrt.config.ConfigurationBlock(kind, label, scope)
-
 
     return composition
 
@@ -167,7 +169,12 @@ def profile_build(ctx, token, interactive, blocks, clone):
     """
     (p_scope, p_label) = extract_profile_from_token(token)
 
+    pf = pcvsrt.profile.Profile(p_label, p_scope)
+    if pf.is_found():
+        logs.err("A profile named '{}' already exist!".format(pf.full_name), abort=1)
+
     blocks_for_profile = {}
+
     if interactive:
         logs.print_header("profile view (build)")
     
@@ -187,27 +194,25 @@ def profile_build(ctx, token, interactive, blocks, clone):
                 logs.err("", abort=1)
 
     logs.print_header("profile view")
+    pf.fill(blocks_for_profile)
+    pf.flush_to_disk()
+
     logs.print_section("final profile (registered as {})".format(p_scope))
     for k, v in blocks_for_profile.items():
         logs.print_item("{: >9s}: {}".format(k.upper(), ".".join([v.scope, v.short_name])))
-    pf = pcvsrt.profile.Profile(p_label, p_scope)
-    pf.fill(blocks_for_profile)
-    #pf.flush_to_disk()
-    logs.nimpl()
-    pass
 
 
 @profile.command(name="destroy",
                  short_help="Delete a profile from disk")
-@click.confirmation_option("-f", "--force",
+@click.confirmation_option("-f", "--force", "force", expose_value=False,
               prompt="Are you sure you want to delete this profile ?",
               help="Do not ask for confirmation")
-@click.argument("name", type=str)
+@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
 @click.pass_context
-def profile_destroy(ctx, token, force):
+def profile_destroy(ctx, token):
     (scope, label) = extract_profile_from_token(token)
 
-    pf = pcvsrt.profile.Profile(name, label)
+    pf = pcvsrt.profile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
             logs.err("err", abort=1)
@@ -245,11 +250,13 @@ def profile_alter(ctx, token, editor):
 @click.pass_context
 def profile_import(ctx, token, src_file):
     (scope, label) = extract_profile_from_token(token)
-
     pf = pcvsrt.profile.Profile(label, scope)
-    if pf.is_found():
+    if not pf.is_found():
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
         pf.flush_to_disk()
+    else:
+        logs.err("Cannot import into an already created profile!", abort=1)
+
 
 
 @profile.command(name="export",
