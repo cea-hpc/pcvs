@@ -1,7 +1,7 @@
 import click
 import yaml
 import pcvsrt
-from pcvsrt import logs
+from pcvsrt import logs, globals
 
 
 
@@ -9,7 +9,7 @@ from pcvsrt import logs
 def compl_list_token(ctx, args, incomplete):
     flat_array = []
     for kind in pcvsrt.config.CONFIG_BLOCKS:
-        for scope in pcvsrt.config.scope_order():
+        for scope in pcvsrt.config.globals.storage_order():
             for elt in pcvsrt.config.CONFIG_EXISTING[kind][scope]:
                 flat_array.append(scope + "." + kind + "." + str(elt[0]))
 
@@ -48,7 +48,7 @@ def config_list_single_kind(kind, scope):
         logs.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pcvsrt.config.scope_order():
+        for sc in pcvsrt.config.globals.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
@@ -98,9 +98,9 @@ def config_list(ctx, token):
         config_list_single_kind(k, scope)
 
     # in case verbosity is enabled, add scope paths
-    logs.info("Scopes are labeled as follows:")
-    for scope, prefix in pcvsrt.config.CONFIG_STORAGES.items():
-        logs.info("- {}: {}".format(scope.upper(), prefix))
+    logs.info("Scopes are ordered as follows:")
+    for i, scope in enumerate(pcvsrt.globals.storage_order()):
+        logs.info("{}. {}: {}".format(i+1, scope.upper(), pcvsrt.globals.STORAGES[scope]))
 
 
 @config.command(name="show",

@@ -2,27 +2,13 @@ import click
 import yaml
 import os
 import pcvsrt
-from pcvsrt import profile, config, logs, files
+from pcvsrt import profile, config, logs, files, globals
 from pcvsrt.scripts.config import commands as cmdConfig
 
 
-def extract_profile_from_token(s, single="right"):
-    array = s.split(".")
-    if len(array) > 2:
-        logs.err("Invalid token", abort=1)
-    elif len(array) == 2:
-        return (array[0], array[1])
-    elif len(array) == 1:
-        if single == "left":
-            return (s, None)
-        else:
-            return (None, s)
-    else:
-        logs.nreach()
-
 def compl_list_token(ctx, args, incomplete):
     flat_array = []
-    for scope in pcvsrt.profile.scope_order():
+    for scope in pcvsrt.profile.globals.storage_order():
         for elt in pcvsrt.profile.PROFILE_EXISTING[scope]:
             flat_array.append(scope + "." + elt[0])
 
@@ -58,7 +44,7 @@ def profile_list(ctx, token):
     """
     (scope, label) = (None, None)
     if token:
-        (scope, label) = extract_profile_from_token(token, single="left")
+        (scope, label) = pcvsrt.profile.extract_profile_from_token(token, single="left")
 
     if label:
         logs.warn("no LABEL required for this command")
@@ -69,7 +55,7 @@ def profile_list(ctx, token):
         logs.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pcvsrt.profile.scope_order():
+        for sc in pcvsrt.profile.globals.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in profiles[sc]]])
             if not names:
@@ -83,9 +69,9 @@ def profile_list(ctx, token):
         logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
     
     # in case verbosity is enabled, add scope paths
-    logs.info("Scopes are labeled as follows:")
-    for scope, prefix in pcvsrt.profile.PROFILE_STORAGES.items():
-        logs.info("- {}: {}".format(scope.upper(), prefix))
+    logs.info("Scopes are ordered as follows:")
+    for i, scope in enumerate(pcvsrt.globals.storage_order()):
+        logs.info("{}. {}: {}".format(i+1, scope.upper(), pcvsrt.globals.STORAGES[scope]))
 
 
 @profile.command(name="show",
@@ -94,7 +80,7 @@ def profile_list(ctx, token):
 @click.pass_context
 def profile_show(ctx, token):
     """Prints a detailed view of the NAME profile."""
-    (scope, label) = extract_profile_from_token(token)
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
     pf = pcvsrt.profile.Profile(label, scope)
     if pf.is_found():
         pf.load_from_disk()
@@ -166,7 +152,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     and end with an alphanumeric but no more restrictions are applied
     (e.g. 'mpi-srun-stampede-large' is allowed)
     """
-    (p_scope, p_label) = extract_profile_from_token(token)
+    (p_scope, p_label) = pcvsrt.profile.extract_profile_from_token(token)
 
     pf = pcvsrt.profile.Profile(p_label, p_scope)
     if pf.is_found():
@@ -209,7 +195,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
 @click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
 @click.pass_context
 def profile_destroy(ctx, token):
-    (scope, label) = extract_profile_from_token(token)
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
 
     pf = pcvsrt.profile.Profile(label, scope)
     if pf.is_found():
@@ -229,7 +215,7 @@ def profile_destroy(ctx, token):
               help="Open file with EDITOR")
 @click.pass_context
 def profile_alter(ctx, token, editor):
-    (scope, label) = extract_profile_from_token(token)
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
 
     pf = pcvsrt.profile.Profile(label, scope)
     if pf.is_found():
@@ -248,7 +234,7 @@ def profile_alter(ctx, token, editor):
 @click.argument("src_file", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, token, src_file):
-    (scope, label) = extract_profile_from_token(token)
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
     pf = pcvsrt.profile.Profile(label, scope)
     if not pf.is_found():
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
@@ -264,7 +250,7 @@ def profile_import(ctx, token, src_file):
 @click.argument("dest_file", type=click.File('w'))
 @click.pass_context
 def profile_export(ctx, token, dest_file):
-    (scope, label) = extract_profile_from_token(token)
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
 
     pf = pcvsrt.profile.Profile(label, scope)
     if pf.is_found():

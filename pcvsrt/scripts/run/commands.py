@@ -9,7 +9,7 @@ from pcvsrt import logs, files
               default="default", type=str, show_envvar=True,
               help="an existing profile")
 @click.option("-o", "--output", "output",
-              default="./build", type=click.Path(exists=False), show_envvar=True,
+              default="./build", type=click.Path(exists=False, file_okay=False), show_envvar=True,
               help="Where artefacts will be stored during/after the run")
 @click.option("-c", "--set-defaults", "set_default",
               default=None, is_flag=True,

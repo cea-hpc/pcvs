@@ -2,13 +2,37 @@ import os
 from os import path
 
 
-def __determine_local_prefix():
-    return os.path.join(os.getcwd(), ".pcvsrt")
+def __determine_local_prefix(path, prefix):
+    cur = path
+    parent = "/"
+    while not os.path.isdir(os.path.join(cur, prefix)):
+        parent = os.path.dirname(cur)
+        # Reach '/' and not found
+        if parent == cur:
+            cur = path
+            break
+        # else, look for parent
+        cur = parent
+
+    return os.path.join(cur, prefix)
+
+def set_exec_path(path):
+    assert (os.path.isdir(path))
+    found = __determine_local_prefix(path, ".pcvsrt")
+    
+    # if local is the same as user path, discard
+    if found in STORAGES.values():
+        found = os.path.join(path, ".pcvsrt")
+
+    STORAGES['local'] = found
+
+def storage_order():
+    return ['local', 'user', 'global']
 
 
 ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
 STORAGES = {
     'global': ROOTPATH,
-    'user': os.environ['HOME'],
-    'local': __determine_local_prefix()
+    'user': os.path.join(os.environ['HOME'], ".pcvsrt"),
+    'local': None
 }

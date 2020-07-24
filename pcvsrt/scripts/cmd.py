@@ -5,8 +5,8 @@ import click
 from .config import commands as cmdConfig
 from .profile import commands as cmdProfile
 from .run import commands as cmdRun
-
-from pcvsrt import logs
+import os
+from pcvsrt import logs, globals, config, profile
 import pkg_resources
 
 
@@ -37,18 +37,26 @@ CONTEXT_SETTINGS = dict(
 @click.option("-g", "--glyph/--no-glyph", "encoding",
               default=True, is_flag=True, show_envvar=True,
               help="enable/disable Unicode glyphs")
+@click.option("-C", "--exec-path", "exec_path",
+              default=".", type=click.Path(exists=True, file_okay=False))
 @click.option("-V", "--version", expose_value=False, is_eager=True, callback=print_version, is_flag=True)
 @click.pass_context
-def cli(ctx, verbose, color, encoding):
+def cli(ctx, verbose, color, encoding, exec_path):
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
+    ctx.obj['exec'] = os.path.abspath(exec_path)
 
     logs.init(verbose, color, encoding)
+    globals.set_exec_path(ctx.obj['exec'])
+
+    # detections
+    config.init()
+    profile.init()
 
 
-@cli.command("doc",
+@cli.command("help",
              short_help="Quick Guide to prepare PCVS after a fresh installation")
 @click.argument("category", type=click.Choice(['completion', 'config', 'scope', 'token']), nargs=1, required=False, default=None)
 @click.pass_context

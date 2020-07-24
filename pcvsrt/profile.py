@@ -5,16 +5,30 @@ from os import path
 from pcvsrt import logs, files, config, globals
 
 
-PROFILE_STORAGES = { k: os.path.join(v, "saves/profile") for k, v in globals.STORAGES.items()}
-PROFILE_EXISTING = {}
+def extract_profile_from_token(s, single="right"):
+    array = s.split(".")
+    if len(array) > 2:
+        logs.err("Invalid token", abort=1)
+    elif len(array) == 2:
+        return (array[0], array[1])
+    elif len(array) == 1:
+        if single == "left":
+            return (s, None)
+        else:
+            return (None, s)
+    else:
+        logs.nreach()
 
-def scope_order():
-    return ['local', 'user', 'global']
 
+PROFILE_STORAGES = dict()
+PROFILE_EXISTING = dict()
 
 def init():
+    global PROFILE_EXISTING, PROFILE_STORAGES
+    PROFILE_STORAGES = { k: os.path.join(v, "saves/profile") for k, v in globals.STORAGES.items()}
+    PROFILE_EXISTING = {}
     # this first loop defines configuration order
-    priority_paths = scope_order()
+    priority_paths = globals.storage_order()
     priority_paths.reverse()
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
@@ -31,7 +45,7 @@ def check_valid_scope(s):
 
 def check_existing_name(name, scope):
     path = None
-    scopes = scope_order() if scope is None else [scope]
+    scopes = globals.storage_order() if scope is None else [scope]
     for sc in scopes:
         for pair in PROFILE_EXISTING[sc]:
             if name == pair[0]:

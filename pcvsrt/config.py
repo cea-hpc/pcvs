@@ -8,10 +8,6 @@ import shutil
 import jsonschema
 import json
 
-CONFIG_STORAGES = { k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
-CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
-CONFIG_EXISTING = {}
-
 
 def extract_config_from_token(s, pair="right", single="right"):
     array = s.split(".")
@@ -38,14 +34,21 @@ def extract_config_from_token(s, pair="right", single="right"):
         logs.nreach()
 
 
-def scope_order():
-    return ['local', 'user', 'global']
+CONFIG_STORAGES = dict()
+CONFIG_BLOCKS = list()
+CONFIG_EXISTING = dict()
 
 def init():
+    global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
+    CONFIG_STORAGES = { k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
+    CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
+    CONFIG_EXISTING = {}
+    print(CONFIG_STORAGES)
+
     # this first loop defines configuration order
     for block in CONFIG_BLOCKS:
         CONFIG_EXISTING[block] = {}
-        priority_paths = scope_order()
+        priority_paths = globals.storage_order()
         priority_paths.reverse()
         for token in priority_paths:  # reverse order (overriding)
             CONFIG_EXISTING[block][token] = []
@@ -78,7 +81,7 @@ def check_valid_scope(s):
 def check_existing_name(kind, name, scope):
     assert (kind in CONFIG_BLOCKS)
     path = None
-    scopes = scope_order() if scope is None else [scope]
+    scopes = globals.storage_order() if scope is None else [scope]
 
     for sc in scopes:
         for pair in CONFIG_EXISTING[kind][sc]:
