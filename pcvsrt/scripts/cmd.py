@@ -21,7 +21,6 @@ CONTEXT_SETTINGS = dict(
                         help_option_names=['-h', '--help', '-help'],
                         ignore_unknown_options=True,
                         allow_interspersed_args=False,
-                        terminal_width=logs.LINELENGTH,
                         auto_envvar_prefix='PCVS',
                         show_default=True
                         )
@@ -37,19 +36,26 @@ CONTEXT_SETTINGS = dict(
 @click.option("-g", "--glyph/--no-glyph", "encoding",
               default=True, is_flag=True, show_envvar=True,
               help="enable/disable Unicode glyphs")
-@click.option("-C", "--exec-path", "exec_path",
+@click.option("-C", "--exec-path", "exec_path", show_envvar=True,
               default=".", type=click.Path(exists=True, file_okay=False))
-@click.option("-V", "--version", expose_value=False, is_eager=True, callback=print_version, is_flag=True)
+@click.option("-V", "--version", expose_value=False, is_eager=True, 
+callback=print_version, is_flag=True)
+@click.option("-w", "--width", "width", type=int, default=0,
+              help="Terminal width (autodetection if omitted")
 @click.pass_context
-def cli(ctx, verbose, color, encoding, exec_path):
+def cli(ctx, verbose, color, encoding, exec_path, width):
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
     ctx.obj['exec'] = os.path.abspath(exec_path)
 
+    # Click specific-related
+    ctx.color = color
+    
     logs.init(verbose, color, encoding)
     globals.set_exec_path(ctx.obj['exec'])
+    globals.LINELENGTH,_ = click.get_terminal_size()
 
     # detections
     config.init()

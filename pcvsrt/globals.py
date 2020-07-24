@@ -19,17 +19,18 @@ def __determine_local_prefix(path, prefix):
 def set_exec_path(path):
     assert (os.path.isdir(path))
     found = __determine_local_prefix(path, ".pcvsrt")
-    
+
     # if local is the same as user path, discard
     if found in STORAGES.values():
         found = os.path.join(path, ".pcvsrt")
-
     STORAGES['local'] = found
+
 
 def storage_order():
     return ['local', 'user', 'global']
 
 
+LINELENGTH=93
 ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
 STORAGES = {
     'global': ROOTPATH,

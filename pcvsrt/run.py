@@ -4,10 +4,11 @@ import yaml
 import shutil
 import tarfile
 import glob
-from tqdm import tqdm
+import click
 import pcvsrt
 from pcvsrt import config, profile, descriptor, globals, logs, files
  
+
 run_settings = {}
 list_of_tes = {}
 
@@ -70,7 +71,7 @@ def prepare(settings):
             shutil.rmtree(test_output_dir)
     os.mkdir(test_output_dir)
 
-    logs.print_item("Load Profile {}".format(settings['pfname']))
+    logs.print_item("Load Profile '{}'".format(settings['pfname']))
     pf = pcvsrt.profile.Profile(settings['pfname'])
     pf.load_from_disk()
     run_settings['profile'] = pf.dump()
@@ -98,44 +99,44 @@ def load_benchmarks(test_dict):
     to_process = []
     # discovery and processing split to add a progress bar (determinist)
     for label, path in test_dict.items():
-        for root, dirs, files in os.walk(path):
+        for root, _, files in os.walk(path):
             if '.pcvsrt' in root or 'build_scripts' in root: # ignore pcvs-rt conf subdirs
                 continue
            
-            to_process += [(path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
+            to_process += [(label, path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
 
-    for path, root, f in tqdm(to_process):
-        environ['pcvs_src'] = path
-        environ['pcvs_build'] = run_settings['output']
-        filepath = os.path.join(root, f)
-        te_package = root.replace(path, '').replace('/', ".")
-        fileroot = {}
-        print(f)
-        if f == 'pcvs.setup':
-            print(f)
-            res = subprocess.run(["echo", filepath, te_package], env=environ, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
-            print(res.stdout.decode("utf-8"))
-            try: pass
-                #fileroot = yaml.safe_load(res.stdout.decode('utf-8'))
-            except yaml.YAMLError as e:
-                logs.err("Bad YAML format:\n{}".format(e), abort=1)
-        elif 'pcvs.yml' in f:
-            try: pass
-                #fileroot = yaml.safe_load(open(filepath, 'r'))
-            except yaml.YAMLError as e:
-                logs.err("Bad YAML format:\n{}".format(e), abort=1)
-            if f.endswith('pcvs.yml.in'):
-                __substitute_yaml_tag(fileroot)
-                # apply replacement
-                pass
-        else:  # Not a pcvs-related file
-            continue
+    import time
+    with click.progressbar(to_process, info_sep=" -- ", show_pos=True, empty_char=" ", fill_char=logs.utf('succ')) as iterbar:
+        for label, path, root, f in iterbar:
+            environ['pcvs_src'] = path
+            environ['pcvs_build'] = run_settings['output']
+            filepath = os.path.join(root, f)
+            te_package = root.replace(path, '').replace('/', ".")
+            fileroot = {}
+            time.sleep(.1)
+            if f == 'pcvs.setup':
+                res = subprocess.run(["echo", filepath, te_package], env=environ, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
+                try: pass
+                    #fileroot = yaml.safe_load(res.stdout.decode('utf-8'))
+                except yaml.YAMLError as e:
+                    logs.err("Bad YAML format:\n{}".format(e), abort=1)
+            elif 'pcvs.yml' in f:
+                try: pass
+                    #fileroot = yaml.safe_load(open(filepath, 'r'))
+                except yaml.YAMLError as e:
+                    logs.err("Bad YAML format:\n{}".format(e), abort=1)
+                if f.endswith('pcvs.yml.in'):
+                    __substitute_yaml_tag(fileroot)
+                    # apply replacement
+                    pass
+            else:  # Not a pcvs-related file
+                continue
 
-        for blockname, blockdesc in fileroot.items():
-            te_name = label + te_package + "." + blockname
-            list_of_tes[te_name] = descriptor.TEDescriptor(fileroot)
-        print(list_of_tes)
-        logs.err("STOP")
+            for blockname, blockdesc in fileroot.items():
+                te_name = label + te_package + "." + blockname
+                list_of_tes[te_name] = descriptor.TEDescriptor(fileroot)
+    print(list_of_tes)
+    logs.err("STOP")
 
 
 def run():

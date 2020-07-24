@@ -59,8 +59,8 @@ def profile_list(ctx, token):
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in profiles[sc]]])
             if not names:
-                logs.print_item("{: <6s}: {}None".format(sc.upper(),
-                                                         logs.cl('grey')))
+                logs.print_item("{: <6s}: {}".format(sc.upper(),
+                                                         logs.cl('None', 'bright_black')))
             else:
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
                                                      ", ".join(names)))
@@ -160,10 +160,15 @@ def profile_build(ctx, token, interactive, blocks, clone):
 
     blocks_for_profile = {}
 
-    if interactive:
+    if clone is not None:
+        (c_scope, c_label) = pcvsrt.profile.extract_profile_from_token(clone)
+        base = pcvsrt.profile.Profile(c_label, c_scope)
+        pf.clone(base, p_scope)
+        pass
+    elif interactive:
         logs.print_header("profile view (build)")
-    
         blocks_for_profile = profile_interactive_select()
+        pf.fill(blocks_for_profile)
     else:
         for block in blocks:
             (b_scope, b_kind, b_label) = pcvsrt.config.extract_config_from_token(block)
@@ -177,10 +182,11 @@ def profile_build(ctx, token, interactive, blocks, clone):
                 else:
                     logs.err("'{}' kind is set twice".format(b_kind.upper()), "First is '{}'".format(blocks_for_profile[b_kind].full_name))
                 logs.err("", abort=1)
-
+        pf.fill(blocks_for_profile)
+    
     logs.print_header("profile view")
-    pf.fill(blocks_for_profile)
     pf.flush_to_disk()
+    pf.display()
 
     logs.print_section("final profile (registered as {})".format(p_scope))
     for k, v in blocks_for_profile.items():

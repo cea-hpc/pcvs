@@ -4,8 +4,6 @@ import pcvsrt
 from pcvsrt import logs, globals
 
 
-
-
 def compl_list_token(ctx, args, incomplete):
     flat_array = []
     for kind in pcvsrt.config.CONFIG_BLOCKS:
@@ -52,8 +50,8 @@ def config_list_single_kind(kind, scope):
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
-                logs.print_item("{: <6s}: {}None".format(sc.upper(),
-                                                         logs.cl('grey')))
+                logs.print_item("{: <6s}: {}".format(sc.upper(),
+                                                          logs.cl('None', 'bright_black')))
             else:
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
                                                      ", ".join(names)))
