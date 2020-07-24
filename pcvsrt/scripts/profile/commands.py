@@ -2,9 +2,8 @@ import click
 import yaml
 import os
 import pcvsrt
-from pcvsrt import utils, profile, config
+from pcvsrt import utils, profile, config, logs, files
 from pcvsrt.scripts.config import commands as cmdConfig
-from pcvsrt.utils import logs, files
 
 
 def extract_profile_from_token(s, single="right"):

@@ -1,6 +1,6 @@
 import os
 import shutil
-from pcvsrt.utils import logs
+from pcvsrt import logs
 import subprocess
 from contextlib import contextmanager
 

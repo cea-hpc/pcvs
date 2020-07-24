@@ -2,12 +2,11 @@ import yaml
 from os import path
 import os
 import pcvsrt
-from pcvsrt import globals
+from pcvsrt import globals, logs, files
 import glob
 import shutil
 import jsonschema
 import json
-from pcvsrt.utils import logs, files
 
 CONFIG_STORAGES = { k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
 CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}

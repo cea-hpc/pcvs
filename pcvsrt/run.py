@@ -8,8 +8,7 @@ from tqdm import tqdm
 
 import pkg_resources
 import pcvsrt
-from pcvsrt.utils import logs, files
-from pcvsrt import config, profile, descriptor, globals
+from pcvsrt import config, profile, descriptor, globals, logs, files
 
 run_settings = {}
 list_of_tes = {}

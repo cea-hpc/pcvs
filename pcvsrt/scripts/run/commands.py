@@ -1,7 +1,7 @@
 import click
 import os
-from pcvsrt.utils import logs, files
-from pcvsrt import main
+import pcvsrt.run
+from pcvsrt import logs, files
 
 
 @click.command(name="run", short_help="Run a validation")
@@ -61,7 +61,7 @@ def run(ctx, profilename, output, log, detach, status,
         files.open_in_editor("defaults")
         exit(0)
 
-    
+
     
     # fill validation settings
     settings = {}
@@ -105,12 +105,12 @@ def run(ctx, profilename, output, log, detach, status,
     logs.banner()
     
     logs.print_header("pre-actions")
-    main.prepare(settings)
+    pcvsrt.run.prepare(settings)
 
-    main.load_benchmarks(dict_of_dirs)
+    pcvsrt.run.load_benchmarks(dict_of_dirs)
 
     logs.print_header("validation start")
-    main.run()
+    pcvsrt.run.run()
 
     logs.print_header("post-treatment")
-    main.terminate()
+    pcvsrt.run.terminate()

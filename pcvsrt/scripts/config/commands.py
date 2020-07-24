@@ -1,8 +1,7 @@
 import click
 import yaml
 import pcvsrt
-from pcvsrt import utils
-from pcvsrt.utils import logs
+from pcvsrt import logs
 
 
 

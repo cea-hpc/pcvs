@@ -6,7 +6,7 @@ from .config import commands as cmdConfig
 from .profile import commands as cmdProfile
 from .run import commands as cmdRun
 
-from pcvsrt.utils import logs
+from pcvsrt import logs
 
 
 def print_version(ctx, param, value):
@@ -52,7 +52,7 @@ def cli(ctx, verbose, color, encoding):
 @click.argument("category", type=click.Choice(['completion', 'config', 'scope', 'token']), nargs=1, required=False, default=None)
 @click.pass_context
 def cli_doc(ctx, category):
-    
+
     logs.print_header("Documentation")
 
     logs.print_section("Enable completion (cmds to be run or added to ~/.*rc)")

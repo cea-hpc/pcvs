@@ -2,9 +2,7 @@ import yaml
 import os
 import glob
 from os import path
-from pcvsrt.utils import logs, files
-from pcvsrt import config
-from pcvsrt import globals
+from pcvsrt import logs, files, config, globals
 
 
 PROFILE_STORAGES = { k: os.path.join(v, "saves/profile") for k, v in globals.STORAGES.items()}
