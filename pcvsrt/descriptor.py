@@ -1,16 +1,13 @@
-import logging
-import utils
+from pcvsrt import logs
 
 
 class TEDescriptor:
     def __init__(self, node):
         if not isinstance(node, dict):
-            logging.critical(
+            logs.err(
                 "Unable to build a TestDescription "
                 "from the given node (got %s)",
-                type(node))
-            raise utils.abort()
-        pass
+                type(node), abort=1)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import click
 import yaml
 import os
 import pcvsrt
-from pcvsrt import utils, profile, config, logs, files
+from pcvsrt import profile, config, logs, files
 from pcvsrt.scripts.config import commands as cmdConfig
 
 

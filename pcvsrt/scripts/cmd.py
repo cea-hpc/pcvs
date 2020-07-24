@@ -7,13 +7,14 @@ from .profile import commands as cmdProfile
 from .run import commands as cmdRun
 
 from pcvsrt import logs
+import pkg_resources
 
 
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    click.echo("WARNING: Version number should be updated dynamically when installing!")
-    click.echo('PCVS Runtime Tool (pcvs-rt) -- version {}'.format('0.6.0'))
+    version = pkg_resources.require("pcvs-rt")[0].version
+    click.echo('PCVS Runtime Tool (pcvs-rt) -- version {}'.format(version))
     ctx.exit()
 
 CONTEXT_SETTINGS = dict(

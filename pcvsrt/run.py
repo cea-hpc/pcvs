@@ -5,11 +5,9 @@ import shutil
 import tarfile
 import glob
 from tqdm import tqdm
-
-import pkg_resources
 import pcvsrt
 from pcvsrt import config, profile, descriptor, globals, logs, files
-
+ 
 run_settings = {}
 list_of_tes = {}
 
