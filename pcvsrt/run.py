@@ -97,23 +97,25 @@ def load_benchmarks(test_dict):
 
     run_settings['user_input'] = test_dict
     to_process = []
-    # discovery and processing split to add a progress bar (determinist)
-    for label, path in test_dict.items():
-        for root, _, files in os.walk(path):
-            if '.pcvsrt' in root or 'build_scripts' in root: # ignore pcvs-rt conf subdirs
-                continue
-           
-            to_process += [(label, path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
+
+    # discovery may take a while with some systems
+    with logs.progbar(test_dict.items(), label=logs.print_item("Discovering", out=False)) as iterbar:
+        for label, path in iterbar:
+            for root, _, files in os.walk(path):
+                if '.pcvsrt' in root or 'build_scripts' in root: # ignore pcvs-rt conf subdirs
+                    continue
+            
+                to_process += [(label, path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
 
     import time
-    with click.progressbar(to_process, info_sep=" -- ", show_pos=True, empty_char=" ", fill_char=logs.utf('succ')) as iterbar:
+    with logs.progbar(to_process, label=logs.print_item("Process", out=False)) as iterbar:
         for label, path, root, f in iterbar:
             environ['pcvs_src'] = path
             environ['pcvs_build'] = run_settings['output']
             filepath = os.path.join(root, f)
             te_package = root.replace(path, '').replace('/', ".")
             fileroot = {}
-            time.sleep(.1)
+            time.sleep(.02)
             if f == 'pcvs.setup':
                 res = subprocess.run(["echo", filepath, te_package], env=environ, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
                 try: pass

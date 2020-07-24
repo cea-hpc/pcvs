@@ -16,6 +16,10 @@ glyphs = {
     'succ': 'V',
     'git': '(git)',
     'time': '(time)',
+    'full_pg': '#',
+    'empty_pg': '-',
+    'sep_v': " | ",
+    'sep_h': "-"
 }
 
 
@@ -39,10 +43,14 @@ def __set_encoding(e):
         glyphs['sec'] = '\u2756'
         glyphs['hdr'] = '\u23BC'
         glyphs['star'] = '\u2605'
-        glyphs['fail'] = '\u2717'
-        glyphs['succ'] = '\u2713'
+        glyphs['fail'] = click.style('\u2716', fg="red", bold=1)
+        glyphs['succ'] = click.style('\u2714', fg="green")
         glyphs['git'] = '\u237F'
         glyphs['time'] = '\U0000231A'
+        glyphs['full_pg'] = click.style("\u2588", fg="bright_black")
+        glyphs['empty_pg'] = click.style("\u26AC", fg='cyan')
+        glyphs['sep_v'] = " \u237F "
+        glyphs['sep_h'] = "\u23BC"
 
 
 def init(verbose, color, encoding):
@@ -61,27 +69,38 @@ def utf(k):
     return glyphs[k]
 
 
-def print_header(s):
+def print_header(s, out=True):
     hdr_char = utf('hdr')
     str_len = globals.LINELENGTH - (len(s) + 2)  # surrounding spaces
     begin = hdr_char * int(str_len / 2)
     end = begin + (hdr_char * (str_len % 2 != 0))
 
-    f = "{} {} {}".format(begin, s.upper(), end)
-    click.secho(f, fg="green")
+    s = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
+    if out:
+        click.echo(s)
+    else:
+        return s
     pass
 
 
-def print_section(s):
+def print_section(s, out=True):
     f = "{} {}".format(utf('sec'), s)
-    click.secho(f, fg='yellow', blink=True)
+    s = click.style(f, fg='yellow', blink=True)
+    if out:
+        click.echo(s)
+    else:
+        return s
 
 
-def print_item(s, depth=1):
+def print_item(s, depth=1, out=True):
     bullet = ("   " * depth) + "{} ".format(utf('item'))
     content = "{}".format(s)
-    click.secho(bullet, fg="red", nl=False)
-    click.secho(content, fg="reset")
+
+    s = click.style(bullet, fg="red") + click.style(content, fg="reset")
+    if out:
+        click.echo(s)
+    else:
+        return s
 
 
 def debug(*msg):
@@ -113,6 +132,17 @@ def nimpl(*msg):
 
 def nreach(*msg):
     err("Should not be reached!", abort=1)
+
+
+def print_n_stop(**kwargs):
+    for k, v in kwargs.items():
+        click.secho("{}: ".format(k), fg="yellow", nl=False)
+        click.secho("'{}'".format(v), fg="blue")
+    sys.exit(42)
+
+
+def progbar(it, **kargs):
+    return click.progressbar(it, info_sep=utf('sep_v'), empty_char=utf('empty_pg'), fill_char=utf('full_pg'), show_percent=False, show_eta=False, show_pos=True, **kargs)
 
 
 def banner():
