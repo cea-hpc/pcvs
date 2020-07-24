@@ -69,10 +69,11 @@ def prepare(settings):
             logs.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(settings['output']), abort=1)
         else:
             shutil.rmtree(test_output_dir)
-    os.mkdir(test_output_dir)
+    os.makedirs(test_output_dir)
 
     logs.print_item("Load Profile '{}'".format(settings['pfname']))
-    pf = pcvsrt.profile.Profile(settings['pfname'])
+    (scope, label) = pcvsrt.profile.extract_profile_from_token(settings['pfname'])
+    pf = pcvsrt.profile.Profile(label, scope)
     pf.load_from_disk()
     run_settings['profile'] = pf.dump()
     
@@ -99,30 +100,41 @@ def load_benchmarks(test_dict):
     to_process = []
 
     # discovery may take a while with some systems
-    with logs.progbar(test_dict.items(), label=logs.print_item("Discovering", out=False)) as iterbar:
-        for label, path in iterbar:
-            for root, _, files in os.walk(path):
-                if '.pcvsrt' in root or 'build_scripts' in root: # ignore pcvs-rt conf subdirs
-                    continue
-            
-                to_process += [(label, path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
+    for label, path in test_dict.items():
+        for root, _, files in os.walk(path):
+            if '.pcvsrt' in root or 'build_scripts' in root: # ignore pcvs-rt conf subdirs
+                continue
+            to_process += [(label, path, root, f) for f in files if 'pcvs.setup' in f or 'pcvs.yml' in f]
 
     import time
     with logs.progbar(to_process, label=logs.print_item("Process", out=False)) as iterbar:
+        # label = search path, given by user
+        # path = associated search path, given by user
+        # root = PCVS-related file prefix
+        # f = filename
         for label, path, root, f in iterbar:
             environ['pcvs_src'] = path
             environ['pcvs_build'] = run_settings['output']
             filepath = os.path.join(root, f)
-            te_package = root.replace(path, '').replace('/', ".")
+            te_package = root.replace(path, '').replace('/', ".")[1:]
             fileroot = {}
             time.sleep(.02)
+            # file has to be run and output kept into pcvs.yml.in
             if f == 'pcvs.setup':
-                res = subprocess.run(["echo", filepath, te_package], env=environ, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, shell=True)
-                try: pass
-                    #fileroot = yaml.safe_load(res.stdout.decode('utf-8'))
+                
+                try:
+                    res = subprocess.run([filepath, te_package], env=environ, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                    print(res.stdout.decode('utf-8'))
+                    nodes = yaml.safe_load(res.stdout.decode('utf-8'))
                 except yaml.YAMLError as e:
                     logs.err("Bad YAML format:\n{}".format(e), abort=1)
-            elif 'pcvs.yml' in f:
+                except ExceptionError as e:
+                    logs.err("Yolo !", abort=1)
+            
+            # this check should be performed either a setup has been found or not
+            # in the first case, the condition should test the output instead
+            # of file name
+            if 'pcvs.yml' in f:
                 try: pass
                     #fileroot = yaml.safe_load(open(filepath, 'r'))
                 except yaml.YAMLError as e:
@@ -137,8 +149,7 @@ def load_benchmarks(test_dict):
             for blockname, blockdesc in fileroot.items():
                 te_name = label + te_package + "." + blockname
                 list_of_tes[te_name] = descriptor.TEDescriptor(fileroot)
-    print(list_of_tes)
-    logs.err("STOP")
+    logs.print_n_stop(read_tes=list_of_tes)
 
 
 def run():

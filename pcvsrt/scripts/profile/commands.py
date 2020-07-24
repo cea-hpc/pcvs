@@ -7,6 +7,7 @@ from pcvsrt.scripts.config import commands as cmdConfig
 
 
 def compl_list_token(ctx, args, incomplete):
+    pcvsrt.profile.init()
     flat_array = []
     for scope in pcvsrt.profile.globals.storage_order():
         for elt in pcvsrt.profile.PROFILE_EXISTING[scope]:
@@ -110,7 +111,6 @@ def profile_interactive_select():
         while idx < 0 or len(choices) < idx:
             idx = click.prompt("Your selection", default, type=int) - 1
         (scope, _, label) = pcvsrt.config.extract_config_from_token(choices[idx], pair="span")
-        print(choices[idx], scope, label)
         composition[kind] = pcvsrt.config.ConfigurationBlock(kind, label, scope)
 
     return composition
@@ -186,7 +186,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     
     logs.print_header("profile view")
     pf.flush_to_disk()
-    pf.display()
+    #pf.display()
 
     logs.print_section("final profile (registered as {})".format(p_scope))
     for k, v in blocks_for_profile.items():

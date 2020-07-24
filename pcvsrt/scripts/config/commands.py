@@ -5,6 +5,7 @@ from pcvsrt import logs, globals
 
 
 def compl_list_token(ctx, args, incomplete):
+    pcvsrt.config.init()
     flat_array = []
     for kind in pcvsrt.config.CONFIG_BLOCKS:
         for scope in pcvsrt.config.globals.storage_order():

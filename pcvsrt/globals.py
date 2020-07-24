@@ -35,5 +35,5 @@ ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
 STORAGES = {
     'global': ROOTPATH,
     'user': os.path.join(os.environ['HOME'], ".pcvsrt"),
-    'local': None
+    'local': os.path.join(os.getcwd(), '.pcvsrt')
 }

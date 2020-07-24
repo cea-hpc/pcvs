@@ -2,10 +2,11 @@ import click
 import os
 import pcvsrt.run
 from pcvsrt import logs, files
+import glob
 
 
 @click.command(name="run", short_help="Run a validation")
-@click.option("-p", "--profile", "profilename",
+@click.option("-p", "--profile", "profilename", autocompletion=pcvsrt.scripts.profile.commands.compl_list_token,
               default="default", type=str, show_envvar=True,
               help="an existing profile")
 @click.option("-o", "--output", "output",
@@ -60,9 +61,7 @@ def run(ctx, profilename, output, log, detach, status,
     elif set_default:
         files.open_in_editor("defaults")
         exit(0)
-
-
-    
+ 
     # fill validation settings
     settings = {}
     # for any 'None' value, a load from default should be made
@@ -85,7 +84,7 @@ def run(ctx, profilename, output, log, detach, status,
             if ':' in d:  # split under LABEL:PATH semantics
                 [label, testpath] = d.split(':')
                 testpath = os.path.abspath(testpath)
-            else: # otherwise, LABEL = dirname
+            else:  # otherwise, LABEL = dirname
                 testpath = os.path.abspath(d)
                 label = os.path.basename(testpath)
 
