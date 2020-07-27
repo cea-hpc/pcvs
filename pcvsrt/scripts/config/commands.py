@@ -4,7 +4,7 @@ import pcvsrt
 from pcvsrt import logs, globals
 
 
-def compl_list_token(ctx, args, incomplete):
+def compl_list_token(ctx, args, incomplete):  #pragma: no cover
     pcvsrt.config.init()
     flat_array = []
     for kind in pcvsrt.config.CONFIG_BLOCKS:
@@ -89,6 +89,7 @@ def config_list(ctx, token):
     else:
         pcvsrt.config.check_valid_kind(kind)
         kinds = [kind]
+    pcvsrt.config.check_valid_scope(scope)
 
     logs.print_header("Configuration view")
 
@@ -122,7 +123,7 @@ def config_show(ctx, token):
     else:
         sc = scope
         sc = "any" if sc is None else sc
-        logs.err("No '{} configuration found at {} level!".format(label, sc) )
+        logs.err("No '{}' configuration found at {} level!".format(label, sc), abort=1 )
 
 
 @config.command(name="create", short_help="Create/Clone a configuration block")
@@ -148,7 +149,7 @@ def config_create(ctx, token, clone):
     if clone is not None:
         (c_scope, c_kind, c_label) = extract_config_from_token(clone, pair='span')
         if c_kind is not None and c_kind != kind:
-            logs.err("Can only clone from a conf. blocks with the same KIND!")
+            logs.err("Can only clone from a conf. blocks with the same KIND!", abort=1)
         base = pcvsrt.config.ConfigurationBlock(kind, c_label, c_scope)
         base.load_from_disk()
     else:
@@ -157,10 +158,10 @@ def config_create(ctx, token, clone):
 
     copy = pcvsrt.config.ConfigurationBlock(kind, label, scope)
     if not copy.is_found():
-        copy.clone(base, scope)
+        copy.clone(base)
         copy.flush_to_disk()
     else:
-        logs.err("Configuration '{}' already exists! ({})".format(label, copy.scope))
+        logs.err("Configuration '{}' already exists! ({})".format(label, copy.scope), abort=1)
 
 
 @config.command(name="destroy", short_help="Remove a config block")

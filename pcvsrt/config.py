@@ -107,13 +107,10 @@ class ConfigurationScheme:
 
     def validate(self, conf):
         assert (isinstance(conf, ConfigurationBlock))
-        # FIXME:
-        return
-        if conf._kind != "compiler":
+        with open(os.path.join(self._scheme_prefix, conf._kind + "-scheme.json"), 'r') as f:
             logs.warn("VALIDATION: TODO: Scheme for KIND '{}'".format(conf._kind))
             return
 
-        with open(os.path.join(self._scheme_prefix, conf._kind + "-scheme.json"), 'r') as f:
             schema = json.load(f)
             jsonschema.validate(instance=conf._details, schema=schema)
 
@@ -126,7 +123,10 @@ class ConfigurationBlock:
         self._kind = kind
         self._name = name
         self._details = {}
-        self._scope, self._file = check_existing_name(kind, name, scope)
+        self._scope = scope
+        tmp, self._file = check_existing_name(kind, name, scope)
+        if self._scope is None:
+            self._scope = 'local' if tmp is None else tmp
 
     def is_found(self):
         return self._file is not None
@@ -171,28 +171,27 @@ class ConfigurationBlock:
             self.fill(yaml.load(f, Loader=yaml.FullLoader))
             
     def flush_to_disk(self):
-        assert (self._file is not None)
+        self._file = compute_path(self._kind, self._name, self._scope)
+        
         logs.info("flush {} from '{} ({})'".format(self._name, self._kind, self._scope))
-
+        
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
             
+        
         with open(self._file, 'w') as f:
             val = ConfigurationScheme(self._kind)
             val.validate(self)
+            
             yaml.safe_dump(self._details, f)
 
-    def clone(self, clone, scope):
+    def clone(self, clone):
         assert (isinstance(clone, ConfigurationBlock))
         assert (clone._kind == self._kind)
         assert (self._file is None)
 
-        scope = 'local' if scope is None else scope
-        if self._scope is None:  # default creation scope level !
-            self._scope = scope
-        
         self._file = compute_path(self._kind, self._name, self._scope)
         logs.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
