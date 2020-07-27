@@ -124,7 +124,7 @@ class Profile:
 
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
-        assert (not check_path(self._name, self._scope))
+        
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
         if not os.path.isdir(prefix_file):
@@ -133,11 +133,7 @@ class Profile:
         with open(self._file, 'w') as f:
             yaml.safe_dump(self._details, f)
 
-    def clone(self, clone, scope):
-        scope = 'local' if scope is None else scope
-        if self._scope is None:  # default creation scope level !
-            self._scope = scope
-        
+    def clone(self, clone):
         self._file = compute_path(self._name, self._scope)
         logs.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))

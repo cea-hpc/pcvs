@@ -147,7 +147,7 @@ def config_create(ctx, token, clone):
     """
     (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
     if clone is not None:
-        (c_scope, c_kind, c_label) = extract_config_from_token(clone, pair='span')
+        (c_scope, c_kind, c_label) = pcvsrt.config.extract_config_from_token(clone, pair='span')
         if c_kind is not None and c_kind != kind:
             logs.err("Can only clone from a conf. blocks with the same KIND!", abort=1)
         base = pcvsrt.config.ConfigurationBlock(kind, c_label, c_scope)

@@ -6,7 +6,7 @@ from pcvsrt import profile, config, logs, files, globals
 from pcvsrt.scripts.config import commands as cmdConfig
 
 
-def compl_list_token(ctx, args, incomplete):
+def compl_list_token(ctx, args, incomplete):  # pragma: no cover
     pcvsrt.profile.init()
     flat_array = []
     for scope in pcvsrt.profile.globals.storage_order():
@@ -49,6 +49,8 @@ def profile_list(ctx, token):
 
     if label:
         logs.warn("no LABEL required for this command")
+
+    pcvsrt.profile.check_valid_scope(scope)
 
     logs.print_header("Profile View")
     profiles = pcvsrt.profile.list_profiles(scope)
@@ -163,7 +165,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     if clone is not None:
         (c_scope, c_label) = pcvsrt.profile.extract_profile_from_token(clone)
         base = pcvsrt.profile.Profile(c_label, c_scope)
-        pf.clone(base, p_scope)
+        pf.clone(base)
         pass
     elif interactive:
         logs.print_header("profile view (build)")

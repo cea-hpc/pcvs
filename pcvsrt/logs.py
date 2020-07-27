@@ -138,7 +138,7 @@ def print_n_stop(**kwargs):
     for k, v in kwargs.items():
         click.secho("{}: ".format(k), fg="yellow", nl=False)
         click.secho("'{}'".format(v), fg="blue")
-    sys.exit(42)
+    sys.exit(0)
 
 
 def progbar(it, **kargs):

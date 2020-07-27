@@ -40,7 +40,7 @@ CONFIG_EXISTING = dict()
 
 def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
-    CONFIG_STORAGES = { k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
+    CONFIG_STORAGES = {k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
     CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
     CONFIG_EXISTING = {}
 
