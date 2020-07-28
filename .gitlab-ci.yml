@@ -1,0 +1,40 @@
+image: "python:3.7"
+
+before_script:
+- python --version
+- pip install flake8 mypy pytest pytest-cov
+
+.scope: &scope
+    tags:
+    - docker
+    only:
+    - master
+    - merge_requests
+    - web
+
+stages:
+- lint
+- install
+- test
+
+flake:
+    <<: *scope
+    stage: lint
+    allow_failure: true
+    script:
+    - flake8 ./pcvsrt/
+
+mypy:
+    <<: *scope
+    stage: lint
+    allow_failure: true
+    script:
+    - python -m mypy ./pcvsrt/
+
+cli: 
+    <<: *scope
+    stage: test
+    script:
+    - pip install .
+    - pytest ./test/ --cov=pcvsrt --cov-report=xml
+    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
