@@ -1,16 +1,17 @@
 ---
 .this_is_a_job:
-    id_name: "optional name"
+    label: "optional name"
     group: "GRPSERIAL"
     build:
-        # define a Makefile-based compilation
-        make_target: all
+        make:
+                target: all
+        sources:
+                # source files to include (if needed)
+                files: "@SRCPATH@/*.c"
+                # program binary (if needed)
+                binary: "a.out"
         # dependency scheme
         depends_on: ["this_is_another_test"]
-        # program binary (if needed)
-        binary: "binary_name"
-        # source files to include (if needed)
-        source_files: "path/to/files"
         # extra cflags
         cflags: "extra cflags"
         # extra ldflags
@@ -20,10 +21,10 @@
         # variants describing the job
         variants:
             - openmp
-            - tbb
             - accel
 
     run: &run_part
+        program: "./a.out"
         iterate:
             # runtime iterators
             n_mpi: [2, 4]
@@ -31,16 +32,23 @@
             program:
                 #name will be used as part of final test-name
                 give_it_a_name:
+                    numeric: true
                     type: "argument|environment"
                     values: ["-iter 1000", "-fast"]
+                    subtitle: "lol"
         # directory where program should be built
         cwd: "dir/to/build"
         # dependency scheme
         depends_on: ["this_is_another_run_test_in_the_same_file"]
         # external modules (suppose a support for modules)
-        modules:
-            - protobuf
-            - gnu/gcc/7.3.0
+        package_manager:
+                spack:
+                - protobuf@3.1.1
+                - gcc@7.3.0
+                - osu ^${COMPILER_SPACKED} %intel
+                modules:
+                - protobuf
+                - gnu/gcc/7.3.0
         # extra env vars to export before running the job
         environment:
             MY_VAR: 1000.0
@@ -59,10 +67,15 @@
             mean_time: 10.0
             tolerance: 2.0
             kill_after: 20
-        parse:
-            regex: '^\d+(\.\d+) received$'
-            script:
-                path: "/path/to/script"
+        match:
+            controller: "./script.py"
+            label:
+                expr: '^\d+(\.\d+) received$'
+                expect: true|false
+
+            label2: 'Total Elapsed: \d+\.\d+ sec.$'
+        script:
+            path: "/path/to/script"
 
 #########################################################
 

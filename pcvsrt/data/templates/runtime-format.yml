@@ -3,7 +3,7 @@ program: "/path/to/command"
 args: "--verbose"
 
 # WIP for this one
-module: "MPC"
+plugin: "MPC"
 
 iterators:
     iterator_name:
