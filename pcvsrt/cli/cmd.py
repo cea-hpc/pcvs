@@ -38,8 +38,9 @@ CONTEXT_SETTINGS = dict(
               help="enable/disable Unicode glyphs")
 @click.option("-C", "--exec-path", "exec_path", show_envvar=True,
               default=".", type=click.Path(exists=True, file_okay=False))
-@click.option("-V", "--version", expose_value=False, is_eager=True, 
-callback=print_version, is_flag=True)
+@click.option("-V", "--version",
+              expose_value=False, is_eager=True, callback=print_version,
+              is_flag=True, help="Display current version")
 @click.option("-w", "--width", "width", type=int, default=0,
               help="Terminal width (autodetection if omitted")
 @click.pass_context

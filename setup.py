@@ -15,7 +15,8 @@ setup(
     packages=find_packages(),
     entry_points='''
         [console_scripts]
-        pcvs=pcvsrt.scripts.cmd:cli
+        pcvs=pcvsrt.cli.cmd:cli
+        pcvs_convert=pcvsrt.converter.yaml_converter:main
     ''',
 
     install_requires=[

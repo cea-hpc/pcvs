@@ -6,7 +6,7 @@ import glob
 
 
 @click.command(name="run", short_help="Run a validation")
-@click.option("-p", "--profile", "profilename", autocompletion=pcvsrt.scripts.profile.commands.compl_list_token,
+@click.option("-p", "--profile", "profilename", autocompletion=pcvsrt.cli.profile.commands.compl_list_token,
               default="default", type=str, show_envvar=True,
               help="an existing profile")
 @click.option("-o", "--output", "output",

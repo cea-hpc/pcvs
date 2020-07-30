@@ -177,9 +177,7 @@ def config_destroy(ctx, token):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = (None, None, None)
-    if token:
-        (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
 
     c = pcvsrt.config.ConfigurationBlock(kind, label, scope)
     if c.is_found():
@@ -214,8 +212,7 @@ def config_edit(ctx, token, editor):
         block.flush_to_disk()
     else:
         logs.err("Cannot open this configuration: does not exist!", abort=1)
-        
-    
+
 
 @config.command(name="import", short_help="Import config from a file")
 @click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
@@ -255,3 +252,5 @@ def config_export(ctx, token, out_file):
     obj = pcvsrt.config.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
         out_file.write(yaml.dump(obj.dump()))
+    else:
+        logs.err("Failed to export '{}': not found!".format(token), abort=1)

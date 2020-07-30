@@ -3,7 +3,7 @@ import yaml
 import os
 import pcvsrt
 from pcvsrt import profile, config, logs, files, globals
-from pcvsrt.scripts.config import commands as cmdConfig
+from pcvsrt.cli.config import commands as cmdConfig
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover

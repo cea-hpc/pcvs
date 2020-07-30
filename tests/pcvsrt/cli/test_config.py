@@ -1,10 +1,11 @@
-from click.testing import CliRunner
-from pcvsrt.scripts.cmd import cli
 import pcvsrt
 import pytest
 import os
-from testing import run_and_test, isolated_fs
+from .cli_testing import run_and_test, isolated_fs
 
+def test_cmd():
+    res = run_and_test('config')
+    assert('Usage:' in res.output)
 
 @pytest.mark.parametrize(
     'kind',
@@ -36,16 +37,18 @@ def test_list_scope(kind):
         _ = run_and_test('config', 'list', ".".join([scope, kind]))
 
 
-def test_list_wrong_kind(caplog):
+def test_list_wrong(caplog):
     caplog.clear()
     _ = run_and_test('config', 'list', 'error', success=False)
     assert ('Invalid KIND' in caplog.text)
 
-
-def test_list_wrong_scope(caplog):
     caplog.clear()
     _ = run_and_test('config', 'list', 'failure.compiler', success=False)
     assert ('Invalid SCOPE' in caplog.text)
+
+    caplog.clear()
+    _ = run_and_test('config', 'list', 'failure.compiler.extra.field', success=False)
+    assert ('Invalid token' in caplog.text)
 
 
 @pytest.mark.parametrize(
@@ -87,6 +90,9 @@ def test_clone(scope, kind, caplog):
         caplog.clear()
         _ = run_and_test('config', 'create', copyname, "--from", "base")
         caplog.clear()
+        _ = run_and_test('config', 'create', copyname+"-2", "--from", "local.base")
+        caplog.clear()
+        
         _ = run_and_test('config', 'create', copyname+"none", "--from", "err", success=False)
         assert('Invalid ' in caplog.text)
         
@@ -139,6 +145,7 @@ def test_import(scope, kind, caplog):
             test:
                 key: 'value'
             """)
+
         token = ".".join(filter(None, (scope, kind, 'test')))
         caplog.clear()
         res = run_and_test('config', 'import', token, success=False)
@@ -172,7 +179,12 @@ def test_export(scope, kind, caplog):
 
         caplog.clear()
         _ = run_and_test('config', 'export', token, fn)
-        assert(os.path.isfile(fn))
+        assert (os.path.isfile(fn))
+        
+        caplog.clear()
+        _ = run_and_test('config', 'export', token+"-err", fn, success=False)
+        assert ("Failed to export" in caplog.text)
+
 
 
 @pytest.mark.parametrize( 'kind', ['compiler', 'runtime', 'group', 'machine', 'criterion'])
