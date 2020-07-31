@@ -36,5 +36,5 @@ cli:
     stage: test
     script:
     - pip install .
-    - pytest ./test/ --cov=pcvsrt --cov-report=xml
+    - pytest ./tests/ --cov=pcvsrt --cov-report=xml
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'

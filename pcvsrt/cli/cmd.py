@@ -54,7 +54,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     # Click specific-related
     ctx.color = color
     
-    logs.init(verbose, color, encoding)
+    logs.init(verbose, encoding)
     globals.set_exec_path(ctx.obj['exec'])
     globals.LINELENGTH,_ = click.get_terminal_size()
 

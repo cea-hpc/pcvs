@@ -1,8 +1,6 @@
 import sys
-import os
 import click
 import logging
-import textwrap
 from pcvsrt import globals
 
 FORMAT = "%(levelname)s: %(message)s"
@@ -43,7 +41,7 @@ def __set_encoding(e):
         glyphs['sec'] = '\u2756'
         glyphs['hdr'] = '\u23BC'
         glyphs['star'] = '\u2605'
-        glyphs['fail'] = click.style('\u2716', fg="red", bold=1)
+        glyphs['fail'] = click.style('\u2716', fg="red", bold=True)
         glyphs['succ'] = click.style('\u2714', fg="green")
         glyphs['git'] = '\u237F'
         glyphs['time'] = '\U0000231A'
@@ -53,7 +51,7 @@ def __set_encoding(e):
         glyphs['sep_h'] = "\u23BC"
 
 
-def init(verbose, color, encoding):
+def init(verbose, encoding):
     __set_logger(verbose)
     __set_encoding(encoding)
     pass
@@ -105,26 +103,31 @@ def print_item(s, depth=1, out=True):
 
 def debug(*msg):
     for elt in msg:
-        logging.debug(click.style(elt, fg="bright_black"))
+        for line in elt.split('\n'):
+            logging.debug(click.style(line, fg="bright_black"))
 
 
 def info(*msg):
     for elt in msg:
-        logging.info(click.style(elt, fg="blue"))
+        for line in elt.split('\n'):
+            logging.info(click.style(line, fg="cyan"))
 
 
 def warn(*msg):
     for elt in msg:
-        logging.warning(click.style(elt, fg="yellow", bold=True))
+        for line in elt.split('\n'):
+            logging.warning(click.style(line, fg="yellow", bold=True))
 
 
 def err(*msg, abort=0):
     for elt in msg:
-        logging.error(click.style(elt, fg="red", bold=True))
+        for line in elt.split('\n'):
+            logging.error(click.style(line, fg="red", bold=True))
 
     if abort:
         logging.error(click.style("Now going to abort.", fg="red", bold=True))
         sys.exit(abort)
+
 
 def nimpl(*msg):
     warn("Not implemented! (WIP)")
@@ -146,41 +149,41 @@ def progbar(it, **kargs):
 
 
 def banner():
-    """ original header to be printed out :
-    ____                   ____     __   ______                            __  _            
+    r""" original header to be printed out :
+    ____                   ____     __   ______                            __  _
    / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _
   / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/
- / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ / 
-/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /  
-                                                          /_/                      /____/   
-                                            (PCVS)                                          
-          _    __      ___     __      __  _                _____       _ __     
-         | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  __(_) /____        
-         | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / / __/ _ \         
-         | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ / / /_/  __/         
-         |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__,_/_/\__/\___/ 
+ / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /
+/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /
+                                                          /_/                      /____/
+                                            (PCVS)
+          _    __      ___     __      __  _                _____       _
+         | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  __(_) /____
+         | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / / __/ _ \
+         | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ / / /_/  __/
+         |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__,_/_/\__/\___/
 
   Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA)
   
-  This program comes with ABSOLUTELY NO WARRANTY; 
-  This is free software, and you are welcome to redistribute it 
+  This program comes with ABSOLUTELY NO WARRANTY;
+  This is free software, and you are welcome to redistribute it
   under certain conditions; Please see COPYING for details.
 """
 
     slice_1 = """\
-    ____                   ____     __   ______                            __  _            
+    ____                   ____     __   ______                            __  _
    / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _
   / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/
- / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ / 
-/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /  
-                                                          /_/                      /____/   """
+ / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /
+/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /
+                                                          /_/                      /____/"""
     slice_2 = """\
                                          {}  (PCVS) {}""".format(utf('star'), utf('star'))
     slice_3 = """\
           _    __      ___     __      __  _                _____       _ __     
          | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  __(_) /____"""
     slice_4 = """\
-         | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / / __/ _ \           
+         | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / / __/ _ \ 
          | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ / / /_/  __/"""
     slice_5 = """\
          |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__,_/_/\__/\___/ """
@@ -199,6 +202,3 @@ def banner():
     click.secho(slice_4, fg="yellow")
     click.secho(slice_5, fg="red")
     click.secho(slice_6)
-
-if __name__ == '__main__':
-    pass
