@@ -1,12 +1,15 @@
-import yaml
-from os import path
-import os
-import pcvsrt
-from pcvsrt import globals, logs, files
 import glob
-import shutil
-import jsonschema
 import json
+import os
+
+import jsonschema
+import yaml
+
+from pcvsrt import files, globals, logs
+
+CONFIG_STORAGES = dict()
+CONFIG_BLOCKS = list()
+CONFIG_EXISTING = dict()
 
 
 def extract_config_from_token(s, pair="right", single="right"):
@@ -32,15 +35,13 @@ def extract_config_from_token(s, pair="right", single="right"):
             return (None, None, s)
     else:
         logs.nreach()
+    return (None, None, None)
 
-
-CONFIG_STORAGES = dict()
-CONFIG_BLOCKS = list()
-CONFIG_EXISTING = dict()
 
 def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
-    CONFIG_STORAGES = {k: os.path.join(v, "saves") for k, v in globals.STORAGES.items()}
+    CONFIG_STORAGES = {k: os.path.join(v, "saves")
+                       for k, v in globals.STORAGES.items()}
     CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
     CONFIG_EXISTING = {}
 
@@ -51,8 +52,12 @@ def init():
         priority_paths.reverse()
         for token in priority_paths:  # reverse order (overriding)
             CONFIG_EXISTING[block][token] = []
-            for config_file in glob.glob(os.path.join(CONFIG_STORAGES[token], block, "*.yml")):
-                CONFIG_EXISTING[block][token].append((os.path.basename(config_file)[:-4], config_file))
+            for config_file in glob.glob(os.path.join(CONFIG_STORAGES[token],
+                                                      block,
+                                                      "*.yml")):
+                CONFIG_EXISTING[block][token].append(
+                    (os.path.basename(config_file)[:-4], config_file))
+
 
 def list_blocks(kind, scope=None):
     assert (kind in CONFIG_BLOCKS)
@@ -107,8 +112,10 @@ class ConfigurationScheme:
 
     def validate(self, conf):
         assert (isinstance(conf, ConfigurationBlock))
-        with open(os.path.join(self._scheme_prefix, conf._kind + "-scheme.json"), 'r') as f:
-            logs.warn("VALIDATION: TODO: Scheme for KIND '{}'".format(conf._kind))
+        filepath = os.path.join(self._scheme_prefix,
+                                conf._kind + "-scheme.json")
+        with open(filepath, 'r') as f:
+            logs.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
             return
 
             schema = json.load(f)
@@ -117,6 +124,7 @@ class ConfigurationScheme:
 
 class ConfigurationBlock:
     _template_path = os.path.join(globals.ROOTPATH, "share/templates")
+
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
         check_valid_scope(scope)
@@ -138,11 +146,11 @@ class ConfigurationBlock:
     @property
     def full_name(self):
         return ".".join([self._scope, self._kind, self._name])
-    
+
     @property
     def short_name(self):
         return self._name
-    
+
     def fill(self, raw):
         assert (isinstance(raw, dict))
         self._details = raw
@@ -156,11 +164,13 @@ class ConfigurationBlock:
         val.validate(self)
 
     def load_from_disk(self):
-        
-        if self._file is None or not os.path.isfile(self._file):
-            logs.err("Invalid name {} for KIND '{}'".format(self._name, self._kind), abort=1)
 
-        logs.info("load {} from '{} ({})'".format(self._name, self._kind, self._scope))
+        if self._file is None or not os.path.isfile(self._file):
+            logs.err("Invalid name {} for KIND '{}'".format(
+                self._name, self._kind), abort=1)
+
+        logs.info("load {} from '{} ({})'".format(
+            self._name, self._kind, self._scope))
         with open(self._file) as f:
             self._details = yaml.safe_load(f)
             self.check()
@@ -169,22 +179,22 @@ class ConfigurationBlock:
         fp = os.path.join(self._template_path, self._kind + "-format.yml")
         with open(fp, "r") as f:
             self.fill(yaml.load(f, Loader=yaml.FullLoader))
-            
+
     def flush_to_disk(self):
         self._file = compute_path(self._kind, self._name, self._scope)
-        
-        logs.info("flush {} from '{} ({})'".format(self._name, self._kind, self._scope))
-        
+
+        logs.info("flush {} from '{} ({})'".format(
+            self._name, self._kind, self._scope))
+
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
-            
-        
+
         with open(self._file, 'w') as f:
             val = ConfigurationScheme(self._kind)
             val.validate(self)
-            
+
             yaml.safe_dump(self._details, f)
 
     def clone(self, clone):
@@ -200,10 +210,11 @@ class ConfigurationBlock:
     def delete(self):
         assert (self._file is not None)
         assert (os.path.isfile(self._file))
-        
-        logs.info("remove {} from '{} ({})'".format(self._name, self._kind, self._scope))
+
+        logs.info("remove {} from '{} ({})'".format(
+            self._name, self._kind, self._scope))
         os.remove(self._file)
-        
+
     def display(self):
         logs.print_header("Configuration display")
         logs.print_section("Scope: {}".format(self._scope.capitalize()))

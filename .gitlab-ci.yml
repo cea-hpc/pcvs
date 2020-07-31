@@ -15,8 +15,8 @@ before_script:
 stages:
 - lint
 - install
-- unit_test
 - cli_test
+- unit_test
 
 flake:
     <<: *scope

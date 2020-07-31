@@ -1,8 +1,12 @@
-import yaml
-import os
 import glob
-from os import path
-from pcvsrt import logs, files, config, globals
+import os
+
+import yaml
+
+from pcvsrt import config, files, globals, logs
+
+PROFILE_STORAGES = dict()
+PROFILE_EXISTING = dict()
 
 
 def extract_profile_from_token(s, single="right"):
@@ -20,12 +24,10 @@ def extract_profile_from_token(s, single="right"):
         logs.nreach()
 
 
-PROFILE_STORAGES = dict()
-PROFILE_EXISTING = dict()
-
 def init():
     global PROFILE_EXISTING, PROFILE_STORAGES
-    PROFILE_STORAGES = { k: os.path.join(v, "saves/profile") for k, v in globals.STORAGES.items()}
+    PROFILE_STORAGES = {k: os.path.join(
+        v, "saves/profile") for k, v in globals.STORAGES.items()}
     PROFILE_EXISTING = {}
     # this first loop defines configuration order
     priority_paths = globals.storage_order()
@@ -33,7 +35,8 @@ def init():
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
         for pfile in glob.glob(os.path.join(PROFILE_STORAGES[token], "*.yml")):
-            PROFILE_EXISTING[token].append((os.path.basename(pfile)[:-4], pfile))
+            PROFILE_EXISTING[token].append(
+                (os.path.basename(pfile)[:-4], pfile))
 
 
 def check_valid_scope(s):
@@ -79,13 +82,15 @@ class Profile:
         self._details = {}
         tmp, self._file = check_existing_name(name, scope)
         if self._scope is None:
-            self._scope = 'local' if tmp is None else tmp 
+            self._scope = 'local' if tmp is None else tmp
 
     def fill(self, raw):
         assert (isinstance(raw, dict))
         check = [val for val in config.CONFIG_BLOCKS if val in raw.keys()]
         if len(check) != len(config.CONFIG_BLOCKS):
-            logs.err("All {} configuration blocks are required to build a valid profile!".format(len(config.CONFIG_BLOCKS)), abort=1)
+            logs.err(
+                "All {} configuration blocks are required to build "
+                "a valid profile!".format(len(config.CONFIG_BLOCKS)), abort=1)
 
         # fill is called either from 'build' (dict of configurationBlock)
         # of from 'clone' (dict of raw file inputs)
@@ -94,7 +99,6 @@ class Profile:
                 self._details[k] = v.dump()
             else:
                 self._details[k] = v
-
 
     def dump(self):
         self.load_from_disk()
@@ -124,7 +128,7 @@ class Profile:
 
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
-        
+
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
         if not os.path.isdir(prefix_file):
@@ -152,10 +156,10 @@ class Profile:
             logs.print_section("Details:")
             for k, v in self._details.items():
                 logs.print_item("{}: {}".format(k, v))
-    
+
     def open_editor(self, e=None):
         assert (self._file is not None)
         assert (os.path.isfile(self._file))
-        
+
         files.open_in_editor(self._file, e)
         self.load_from_disk()

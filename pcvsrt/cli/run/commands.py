@@ -1,16 +1,18 @@
-import click
 import os
-import pcvsrt.run
-from pcvsrt import logs, files
-import glob
+
+import click
+
+from pcvsrt import run as pvRun
+from pcvsrt.cli.profile import commands as cmdProfile
+from pcvsrt import files, logs
 
 
 @click.command(name="run", short_help="Run a validation")
-@click.option("-p", "--profile", "profilename", autocompletion=pcvsrt.cli.profile.commands.compl_list_token,
-              default="default", type=str, show_envvar=True,
-              help="an existing profile")
-@click.option("-o", "--output", "output",
-              default="./build", type=click.Path(exists=False, file_okay=False), show_envvar=True,
+@click.option("-p", "--profile", "profilename", default="default",
+              autocompletion=cmdProfile.compl_list_token,
+              type=str, show_envvar=True, help="an existing profile")
+@click.option("-o", "--output", "output", default="./build", show_envvar=True,
+              type=click.Path(exists=False, file_okay=False),
               help="Where artefacts will be stored during/after the run")
 @click.option("-c", "--set-defaults", "set_default",
               default=None, is_flag=True,
@@ -40,7 +42,13 @@ import glob
 @click.pass_context
 def run(ctx, profilename, output, log, detach, status,
         resume, pause, bootstrap, override, set_default, list_of_dirs):
+    """
+    Execute a validation suite from a given PROFILE.
 
+    By default the current directory is scanned to find test-suites to run.
+    May also be provided as a list of directories as described by tests
+    found in LIST_OF_DIRS.
+    """
     # parse non-run situations
     if bootstrap:
         logs.info("Bootstrapping directories")
@@ -61,7 +69,7 @@ def run(ctx, profilename, output, log, detach, status,
     elif set_default:
         files.open_in_editor("defaults")
         exit(0)
- 
+
     # fill validation settings
     settings = {}
     # for any 'None' value, a load from default should be made
@@ -91,7 +99,7 @@ def run(ctx, profilename, output, log, detach, status,
             # if path does not exist
             if not os.path.isdir(testpath):
                 err_dirs.append(testpath)
-            
+
             dict_of_dirs[label] = testpath
 
     # list all non-existent dirs
@@ -102,14 +110,14 @@ def run(ctx, profilename, output, log, detach, status,
         logs.err("please see '--help' for more information", abort=1)
 
     logs.banner()
-    
-    logs.print_header("pre-actions")
-    pcvsrt.run.prepare(settings)
 
-    pcvsrt.run.load_benchmarks(dict_of_dirs)
+    logs.print_header("pre-actions")
+    pvRun.prepare(settings)
+
+    pvRun.load_benchmarks(dict_of_dirs)
 
     logs.print_header("validation start")
-    pcvsrt.run.run()
+    pvRun.run()
 
     logs.print_header("post-treatment")
-    pcvsrt.run.terminate()
+    pvRun.terminate()

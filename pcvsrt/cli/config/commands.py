@@ -1,15 +1,17 @@
 import click
 import yaml
-import pcvsrt
-from pcvsrt import logs, globals
+
+from pcvsrt import globals as pvGlobals
+from pcvsrt import config as pvConfig
+from pcvsrt import logs
 
 
-def compl_list_token(ctx, args, incomplete):  #pragma: no cover
-    pcvsrt.config.init()
+def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
+    pvConfig.init()
     flat_array = []
-    for kind in pcvsrt.config.CONFIG_BLOCKS:
-        for scope in pcvsrt.config.globals.storage_order():
-            for elt in pcvsrt.config.CONFIG_EXISTING[kind][scope]:
+    for kind in pvConfig.CONFIG_BLOCKS:
+        for scope in pvConfig.globals.storage_order():
+            for elt in pvConfig.CONFIG_EXISTING[kind][scope]:
                 flat_array.append(scope + "." + kind + "." + str(elt[0]))
 
     return [elt for elt in flat_array if incomplete in elt]
@@ -17,7 +19,7 @@ def compl_list_token(ctx, args, incomplete):  #pragma: no cover
 
 @click.group(name="config", short_help="Manage Configuration blocks")
 @click.pass_context
-def config(ctx):
+def config(ctx) -> None:
     """The 'config' command helps user to manage configuration basic blocks in
     order to set up a future validation to process. A basic block is the
     smallest piece of configuration gathering similar informations. Multiple
@@ -38,24 +40,25 @@ def config(ctx):
     """
 
 
-
-def config_list_single_kind(kind, scope):
+def config_list_single_kind(kind, scope) -> None:
     """Related to 'config list' command, handling a single 'kind' at a time"""
     # retrieve blocks to print
-    blocks = pcvsrt.config.list_blocks(kind, scope)
+    blocks = pvConfig.list_blocks(kind, scope)
     if not blocks:
         logs.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pcvsrt.config.globals.storage_order():
+        for sc in pvConfig.globals.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
-                logs.print_item("{: <6s}: {}".format(sc.upper(),
-                                                          logs.cl('None', 'bright_black')))
+                logs.print_item("{: <6s}: {}".format(
+                                sc.upper(),
+                                logs.cl('None', 'bright_black')))
             else:
-                logs.print_item("{: <6s}: {}".format(sc.upper(),
-                                                     ", ".join(names)))
+                logs.print_item("{: <6s}: {}".format(
+                                sc.upper(),
+                                ", ".join(names)))
     else:
         names = sorted([x[0] for x in blocks])
         logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
@@ -65,7 +68,7 @@ def config_list_single_kind(kind, scope):
 @click.argument("token", nargs=1, required=False,
                 type=click.STRING, autocompletion=compl_list_token)
 @click.pass_context
-def config_list(ctx, token):
+def config_list(ctx, token) -> None:
     """List available configurations on the system. The list can be
     filtered by applying a KIND. Possible values for KIND are documented
     through the `pcvs config --help` command.
@@ -77,7 +80,8 @@ def config_list(ctx, token):
     """
     (scope, kind, label) = (None, None, None)
     if token:
-        (scope, kind, label) = pcvsrt.config.extract_config_from_token(token, pair="left", single="center")
+        (scope, kind, label) = pvConfig.extract_config_from_token(
+            token, pair="left", single="center")
     if label:
         logs.warn("no LABEL required for this command")
 
@@ -85,11 +89,11 @@ def config_list(ctx, token):
     # - no 'label' are required (ignored otherwise)
     # - a special 'all' value is allowed for 'kind' parameter
     if kind is None or kind.lower() == 'all':
-        kinds = pcvsrt.config.CONFIG_BLOCKS
+        kinds = pvConfig.CONFIG_BLOCKS
     else:
-        pcvsrt.config.check_valid_kind(kind)
+        pvConfig.check_valid_kind(kind)
         kinds = [kind]
-    pcvsrt.config.check_valid_scope(scope)
+    pvConfig.check_valid_scope(scope)
 
     logs.print_header("Configuration view")
 
@@ -99,40 +103,44 @@ def config_list(ctx, token):
 
     # in case verbosity is enabled, add scope paths
     logs.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(pcvsrt.globals.storage_order()):
-        logs.info("{}. {}: {}".format(i+1, scope.upper(), pcvsrt.globals.STORAGES[scope]))
+    for i, scope in enumerate(pvGlobals.storage_order()):
+        logs.info("{}. {}: {}".format(
+            i+1, scope.upper(), pvGlobals.STORAGES[scope]))
 
 
 @config.command(name="show",
                 short_help="Show detailed view of the selected configuration")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.pass_context
-def config_show(ctx, token):
+def config_show(ctx, token) -> None:
     """Prints a detailed description of this configuration block, labeled NAME
     and belonging to the KIND kind.
 
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
 
-    block = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
         block.load_from_disk()
         block.display()
     else:
         sc = scope
         sc = "any" if sc is None else sc
-        logs.err("No '{}' configuration found at {} level!".format(label, sc), abort=1 )
+        logs.err("No '{}' configuration found at {} level!".format(
+            label, sc), abort=1)
 
 
 @config.command(name="create", short_help="Create/Clone a configuration block")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.option("-f", "--from", "clone",
               default=None, type=str, show_envvar=True,
               help="Valid name to copy (may use scope, e.g. global.label)")
 @click.pass_context
-def config_create(ctx, token, clone):
+def config_create(ctx, token, clone) -> None:
     """Create a new configuration block for the given KIND. The newly created
     block will be labeled NAME. It is inherited from a default template. This
     can be overriden by spefifying a CLONE argument.
@@ -145,56 +153,66 @@ def config_create(ctx, token, clone):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
     if clone is not None:
-        (c_scope, c_kind, c_label) = pcvsrt.config.extract_config_from_token(clone, pair='span')
+        (c_scope, c_kind, c_label) = pvConfig.extract_config_from_token(
+            clone, pair='span')
         if c_kind is not None and c_kind != kind:
-            logs.err("Can only clone from a conf. blocks with the same KIND!", abort=1)
-        base = pcvsrt.config.ConfigurationBlock(kind, c_label, c_scope)
+            logs.err("Can only clone from a conf. blocks with the same KIND!",
+                     abort=1)
+        base = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
         base.load_from_disk()
     else:
-        base = pcvsrt.config.ConfigurationBlock(kind, 'default', None)
+        base = pvConfig.ConfigurationBlock(kind, 'default', None)
         base.load_template()
 
-    copy = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    copy = pvConfig.ConfigurationBlock(kind, label, scope)
     if not copy.is_found():
         copy.clone(base)
         copy.flush_to_disk()
     else:
-        logs.err("Configuration '{}' already exists! ({})".format(label, copy.scope), abort=1)
+        logs.err("Configuration '{}' already exists! ({})".format(
+            label, copy.scope), abort=1)
 
 
 @config.command(name="destroy", short_help="Remove a config block")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
-@click.confirmation_option("-f", "--force",
-                           prompt="Are you sure you want to delete this config ?",
-                           help="Do not ask for confirmation before deletion")
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
+@click.confirmation_option(
+    "-f", "--force",
+    prompt="Are you sure you want to delete this config ?",
+    help="Do not ask for confirmation before deletion")
 @click.pass_context
-def config_destroy(ctx, token):
+def config_destroy(ctx, token) -> None:
     """
     Erase from disk a previously created configuration block.
 
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
 
-    c = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    c = pvConfig.ConfigurationBlock(kind, label, scope)
     if c.is_found():
         if c.scope == 'global' and label == 'default':
-            logs.err("No global default configuration can be deleted/altered from CLI! Sorry!", abort=1)
+            logs.err(
+                "No alteration allowed from CLI for global configurations",
+                "Please proceed manually (with care)",
+                abort=1)
         c.delete()
     else:
-        logs.err("Configuration '{}' not found!".format(label), "Please check the 'list' command", abort=1)
+        logs.err("Configuration '{}' not found!".format(label),
+                 "Please check the 'list' command", abort=1)
 
 
 @config.command(name="edit", short_help="edit the config block")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
               default=None, type=str,
               help="Open file with EDITOR")
 @click.pass_context
-def config_edit(ctx, token, editor):
+def config_edit(ctx, token, editor) -> None:
     """
     Open the file with $EDITOR for direct modifications. The configuration is
     then validated to ensure consistency.
@@ -202,12 +220,15 @@ def config_edit(ctx, token, editor):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
 
-    block = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
         if block.scope == 'global' and label == 'default':
-            logs.err("No global default configuration can be deleted/altered from CLI! Sorry!", abort=1)
+            logs.err(
+                "No alteration allowed from CLI for global configurations",
+                "Please proceed manually (with care)",
+                abort=1)
         block.open_editor(editor)
         block.flush_to_disk()
     else:
@@ -215,10 +236,11 @@ def config_edit(ctx, token, editor):
 
 
 @config.command(name="import", short_help="Import config from a file")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.argument("in_file", type=click.File('r'))
 @click.pass_context
-def config_import(ctx, token, in_file):
+def config_import(ctx, token, in_file) -> None:
     """
     Import a new configuration block from a YAML file named IN_FILE.
     The configuration is then validated to ensure consistency.
@@ -226,9 +248,9 @@ def config_import(ctx, token, in_file):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
 
-    obj = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found():
         obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
         obj.flush_to_disk()
@@ -237,7 +259,8 @@ def config_import(ctx, token, in_file):
 
 
 @config.command(name="export", short_help="Export config into a file")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.argument("out_file", type=click.File('w'))
 @click.pass_context
 def config_export(ctx, token, out_file):
@@ -247,9 +270,9 @@ def config_export(ctx, token, out_file):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pcvsrt.config.extract_config_from_token(token)
+    (scope, kind, label) = pvConfig.extract_config_from_token(token)
 
-    obj = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+    obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
         out_file.write(yaml.dump(obj.dump()))
     else:

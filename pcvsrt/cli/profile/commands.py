@@ -1,16 +1,18 @@
 import click
 import yaml
-import os
-import pcvsrt
-from pcvsrt import profile, config, logs, files, globals
+
+from pcvsrt import config as pvConfig
+from pcvsrt import profile as pvProfile
+from pcvsrt import globals as pvGlobals
+from pcvsrt import logs
 from pcvsrt.cli.config import commands as cmdConfig
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
-    pcvsrt.profile.init()
+    pvProfile.init()
     flat_array = []
-    for scope in pcvsrt.profile.globals.storage_order():
-        for elt in pcvsrt.profile.PROFILE_EXISTING[scope]:
+    for scope in pvGlobals.storage_order():
+        for elt in pvProfile.PROFILE_EXISTING[scope]:
             flat_array.append(scope + "." + elt[0])
 
     return [elt for elt in flat_array if incomplete in elt]
@@ -33,58 +35,63 @@ def profile(ctx):
     """
 
 
-@profile.command(name = "list", short_help = "List available profiles")
+@profile.command(name="list", short_help="List available profiles")
 @click.argument("token", nargs=1, required=False,
                 type=click.STRING, autocompletion=compl_list_token)
 @click.pass_context
 def profile_list(ctx, token):
     """
-    List all known profiles to be used as part of a validation process. The list
-    can be filtered out depending on the '--scope' option to only print out
-    profiles available at a given granularity.
+    List all known profiles to be used as part of a validation process. The
+    list can be filtered out depending on the '--scope' option to only print
+    out profiles available at a given granularity.
     """
     (scope, label) = (None, None)
     if token:
-        (scope, label) = pcvsrt.profile.extract_profile_from_token(token, single="left")
+        (scope, label) = pvProfile.extract_profile_from_token(token,
+                                                              single="left")
 
     if label:
         logs.warn("no LABEL required for this command")
 
-    pcvsrt.profile.check_valid_scope(scope)
+    pvProfile.check_valid_scope(scope)
 
     logs.print_header("Profile View")
-    profiles = pcvsrt.profile.list_profiles(scope)
+    profiles = pvProfile.list_profiles(scope)
     if not profiles:
         logs.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pcvsrt.profile.globals.storage_order():
+        for sc in pvGlobals.storage_order():
             # aggregate names for each sccope
-            names = sorted([elt[0] for elt in [array for array in profiles[sc]]])
+            names = sorted([elt[0]
+                            for elt in [array for array in profiles[sc]]])
             if not names:
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
-                                                         logs.cl('None', 'bright_black')))
+                                                     logs.cl('None',
+                                                             'bright_black')))
             else:
                 logs.print_item("{: <6s}: {}".format(sc.upper(),
                                                      ", ".join(names)))
     else:
         names = sorted([x[0] for x in profiles])
         logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
-    
+
     # in case verbosity is enabled, add scope paths
     logs.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(pcvsrt.globals.storage_order()):
-        logs.info("{}. {}: {}".format(i+1, scope.upper(), pcvsrt.globals.STORAGES[scope]))
+    for i, scope in enumerate(pvGlobals.storage_order()):
+        logs.info("{}. {}: {}".format(
+            i+1, scope.upper(), pvGlobals.STORAGES[scope]))
 
 
 @profile.command(name="show",
                  short_help="Prints single profile details")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.pass_context
 def profile_show(ctx, token):
     """Prints a detailed view of the NAME profile."""
-    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
-    pf = pcvsrt.profile.Profile(label, scope)
+    (scope, label) = pvProfile.extract_profile_from_token(token)
+    pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         pf.load_from_disk()
         pf.display()
@@ -95,10 +102,10 @@ def profile_show(ctx, token):
 
 def profile_interactive_select():
     composition = {}
-    for kind in pcvsrt.config.CONFIG_BLOCKS:
+    for kind in pvConfig.CONFIG_BLOCKS:
         logs.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
-        for scope, avails in pcvsrt.config.list_blocks(kind).items():
+        for scope, avails in pvConfig.list_blocks(kind).items():
             for elt in avails:
                 choices.append(".".join([scope, elt[0]]))
 
@@ -109,13 +116,15 @@ def profile_interactive_select():
             default = None
         for i, cell in enumerate(choices):
             logs.print_item("{}: {}".format(i + 1, cell))
-        
-        while idx < 0 or len(choices) < idx:
+        print(choices)
+        while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
-        (scope, _, label) = pcvsrt.config.extract_config_from_token(choices[idx], pair="span")
-        composition[kind] = pcvsrt.config.ConfigurationBlock(kind, label, scope)
+        (scope, _, label) = pvConfig.extract_config_from_token(
+            choices[idx], pair="span")
+        composition[kind] = pvConfig.ConfigurationBlock(kind, label, scope)
 
     return composition
+
 
 @profile.command(name="build",
                  short_help="Build/copy a profile from basic conf blocks")
@@ -130,7 +139,8 @@ def profile_interactive_select():
               default=None, type=click.STRING,
               autocompletion=compl_list_token,
               help="Another profile to herit from.")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.pass_context
 def profile_build(ctx, token, interactive, blocks, clone):
     """
@@ -154,96 +164,105 @@ def profile_build(ctx, token, interactive, blocks, clone):
     and end with an alphanumeric but no more restrictions are applied
     (e.g. 'mpi-srun-stampede-large' is allowed)
     """
-    (p_scope, p_label) = pcvsrt.profile.extract_profile_from_token(token)
+    (p_scope, p_label) = pvProfile.extract_profile_from_token(token)
 
-    pf = pcvsrt.profile.Profile(p_label, p_scope)
+    pf = pvProfile.Profile(p_label, p_scope)
     if pf.is_found():
-        logs.err("A profile named '{}' already exist!".format(pf.full_name), abort=1)
+        logs.err("A profile named '{}' already exist!".format(
+            pf.full_name), abort=1)
 
-    blocks_for_profile = {}
+    pf_blocks = {}
 
     if clone is not None:
-        (c_scope, c_label) = pcvsrt.profile.extract_profile_from_token(clone)
-        base = pcvsrt.profile.Profile(c_label, c_scope)
+        (c_scope, c_label) = pvProfile.extract_profile_from_token(clone)
+        base = pvProfile.Profile(c_label, c_scope)
         pf.clone(base)
         pass
     elif interactive:
         logs.print_header("profile view (build)")
-        blocks_for_profile = profile_interactive_select()
-        pf.fill(blocks_for_profile)
+        pf_blocks = profile_interactive_select()
+        pf.fill(pf_blocks)
     else:
         for block in blocks:
-            (b_scope, b_kind, b_label) = pcvsrt.config.extract_config_from_token(block)
-            cur = pcvsrt.config.ConfigurationBlock(b_kind, b_label, b_scope)
-            if cur.is_found() and b_kind not in blocks_for_profile.keys():
-                blocks_for_profile[b_kind] = cur
+            (b_sc, b_kind, b_label) = pvConfig.extract_config_from_token(block)
+            cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
+            if cur.is_found() and b_kind not in pf_blocks.keys():
+                pf_blocks[b_kind] = cur
             else:
                 logs.err("Issue with '{}'".format(block))
                 if not cur.is_found():
                     logs.err("Such configuration does not exist!")
                 else:
-                    logs.err("'{}' kind is set twice".format(b_kind.upper()), "First is '{}'".format(blocks_for_profile[b_kind].full_name))
+                    logs.err(
+                        "'{}' kind is set twice".format(b_kind.upper()),
+                        "First is '{}'".format(pf_blocks[b_kind].full_name))
                 logs.err("", abort=1)
-        pf.fill(blocks_for_profile)
-    
+        pf.fill(pf_blocks)
+
     logs.print_header("profile view")
     pf.flush_to_disk()
-    #pf.display()
+    # pf.display()
 
     logs.print_section("final profile (registered as {})".format(p_scope))
-    for k, v in blocks_for_profile.items():
-        logs.print_item("{: >9s}: {}".format(k.upper(), ".".join([v.scope, v.short_name])))
+    for k, v in pf_blocks.items():
+        logs.print_item("{: >9s}: {}".format(
+            k.upper(), ".".join([v.scope, v.short_name])))
 
 
 @profile.command(name="destroy",
                  short_help="Delete a profile from disk")
-@click.confirmation_option("-f", "--force", "force", expose_value=False,
-              prompt="Are you sure you want to delete this profile ?",
-              help="Do not ask for confirmation")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.confirmation_option(
+    "-f", "--force", "force", expose_value=False,
+    prompt="Are you sure you want to delete this profile ?",
+    help="Do not ask for confirmation")
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.pass_context
 def profile_destroy(ctx, token):
-    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
+    (scope, label) = pvProfile.extract_profile_from_token(token)
 
-    pf = pcvsrt.profile.Profile(label, scope)
+    pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
             logs.err("err", abort=1)
         else:
             pf.delete()
     else:
-        logs.err("Profile '{}' not found!".format(label), "Please check the 'list' command", abort=1)
+        logs.err("Profile '{}' not found!".format(label),
+                 "Please check the 'list' command", abort=1)
 
 
 @profile.command(name="alter",
                  short_help="Edit an existing profile")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
               default=None, type=str,
               help="Open file with EDITOR")
 @click.pass_context
 def profile_alter(ctx, token, editor):
-    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
+    (scope, label) = pvProfile.extract_profile_from_token(token)
 
-    pf = pcvsrt.profile.Profile(label, scope)
+    pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
             logs.err("err", abort=1)
         else:
             pf.open_editor(editor)
     else:
-        logs.err("Profile '{}' not found!".format(label), "Please check the 'list' command", abort=1)
-
+        logs.err("Profile '{}' not found!".format(label),
+                 "Please check the 'list' command", abort=1)
 
 
 @profile.command(name="import",
                  short_help="Import a file as a profile")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.argument("src_file", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, token, src_file):
-    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
-    pf = pcvsrt.profile.Profile(label, scope)
+    (scope, label) = pvProfile.extract_profile_from_token(token)
+    pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
         pf.flush_to_disk()
@@ -251,15 +270,15 @@ def profile_import(ctx, token, src_file):
         logs.err("Cannot import into an already created profile!", abort=1)
 
 
-
 @profile.command(name="export",
                  short_help="Export a profile to a file")
-@click.argument("token", nargs=1, type=click.STRING, autocompletion=compl_list_token)
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
 @click.argument("dest_file", type=click.File('w'))
 @click.pass_context
 def profile_export(ctx, token, dest_file):
-    (scope, label) = pcvsrt.profile.extract_profile_from_token(token)
+    (scope, label) = pvProfile.extract_profile_from_token(token)
 
-    pf = pcvsrt.profile.Profile(label, scope)
+    pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         dest_file.write(yaml.dump(pf.dump()))
