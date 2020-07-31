@@ -51,7 +51,7 @@ def test_list_wrong(caplog):
     assert ('Invalid token' in caplog.text)
 
 
-@pytest.mark.parametrize(
+@pytest.mark.parametrize( 
     'kind',
     ['compiler', 'runtime', 'machine', 'criterion', 'group'])
 @pytest.mark.parametrize('scope', [None, 'local'])
