@@ -1,13 +1,24 @@
 #!/usr/bin/env python3
 
+import os
+
 import click
+import pkg_resources
+
+from pcvsrt import config, globals, logs, profile
 
 from .config import commands as cmdConfig
 from .profile import commands as cmdProfile
 from .run import commands as cmdRun
-import os
-from pcvsrt import logs, globals, config, profile
-import pkg_resources
+
+
+CONTEXT_SETTINGS = dict(
+    help_option_names=['-h', '--help', '-help'],
+    ignore_unknown_options=True,
+    allow_interspersed_args=False,
+    auto_envvar_prefix='PCVS',
+    show_default=True
+)
 
 
 def print_version(ctx, param, value):
@@ -16,14 +27,6 @@ def print_version(ctx, param, value):
     version = pkg_resources.require("pcvs-rt")[0].version
     click.echo('PCVS Runtime Tool (pcvs-rt) -- version {}'.format(version))
     ctx.exit()
-
-CONTEXT_SETTINGS = dict(
-                        help_option_names=['-h', '--help', '-help'],
-                        ignore_unknown_options=True,
-                        allow_interspersed_args=False,
-                        auto_envvar_prefix='PCVS',
-                        show_default=True
-                        )
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, name="cli")
@@ -53,19 +56,21 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
 
     # Click specific-related
     ctx.color = color
-    
+
     logs.init(verbose, encoding)
     globals.set_exec_path(ctx.obj['exec'])
-    globals.LINELENGTH,_ = click.get_terminal_size()
+    globals.LINELENGTH, _ = click.get_terminal_size()
 
     # detections
     config.init()
     profile.init()
 
 
-@cli.command("help",
-             short_help="Quick Guide to prepare PCVS after a fresh installation")
-@click.argument("category", type=click.Choice(['completion', 'config', 'scope', 'token']), nargs=1, required=False, default=None)
+@cli.command(
+    "help",
+    short_help="Quick Guide to prepare PCVS after a fresh installation")
+@click.argument("category", nargs=1, required=False, default=None,
+                type=click.Choice(['completion', 'config', 'scope', 'token']))
 @click.pass_context
 def cli_doc(ctx, category):
 
@@ -73,7 +78,9 @@ def cli_doc(ctx, category):
 
     logs.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
     for shell in ['zsh', 'bash']:
-        logs.print_item("{: >4s}: eval \"$(_PCVS_COMPLETE=source_{} pcvs)\"".format(shell.upper(), shell))
+        logs.print_item(
+            "{: >4s}: eval \"$(_PCVS_COMPLETE=source_{} pcvs)\"".
+            format(shell.upper(), shell))
     pass
 
     logs.print_section("Create basic configuration blocks")

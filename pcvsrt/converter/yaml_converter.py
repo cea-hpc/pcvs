@@ -226,7 +226,7 @@ def print_version(ctx, param, value) -> None:
 @click.option("-o", "--output", "out", default=None,
               type=click.Path(exists=False, dir_okay=False),
               help="Filepath where to put the converted YAML")
-@click.argument("input_file", type=click.Path(exists=True, dir_okay=False, 
+@click.argument("input_file", type=click.Path(exists=True, dir_okay=False,
                                               readable=True, allow_dash=True))
 @click.pass_context
 def main(ctx, color, encoding, verbose, kind, input_file, out, scheme) -> None:
@@ -236,7 +236,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme) -> None:
     """
     # Click specific-related
     ctx.color = color
-    
+
     logs.init(verbose, encoding)
     logs.print_header("YAML Conversion")
     logs.print_item("Loading data file & scheme")
