@@ -3,9 +3,10 @@
 		"<name>": "(?P<name>[a-zA-Z0-9-_]+)",
 		"<ropt>": "(?P<ropt>[a-zA-Z0-9-]+)",
 		"<child_nodes>": "(?P<child_nodes>.*)",
-		"<append>": ["aaaa", "<append>"]
+		"<it>": "(?P<it>.*)",
+		"<te_it>": "(?P<te_it>(?!(type|files|bin|cargs|chdir|target|deps|args|time|tolerance|timeout|returns|herit|tbb|accl|openmp))[a-zA-Z0-9-_]+)"
+		
 	},
-
 
 	"__modifiers": {
 		"te.<name>.herit.<child_nodes>": "te.<name>.<child_nodes>"
@@ -53,9 +54,9 @@
 	"runtime.args": "runtime.args",
 	"runtime.module": "runtime.plugin",
 	"runtime.timeout_prefix": null,
-	"runtime.<name>.key": "runtime.iterators.<name>.option",
-	"runtime.<name>.usage": "runtime.iterators.<name>.type",
-	"runtime.<name>.<ropt>_val": "runtime.iterators.<name>.values.<ropt>",
+	"runtime.<it>.key": ["call:if '<it>'.startswith('n_'): k = 'runtime.iterators.<it>.numeric=true'", "runtime.iterators.<it>.option"],
+	"runtime.<it>.usage": "runtime.iterators.<it>.type",
+	"runtime.<it>.<ropt>_val": "runtime.iterators.<it>.values.<ropt>",
 
 	"te.<name>.type": null,
 	"te.<name>.files": "<name>.build.sources.files",
@@ -63,14 +64,17 @@
 	"te.<name>.cargs": "<name>.build.cflags",
 	"te.<name>.chdir": ["<name>.build.cwd", "<name>.run.cwd"],
 	"te.<name>.target": "<name>.build.make.target",
-	"te.<name>.openmp": "<name>.build.variants.<append>",
-	"te.<name>.tbb": "<name>.build.variants.<append>",
-	"te.<name>.accl": "<name>.build.variants.<append>",
 	"te.<name>.deps": "<name>.run.depends_on",
 	"te.<name>.args": "<name>.run.iterate.program.args.values",
 	"te.<name>.time": "<name>.run.validate.time.mean_time",
 	"te.<name>.tolerance": "<name>.run.validate.time.tolerance",
 	"te.<name>.timeout": "<name>.run.validate.time.kill_after",
 	"te.<name>.returns": "<name>.run.validate.expect_exit",
-	"te.<name>.herit": null
+	"te.<name>.herit": null,
+	"te.<name>.tbb": "<name>.build.variants+tbb",
+	"te.<name>.accl": "<name>.build.variants+accl",
+	"te.<name>.openmp": "<name>.build.variants+openmp",
+
+	"te.<name>.<te_it>": "<name>.run.iterate.<te_it>",
+	"te.<name>.test": "<name>.run.testing+true"
 }
