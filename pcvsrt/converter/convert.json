@@ -59,7 +59,7 @@
 	"runtime.<it>.<ropt>_val": "runtime.iterators.<it>.values.<ropt>",
 
 	"te.<name>.type": null,
-	"te.<name>.files": "<name>.build.sources.files",
+	"te.<name>.files": ["<name>.build.sources.files", "<name>.build.make.file"],
 	"te.<name>.bin": ["<name>.build.sources.binary", "<name>.run.program"],
 	"te.<name>.cargs": "<name>.build.cflags",
 	"te.<name>.chdir": ["<name>.build.cwd", "<name>.run.cwd"],

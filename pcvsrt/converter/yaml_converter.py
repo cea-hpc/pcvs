@@ -210,6 +210,10 @@ def print_version(ctx, param, value) -> None:
               type=click.Choice(['compiler', 'runtime', 'environment', 'te'],
                                 case_sensitive=False),
               required=True, help="Select a kind to apply for the file")
+@click.option("-t", "--template", "template",
+              type=click.Path(exists=True, dir_okay=False, readable=True),
+              required=False, default=None,
+              help="Optional template file (=group) to resolve aliases")
 @click.option("-s", "--scheme", "scheme", required=False, default=None,
               type=click.Path(exists=True, dir_okay=False, readable=True),
               help="Override default spec by custom one")
@@ -226,27 +230,53 @@ def print_version(ctx, param, value) -> None:
 @click.option("-o", "--output", "out", default=None,
               type=click.Path(exists=False, dir_okay=False),
               help="Filepath where to put the converted YAML")
+@click.option("--stdout", "stdout", is_flag=True, default=False,
+              help="Print the stdout nothing but the converted data")
 @click.argument("input_file", type=click.Path(exists=True, dir_okay=False,
                                               readable=True, allow_dash=True))
+@click.option("-F", "--fancy", "enrich_exp", default=False, is_flag=True,
+              help="Visually enrich your PCVS experience :)")
 @click.pass_context
-def main(ctx, color, encoding, verbose, kind, input_file, out, scheme) -> None:
+def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, scheme, template, stdout) -> None:
     """
     Process the conversion from one YAML format to another.
     Conversion specifications are described by the SCHEME file.
     """
     # Click specific-related
     ctx.color = color
-
-    logs.init(verbose, encoding)
+    kind = kind.lower()
+    logs.init(verbose, encoding, enrich_exp)
+    logs.enrich_print(
+        "Welcome to this PCVS-oriented YAML to YAML converter."
+        "The purpose of this script is to convert files from the old deprecated"
+        " syntax to the new one in a minimal effort. Please note that because"
+        " of the large flexibility allowed by the syntax, the conversion may"
+        " fail and a human proofreading is required to ensure correctness",
+        skippable=True
+    )
     logs.print_header("YAML Conversion")
-    logs.print_item("Loading data file & scheme")
+    
+
+    if template is None and kind == "te":
+        logs.warn("If the TE file contains YAML aliases, the conversion may",
+                  "fail. Use the '--template' option to provide the YAML file",
+                  "containing these aliases")
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
-    data_to_convert = yaml.load(f, Loader=yaml.FullLoader)
+    try:
+        logs.print_item("Load data file: {}".format(f.name))
+        stream = f.read()
+        if template:
+            logs.print_item("Load template file: {}".format(template))
+            stream = open(template, 'r').read() + stream
+        data_to_convert = yaml.load(stream, Loader=yaml.FullLoader)
+    except yaml.composer.ComposerError as e:
+        logs.err("Issue when parsing YAML: ", "{}".format(e), abort=1)
 
     # load the scheme
     if not scheme:
         scheme = open(os.path.join(os.path.dirname(__file__), "convert.json"))
+    logs.print_item("Load scheme file: {}".format(scheme.name))
     tmp = json.load(scheme)
 
     # if modifiers are declared, replace token with regexes
@@ -270,20 +300,23 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme) -> None:
     data_to_convert = flatten(data_to_convert, "")
 
     # Finally, convert the original data to the final yaml dict
-    logs.print_item("Process the data file: {}".format(
-        "standard input" if input_file == "-" else input_file))
+    logs.print_item("Process the data")
     final_data = process(data_to_convert)
     logs.info("Final layout:", "{}".format(pprint.pformat(final_data)))
 
-    if out is None:
-        prefix, base = os.path.split(
-            "./file.yml" if input_file == "-" else input_file)
-        out = os.path.join(prefix, "converted-"+base)
+    if stdout:
+        f = sys.stdout
+    else:
+        if out is None:
+            prefix, base = os.path.split(
+                "./file.yml" if input_file == "-" else input_file)
+            out = os.path.join(prefix, "convert-" + base)
+        f = open(out, "w")
 
-    with open(out, "w") as f:
-        logs.print_section("Converted file written into: {}".format(f.name))
-        yaml.dump(final_data, f)
+    logs.print_section("Converted data written into {}".format(f.name))
+    yaml.dump(final_data, f)
 
+    f.close()
 
 """
 MISSING:
