@@ -3,7 +3,8 @@ import os
 
 import yaml
 
-from pcvsrt import config, files, globals, logs
+from pcvsrt import config, files, logs
+from pcvsrt import globals as pvGlobals
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -27,10 +28,10 @@ def extract_profile_from_token(s, single="right"):
 def init():
     global PROFILE_EXISTING, PROFILE_STORAGES
     PROFILE_STORAGES = {k: os.path.join(
-        v, "saves/profile") for k, v in globals.STORAGES.items()}
+        v, "saves/profile") for k, v in pvGlobals.STORAGES.items()}
     PROFILE_EXISTING = {}
     # this first loop defines configuration order
-    priority_paths = globals.storage_order()
+    priority_paths = pvGlobals.storage_order()
     priority_paths.reverse()
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
@@ -39,16 +40,9 @@ def init():
                 (os.path.basename(pfile)[:-4], pfile))
 
 
-def check_valid_scope(s):
-    if s not in PROFILE_STORAGES.keys() and s is not None:
-        logs.err("Invalid SCOPE '{}'".format(s),
-                 "See --help for more information",
-                 abort=1)
-
-
 def check_existing_name(name, scope):
     path = None
-    scopes = globals.storage_order() if scope is None else [scope]
+    scopes = pvGlobals.storage_order() if scope is None else [scope]
     for sc in scopes:
         for pair in PROFILE_EXISTING[sc]:
             if name == pair[0]:
@@ -76,7 +70,7 @@ def list_profiles(scope=None):
 
 class Profile:
     def __init__(self, name, scope=None):
-        check_valid_scope(scope)
+        pvpvGlobals.check_valid_scope(scope)
         self._name = name
         self._scope = scope
         self._details = {}

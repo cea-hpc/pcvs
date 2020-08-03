@@ -5,7 +5,8 @@ import os
 import jsonschema
 import yaml
 
-from pcvsrt import files, globals, logs
+from pcvsrt import files, logs
+from pcvsrt import globals as pvGlobals
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = list()
@@ -41,14 +42,14 @@ def extract_config_from_token(s, pair="right", single="right"):
 def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_STORAGES = {k: os.path.join(v, "saves")
-                       for k, v in globals.STORAGES.items()}
+                       for k, v in pvGlobals.STORAGES.items()}
     CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
     CONFIG_EXISTING = {}
 
     # this first loop defines configuration order
     for block in CONFIG_BLOCKS:
         CONFIG_EXISTING[block] = {}
-        priority_paths = globals.storage_order()
+        priority_paths = pvGlobals.storage_order()
         priority_paths.reverse()
         for token in priority_paths:  # reverse order (overriding)
             CONFIG_EXISTING[block][token] = []
@@ -69,15 +70,15 @@ def list_blocks(kind, scope=None):
 
 
 def check_valid_kind(s):
-    if s not in CONFIG_BLOCKS:
-        logs.err("Invalid KIND '{}'".format(s),
+    if s is None:
+        logs.err("You must specify a 'kind' when referring to a conf. block",
+                 "Allowed values: {}".format(", ".join(CONFIG_BLOCKS)),
                  "See --help for more information",
                  abort=1)
 
-
-def check_valid_scope(s):
-    if s not in CONFIG_STORAGES.keys() and s is not None:
-        logs.err("Invalid SCOPE '{}'".format(s),
+    if s not in CONFIG_BLOCKS:
+        logs.err("Invalid KIND '{}'".format(s),
+                 "Allowed values: {}".format(", ".join(CONFIG_BLOCKS)),
                  "See --help for more information",
                  abort=1)
 
@@ -85,7 +86,7 @@ def check_valid_scope(s):
 def check_existing_name(kind, name, scope):
     assert (kind in CONFIG_BLOCKS)
     path = None
-    scopes = globals.storage_order() if scope is None else [scope]
+    scopes = pvGlobals.storage_order() if scope is None else [scope]
 
     for sc in scopes:
         for pair in CONFIG_EXISTING[kind][sc]:
@@ -105,7 +106,7 @@ def compute_path(kind, name, scope):
 
 
 class ConfigurationScheme:
-    _scheme_prefix = os.path.join(globals.ROOTPATH, "share/schemes")
+    _scheme_prefix = os.path.join(pvGlobals.ROOTPATH, "share/schemes")
 
     def __init__(self, kind):
         pass
@@ -123,11 +124,11 @@ class ConfigurationScheme:
 
 
 class ConfigurationBlock:
-    _template_path = os.path.join(globals.ROOTPATH, "share/templates")
+    _template_path = os.path.join(pvGlobals.ROOTPATH, "share/templates")
 
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
-        check_valid_scope(scope)
+        pvGlobals.check_valid_scope(scope)
         self._kind = kind
         self._name = name
         self._details = {}

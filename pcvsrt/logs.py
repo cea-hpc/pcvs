@@ -99,7 +99,7 @@ def print_header(s, out=True):
 
 def print_section(s, out=True):
     f = "{} {}".format(utf('sec'), s)
-    s = click.style(f, fg='yellow', blink=True)
+    s = click.style(f, fg='yellow')
     if out:
         click.echo(s, err=True)
     else:

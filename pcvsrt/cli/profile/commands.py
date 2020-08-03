@@ -53,7 +53,7 @@ def profile_list(ctx, token):
     if label:
         logs.warn("no LABEL required for this command")
 
-    pvProfile.check_valid_scope(scope)
+    pvGlobals.check_valid_scope(scope)
 
     logs.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)

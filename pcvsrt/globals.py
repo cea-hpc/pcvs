@@ -31,6 +31,13 @@ def storage_order():
     return ['local', 'user', 'global']
 
 
+def check_valid_scope(s):
+    if s not in storage_order() and s is not None:
+        logs.err("Invalid SCOPE '{}'".format(s),
+                 "Allowed values are: None, local, user & global",
+                 "See --help for more information",
+                 abort=1)
+
 LINELENGTH = 93
 ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
 STORAGES = {

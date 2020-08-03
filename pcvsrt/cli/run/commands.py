@@ -7,6 +7,24 @@ from pcvsrt.cli.profile import commands as cmdProfile
 from pcvsrt import files, logs
 
 
+def iterate_dirs(ctx, param, value) -> list:
+    list_of_dirs = []
+    if not value:  # if not specified
+        curdir = os.getcwd()
+        list_of_dirs.append((os.path.basename(curdir), curdir))
+    else:  # once specified
+        for d in value:
+            if ':' in d:  # split under LABEL:PATH semantics
+                [label, testpath] = d.split(':')
+                testpath = os.path.abspath(testpath)
+            else:  # otherwise, LABEL = dirname
+                testpath = os.path.abspath(d)
+                label = os.path.basename(testpath)
+
+            list_of_dirs.append((label, testpath))
+    return list_of_dirs
+
+
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cmdProfile.compl_list_token,
@@ -34,14 +52,14 @@ from pcvsrt import files, logs
               help="Resume a previously paused run")
 @click.option("-b", "--bootstrap", "bootstrap",
               default=False, is_flag=True, show_envvar=True,
-              help="Initialize basic test templates in given dirs")
+              help="Initialize basic test templates in given directory")
 @click.option("-f", "--override", "override",
               default=False, is_flag=True, show_envvar=True,
-              help="Allow to reuse an already existing output dir")
-@click.argument("list_of_dirs", nargs=-1, type=str)
+              help="Allow to reuse an already existing output directory")
+@click.argument("dirs", nargs=-1,
+                type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, log, detach, status,
-        resume, pause, bootstrap, override, set_default, list_of_dirs):
+def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap, override, set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -52,22 +70,22 @@ def run(ctx, profilename, output, log, detach, status,
     # parse non-run situations
     if bootstrap:
         logs.info("Bootstrapping directories")
-        for directory in list_of_dirs:
-            run.init_structure(directory)
+        logs.nimpl("Bootstrap")
         exit(0)
     elif pause and resume:
-        logs.err("Cannot pause and resume the run at the same time!")
+        logs.err("Cannot pause and resume the run at the same time!", abort=1)
     elif pause:
-        logs.info("Pause the current run")
+        logs.nimpl("pause")
         exit(0)
     elif resume:
-        logs.info("Resume the current run")
+        logs.nimpl("resume")
         exit(0)
     elif status:
-        logs.info("Get status about the running validation")
+        logs.nimpl("status")
         exit(0)
     elif set_default:
-        files.open_in_editor("defaults")
+        logs.nimpl("set_defaultss")
+        #files.open_in_editor("defaults")
         exit(0)
 
     # fill validation settings
@@ -81,40 +99,28 @@ def run(ctx, profilename, output, log, detach, status,
     settings['bg'] = detach
     settings['override'] = override
 
-    # analys directory list
-    dict_of_dirs = {}
-    err_dirs = []
-    if not list_of_dirs:  # if not specified
-        curdir = os.getcwd()
-        dict_of_dirs[os.path.basename(curdir)] = curdir
-    else:  # once specified
-        for d in list_of_dirs:
-            if ':' in d:  # split under LABEL:PATH semantics
-                [label, testpath] = d.split(':')
-                testpath = os.path.abspath(testpath)
-            else:  # otherwise, LABEL = dirname
-                testpath = os.path.abspath(d)
-                label = os.path.basename(testpath)
+    # analyse directory list
+    err_dirs = [(label, path) for label, path in dirs if not os.path.isdir(path)]
 
-            # if path does not exist
-            if not os.path.isdir(testpath):
-                err_dirs.append(testpath)
-
-            dict_of_dirs[label] = testpath
-
-    # list all non-existent dirs
-    if err_dirs:
+    if len(err_dirs) > 0:
         logs.err("Following arguments should be valid paths:")
-        for p in err_dirs:
-            logs.err('- {}'.format(p))
+        for label, path in err_dirs:
+            logs.err('- {}: {}'.format(label, path))
         logs.err("please see '--help' for more information", abort=1)
 
+    list_of_labels = [l for l, p in dirs]
+    if len(list_of_labels) != len(set(list_of_labels)):
+        logs.err("Path labels must be unique! 2 possible causes:",
+                 "  - An explicit label is used more than once",
+                 "  - Two 'no-labeled' paths have the same basename",
+                 abort=1)
+    
     logs.banner()
 
     logs.print_header("pre-actions")
     pvRun.prepare(settings)
 
-    pvRun.load_benchmarks(dict_of_dirs)
+    pvRun.load_benchmarks(dirs)
 
     logs.print_header("validation start")
     pvRun.run()
