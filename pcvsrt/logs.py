@@ -3,7 +3,14 @@ import click
 import logging
 from pcvsrt import globals
 
+try:
+    import cowsay
+except ImportError:
+    pass
+
+
 FORMAT = "%(levelname)s: %(message)s"
+enrich_display = False
 glyphs = {
     'copy': '(c)',
     'item': '*',
@@ -31,6 +38,7 @@ def __set_logger(v):
         lv = logging.WARNING
 
     logging.basicConfig(format=FORMAT, level=lv)
+    logging.disabled = True
 
 
 def __set_encoding(e):
@@ -51,10 +59,18 @@ def __set_encoding(e):
         glyphs['sep_h'] = "\u23BC"
 
 
-def init(verbose, encoding):
+def init(verbose, encoding, enrich_exp=False):
+    global enrich_display
     __set_logger(verbose)
     __set_encoding(encoding)
-    pass
+    if enrich_exp:
+        if not cowsay:
+            logs.warn(
+                "Unable to enrich your experience without the following modules:",
+                " - cowsay"
+            )
+        else:
+            enrich_display = True
 
 
 def cl(s, color='reset', **args):
@@ -75,7 +91,7 @@ def print_header(s, out=True):
 
     s = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
     if out:
-        click.echo(s)
+        click.echo(s, err=True)
     else:
         return s
     pass
@@ -85,7 +101,7 @@ def print_section(s, out=True):
     f = "{} {}".format(utf('sec'), s)
     s = click.style(f, fg='yellow', blink=True)
     if out:
-        click.echo(s)
+        click.echo(s, err=True)
     else:
         return s
 
@@ -96,7 +112,7 @@ def print_item(s, depth=1, out=True):
 
     s = click.style(bullet, fg="red") + click.style(content, fg="reset")
     if out:
-        click.echo(s)
+        click.echo(s, err=True)
     else:
         return s
 
@@ -120,21 +136,51 @@ def warn(*msg):
 
 
 def err(*msg, abort=0):
+    global enrich_display
     for elt in msg:
         for line in elt.split('\n'):
             logging.error(click.style(line, fg="red", bold=True))
 
     if abort:
-        logging.error(click.style("Now going to abort.", fg="red", bold=True))
+        if enrich_display:
+            cowsay.tux(
+                "Im sorry but an unfortunate error forced me to stop this program"
+                "If I'm doing it wrong, feel free to yell at people who coded"
+                " me. Sorry for the inconvenience."
+                )
+        else:
+            logging.error(click.style(
+                "Fatal error(s) above. The program will now stop!",
+                fg="red", bold=True))
         sys.exit(abort)
 
 
 def nimpl(*msg):
-    warn("Not implemented! (WIP)")
+    global enrich_display
+    s = "'{}' not implemented yet! (WIP)".format(*msg)
+    if enrich_display:
+        cowsay.daemon(click.style(s, fg="yellow", bold=True))
+    else:
+        warn(s)
 
 
 def nreach(*msg):
-    err("Should not be reached!", abort=1)
+    if enrich_display:
+        cowsay.tux(
+            "Uh oh, I reached this point but one ever told me I'll never go "
+            "that far! I'm afraid something really bad happened. Please send "
+            "help, I'm scared! Here are my coordinates: {}".format(*msg))
+    else:
+        err(click.style("{} should not be reached in any way! "
+            "Something went wrong".format(*msg), fg='red', bold=True))
+
+
+def enrich_print(*msg, skippable=False):
+    global enrich_display
+    if enrich_display:
+        cowsay.tux(*msg)
+    elif skippable is False:
+        click.secho(*msg)
 
 
 def print_n_stop(**kwargs):

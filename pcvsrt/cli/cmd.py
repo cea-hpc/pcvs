@@ -5,11 +5,12 @@ import os
 import click
 import pkg_resources
 
-from pcvsrt import config, globals, logs, profile
+from pcvsrt import config, globals, logs, profile, bank
 
 from .config import commands as cmdConfig
 from .profile import commands as cmdProfile
 from .run import commands as cmdRun
+from .bank import commands as cmdBank
 
 
 CONTEXT_SETTINGS = dict(
@@ -46,8 +47,10 @@ def print_version(ctx, param, value):
               is_flag=True, help="Display current version")
 @click.option("-w", "--width", "width", type=int, default=0,
               help="Terminal width (autodetection if omitted")
+@click.option("-F", "--fancy", "enrich_exp", default=False, is_flag=True,
+              help="Visually enrich your PCVS experience :)")
 @click.pass_context
-def cli(ctx, verbose, color, encoding, exec_path, width):
+def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
@@ -57,13 +60,14 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     # Click specific-related
     ctx.color = color
 
-    logs.init(verbose, encoding)
+    logs.init(verbose, encoding, enrich_exp)
     globals.set_exec_path(ctx.obj['exec'])
     globals.LINELENGTH, _ = click.get_terminal_size()
 
     # detections
     config.init()
     profile.init()
+    bank.init()
 
 
 @cli.command(
@@ -102,3 +106,4 @@ def cli_doc(ctx, category):
 cli.add_command(cmdConfig.config)
 cli.add_command(cmdProfile.profile)
 cli.add_command(cmdRun.run)
+cli.add_command(cmdBank.bank)

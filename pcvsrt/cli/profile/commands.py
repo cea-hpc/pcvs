@@ -18,7 +18,7 @@ def compl_list_token(ctx, args, incomplete):  # pragma: no cover
     return [elt for elt in flat_array if incomplete in elt]
 
 
-@click.group(name="profile", short_help="profile")
+@click.group(name="profile", short_help="Manage Profiles")
 @click.pass_context
 def profile(ctx):
     """
@@ -102,6 +102,11 @@ def profile_show(ctx, token):
 
 def profile_interactive_select():
     composition = {}
+    logs.enrich_print("Hello! I'm Tux and I'm here to assist you building a "
+                      "valid profile from a combination of configuration blocks."
+                      " Lists are based on currently found files on "
+                      "your system. If possible, a default block  will be"
+                      " loaded".format(len(pvConfig.CONFIG_BLOCKS)), skippable=True)
     for kind in pvConfig.CONFIG_BLOCKS:
         logs.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
@@ -116,7 +121,6 @@ def profile_interactive_select():
             default = None
         for i, cell in enumerate(choices):
             logs.print_item("{}: {}".format(i + 1, cell))
-        print(choices)
         while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
         (scope, _, label) = pvConfig.extract_config_from_token(
@@ -259,6 +263,7 @@ def profile_alter(ctx, token, editor):
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.argument("src_file", type=click.File('r'))
+@click.option("--test", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, token, src_file):
     (scope, label) = pvProfile.extract_profile_from_token(token)
