@@ -131,12 +131,10 @@ def test_destroy(scope, kind, caplog):
         caplog.clear()
         _ = run_and_test('config', 'destroy', '-f', token, success=False)
         assert("not found!" in caplog.text)
+        
 
-
-@pytest.mark.parametrize('kind', ['compiler', 'runtime', 'group', 'machine', 'criterion']
-)
-@pytest.mark.parametrize('scope', [None, 'local']
-)
+@pytest.mark.parametrize('kind', ['compiler', 'runtime', 'group', 'machine', 'criterion'])
+@pytest.mark.parametrize('scope', [None, 'local'])
 def test_import(scope, kind, caplog):
     with isolated_fs():
         fn = './tmp-file.yml'

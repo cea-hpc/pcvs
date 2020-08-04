@@ -171,8 +171,8 @@ def config_create(ctx, token, clone) -> None:
         copy.clone(base)
         copy.flush_to_disk()
     else:
-        logs.err("Configuration '{}' already exists! ({})".format(
-            label, copy.scope), abort=1)
+        logs.err("Configuration '{}' already exists!".format(
+            copy.full_name), abort=1)
 
 
 @config.command(name="destroy", short_help="Remove a config block")
@@ -194,11 +194,6 @@ def config_destroy(ctx, token) -> None:
 
     c = pvConfig.ConfigurationBlock(kind, label, scope)
     if c.is_found():
-        if c.scope == 'global' and label == 'default':
-            logs.err(
-                "No alteration allowed from CLI for global configurations",
-                "Please proceed manually (with care)",
-                abort=1)
         c.delete()
     else:
         logs.err("Configuration '{}' not found!".format(label),
@@ -224,11 +219,6 @@ def config_edit(ctx, token, editor) -> None:
 
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
-        if block.scope == 'global' and label == 'default':
-            logs.err(
-                "No alteration allowed from CLI for global configurations",
-                "Please proceed manually (with care)",
-                abort=1)
         block.open_editor(editor)
         block.flush_to_disk()
     else:

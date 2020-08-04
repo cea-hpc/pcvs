@@ -29,15 +29,15 @@ def extract_config_from_token(s, pair="right", single="right"):
         else:
             return (None, array[0], array[1])
     elif len(array) == 1:
-        if single == "left":
+        if single == "left":  # pragma: no cover
             return (s, None, None)
         elif single == "center":
             return (None, s, None)
         else:
             return (None, None, s)
-    else:
+    else:  # pragma: no cover
         logs.nreach()
-    return (None, None, None)
+    return (None, None, None)  # pragma: no cover
 
 
 def init():
@@ -97,10 +97,6 @@ def check_existing_name(kind, name, scope):
     return (None, None)
 
 
-def check_path(kind, name, scope):
-    return os.path.isfile(compute_path(kind, name, scope))
-
-
 def compute_path(kind, name, scope):
     assert (scope is not None)
     return os.path.join(CONFIG_STORAGES[scope], kind, name + ".yml")
@@ -142,16 +138,8 @@ class ConfigurationBlock:
         return self._file is not None
 
     @property
-    def scope(self):
-        return self._scope
-
-    @property
     def full_name(self):
         return ".".join([self._scope, self._kind, self._name])
-
-    @property
-    def short_name(self):
-        return self._name
 
     def fill(self, raw):
         assert (isinstance(raw, dict))
@@ -220,10 +208,9 @@ class ConfigurationBlock:
         logs.print_header("Configuration display")
         logs.print_section("Scope: {}".format(self._scope.capitalize()))
         logs.print_section("Path: {}".format(self._file))
-        if self._details:
-            logs.print_section("Details:")
-            for k, v in self._details.items():
-                logs.print_item("{}: {}".format(k, v))
+        logs.print_section("Details:")
+        for k, v in self._details.items():
+           logs.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
         assert (self._file is not None)
