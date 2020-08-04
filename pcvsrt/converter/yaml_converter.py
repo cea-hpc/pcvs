@@ -200,7 +200,7 @@ def print_version(ctx, param, value) -> None:
     """print converter version number, tied to PCVS-RT version number """
     if not value or ctx.resilient_parsing:
         return
-    version = pkg_resources.require("pcvs-rt")[0].version
+    version = pkg_resources.require("pcvsrt")[0].version
     click.echo('YAML Converter (pcvs-rt Suite) -- version {}'.format(version))
     ctx.exit()
 

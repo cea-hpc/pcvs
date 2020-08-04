@@ -7,10 +7,10 @@ import pkg_resources
 
 from pcvsrt import config, globals, logs, profile, bank
 
-from .config import commands as cmdConfig
-from .profile import commands as cmdProfile
-from .run import commands as cmdRun
-from .bank import commands as cmdBank
+from pcvsrt.cli.config import commands as cmdConfig
+from pcvsrt.cli.profile import commands as cmdProfile
+from pcvsrt.cli.run import commands as cmdRun
+from pcvsrt.cli.bank import commands as cmdBank
 
 
 CONTEXT_SETTINGS = dict(
@@ -25,7 +25,7 @@ CONTEXT_SETTINGS = dict(
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    version = pkg_resources.require("pcvs-rt")[0].version
+    version = pkg_resources.require("pcvsrt")[0].version
     click.echo('PCVS Runtime Tool (pcvs-rt) -- version {}'.format(version))
     ctx.exit()
 
