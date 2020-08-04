@@ -13,10 +13,9 @@ before_script:
     - web
 
 stages:
-- lint
 - install
 - cli_test
-- unit_test
+- lint
 
 flake:
     <<: *scope
@@ -37,7 +36,7 @@ cli_config:
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
     stage: cli_test
     script:
-    - pip install .
+    - pip install -e .
     - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _config
 
 cli_profile:
@@ -45,7 +44,7 @@ cli_profile:
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
     stage: cli_test
     script:
-    - pip install .
+    - pip3 install -e .
     - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _profile
 
 cli_run:
@@ -53,12 +52,26 @@ cli_run:
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
     stage: cli_test
     script:
-    - pip install .
+    - pip install -e .
     - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _run
 
-tbw:
+pip:
     <<: *scope
-    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: unit_test
+    stage: install
     script:
-    - exit 1
+    - pip3 install wheel
+    - python3 setup.py bdist_wheel
+    - pip3 install dist/*.whl
+    - pcvs --version
+
+from_sources:
+    <<: *scope
+    stage: install
+    script:
+    - mkdir dist_sources
+    - python3 setup.py sdist --formats=gztar
+    - tar xf dist/pcvsrt-*.tar.gz -C $PWD/dist_sources
+    - python3 $PWD/dist_sources/*/setup.py install
+    - pcvs --version
+
+    

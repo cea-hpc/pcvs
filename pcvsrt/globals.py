@@ -1,5 +1,6 @@
 import os
 from os import path
+from pcvsrt import logs
 
 
 def __determine_local_prefix(path, prefix):

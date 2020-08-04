@@ -117,7 +117,7 @@ def test_destroy(scope, kind, caplog):
         if kind is None:
             _ = run_and_test('config', 'create', token, success=False)
             if scope is None:
-                assert("Invalid KIND 'None'" in caplog.text)
+                assert("You must specify" in caplog.text)
             else:
                 assert ("Invalid KIND 'local'" in caplog.text)
             return
