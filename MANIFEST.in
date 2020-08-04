@@ -1,0 +1,10 @@
+recursive-include pcvsrt/schemes *.json
+recursive-include pcvsrt/templates *.yml
+
+include utils/get_version
+include .version
+
+include CHANGES
+include COPYING
+include README
+include requirements.txt

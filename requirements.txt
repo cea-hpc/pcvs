@@ -1,0 +1,3 @@
+PyYAML
+Click>=7.0
+jsonschema
