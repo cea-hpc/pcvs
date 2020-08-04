@@ -70,7 +70,7 @@ def list_profiles(scope=None):
 
 class Profile:
     def __init__(self, name, scope=None):
-        pvpvGlobals.check_valid_scope(scope)
+        pvGlobals.check_valid_scope(scope)
         self._name = name
         self._scope = scope
         self._details = {}

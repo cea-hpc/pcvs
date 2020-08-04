@@ -4,6 +4,7 @@ import os
 
 import jsonschema
 import yaml
+import pkg_resources
 
 from pcvsrt import files, logs
 from pcvsrt import globals as pvGlobals
@@ -106,21 +107,21 @@ def compute_path(kind, name, scope):
 
 
 class ConfigurationScheme:
-    _scheme_prefix = os.path.join(pvGlobals.ROOTPATH, "share/schemes")
 
     def __init__(self, kind):
         pass
 
     def validate(self, conf):
-        assert (isinstance(conf, ConfigurationBlock))
-        filepath = os.path.join(self._scheme_prefix,
-                                conf._kind + "-scheme.json")
-        with open(filepath, 'r') as f:
-            logs.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
-            return
 
-            schema = json.load(f)
-            jsonschema.validate(instance=conf._details, schema=schema)
+        assert (isinstance(conf, ConfigurationBlock))
+        stream = pkg_resources.resource_string(
+            __name__,
+            'schemes/{}-scheme.json'.format(conf._kind)),
+        
+        logs.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
+        return
+        schema = json.load(stream)
+        jsonschema.validate(instance=conf._details, schema=schema)
 
 
 class ConfigurationBlock:
@@ -177,9 +178,8 @@ class ConfigurationBlock:
             self.check()
 
     def load_template(self):
-        fp = os.path.join(self._template_path, self._kind + "-format.yml")
-        with open(fp, "r") as f:
-            self.fill(yaml.load(f, Loader=yaml.FullLoader))
+        stream = pkg_resources.resource_string(__name__, 'templates/{}-format.yml'.format(self._kind))
+        self.fill(yaml.load(stream, Loader=yaml.FullLoader))
 
     def flush_to_disk(self):
         self._file = compute_path(self._kind, self._name, self._scope)
