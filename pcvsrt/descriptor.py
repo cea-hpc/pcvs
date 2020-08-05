@@ -6,8 +6,7 @@ class TEDescriptor:
         if not isinstance(node, dict):
             logs.err(
                 "Unable to build a TestDescription "
-                "from the given node (got %s)",
-                type(node), abort=1)
+                "from the given node (got {})".format(type(node)), abort=1)
 
 
 if __name__ == '__main__':

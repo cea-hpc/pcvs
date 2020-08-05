@@ -7,8 +7,8 @@ from pcvsrt.cli.profile import commands as cmdProfile
 from pcvsrt import files, logs
 
 
-def iterate_dirs(ctx, param, value) -> list:
-    list_of_dirs = []
+def iterate_dirs(ctx, param, value) -> dict:
+    list_of_dirs = dict()
     if not value:  # if not specified
         curdir = os.getcwd()
         list_of_dirs.append((os.path.basename(curdir), curdir))
@@ -21,7 +21,7 @@ def iterate_dirs(ctx, param, value) -> list:
                 testpath = os.path.abspath(d)
                 label = os.path.basename(testpath)
 
-            list_of_dirs.append((label, testpath))
+            list_of_dirs[label] = testpath
     return list_of_dirs
 
 
@@ -100,7 +100,7 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     settings['override'] = override
 
     # analyse directory list
-    err_dirs = [(label, path) for label, path in dirs if not os.path.isdir(path)]
+    err_dirs = [(label, path) for label, path in dirs.items() if not os.path.isdir(path)]
 
     if len(err_dirs) > 0:
         logs.err("Following arguments should be valid paths:")
@@ -108,8 +108,7 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
             logs.err('- {}: {}'.format(label, path))
         logs.err("please see '--help' for more information", abort=1)
 
-    list_of_labels = [l for l, p in dirs]
-    if len(list_of_labels) != len(set(list_of_labels)):
+    if len(dirs.keys()) != len(set(dirs.keys())):
         logs.err("Path labels must be unique! 2 possible causes:",
                  "  - An explicit label is used more than once",
                  "  - Two 'no-labeled' paths have the same basename",
@@ -118,9 +117,9 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     logs.banner()
 
     logs.print_header("pre-actions")
-    pvRun.prepare(settings)
+    pvRun.prepare(settings, dirs)
 
-    pvRun.load_benchmarks(dirs)
+    pvRun.load_benchmarks()
 
     logs.print_header("validation start")
     pvRun.run()
