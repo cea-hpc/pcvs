@@ -1,6 +1,7 @@
 from .cli_testing import run_and_test, isolated_fs
 import pytest
-
+from pytest_mock import mocker
+from pcvsrt import config as pvConfig
 
 def test_cmd():
     res = run_and_test('profile')
@@ -27,6 +28,7 @@ def test_list_wrong(caplog):
 
 @pytest.mark.parametrize('scope', [None, 'local'])
 def test_build(scope, caplog):
+    mocker.patch.object(pvConfig.ConfigurationBlock, )
     with isolated_fs():
         _ = run_and_test('profile', 'build', 'local.default')
 
