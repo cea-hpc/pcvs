@@ -157,8 +157,9 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
             logs.info("DISCARDING {}".format(k))
             if warn_if_missing:
                 logs.warn("Key {} undeclared in spec.".format(k))
-            # but still, keep it in the final output
-            set_with(output, k.split("."), v)
+                set_with(output, ['pcvsrt_missing'] + k.split("."), v)
+            else:
+                set_with(output, k.split("."), v)
     return output
 
 
@@ -255,7 +256,6 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
         skippable=True
     )
     logs.print_header("YAML Conversion")
-    
 
     if template is None and kind == "te":
         logs.warn("If the TE file contains YAML aliases, the conversion may",
@@ -302,6 +302,13 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
     # Finally, convert the original data to the final yaml dict
     logs.print_item("Process the data")
     final_data = process(data_to_convert)
+
+    # remove template key from the output to avoid polluting the caller
+    logs.print_item("Pruning templates from the final data")
+    invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
+    logs.info("Prune the following:", "{}".format(pprint.pformat(invalid_nodes)))
+    [final_data.pop(x, None) for x in invalid_nodes + ["pcvsrt_missing"]]
+    
     logs.info("Final layout:", "{}".format(pprint.pformat(final_data)))
 
     if stdout:
@@ -314,7 +321,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
         f = open(out, "w")
 
     logs.print_section("Converted data written into {}".format(f.name))
-    yaml.dump(final_data, f)
+    yaml.dump(final_data, f, default_style='"')
 
     f.close()
 
