@@ -1,6 +1,7 @@
 import sys
 import click
 import logging
+import pprint
 from pcvsrt import globals
 
 try:
@@ -65,7 +66,7 @@ def init(verbose, encoding, enrich_exp=False):
     __set_encoding(encoding)
     if enrich_exp:
         if not cowsay:
-            logs.warn(
+            warn(
                 "Unable to enrich your experience without the following modules:",
                 " - cowsay"
             )
@@ -186,7 +187,7 @@ def enrich_print(*msg, skippable=False):
 def print_n_stop(**kwargs):
     for k, v in kwargs.items():
         click.secho("{}: ".format(k), fg="yellow", nl=False)
-        click.secho("'{}'".format(v), fg="blue")
+        click.secho(pprint.pformat(v), fg="blue")
     sys.exit(0)
 
 
@@ -195,6 +196,25 @@ def progbar(it, **kargs):
                              info_sep=utf('sep_v'), fill_char=utf('full_pg'),
                              show_percent=False, show_eta=False, show_pos=True,
                              **kargs)
+
+
+def short_banner():
+    logo = [
+        r"""             ____    ______  _    __  _____""",
+        r"""            / __ \  / ____/ | |  / / / ___/""",
+        r"""           / /_/ / / /      | | / /  \__ \ """,
+        r"""          / ____/ / /___    | |/ /  ___/ / """,
+        r"""         /_/      \____/    |___/  /____/  """,
+        r"""                                                """,
+        r"""      Parallel Computing -- Validation Suite """,
+        r"""             Copyright {} 2017 -- CEA       """.format(utf('copy')),
+        r""""""
+    ]
+
+    click.secho("\n".join(logo[0:3]), fg="green")
+    click.secho("\n".join(logo[3:4]), fg="yellow")
+    click.secho("\n".join(logo[4:5]), fg="red")
+    click.secho("\n".join(logo[5:]))
 
 
 def banner():
@@ -247,9 +267,13 @@ def banner():
         r"""                                    """,
     ]
 
-    click.secho("\n".join(logo[0:6]), fg="green")
-    click.secho("\n".join(logo[6:7]))
-    click.secho("\n".join(logo[7:9]), fg="green")
-    click.secho("\n".join(logo[9:11]), fg="yellow")
-    click.secho("\n".join(logo[11:12]), fg="red")
-    click.secho("\n".join(logo[12:]))
+    if globals.LINELENGTH < max(map(lambda x: len(x), logo)):
+        short_banner()
+        return
+    else:
+        click.secho("\n".join(logo[0:6]), fg="green")
+        click.secho("\n".join(logo[6:7]))
+        click.secho("\n".join(logo[7:9]), fg="green")
+        click.secho("\n".join(logo[9:11]), fg="yellow")
+        click.secho("\n".join(logo[11:12]), fg="red")
+        click.secho("\n".join(logo[12:]))

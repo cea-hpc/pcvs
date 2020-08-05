@@ -62,7 +62,9 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
 
     logs.init(verbose, encoding, enrich_exp)
     globals.set_exec_path(ctx.obj['exec'])
-    globals.LINELENGTH, _ = click.get_terminal_size()
+
+    if click.get_terminal_size()[0] < globals.LINELENGTH:
+        globals.LINELENGTH = click.get_terminal_size()[0]
 
     # detections
     config.init()
