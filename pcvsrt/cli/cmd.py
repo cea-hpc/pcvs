@@ -17,8 +17,7 @@ CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
     ignore_unknown_options=True,
     allow_interspersed_args=False,
-    auto_envvar_prefix='PCVS',
-    show_default=True
+    auto_envvar_prefix='PCVS'
 )
 
 
