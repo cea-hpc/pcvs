@@ -1,8 +1,9 @@
 import os
-
+import time
 import click
 
 from pcvsrt import run as pvRun
+from pcvsrt import profile as pvProfile
 from pcvsrt.cli.profile import commands as cmdProfile
 from pcvsrt import files, logs
 
@@ -10,8 +11,8 @@ from pcvsrt import files, logs
 def iterate_dirs(ctx, param, value) -> dict:
     list_of_dirs = dict()
     if not value:  # if not specified
-        curdir = os.getcwd()
-        list_of_dirs.append((os.path.basename(curdir), curdir))
+        testpath = os.getcwd()
+        label = os.path.basename(testpath)
     else:  # once specified
         for d in value:
             if ':' in d:  # split under LABEL:PATH semantics
@@ -21,7 +22,7 @@ def iterate_dirs(ctx, param, value) -> dict:
                 testpath = os.path.abspath(d)
                 label = os.path.basename(testpath)
 
-            list_of_dirs[label] = testpath
+    list_of_dirs[label] = testpath
     return list_of_dirs
 
 
@@ -29,7 +30,7 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cmdProfile.compl_list_token,
               type=str, show_envvar=True, help="an existing profile")
-@click.option("-o", "--output", "output", default="./build", show_envvar=True,
+@click.option("-o", "--output", "output", default=".", show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
               help="Where artefacts will be stored during/after the run")
 @click.option("-c", "--set-defaults", "set_default",
@@ -84,7 +85,7 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
         logs.nimpl("status")
         exit(0)
     elif set_default:
-        logs.nimpl("set_defaultss")
+        logs.nimpl("set_defaults")
         #files.open_in_editor("defaults")
         exit(0)
 
@@ -98,6 +99,13 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     settings['tee'] = log
     settings['bg'] = detach
     settings['override'] = override
+
+    (scope, label) = pvProfile.extract_profile_from_token(profilename)
+    pf = pvProfile.Profile(label, scope)
+    if not pf.is_found():
+        logs.err("Please use a valid profile name:",
+                 "No '{}' found!".format(profilename), abort=1)
+    settings['profile'] = pf.dump()
 
     # analyse directory list
     err_dirs = [(label, path) for label, path in dirs.items() if not os.path.isdir(path)]
@@ -116,13 +124,19 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     
     logs.banner()
 
-    logs.print_header("pre-actions")
+    logs.print_header("Prepare Environment")
     pvRun.prepare(settings, dirs)
 
+    logs.print_header("Process benchmarks")
+    start = time.time()
     pvRun.load_benchmarks()
-
-    logs.print_header("validation start")
+    logs.print_section("===> Loading done in {:<.3f} sec(s)".format(time.time() - start))
+    start = time.time()
+    pvRun.process_benchmarks()
+    logs.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
+    
+    logs.print_header("Validation Start")
     pvRun.run()
 
-    logs.print_header("post-treatment")
+    logs.print_header("Finalization")
     pvRun.terminate()

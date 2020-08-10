@@ -207,7 +207,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     pf.flush_to_disk()
     # pf.display()
 
-    logs.print_section("final profile (registered as {})".format(p_scope))
+    logs.print_section("final profile (registered as {})".format(pf.scope))
     for k, v in pf_blocks.items():
         logs.print_item("{: >9s}: {}".format(
             k.upper(), ".".join([v.scope, v.short_name])))
