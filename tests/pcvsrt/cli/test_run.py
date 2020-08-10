@@ -3,6 +3,10 @@ import pcvsrt
 import os
 
 
+def test_no_userdirs():
+    _ = run_and_test('run')
+
+
 def test_override(caplog):
     with isolated_fs():
         _ = run_and_test('run', '.')
