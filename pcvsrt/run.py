@@ -5,6 +5,7 @@ import shutil
 import tarfile
 import glob
 import pprint
+import pathlib
 import pcvsrt
 from pcvsrt import config, profile, descriptor, globals, logs, files, engine
 
@@ -106,8 +107,8 @@ tokens = {
     '@ROOTPATH@': None,
     '@BROOTPATH@': None,
     '@SPACKPATH@': "TBD",
-    '@HOME@': os.environ['HOME'],
-    '@USER@': os.environ['USER']
+    '@HOME@': str(pathlib.Path.home()),
+    '@USER@': os.getlogin()
 }
 
 
@@ -153,7 +154,7 @@ def __load_yaml_to_tree(f, src, build, prefix):
             logs.debug("Save converted file to {}".format(convert_file))
             with open(convert_file, 'w') as fh:
                 yaml.dump(obj, fh)
-
+    
     return obj
 
 def print_file_walker(elt):
