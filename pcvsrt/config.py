@@ -141,6 +141,14 @@ class ConfigurationBlock:
     def full_name(self):
         return ".".join([self._scope, self._kind, self._name])
 
+    @property
+    def scope(self):
+        return self._scope
+
+    @property
+    def short_name(self):
+        return self._name
+
     def fill(self, raw):
         assert (isinstance(raw, dict))
         self._details = raw

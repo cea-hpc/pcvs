@@ -12,6 +12,12 @@ except ImportError:
 
 FORMAT = "%(levelname)s: %(message)s"
 enrich_display = False
+vb_array = {
+    'normal': (0, logging.WARNING),
+    'info': (1, logging.INFO),
+    'debug': (2, logging.DEBUG)
+}
+verbosity = 0
 glyphs = {
     'copy': '(c)',
     'item': '*',
@@ -30,16 +36,24 @@ glyphs = {
 
 
 def __set_logger(v):
-    lv = None
-    if v > 1:
-        lv = logging.DEBUG
-    elif v > 0:
-        lv = logging.INFO
-    else:
-        lv = logging.WARNING
+    global vb_array
+    global verbosity
+    verbosity = max(min(v, len(vb_array)-1), 0)
+    for _, v in vb_array.items():
+        if verbosity == v[0]:
+            logging.basicConfig(format=FORMAT, level=v[1])
 
-    logging.basicConfig(format=FORMAT, level=lv)
-    logging.disabled = True
+
+def get_verbosity(match):
+    global vb_array
+    assert(match in vb_array.keys())
+    return vb_array[match][0] <= verbosity
+
+
+def get_verbosity_str():
+    for k, v in vb_array.items():
+        if v[0] == verbosity:
+            return k
 
 
 def __set_encoding(e):
@@ -191,10 +205,11 @@ def print_n_stop(**kwargs):
     sys.exit(0)
 
 
-def progbar(it, **kargs):
+def progbar(it, print_func=None, **kargs):
     return click.progressbar(it, empty_char=utf('empty_pg'),
                              info_sep=utf('sep_v'), fill_char=utf('full_pg'),
-                             show_percent=False, show_eta=False, show_pos=True,
+                             show_percent=False, show_eta=False, show_pos=False,
+                             item_show_func=print_func,
                              **kargs)
 
 
