@@ -1,7 +1,7 @@
 {
 	"__tokens": {
 		"<name>": "(?P<name>[a-zA-Z0-9-_]+)",
-		"<ropt>": "(?P<ropt>[a-zA-Z0-9-]+)",
+		"<ropt>": "(?P<ropt>[a-zA-Z0-9-_]+)",
 		"<child_nodes>": "(?P<child_nodes>.*)",
 		"<it>": "(?P<it>.*)",
 		"<te_it>": "(?P<te_it>(?!(type|files|bin|cargs|chdir|target|deps|args|time|tolerance|timeout|returns|herit|tbb|accl|openmp))[a-zA-Z0-9-_]+)"
@@ -53,8 +53,8 @@
 	"runtime.cmd": "runtime.program",
 	"runtime.args": "runtime.args",
 	"runtime.module": "runtime.plugin",
-	"runtime.timeout_prefix": null,
-	"runtime.<it>.key": ["call:if '<it>'.startswith('n_'): k = 'runtime.iterators.<it>.numeric=true'", "runtime.iterators.<it>.option"],
+	"runtime.timeout-prefix": null,
+	"runtime.<it>.key": ["call:k = 'runtime.iterators.<it>.numeric=True' if '<it>'.startswith('n_') else 'runtime.iterators.<it>.numeric=False'", "runtime.iterators.<it>.option"],
 	"runtime.<it>.usage": "runtime.iterators.<it>.type",
 	"runtime.<it>.<ropt>_val": "runtime.iterators.<it>.values.<ropt>",
 

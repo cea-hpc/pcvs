@@ -17,7 +17,15 @@ def separate_key_and_value(s: str, c: str) -> tuple:
     """ helper to split the key and value from a string"""
     array = s.split(c)
     if len(array) > 1:
-        return (array[0], "".join(array[1:]))
+        k = array[0]
+        v = "".join(array[1:])
+        
+        if v.lower() == 'true':
+            v = True
+        elif v.lower() == 'false':
+            v = False
+        
+        return (k, v)
     else:
         return (s, None)
 
@@ -321,7 +329,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
         f = open(out, "w")
 
     logs.print_section("Converted data written into {}".format(f.name))
-    yaml.dump(final_data, f, default_style='"')
+    yaml.dump(final_data, f)
 
     f.close()
 
