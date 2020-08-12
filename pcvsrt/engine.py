@@ -1,26 +1,20 @@
 import itertools
-from pcvsrt import logs
+import os
+from xml.sax.saxutils import escape
+from pcvsrt import logs, descriptor
 import pprint
 
 sys_iterators = dict()
 
-def unroll_numeric_values(array):
-    for entry in array:
-        if not isinstance(entry, str):
-            logs.warn("Unable to deal with non-scalar iterator values; skip {}".format(entry))
-        else:
-            logs.warn("TODO unrooling numeric values")
-    return array
 
-
-def unroll_iterators(it_list):
+def unroll_criterion_decl(it_list):
     for name, it in sys_iterators.items():
         if isinstance(it['values'], list):
             if 'numeric' in it.keys() and it['numeric']:
-                unrolled = unroll_numeric_values(it['values'])
+                unrolled = descriptor.unroll_numeric_values(it['values'])
         else:
             unrolled = it
-        sys_iterators[name]['values'] = unrolled
+        sys_iterators[name]['values'] = list(set(unrolled))
 
     # unrolling is done twice to alleviate dep problem
     # This is tedious as it should be part of each iterator
@@ -52,14 +46,56 @@ def initialize(settings):
         if k in it_to_remove:
             continue
     sys_iterators = {k: {**criterion_iterators[k], **runtime_iterators[k]} for k in criterion_iterators.keys() if k not in it_to_remove}
-    
     logs.print_item("Expand possible iterator expressions")
-    sys_iterators = unroll_iterators(sys_iterators)
+    sys_iterators = unroll_criterion_decl(sys_iterators)
 
 
-def process(single_te):
-    logs.info("processing {}".format(single_te.name))
-    pass
+def __generate_test_line(**kwargs):
+    keys = kwargs.keys()
+
+    string = "<job><name>{}</name".format(kwargs['name'])
+    string += "<deps>"
+    if 'deps' in keys: string += "".join(["<dep>{}</dep>".format(d) for d in kwargs['deps']])
+    string += "</deps>"
+    string += "<command>{}</command>".format(escape(kwargs['command'], entities={
+        "'": "&apos;",
+        "\"": "&quot;"
+    }))
+
+    if 'time' in keys: string += "<time>{}</time>".format(kwargs['time'])
+    if 'delta' in keys: string += "<delta>{}</delta>".format(kwargs['delta'])
+    if 'resources' in keys: string += "<resources>{}</resources>".format(kwargs['n_res'])
+    if 'extras' in keys: string += "<extras>{}</extras".format(kwargs['extras'])
+    if 'postscript' in keys: string+= "<postCommand>{}</postCommand".format(kwargs['postscript'])
+    return string
+    
+
+def process_desc(single_desc):
+    global sys_iterators
+    logs.info("processing {}".format(single_desc.name))
+    return "<job><name>{}</name><command>echo 'toto'</command></job>".format(single_desc.name)
+    if not single_desc.override_iterators():
+        single_desc.iterators_set(sys_iterators)
+    else:
+        dict_it = single_desc.iterators
+        for k in sys_iterators.keys():
+            sys_values = sys_iterators[k]
+            if k in dict_it.keys():
+                # intersect sets
+                dict_it[k]['values'] += sys_values
+            else:
+                dict_it[k]['values'] = sys_values
+        single_desc.iterators_set(dict_it)
+    
+    return "<job>{}</job>".format(single_desc.serialize())
+
+def finalize_file(path, package, content):
+    fn = os.path.join(path, "list_of_tests.xml")
+    with open(fn, 'w') as fh:
+        fh.write("<jobSuite package='{}'>".format(package))
+        fh.write(content)
+        fh.write("</jobSuite>")
+    return fn
 
 
 def generate_combinations(self, *lists):

@@ -4,14 +4,15 @@ import os
 
 
 def test_no_userdirs():
-    _ = run_and_test('run')
+    with isolated_fs():
+        _ = run_and_test('run')
 
 
 def test_override(caplog):
     with isolated_fs():
         _ = run_and_test('run', '.')
 
-        _ = run_and_test('run', '.', success=False)
+        res = run_and_test('run', '.', success=False)
         assert(res.exit_code != 0)    
         assert ("Previous run artifacts found" in caplog.text)
 
