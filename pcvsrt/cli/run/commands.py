@@ -1,6 +1,7 @@
 import os
 import time
 import click
+import pprint
 
 from pcvsrt import run as pvRun
 from pcvsrt import profile as pvProfile
@@ -14,6 +15,7 @@ def iterate_dirs(ctx, param, value) -> dict:
         testpath = os.getcwd()
         label = os.path.basename(testpath)
     else:  # once specified
+        err_msg = ""
         for d in value:
             if ':' in d:  # split under LABEL:PATH semantics
                 [label, testpath] = d.split(':')
@@ -21,8 +23,21 @@ def iterate_dirs(ctx, param, value) -> dict:
             else:  # otherwise, LABEL = dirname
                 testpath = os.path.abspath(d)
                 label = os.path.basename(testpath)
+            
+            # if label already used for a different path
+            if label in list_of_dirs.keys() and testpath != list_of_dirs[label]:
+                err_msg += "- '{}': Used more than once\n".format(label.upper())
+            elif not os.path.isdir(testpath):
+                err_msg += "- '{}': No such directory\n".format(testpath)   
+             # else, add it
+            else:
+                list_of_dirs[label] = testpath
+        if len(err_msg):
+            logs.err(
+                "Errors occured while parsing user directories:",
+                err_msg,
+                "please see '--help' for more information", abort=1)
 
-    list_of_dirs[label] = testpath
     return list_of_dirs
 
 
@@ -107,32 +122,14 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
                  "No '{}' found!".format(profilename), abort=1)
     settings['profile'] = pf.dump()
 
-    # analyse directory list
-    err_dirs = [(label, path) for label, path in dirs.items() if not os.path.isdir(path)]
-
-    if len(err_dirs) > 0:
-        logs.err("Following arguments should be valid paths:")
-        for label, path in err_dirs:
-            logs.err('- {}: {}'.format(label, path))
-        logs.err("please see '--help' for more information", abort=1)
-
-    if len(dirs.keys()) != len(set(dirs.keys())):
-        logs.err("Path labels must be unique! 2 possible causes:",
-                 "  - An explicit label is used more than once",
-                 "  - Two 'no-labeled' paths have the same basename",
-                 abort=1)
     
     logs.banner()
-
     logs.print_header("Prepare Environment")
     pvRun.prepare(settings, dirs)
 
     logs.print_header("Process benchmarks")
     start = time.time()
-    pvRun.load_benchmarks()
-    logs.print_section("===> Loading done in {:<.3f} sec(s)".format(time.time() - start))
-    start = time.time()
-    pvRun.process_benchmarks()
+    pvRun.process()
     logs.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
     
     logs.print_header("Validation Start")
