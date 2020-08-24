@@ -3,11 +3,11 @@
     label: "optional name"
     group: "GRPSERIAL"
     build:
+        # source files to include (if needed)
+        files: "@SRCPATH@/*.c"
         make:
                 target: all
         sources:
-                # source files to include (if needed)
-                files: "@SRCPATH@/*.c"
                 # program binary (if needed)
                 binary: "a.out"
         # dependency scheme

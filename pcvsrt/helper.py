@@ -1,30 +1,48 @@
 from addict import Dict
 import itertools
 import pprint
+import os
 import re
 from pcvsrt.context import settings
 from xml.sax.saxutils import escape
 
-
-def prepare_run_command(comb=None):
+def __convert_comb(elt, n, comb):
     args = []
     env = []
+    value = n.aliases[comb[elt]] if comb[elt] in n.aliases else comb[elt]
+    opt = str(n.option)+str(value)
+
+    if 'before' in n.get('position', ""):
+        opt = str(value)+str(n.option)
+
+    if 'environment' in n.get('type', ""):
+        env.append(opt)
+    else:
+        args.append(opt)
+    
+    return (args, env)
+
+
+def prepare_run_command(comb=None, user_it=None, program="a.out"):
+    args = []
+    env = []
+    params_env = []
+    params = []
     for elt in comb:
         if elt in settings.runtime.iterators:
-            n = Dict(settings.runtime.iterators[elt])
-            value = n.aliases[comb[elt]] if comb[elt] in n.aliases else comb[elt]
-            opt = str(n.option)+str(value)
-            if 'before' in n.get('position', ""):
-                opt = str(value)+str(n.option)
-
-            if 'argument' in n.get('type', ""):
-                args.append(opt)
-            elif 'environment' in n.get('type', ""):
-                env.append(opt)
-        else:
-            pass
-    
-    return " ".join(env + [settings.runtime.program, settings.runtime.args] + args)
+            a, e = __convert_comb(elt, Dict(settings.runtime.iterators[elt]), comb)
+            args += a
+            env += e
+        elif elt in user_it:
+            a, e = __convert_comb(elt, Dict(user_it[elt]), comb)
+            params += a
+            params_env += e
+    return " ".join(
+        env + params_env + 
+        [settings.runtime.program, settings.runtime.args] +
+        args +
+        [program] +
+        params)
 
 
 def detect_source_lang(array_of_files):
@@ -57,11 +75,8 @@ def detect_source_lang(array_of_files):
     return 'cc'
 
 
-def prepare_cmd_build_prefix(lang='cc', variants=[], comb=None):
-    return " ".join([
-        settings.compiler.commands.get(lang, 'echo'),
-        " ".join(settings.compiler.variants[i].args for i in variants)
-    ])
+def prepare_cmd_build_variants(variants=[], comb=None):
+    return " ".join(settings.compiler.variants[i].args for i in variants)
 
 
 def stringify_combination(cur):
@@ -90,3 +105,10 @@ def xml_escape(s):
         "'": "&apos;",
         "\"": "&quot;"
     })
+
+def generate_local_variables(label, subprefix):
+    base_srcdir = settings.rootdirs[label]
+    cur_srcdir = os.path.join(base_srcdir, subprefix)
+    base_buildir = os.path.join(settings.validation.output, "test_suite", label)
+    cur_buildir = os.path.join(base_buildir, subprefix)
+    return base_srcdir, cur_srcdir, base_buildir, cur_buildir

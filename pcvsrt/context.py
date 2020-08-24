@@ -10,11 +10,6 @@ class Settings(Dict):
 
 settings = Settings()
 
-def get_or_none(k, dflt=None):
-    if k in settings:
-        return settings[k]
-    else:
-        return dflt
 
 def serialize():
     return settings.to_dict()

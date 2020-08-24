@@ -129,14 +129,6 @@ def __replace_yaml_token(stream, src, build, prefix):
     return stream
 
 
-def __generate_local_variables(label, subprefix):
-    base_srcdir = settings.rootdirs[label]
-    cur_srcdir = os.path.join(base_srcdir, subprefix)
-    base_buildir = os.path.join(settings.validation.output, "test_suite", label)
-    cur_buildir = os.path.join(base_buildir, subprefix)
-    return base_srcdir, cur_srcdir, base_buildir, cur_buildir
-
-
 def __load_yaml_file_legacy(f):
     # barely legal to do that...
     old_group_file = os.path.join(os.path.dirname(__file__), "templates/group-compat.yml")
@@ -153,7 +145,7 @@ def __load_yaml_file(f, src, build, prefix):
             obj = yaml.load(__replace_yaml_token(fh.read(), src, build, prefix), Loader=yaml.FullLoader)
 
         # TODO: Validate input & raise YAMLError if invalid
-        raise yaml.YAMLError("TODO: write validation")
+        #raise yaml.YAMLError("TODO: write validation")
     except yaml.YAMLError:
         convert = True
     except Exception as e:
@@ -221,7 +213,7 @@ def process_dyn_setup_scripts(setup_files):
     logs.print_item("Manage dynamic files (scripts)")
     with logs.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            base_src, cur_src, base_build, cur_build = __generate_local_variables(label, subprefix)
+            base_src, cur_src, base_build, cur_build = helper.generate_local_variables(label, subprefix)
             env = os.environ.copy()
             
             env['pcvs_src'] = base_src
@@ -240,12 +232,9 @@ def process_dyn_setup_scripts(setup_files):
             except CalledProcessError as e:
                 err += [(f, e)]
                 continue
-
             stream = ""
-            te_base = ".".join([label, subprefix.replace("/", ".")])
-            logs.info("Process descs in {}".format(te_base))
             for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in test.TEDescriptor(v_elt, te_base, k_elt).construct_tests()])
+                stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
             settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err  
 
@@ -254,7 +243,7 @@ def process_static_yaml_files(yaml_files):
     logs.print_item("Process static test files")
     with logs.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            base_src, cur_src, base_build, cur_build = __generate_local_variables(label, subprefix)
+            base_src, cur_src, base_build, cur_build = helper.generate_local_variables(label, subprefix)
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
@@ -266,9 +255,8 @@ def process_static_yaml_files(yaml_files):
                 continue
             except Exception as e:
                 logs.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
-            te_base = ".".join([label, subprefix.replace("/", ".")])
             for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in test.TEDescriptor(v_elt, te_base, k_elt).construct_tests()])
+                stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
             settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err
 
