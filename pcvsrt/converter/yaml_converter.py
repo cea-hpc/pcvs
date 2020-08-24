@@ -65,7 +65,7 @@ def flatten(dd, prefix='') -> dict:
             } if isinstance(dd, dict) else {prefix: dd}
 
 
-def compute_new_key(k, m) -> str:
+def compute_new_key(k, v, m) -> str:
     """replace in 'k' any pattern found in 'm'.
     'k' is a string with placeholders, while 'm' is a match result with groups
     named after placeholders.
@@ -79,10 +79,9 @@ def compute_new_key(k, m) -> str:
 
     # if this key is a special python expression to process:
     if k.startswith('call:'):
-        env = {'k': k, 'm': m}
+        env = {'k': k, 'v': v, 'm': m}
         # the 'k' & 'm' vars are exposed to evaluated code
-        code = compile(k.split("call:")[1], 'user-defined', 'exec')
-        eval(code, env)
+        exec("import re\n"+k.split("call:")[1], env)
         # the 'k' is retrieved and used as a whole
         replacement = env['k']
     else:
@@ -90,7 +89,7 @@ def compute_new_key(k, m) -> str:
     return replacement
 
 
-def check_if_key_matches(key, ref_array) -> tuple:
+def check_if_key_matches(key, value, ref_array) -> tuple:
     """list all matches for the current key in the new YAML description."""
     # for each key to be replaced.
     # WARNING: no order!
@@ -105,9 +104,9 @@ def check_if_key_matches(key, ref_array) -> tuple:
             # if there is a associated key in the new tree
             if new_k is not None:
                 if isinstance(new_k, list):
-                    dest_k = [compute_new_key(i, res) for i in new_k]
+                    dest_k = [compute_new_key(i, value, res) for i in new_k]
                 else:
-                    dest_k = [compute_new_key(new_k, res)]
+                    dest_k = [compute_new_key(new_k, value, res)]
             else:
                 dest_k = []
             return (True, dest_k)
@@ -134,7 +133,7 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
         #    * the new key alongside with the transformed value as well
         # in the latter case, a split is required to identify key & value
         # an array is returned as a single node can produe multiple new nodes
-        (valid, dest_k) = check_if_key_matches(k, ref_array)
+        (valid, dest_k) = check_if_key_matches(k, v, ref_array)
 
         if valid:
             logs.info("Processing {}".format(k))
@@ -146,6 +145,9 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
             # Process each of the new keys
             for elt_dest_k in dest_k:
                 (final_k, final_v, token) = (elt_dest_k, None, '')
+                # src key won't be kept
+                if final_k is None:
+                    continue
                 # if a split is required
                 for token in ['+', '=']:
                     (final_k, final_v) = separate_key_and_value(elt_dest_k,

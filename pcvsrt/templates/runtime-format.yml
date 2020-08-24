@@ -11,7 +11,7 @@ iterators:
         numeric: true
         type: "argument|environment"
         position: "before|after"
-        values:
+        aliases:
             ib: "openib"
             tcp: "tcp"
             shmem: "sm"

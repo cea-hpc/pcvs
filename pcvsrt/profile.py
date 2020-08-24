@@ -157,3 +157,23 @@ class Profile:
 
         files.open_in_editor(self._file, e)
         self.load_from_disk()
+
+    @property
+    def compiler(self):
+        return self._details['compiler']
+
+    @property
+    def runtime(self):
+        return self._details['runtime']
+    
+    @property
+    def criterion(self):
+        return self._details['criterion']
+    
+    @property
+    def group(self):
+        return self._details['group']
+    
+    @property
+    def machine(self):
+        return self._details['machine']

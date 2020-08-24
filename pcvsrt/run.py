@@ -7,20 +7,21 @@ import tarfile
 import glob
 import pprint
 import pathlib
+import addict
 import pcvsrt
-from pcvsrt import config, profile, descriptor, globals, logs, files, engine
-
-run_settings = {}
+from pcvsrt import config, profile, test, globals, logs, files, engine, helper, context
+from pcvsrt.context import settings
 
 def __print_summary():
     global run_settings
+    n = settings.validation
     logs.print_section("Validation details:")
-    logs.print_item("Loaded profile: '{}'".format(run_settings['validation']['pfname']))
-    logs.print_item("Built into: {}".format(run_settings['validation']['output']))
+    logs.print_item("Loaded profile: '{}'".format(n.pfname))
+    logs.print_item("Built into: {}".format(n.output))
     logs.print_item("Verbosity: {}".format(logs.get_verbosity_str().capitalize()))
     logs.print_item("User directories:")
-    width = max([len(i) for i in run_settings['user_dirs'].keys()])
-    for k, v in run_settings['user_dirs'].items():
+    width = max([len(i) for i in settings.rootdirs])
+    for k, v in settings.rootdirs.items():
         logs.print_item("{:<{width}}: {:<{width}}".format(k.upper(), v, width=width), depth=2)
     # logs.print_item(": {}".format())
 
@@ -28,10 +29,11 @@ def __print_summary():
 def __build_jchronoss():
     global run_settings
     archive_name = None
-    # Compute JCHRONOSS paths & store them
-    src_prefix = os.path.join(run_settings['validation']['output'], "cache/src")
-    inst_prefix = os.path.join(run_settings['validation']['output'], "cache/install")
-    exec_prefix = os.path.join(run_settings['validation']['output'], "cache/exec")
+    # Compute JCHRONOSS paths & store themf
+    val_node = settings.validation
+    src_prefix = os.path.join(val_node.output, "cache/src")
+    inst_prefix = os.path.join(val_node.output, "cache/install")
+    exec_prefix = os.path.join(val_node.output, "cache/exec")
     # FIXME: Dirty way to locate the archive
     # find & extract the jchronoss archive
     for f in glob.glob(os.path.join(globals.ROOTPATH, "../**/jchronoss-*"), recursive=True):
@@ -49,21 +51,20 @@ def __build_jchronoss():
     with files.cwd(os.path.join(src_prefix, "build")):
         command = "cmake {} -DCMAKE_INSTALL_PREFIX={} -DENABLE_OPENMP=OFF -DENABLE_COLOR={} && make install".format(
             src_prefix, inst_prefix,
-            "ON" if run_settings['validation']['color'] else "OFF"
+            "ON" if val_node.color else "OFF"
         )
         try:
             _ = subprocess.check_call(command, shell=True,
                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         except CalledProcessError as e:
-            logs.err("Failed to build JCHRONOSS:".format(out), abort=1)
+            logs.err("Failed to build JCHRONOSS:", abort=1)
 
-    os.makedirs(exec_prefix)
-    run_settings['validation']['jchronoss'] = {
-        "src": src_prefix,
-        "install": inst_prefix,
-        "exec": exec_prefix
+    globals.create_or_clean_path(exec_prefix)
 
-    }
+    val_node.jchronoss.src = src_prefix
+    val_node.jchronoss.exec = exec_prefix 
+    val_node.jchronoss.install = inst_prefix
+
 
 def __setup_webview():
     pass
@@ -77,33 +78,40 @@ def __build_tools():
     __setup_webview()
 
 
-def prepare(settings, dirs_dict):
-    global run_settings
-
+def prepare(run_settings, dirs_dict, profile):
+    
     logs.print_section("Prepare environment")
-    run_settings['validation'] = settings
-    run_settings['user_dirs'] = dirs_dict
-    run_settings['xmls'] = list()
+    logs.print_item("build configuration tree")
+
+    settings.validation = run_settings
+    settings.validation.xmls = list()
+    settings.rootdirs = dirs_dict
+    settings.compiler = profile.compiler
+    settings.runtime = profile.runtime
+    settings.group = profile.group
+    settings.machine = profile.machine
+    settings.criterion = profile.criterion
 
     logs.print_item("Check whether build directory is valid")
-    buildir = os.path.join(run_settings['validation']['output'], "test_suite")
+    buildir = os.path.join(settings.validation.output, "test_suite")
     # if a previous build exists
     if os.path.isdir(buildir):
-        if not run_settings['validation']['override']:
-            logs.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(settings['output']), abort=1)
+        if not settings.validation.force:
+            logs.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(settings.validation.output), abort=1)
         else:
             logs.print_item("Cleaning up {}".format(buildir), depth=2)
-            shutil.rmtree(buildir)
+            globals.create_or_clean_path(buildir)
 
     logs.print_item("Create subdirs for each provided directories")
-    for label in dirs_dict.keys():
+    for label in settings.rootdirs.keys():
         os.makedirs(os.path.join(buildir, label))
 
     logs.print_section("Build third-party tools")
     __build_tools()
 
     logs.print_section("Initialize the test engine")
-    engine.initialize(run_settings)
+    engine.initialize()
+
 
 
 def __replace_yaml_token(stream, src, build, prefix):   
@@ -122,16 +130,15 @@ def __replace_yaml_token(stream, src, build, prefix):
 
 
 def __generate_local_variables(label, subprefix):
-    global run_settings
-    base_srcdir = run_settings['user_dirs'][label]
+    base_srcdir = settings.rootdirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
-    base_buildir = os.path.join(run_settings['validation']['output'], "test_suite", label)
+    base_buildir = os.path.join(settings.validation.output, "test_suite", label)
     cur_buildir = os.path.join(base_buildir, subprefix)
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
 
 def __load_yaml_file_legacy(f):
-    # barely legal to do that..;
+    # barely legal to do that...
     old_group_file = os.path.join(os.path.dirname(__file__), "templates/group-compat.yml")
     cmd = "pcvs_convert {} --stdout -k te -t {} 2>/dev/null".format(f, old_group_file)
     out = subprocess.check_output(cmd, shell=True)
@@ -170,10 +177,8 @@ def __print_progbar_walker(elt):
 
 
 def process():
-    global run_settings
-
     logs.print_section("Load from filesystem")
-    path_dict = run_settings['user_dirs']
+    path_dict = settings.rootdirs
     setup_files = list()
     yaml_files = list()
 
@@ -212,7 +217,6 @@ def process():
 
 
 def process_dyn_setup_scripts(setup_files):
-    global run_settings
     err = []
     logs.print_item("Manage dynamic files (scripts)")
     with logs.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
@@ -222,11 +226,13 @@ def process_dyn_setup_scripts(setup_files):
             
             env['pcvs_src'] = base_src
             env['pcvs_testbuild'] = base_build
-            os.makedirs(os.path.join(base_build, subprefix))
+
+            if not os.path.isdir(cur_build):
+                os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
             try:
                 out = subprocess.check_output([f, subprefix], env=env,
-                                              stderr=subprocess.STDOUT)
+                                              stderr=subprocess.DEVNULL)
                 out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
                     fh.write(out.decode('utf-8'))
@@ -239,10 +245,8 @@ def process_dyn_setup_scripts(setup_files):
             te_base = ".".join([label, subprefix.replace("/", ".")])
             logs.info("Process descs in {}".format(te_base))
             for k_elt, v_elt in te_node.items():
-                te_name = ".".join([te_base, k_elt])
-                stream += engine.process_desc(descriptor.TEDescriptor(v_elt, te_name))
-
-            run_settings['xmls'].append(engine.finalize_file(cur_build, te_base, stream))
+                stream +="".join([t.serialize() for t in test.TEDescriptor(v_elt, te_base, k_elt).construct_tests()])
+            settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err  
 
 def process_static_yaml_files(yaml_files):
@@ -251,7 +255,8 @@ def process_static_yaml_files(yaml_files):
     with logs.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
             base_src, cur_src, base_build, cur_build = __generate_local_variables(label, subprefix)
-            os.makedirs(os.path.join(base_build, subprefix))
+            if not os.path.isdir(cur_build):
+                os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
             stream = ""
             try:
@@ -263,29 +268,37 @@ def process_static_yaml_files(yaml_files):
                 logs.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
             te_base = ".".join([label, subprefix.replace("/", ".")])
             for k_elt, v_elt in te_node.items():
-                te_name = ".".join([te_base, k_elt])
-                stream += engine.process_desc(descriptor.TEDescriptor(v_elt, te_name))
-            run_settings['xmls'].append(engine.finalize_file(cur_build, te_base, stream))
+                stream +="".join([t.serialize() for t in test.TEDescriptor(v_elt, te_base, k_elt).construct_tests()])
+            settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err
 
 
 def run():
     __print_summary()
     logs.print_item("Save Configurations for later use")
-    #yaml.add_representer(pcvsrt.descriptor.TEDescriptor, pcvsrt.descriptor.representer)
-    with open(os.path.join( run_settings['validation']['output'], "conf.yml"), 'w') as conf_fh:
-        yaml.dump(run_settings, conf_fh)
+    with open(os.path.join(settings.validation.output, "conf.yml"), 'w') as conf_fh:
+        yaml.dump(context.serialize(), conf_fh)
     
     logs.print_section("Run the Orchestrator (JCHRONOSS)")
 
-    prog =  os.path.join(run_settings['validation']['jchronoss']['install'], "bin/jchronoss")
-    build = os.path.join(run_settings['validation']['jchronoss']['exec'])
-    files = run_settings['xmls']
-    subprocess.run([
+    prog = os.path.join(settings.validation.jchronoss.install, "bin/jchronoss")
+    build = os.path.join(settings.validation.jchronoss.exec)
+    verb = min(2, settings.validation.verbose)
+    files = settings.validation.xmls
+
+    cmd = [
         prog,
-        "--build", build
-       ] + files)
-    pass
+        "--verbosity={}".format(verb),
+        "--build", build,
+        "--nb-resources={}".format(settings.machine.nodes)
+       ] + files
+    
+    logs.info("JCHRONOSS: '{}'".format(" ".join(cmd)))
+    try:
+        raise subprocess.CalledProcessError()
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as e:
+        logs.err("JCHRONOSS returned non-zero exit code!", abort=1)
 
 
 def terminate():

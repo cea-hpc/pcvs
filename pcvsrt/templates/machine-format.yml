@@ -1,21 +1,20 @@
 ---
-machine:
-    default: 'knl'
-    batch_mintime: 1000
-    batch_maxtime: 1500
-    command:
-        alloc: 'salloc'
-        run: 'srun'
-    wrapper:
-        alloc: '/path/to/wrapper/for/this/batch/manager'
-        run: '/path/to/wrapper/for/this/batch/manager'
-    partitions:
-        knl:
-            nodes: 4
-            cores_per_node: 272
-            batch_mintime: 10
-        arm:
-            nodes: 100
-            cores_per_node: 32
-            command:
-                alloc: 'mycmd -K'
+default: 'knl'
+batch_mintime: 1000
+batch_maxtime: 1500
+command:
+    alloc: 'salloc'
+    run: 'srun'
+wrapper:
+    alloc: '/path/to/wrapper/for/this/batch/manager'
+    run: '/path/to/wrapper/for/this/batch/manager'
+partitions:
+    knl:
+        nodes: 4
+        cores_per_node: 272
+        batch_mintime: 10
+    arm:
+        nodes: 100
+        cores_per_node: 32
+        command:
+            alloc: 'mycmd -K'

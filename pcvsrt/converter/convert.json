@@ -56,10 +56,10 @@
 	"runtime.timeout-prefix": null,
 	"runtime.<it>.key": ["call:k = 'runtime.iterators.<it>.numeric=True' if '<it>'.startswith('n_') else 'runtime.iterators.<it>.numeric=False'", "runtime.iterators.<it>.option"],
 	"runtime.<it>.usage": "runtime.iterators.<it>.type",
-	"runtime.<it>.<ropt>_val": "runtime.iterators.<it>.values.<ropt>",
+	"runtime.<it>.<ropt>_val": "runtime.iterators.<it>.aliases.<ropt>",
 
-	"te.<name>.type": null,
-	"te.<name>.files": ["<name>.build.sources.files", "<name>.build.make.file"],
+	"te.<name>.type": ["call:k = '<name>.build._compat' if re.search('(build|complete)', v) else None", "call:k = '<name>.run._compat' if re.search('(run|complete)', v) else None"],
+	"te.<name>.files": ["<name>.build.files"],
 	"te.<name>.bin": ["<name>.build.sources.binary", "<name>.run.program"],
 	"te.<name>.cargs": "<name>.build.cflags",
 	"te.<name>.chdir": ["<name>.build.cwd", "<name>.run.cwd"],

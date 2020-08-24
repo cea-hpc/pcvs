@@ -104,28 +104,29 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
         #files.open_in_editor("defaults")
         exit(0)
 
-    # fill validation settings
-    settings = {}
+    # fill validation run_setttings
+    run_setttings = {}
     # for any 'None' value, a load from default should be made
-    settings['verbose'] = ctx.obj['verbose']
-    settings['color'] = ctx.obj['color']
-    settings['pfname'] = profilename
-    settings['output'] = os.path.join(os.path.abspath(output), ".pcvs")
-    settings['tee'] = log
-    settings['bg'] = detach
-    settings['override'] = override
+    run_setttings['verbose'] = ctx.obj['verbose']
+    run_setttings['color'] = ctx.obj['color']
+    run_setttings['pfname'] = profilename
+    run_setttings['output'] = os.path.join(os.path.abspath(output), ".pcvs")
+    run_setttings['tee'] = log
+    run_setttings['bg'] = detach
+    run_setttings['force'] = override
 
     (scope, label) = pvProfile.extract_profile_from_token(profilename)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
         logs.err("Please use a valid profile name:",
                  "No '{}' found!".format(profilename), abort=1)
-    settings['profile'] = pf.dump()
+    else:
+        pf.load_from_disk()
 
     
     logs.banner()
     logs.print_header("Prepare Environment")
-    pvRun.prepare(settings, dirs)
+    pvRun.prepare(run_setttings, dirs, pf)
 
     logs.print_header("Process benchmarks")
     start = time.time()
