@@ -28,8 +28,8 @@ def test_list_wrong(caplog):
 
 
 @pytest.mark.parametrize('scope', [None, 'local'])
-def test_build(scope, caplog, mocker):
-    mocker.patch.object(pvConfig.ConfigurationBlock, )
+def test_build(scope, caplog, mock):
+    #mock.patch.object(pvConfig.ConfigurationBlock, )
     with isolated_fs():
         _ = run_and_test('profile', 'build', 'local.default')
 

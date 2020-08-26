@@ -45,7 +45,7 @@ def print_version(ctx, param, value):
 @click.option("-V", "--version",
               expose_value=False, is_eager=True, callback=print_version,
               is_flag=True, help="Display current version")
-@click.option("-w", "--width", "width", type=int, default=0,
+@click.option("-w", "--width", "width", type=int, default=None,
               help="Terminal width (autodetection if omitted")
 @click.option("-F", "--fancy", "enrich_exp", default=False, is_flag=True,
               help="Visually enrich your PCVS experience :)")
@@ -60,11 +60,8 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
     # Click specific-related
     ctx.color = color
 
-    log.init(verbose, encoding, enrich_exp)
+    log.init(verbose, encoding, width, enrich_exp)
     io.set_local_path(ctx.obj['exec'])
-
-    if click.get_terminal_size()[0] < log.LINELENGTH:
-        log.LINELENGTH = click.get_terminal_size()[0]
 
     # detections
     config.init()

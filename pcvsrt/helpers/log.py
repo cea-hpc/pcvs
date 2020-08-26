@@ -2,14 +2,16 @@ import sys
 import click
 import logging
 import pprint
+import textwrap
 
 try:
     import cowsay
 except ImportError:
     pass
 
-LINELENGTH = 93
+linelength = 93
 FORMAT = "%(levelname)s: %(message)s"
+wrapper = None
 enrich_display = False
 vb_array = {
     'normal': (0, logging.WARNING),
@@ -73,10 +75,14 @@ def __set_encoding(e):
         glyphs['sep_h'] = "\u23BC"
 
 
-def init(verbose, encoding, enrich_exp=False):
-    global enrich_display
+def init(verbose, encoding, length, enrich_exp=False):
+    global enrich_display, wrapper, linelength
     __set_logger(verbose)
     __set_encoding(encoding)
+
+    if length is not None:
+        linelength = length if length > 0 else click.get_terminal_size()[0]
+    wrapper = textwrap.TextWrapper(width=linelength)
     if enrich_exp:
         if not cowsay:
             warn(
@@ -98,22 +104,30 @@ def utf(k):
 
 
 def print_header(s, out=True):
+    global wrapper, linelength
     hdr_char = utf('hdr')
-    str_len = LINELENGTH - (len(s) + 2)  # surrounding spaces
+    str_len = linelength - (len(s) + 2 + 9)  # surrounding spaces  + color ID
     begin = hdr_char * int(str_len / 2)
     end = begin + (hdr_char * (str_len % 2 != 0))
 
-    s = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
+    fs = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
+    if len(fs) > linelength:
+        fs = click.style("{} {} {}".format(2*hdr_char, s.upper(), 2*hdr_char), fg="green")
+    
+    wrapper.subsequent_indent = (2*hdr_char) + " "
+    fs = wrapper.fill(fs)
     if out:
-        click.echo(s, err=True)
+        click.echo(fs, err=True)
     else:
-        return s
+        return fs
     pass
 
 
 def print_section(s, out=True):
+    global wrapper
     f = "{} {}".format(utf('sec'), s)
-    s = click.style(f, fg='yellow')
+    wrapper.subsequent_indent = "  "
+    s = wrapper.fill(click.style(f, fg='yellow'))
     if out:
         click.echo(s, err=True)
     else:
@@ -121,10 +135,13 @@ def print_section(s, out=True):
 
 
 def print_item(s, depth=1, out=True):
-    bullet = ("   " * depth) + "{} ".format(utf('item'))
+    global wrapper
+    indent = ("   " * depth)
+    bullet =  indent + "{} ".format(utf('item'))
     content = "{}".format(s)
 
-    s = click.style(bullet, fg="red") + click.style(content, fg="reset")
+    wrapper.subsequent_indent = indent + "  "
+    s = wrapper.fill(click.style(bullet, fg="red") + click.style(content, fg="reset"))
     if out:
         click.echo(s, err=True)
     else:
@@ -225,10 +242,17 @@ def short_banner():
         r""""""
     ]
 
-    click.secho("\n".join(logo[0:3]), fg="green")
-    click.secho("\n".join(logo[3:4]), fg="yellow")
-    click.secho("\n".join(logo[4:5]), fg="red")
-    click.secho("\n".join(logo[5:]))
+    if linelength < max(map(lambda x: len(x), logo)):
+        click.secho("{}".format(utf("star")*14), fg="green")
+        click.secho("{} PCVS -- RT {}".format(utf("star"), utf('star')), fg="yellow")
+        click.secho("{} CEA {} 2017 {}".format(utf('star'), utf('copy'), utf('star')), fg="red")
+        click.secho("{}".format(utf("star")*14), fg="green")
+        return
+    else:
+        click.secho("\n".join(logo[0:3]), fg="green")
+        click.secho("\n".join(logo[3:4]), fg="yellow")
+        click.secho("\n".join(logo[4:5]), fg="red")
+        click.secho("\n".join(logo[5:]))
 
 
 def banner():
@@ -281,7 +305,7 @@ def banner():
         r"""                                    """,
     ]
 
-    if LINELENGTH < max(map(lambda x: len(x), logo)):
+    if linelength < max(map(lambda x: len(x), logo)):
         short_banner()
         return
     else:
