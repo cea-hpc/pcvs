@@ -14,8 +14,10 @@ before_script:
 
 stages:
 - install
-- cli_test
 - lint
+- unit_tests
+- coverage
+
 
 flake:
     <<: *scope
@@ -31,29 +33,36 @@ mypy:
     script:
     - python -m mypy ./pcvsrt/
 
-cli_config:
+main:
     <<: *scope
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: cli_test
+    stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _config
+    - pytest ./tests/pcvsrt/cli
 
-cli_profile:
+converter:
     <<: *scope
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: cli_test
-    script:
-    - pip3 install -e .
-    - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _profile
-
-cli_run:
-    <<: *scope
-    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: cli_test
+    stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt/cli --cov=pcvsrt --cov-report=xml -k _run
+    - pytest ./tests/pcvsrt/converter
+
+helpers:
+    <<: *scope
+    stage: unit_tests
+    script:
+    - pip install -e .
+    - pytest ./tests/pcvsrt/helpers
+
+full_nr:
+    <<: *scope
+    stage: coverage
+    script:
+    - pip install -e .
+    - pytest ./tests/pcvsrt --cov=pcvsrt
+
 
 pip:
     <<: *scope
