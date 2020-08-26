@@ -1,8 +1,7 @@
 import os
 import glob
 
-from pcvsrt import globals as pvGlobals
-
+from pcvsrt.helpers import io
 
 BANKS = dict()
 BANKS_STORAGE = ""
@@ -10,7 +9,7 @@ BANKS_STORAGE = ""
 
 def init():
     global BANKS, BANKS_STORAGE
-    BANKS_STORAGE = os.path.join(pvGlobals.STORAGES['user'], 'saves/banks')
+    BANKS_STORAGE = os.path.join(io.STORAGES['user'], 'saves/banks')
     for f in glob.glob(os.path.join(BANKS_STORAGE, '*')):
         BANKS[os.path.basename(f)] = open(f, 'r').read()
 
@@ -18,9 +17,9 @@ def init():
 def list_banks():
     return BANKS
 
+
 def compute_path(name):
     return os.path.join(BANKS_STORAGE, name)
-
 
 
 class Bank:

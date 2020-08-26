@@ -8,7 +8,7 @@ import click
 import pkg_resources
 import yaml
 
-from pcvsrt import logs
+from pcvsrt.helpers import log
 
 desc_dict = dict()
 
@@ -136,7 +136,7 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
         (valid, dest_k) = check_if_key_matches(k, v, ref_array)
 
         if valid:
-            logs.info("Processing {}".format(k))
+            log.info("Processing {}".format(k))
             # An empty array means the key does not exist in the new tree.
             # => discard
             if len(dest_k) <= 0:
@@ -164,9 +164,9 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
                 set_with(output, final_k.split('.'), final_v, should_append)
         else:
             # warn when an old_key hasn't be declared in spec.
-            logs.info("DISCARDING {}".format(k))
+            log.info("DISCARDING {}".format(k))
             if warn_if_missing:
-                logs.warn("Key {} undeclared in spec.".format(k))
+                log.warn("Key {} undeclared in spec.".format(k))
                 set_with(output, ['pcvsrt_missing'] + k.split("."), v)
             else:
                 set_with(output, k.split("."), v)
@@ -256,8 +256,8 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
     # Click specific-related
     ctx.color = color
     kind = kind.lower()
-    logs.init(verbose, encoding, enrich_exp)
-    logs.enrich_print(
+    log.init(verbose, encoding, enrich_exp)
+    log.enrich_print(
         "Welcome to this PCVS-oriented YAML to YAML converter."
         "The purpose of this script is to convert files from the old deprecated"
         " syntax to the new one in a minimal effort. Please note that because"
@@ -265,28 +265,28 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
         " fail and a human proofreading is required to ensure correctness",
         skippable=True
     )
-    logs.print_header("YAML Conversion")
+    log.print_header("YAML Conversion")
 
     if template is None and kind == "te":
-        logs.warn("If the TE file contains YAML aliases, the conversion may",
-                  "fail. Use the '--template' option to provide the YAML file",
-                  "containing these aliases")
+        log.warn("If the TE file contains YAML aliases, the conversion may",
+                 "fail. Use the '--template' option to provide the YAML file",
+                 "containing these aliases")
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
     try:
-        logs.print_item("Load data file: {}".format(f.name))
+        log.print_item("Load data file: {}".format(f.name))
         stream = f.read()
         if template:
-            logs.print_item("Load template file: {}".format(template))
+            log.print_item("Load template file: {}".format(template))
             stream = open(template, 'r').read() + stream
         data_to_convert = yaml.load(stream, Loader=yaml.FullLoader)
     except yaml.composer.ComposerError as e:
-        logs.err("Issue when parsing YAML: ", "{}".format(e), abort=1)
+        log.err("Issue when parsing YAML: ", "{}".format(e), abort=1)
 
     # load the scheme
     if not scheme:
         scheme = open(os.path.join(os.path.dirname(__file__), "convert.json"))
-    logs.print_item("Load scheme file: {}".format(scheme.name))
+    log.print_item("Load scheme file: {}".format(scheme.name))
     tmp = json.load(scheme)
 
     # if modifiers are declared, replace token with regexes
@@ -296,30 +296,30 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
     desc_dict['second'] = replace_placeholder(tmp,
                                               tmp['__tokens'])
 
-    logs.info("Conversion list {old_key -> new_key):",
+    log.info("Conversion list {old_key -> new_key):",
               "{}".format(pprint.pformat(desc_dict)))
 
     # first, "flattening" the original array: {(1, 2, 3): "val"}
     data_to_convert = flatten(data_to_convert, kind)
 
     # then, process modifiers, altering original data before processing
-    logs.print_item("Process alterations to the original data")
+    log.print_item("Process alterations to the original data")
     data_to_convert = process_modifiers(data_to_convert)
     # as modifiers may have created nested dictionaries:
     # => "flattening" again, but with no prefix (persistent from first)
     data_to_convert = flatten(data_to_convert, "")
 
     # Finally, convert the original data to the final yaml dict
-    logs.print_item("Process the data")
+    log.print_item("Process the data")
     final_data = process(data_to_convert)
 
     # remove template key from the output to avoid polluting the caller
-    logs.print_item("Pruning templates from the final data")
+    log.print_item("Pruning templates from the final data")
     invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
-    logs.info("Prune the following:", "{}".format(pprint.pformat(invalid_nodes)))
+    log.info("Prune the following:", "{}".format(pprint.pformat(invalid_nodes)))
     [final_data.pop(x, None) for x in invalid_nodes + ["pcvsrt_missing"]]
     
-    logs.info("Final layout:", "{}".format(pprint.pformat(final_data)))
+    log.info("Final layout:", "{}".format(pprint.pformat(final_data)))
 
     if stdout:
         f = sys.stdout
@@ -330,7 +330,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
             out = os.path.join(prefix, "convert-" + base)
         f = open(out, "w")
 
-    logs.print_section("Converted data written into {}".format(f.name))
+    log.print_section("Converted data written into {}".format(f.name))
     yaml.dump(final_data, f)
 
     f.close()

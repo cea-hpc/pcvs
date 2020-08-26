@@ -1,7 +1,17 @@
 import os
 import shutil
-from os import path
-from pcvsrt import logs
+import subprocess
+from contextlib import contextmanager
+
+from pcvsrt.helpers import log
+from pcvsrt.helpers.system import sysTable
+
+ROOTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+STORAGES = {
+    'global': ROOTPATH,
+    'user': os.path.join(os.environ['HOME'], ".pcvsrt"),
+    'local': os.path.join(os.getcwd(), '.pcvsrt')
+}
 
 
 def __determine_local_prefix(path, prefix):
@@ -24,7 +34,8 @@ def create_or_clean_path(prefix):
         shutil.rmtree(prefix)
     os.mkdir(prefix)
 
-def set_exec_path(path):
+
+def set_local_path(path):
     assert (os.path.isdir(path))
     found = __determine_local_prefix(path, ".pcvsrt")
 
@@ -40,18 +51,38 @@ def storage_order():
 
 def check_valid_scope(s):
     if s not in storage_order() and s is not None:
-        logs.err("Invalid SCOPE '{}'".format(s),
-                 "Allowed values are: None, local, user & global",
-                 "See --help for more information",
-                 abort=1)
+        log.err("Invalid SCOPE '{}'".format(s),
+                "Allowed values are: None, local, user & global",
+                "See --help for more information",
+                abort=1)
 
-LINELENGTH = 93
-ROOTPATH = path.abspath(path.join(path.dirname(__file__)))
-STORAGES = {
-    'global': ROOTPATH,
-    'user': os.path.join(os.environ['HOME'], ".pcvsrt"),
-    'local': os.path.join(os.getcwd(), '.pcvsrt')
-}
+
+def generate_local_variables(label, subprefix):
+    base_srcdir = sysTable.rootdirs[label]
+    cur_srcdir = os.path.join(base_srcdir, subprefix)
+    base_buildir = os.path.join(sysTable.validation.output, "test_suite", label)
+    cur_buildir = os.path.join(base_buildir, subprefix)
+    return base_srcdir, cur_srcdir, base_buildir, cur_buildir
+
+
+@contextmanager
+def cwd(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    oldpwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(oldpwd)
+
+
+def open_in_editor(path, e=None):
+    editor = e if e is not None else os.environ['EDITOR']
+    if shutil.which(editor) is None:
+        log.err("'{}' is not a valid editor.".format(editor),
+                "Please see the '-e' option!", abort=1)
+    subprocess.run([editor, path])
 
 
 class MetaDict(dict):
@@ -67,7 +98,7 @@ class MetaDict(dict):
     def __getitem__(self, key):
         if '.' not in key:
             return dict.__getitem__(self, key)
-        
+
         k, next_k = key.split('.', 1)
         subdict = dict.__getitem__(self, k)
         if not isinstance(subdict, MetaDict):
@@ -94,6 +125,6 @@ class MetaDict(dict):
         if key not in self:
             self[key] = dflt
         return self[key]
-  
+
     __setattr__ = __setitem__
     __getattr__ = __getitem__

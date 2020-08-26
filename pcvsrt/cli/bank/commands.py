@@ -2,7 +2,7 @@ import os
 
 import click
 from pcvsrt import bank as pvBank
-from pcvsrt import logs
+from pcvsrt.helpers import log, io
 
 
 def compl_list_banks(ctx, args, incomplete):
@@ -24,9 +24,9 @@ def bank(ctx):
                 autocompletion=compl_list_banks)
 @click.pass_context
 def bank_list(ctx, name):
-    logs.print_header("Bank View")
-    for l, path in pvBank.list_banks().items():
-        logs.print_item("{: <8s}: {}".format(l.upper(), path))
+    log.print_header("Bank View")
+    for label, path in pvBank.list_banks().items():
+        log.print_item("{: <8s}: {}".format(label.upper(), path))
 
 
 @bank.command(name="init", short_help="Register a new bank")
@@ -36,13 +36,13 @@ def bank_list(ctx, name):
 @click.pass_context
 def bank_init(ctx, name, path, force):
 
-    logs.print_header("Bank View")
+    log.print_header("Bank View")
     if path is None:
         path = os.getcwd()
 
     b = pvBank.Bank(name, path)
     if b.exists() and not force:
-        logs.err("'{}' already exist, use '-f' to overwrite".format(name), abort=1)
+        log.err("'{}' already exist, use '-f' to overwrite".format(name), abort=1)
     else:
         b.flush_to_disk()
 

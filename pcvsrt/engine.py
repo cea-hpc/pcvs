@@ -1,8 +1,8 @@
 import os
-import pprint
 
-from pcvsrt import test, logs, helper
-from pcvsrt.context import settings
+from pcvsrt import test
+from pcvsrt.helpers import log, lowtest
+from pcvsrt.helpers.system import sysTable
 
 
 def prepare_system_criterion(sys_it):
@@ -11,7 +11,7 @@ def prepare_system_criterion(sys_it):
         if 'numeric' in it.keys() and it['numeric'] is True:
             if isinstance(it['values'], list):
                 unrolled = [elt for elt in it['values'] if isinstance(elt, int)]
-                unrolled += [helper.convert_numeric_sequence(elt) for elt in it['values'] if isinstance(elt, str)]
+                unrolled += [lowtest.convert_numeric_sequence(elt) for elt in it['values'] if isinstance(elt, str)]
             else:
                 unrolled = [it['values']]
         else:
@@ -29,18 +29,19 @@ def prepare_system_criterion(sys_it):
                 pass
     return final
 
+
 def initialize():
     # sanity checks
-    assert (settings.runtime.iterators)
-    runtime_iterators = settings.runtime.iterators
-    criterion_iterators = settings.criterion.iterators
+    assert (sysTable.runtime.iterators)
+    runtime_iterators = sysTable.runtime.iterators
+    criterion_iterators = sysTable.criterion.iterators
     it_to_remove = []
-    logs.print_item("Prune undesired iterators from the run")
+    log.print_item("Prune undesired iterators from the run")
     for it in criterion_iterators.keys():
         if it not in runtime_iterators:
-            logs.warn("Undeclared criterion as part of runtime: '{}' ".format(it))
+            log.warn("Undeclared criterion as part of runtime: '{}' ".format(it))
         elif criterion_iterators[it]['values'] is None:
-            logs.debug('No combination found for {}, removing from schedule'.format(it))
+            log.debug('No combination found for {}, removing from schedule'.format(it))
         else:
             continue
         it_to_remove.append(it)
@@ -49,7 +50,7 @@ def initialize():
         if k in it_to_remove:
             continue
     sys_iterators = {k: {**criterion_iterators[k], **runtime_iterators[k]} for k in criterion_iterators.keys() if k not in it_to_remove}
-    logs.print_item("Expand possible iterator expressions")
+    log.print_item("Expand possible iterator expressions")
     sys_iterators = prepare_system_criterion(sys_iterators)
 
     # TODO: replace resource here by the one read from config

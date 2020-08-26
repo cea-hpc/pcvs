@@ -1,44 +1,44 @@
-import os
-import subprocess
-from subprocess import CalledProcessError
-import yaml
-import shutil
-import tarfile
 import glob
-import pprint
+import os
 import pathlib
-import addict
-import pcvsrt
-from pcvsrt import config, profile, test, globals, logs, files, engine, helper, context
-from pcvsrt.context import settings
+import pprint
+import shutil
+import subprocess
+import tarfile
+from subprocess import CalledProcessError
+
+import yaml
+
+from pcvsrt import config, engine, profile, test
+from pcvsrt.helpers import io, log
+from pcvsrt.helpers.system import sysTable
+
 
 def __print_summary():
-    global run_settings
-    n = settings.validation
-    logs.print_section("Validation details:")
-    logs.print_item("Loaded profile: '{}'".format(n.pfname))
-    logs.print_item("Built into: {}".format(n.output))
-    logs.print_item("Verbosity: {}".format(logs.get_verbosity_str().capitalize()))
-    logs.print_item("User directories:")
-    width = max([len(i) for i in settings.rootdirs])
-    for k, v in settings.rootdirs.items():
-        logs.print_item("{:<{width}}: {:<{width}}".format(k.upper(), v, width=width), depth=2)
-    # logs.print_item(": {}".format())
+    n = sysTable.validation
+    log.print_section("Validation details:")
+    log.print_item("Loaded profile: '{}'".format(n.pfname))
+    log.print_item("Built into: {}".format(n.output))
+    log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
+    log.print_item("User directories:")
+    width = max([len(i) for i in sysTable.rootdirs])
+    for k, v in sysTable.rootdirs.items():
+        log.print_item("{:<{width}}: {:<{width}}".format(k.upper(), v, width=width), depth=2)
+    # log.print_item(": {}".format())
 
 
 def __build_jchronoss():
-    global run_settings
     archive_name = None
     # Compute JCHRONOSS paths & store themf
-    val_node = settings.validation
+    val_node = sysTable.validation
     src_prefix = os.path.join(val_node.output, "cache/src")
     inst_prefix = os.path.join(val_node.output, "cache/install")
     exec_prefix = os.path.join(val_node.output, "cache/exec")
     # FIXME: Dirty way to locate the archive
     # find & extract the jchronoss archive
-    for f in glob.glob(os.path.join(globals.ROOTPATH, "../**/jchronoss-*"), recursive=True):
+    for f in glob.glob(os.path.join(io.ROOTPATH, "../**/jchronoss-*"), recursive=True):
         if 'jchronoss-' in f:
-            archive_name = os.path.join(globals.ROOTPATH, f)
+            archive_name = os.path.join(io.ROOTPATH, f)
             break
     assert(archive_name)
     tarfile.open(os.path.join(archive_name)).extractall(src_prefix)
@@ -48,18 +48,19 @@ def __build_jchronoss():
                                 src_prefix, "jchronoss-*/CMakeLists.txt"))[0])
 
     # CD to build dir
-    with files.cwd(os.path.join(src_prefix, "build")):
+    with io.cwd(os.path.join(src_prefix, "build")):
         command = "cmake {} -DCMAKE_INSTALL_PREFIX={} -DENABLE_OPENMP=OFF -DENABLE_COLOR={} && make install".format(
             src_prefix, inst_prefix,
             "ON" if val_node.color else "OFF"
         )
         try:
-            _ = subprocess.check_call(command, shell=True,
-                        stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        except CalledProcessError as e:
-            logs.err("Failed to build JCHRONOSS:", abort=1)
+            _ = subprocess.check_call(
+                command, shell=True,
+                stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        except CalledProcessError:
+            log.err("Failed to build JCHRONOSS:", abort=1)
 
-    globals.create_or_clean_path(exec_prefix)
+    io.create_or_clean_path(exec_prefix)
 
     val_node.jchronoss.src = src_prefix
     val_node.jchronoss.exec = exec_prefix 
@@ -69,49 +70,46 @@ def __build_jchronoss():
 def __setup_webview():
     pass
 
-def __build_tools():
-    
-    logs.print_item("job orchestrator (JCHRONOSS)")
-    __build_jchronoss()
 
-    logs.print_item("Web-based reporting tool")
+def __build_tools():
+    log.print_item("job orchestrator (JCHRONOSS)")
+    __build_jchronoss()
+    log.print_item("Web-based reporting tool")
     __setup_webview()
 
 
-def prepare(run_settings, dirs_dict, profile):
-    
-    logs.print_section("Prepare environment")
-    logs.print_item("build configuration tree")
+def prepare(run_settings, dirs_dict, pf):
+    log.print_section("Prepare environment")
+    log.print_item("build configuration tree")
 
-    settings.validation = run_settings
-    settings.validation.xmls = list()
-    settings.rootdirs = dirs_dict
-    settings.compiler = profile.compiler
-    settings.runtime = profile.runtime
-    settings.group = profile.group
-    settings.machine = profile.machine
-    settings.criterion = profile.criterion
+    sysTable.validation = run_settings
+    sysTable.validation.xmls = list()
+    sysTable.rootdirs = dirs_dict
+    sysTable.compiler = pf.compiler
+    sysTable.runtime = pf.runtime
+    sysTable.group = pf.group
+    sysTable.machine = pf.machine
+    sysTable.criterion = pf.criterion
 
-    logs.print_item("Check whether build directory is valid")
-    buildir = os.path.join(settings.validation.output, "test_suite")
+    log.print_item("Check whether build directory is valid")
+    buildir = os.path.join(sysTable.validation.output, "test_suite")
     # if a previous build exists
     if os.path.isdir(buildir):
-        if not settings.validation.force:
-            logs.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(settings.validation.output), abort=1)
+        if not sysTable.validation.force:
+            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(sysTable.validation.output), abort=1)
         else:
-            logs.print_item("Cleaning up {}".format(buildir), depth=2)
-            globals.create_or_clean_path(buildir)
+            log.print_item("Cleaning up {}".format(buildir), depth=2)
+            io.create_or_clean_path(buildir)
 
-    logs.print_item("Create subdirs for each provided directories")
-    for label in settings.rootdirs.keys():
+    log.print_item("Create subdirs for each provided directories")
+    for label in sysTable.rootdirs.keys():
         os.makedirs(os.path.join(buildir, label))
 
-    logs.print_section("Build third-party tools")
+    log.print_section("Build third-party tools")
     __build_tools()
 
-    logs.print_section("Initialize the test engine")
+    log.print_section("Initialize the test engine")
     engine.initialize()
-
 
 
 def __replace_yaml_token(stream, src, build, prefix):   
@@ -149,14 +147,14 @@ def __load_yaml_file(f, src, build, prefix):
     except yaml.YAMLError:
         convert = True
     except Exception as e:
-        logs.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
+        log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
 
     if convert:
-        logs.info("Attempt to use legacy syntax for {}".format(f))
+        log.info("Attempt to use legacy syntax for {}".format(f))
         obj = yaml.load(__replace_yaml_token(__load_yaml_file_legacy(f), src, build, prefix), Loader=yaml.FullLoader)
-        if logs.get_verbosity('debug'):
+        if log.get_verbosity('debug'):
             convert_file = os.path.join(os.path.split(f)[0], "convert-pcvs.yml")
-            logs.debug("Save converted file to {}".format(convert_file))
+            log.debug("Save converted file to {}".format(convert_file))
             with open(convert_file, 'w') as fh:
                 yaml.dump(obj, fh)
     return obj
@@ -169,21 +167,24 @@ def __print_progbar_walker(elt):
 
 
 def process():
-    logs.print_section("Load from filesystem")
-    path_dict = settings.rootdirs
+    log.print_section("Load from filesystem")
+    path_dict = sysTable.rootdirs
     setup_files = list()
     yaml_files = list()
 
-    logs.info("Discovery user directories: {}".format(pprint.pformat(path_dict)))
+    log.info("Discovery user directories: {}".format(pprint.pformat(path_dict)))
     # discovery may take a while with some systems
-    logs.print_item("PCVS-related file detection")
+    log.print_item("PCVS-related file detection")
     # iterate over user directories
     for label, path in path_dict.items():
         # for each, walk through the tree
-        for root, _, list_files in os.walk(path):
+        for root, dirs, list_files in os.walk(path):
             last_dir = os.path.basename(root)
             # if the current dir is a 'special' one, discard
             if last_dir in ['.pcvsrt', '.pcvs', "build_scripts"]:
+                log.debug("skip {}".format(root))
+                # set dirs to null, avoiding os.wal() to go further in that dir
+                dirs[:] = []
                 continue
             # otherwise, save the file
             for f in list_files:
@@ -193,27 +194,27 @@ def process():
                 elif 'pcvs.yml' == f or 'pcvs.yml.in' == f:
                     yaml_files.append((label, root.replace(path, '')[1:], f))
 
-    logs.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
-    logs.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
+    log.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
+    log.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
 
     errors = []
     errors += process_dyn_setup_scripts(setup_files)
     errors += process_static_yaml_files(yaml_files)
 
-    logs.print_item("Checking for errors")
+    log.print_item("Checking for errors")
     if len(errors):
-        logs.err("Issues while loading benchmarks:")
+        log.err("Issues while loading benchmarks:")
         for elt in errors:
-            logs.err("  - {}: {}".format(elt[0], elt[1]))
-        logs.err("", abort=1)
+            log.err("  - {}: {}".format(elt[0], elt[1]))
+        log.err("", abort=1)
 
 
 def process_dyn_setup_scripts(setup_files):
     err = []
-    logs.print_item("Manage dynamic files (scripts)")
-    with logs.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
+    log.print_item("Manage dynamic files (scripts)")
+    with log.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            base_src, cur_src, base_build, cur_build = helper.generate_local_variables(label, subprefix)
+            base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
             env = os.environ.copy()
             
             env['pcvs_src'] = base_src
@@ -235,15 +236,15 @@ def process_dyn_setup_scripts(setup_files):
             stream = ""
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
+            sysTable.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err  
 
 def process_static_yaml_files(yaml_files):
     err = []
-    logs.print_item("Process static test files")
-    with logs.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
+    log.print_item("Process static test files")
+    with log.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            base_src, cur_src, base_build, cur_build = helper.generate_local_variables(label, subprefix)
+            base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
@@ -254,47 +255,47 @@ def process_static_yaml_files(yaml_files):
                 err += [(f, e)]
                 continue
             except Exception as e:
-                logs.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
+                log.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            settings.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
+            sysTable.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
     return err
 
 
 def run():
     __print_summary()
-    logs.print_item("Save Configurations for later use")
-    with open(os.path.join(settings.validation.output, "conf.yml"), 'w') as conf_fh:
-        yaml.dump(context.serialize(), conf_fh)
+    log.print_item("Save Configurations for later use")
+    with open(os.path.join(sysTable.validation.output, "conf.yml"), 'w') as conf_fh:
+        yaml.dump(sysTable.serialize(), conf_fh)
     
-    logs.print_section("Run the Orchestrator (JCHRONOSS)")
+    log.print_section("Run the Orchestrator (JCHRONOSS)")
 
-    prog = os.path.join(settings.validation.jchronoss.install, "bin/jchronoss")
-    build = os.path.join(settings.validation.jchronoss.exec)
-    verb = min(2, settings.validation.verbose)
-    files = settings.validation.xmls
+    prog = os.path.join(sysTable.validation.jchronoss.install, "bin/jchronoss")
+    build = os.path.join(sysTable.validation.jchronoss.exec)
+    verb = min(2, sysTable.validation.verbose)
+    files = sysTable.validation.xmls
 
     cmd = [
         prog,
         "--verbosity={}".format(verb),
         "--build", build,
-        "--nb-resources={}".format(settings.machine.nodes)
+        "--nb-resources={}".format(sysTable.machine.nodes)
        ] + files
     
-    logs.info("JCHRONOSS: '{}'".format(" ".join(cmd)))
+    log.info("JCHRONOSS: '{}'".format(" ".join(cmd)))
     try:
-        raise subprocess.CalledProcessError()
+        #raise subprocess.CalledProcessError()
         subprocess.check_call(cmd)
-    except subprocess.CalledProcessError as e:
-        logs.err("JCHRONOSS returned non-zero exit code!", abort=1)
+    except subprocess.CalledProcessError:
+        log.err("JCHRONOSS returned non-zero exit code!", abort=1)
 
 
 def terminate():
-    logs.print_section("Build final results archive")
-    logs.print_item("Prune non-printable characters")
-    logs.print_item("Remove undesired data")
-    logs.print_item("Extract base information")
-    logs.print_item("Save user-defined artifacts")
+    log.print_section("Build final results archive")
+    log.print_item("Prune non-printable characters")
+    log.print_item("Remove undesired data")
+    log.print_item("Extract base information")
+    log.print_item("Save user-defined artifacts")
 
     if shutil.which("xsltproc") is not None:
-        logs.print_section("Generate static reporting webpages")
+        log.print_section("Generate static reporting webpages")

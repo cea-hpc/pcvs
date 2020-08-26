@@ -5,7 +5,8 @@ import os
 import click
 import pkg_resources
 
-from pcvsrt import config, globals, logs, profile, bank
+from pcvsrt import config, profile, bank
+from pcvsrt.helpers import log, io
 
 from pcvsrt.cli.config import commands as cmdConfig
 from pcvsrt.cli.profile import commands as cmdProfile
@@ -59,11 +60,11 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
     # Click specific-related
     ctx.color = color
 
-    logs.init(verbose, encoding, enrich_exp)
-    globals.set_exec_path(ctx.obj['exec'])
+    log.init(verbose, encoding, enrich_exp)
+    io.set_local_path(ctx.obj['exec'])
 
-    if click.get_terminal_size()[0] < globals.LINELENGTH:
-        globals.LINELENGTH = click.get_terminal_size()[0]
+    if click.get_terminal_size()[0] < log.LINELENGTH:
+        log.LINELENGTH = click.get_terminal_size()[0]
 
     # detections
     config.init()
@@ -79,29 +80,29 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
 @click.pass_context
 def cli_doc(ctx, category):
 
-    logs.print_header("Documentation")
+    log.print_header("Documentation")
 
-    logs.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
+    log.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
     for shell in ['zsh', 'bash']:
-        logs.print_item(
+        log.print_item(
             "{: >4s}: eval \"$(_PCVS_COMPLETE=source_{} pcvs)\"".
             format(shell.upper(), shell))
     pass
 
-    logs.print_section("Create basic configuration blocks")
-    logs.print_item("WIP")
+    log.print_section("Create basic configuration blocks")
+    log.print_item("WIP")
 
-    logs.print_section("Create a profile")
-    logs.print_item("WIP")
+    log.print_section("Create a profile")
+    log.print_item("WIP")
 
-    logs.print_section("Make a compliant test-suite")
-    logs.print_item("WIP")
+    log.print_section("Make a compliant test-suite")
+    log.print_item("WIP")
 
-    logs.print_section("Run a  simple validation")
-    logs.print_item("WIP")
+    log.print_section("Run a  simple validation")
+    log.print_item("WIP")
 
-    logs.print_section("Browse results")
-    logs.print_item("WIP")
+    log.print_section("Browse results")
+    log.print_item("WIP")
 
 
 cli.add_command(cmdConfig.config)

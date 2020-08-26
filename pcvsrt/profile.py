@@ -3,8 +3,8 @@ import os
 
 import yaml
 
-from pcvsrt import config, files, logs
-from pcvsrt import globals as pvGlobals
+from pcvsrt import config
+from pcvsrt.helpers import io, log
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -13,7 +13,7 @@ PROFILE_EXISTING = dict()
 def extract_profile_from_token(s, single="right"):
     array = s.split(".")
     if len(array) > 2:
-        logs.err("Invalid token", abort=1)
+        log.err("Invalid token", abort=1)
     elif len(array) == 2:
         return (array[0], array[1])
     elif len(array) == 1:
@@ -22,16 +22,16 @@ def extract_profile_from_token(s, single="right"):
         else:
             return (None, s)
     else:
-        logs.nreach()
+        log.nreach()
 
 
 def init():
     global PROFILE_EXISTING, PROFILE_STORAGES
     PROFILE_STORAGES = {k: os.path.join(
-        v, "saves/profile") for k, v in pvGlobals.STORAGES.items()}
+        v, "saves/profile") for k, v in io.STORAGES.items()}
     PROFILE_EXISTING = {}
     # this first loop defines configuration order
-    priority_paths = pvGlobals.storage_order()
+    priority_paths = io.storage_order()
     priority_paths.reverse()
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
@@ -42,7 +42,7 @@ def init():
 
 def check_existing_name(name, scope):
     path = None
-    scopes = pvGlobals.storage_order() if scope is None else [scope]
+    scopes = io.storage_order() if scope is None else [scope]
     for sc in scopes:
         for pair in PROFILE_EXISTING[sc]:
             if name == pair[0]:
@@ -70,7 +70,7 @@ def list_profiles(scope=None):
 
 class Profile:
     def __init__(self, name, scope=None):
-        pvGlobals.check_valid_scope(scope)
+        io.check_valid_scope(scope)
         self._name = name
         self._scope = scope
         self._details = {}
@@ -82,7 +82,7 @@ class Profile:
         assert (isinstance(raw, dict))
         check = [val for val in config.CONFIG_BLOCKS if val in raw.keys()]
         if len(check) != len(config.CONFIG_BLOCKS):
-            logs.err(
+            log.err(
                 "All {} configuration blocks are required to build "
                 "a valid profile!".format(len(config.CONFIG_BLOCKS)), abort=1)
 
@@ -111,14 +111,14 @@ class Profile:
 
     def load_from_disk(self):
         if self._file is None or not os.path.isfile(self._file):
-            logs.err("Invalid profile name {}".format(self._name), abort=1)
+            log.err("Invalid profile name {}".format(self._name), abort=1)
 
-        logs.info("load {} ({})".format(self._name, self._scope))
+        log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = yaml.safe_load(f)
 
     def load_template(self):
-        logs.nimpl()
+        log.nimpl()
 
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
@@ -133,29 +133,29 @@ class Profile:
 
     def clone(self, clone):
         self._file = compute_path(self._name, self._scope)
-        logs.info("Compute target prefix: {}".format(self._file))
+        log.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details
 
     def delete(self):
-        logs.info("delete {}".format(self._file))
+        log.info("delete {}".format(self._file))
         os.remove(self._file)
         pass
 
     def display(self):
-        logs.print_header("Profile View")
-        logs.print_section("Scope: {}".format(self._scope.capitalize()))
-        logs.print_section("Profile details:")
+        log.print_header("Profile View")
+        log.print_section("Scope: {}".format(self._scope.capitalize()))
+        log.print_section("Profile details:")
         if self._details:
-            logs.print_section("Details:")
+            log.print_section("Details:")
             for k, v in self._details.items():
-                logs.print_item("{}: {}".format(k, v))
+                log.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
         assert (self._file is not None)
         assert (os.path.isfile(self._file))
 
-        files.open_in_editor(self._file, e)
+        io.open_in_editor(self._file, e)
         self.load_from_disk()
 
     @property

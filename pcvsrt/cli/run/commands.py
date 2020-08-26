@@ -1,12 +1,11 @@
 import os
 import time
 import click
-import pprint
 
 from pcvsrt import run as pvRun
 from pcvsrt import profile as pvProfile
 from pcvsrt.cli.profile import commands as cmdProfile
-from pcvsrt import files, logs
+from pcvsrt.helpers import io, log
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -29,11 +28,11 @@ def iterate_dirs(ctx, param, value) -> dict:
                 err_msg += "- '{}': Used more than once\n".format(label.upper())
             elif not os.path.isdir(testpath):
                 err_msg += "- '{}': No such directory\n".format(testpath)   
-             # else, add it
+            # else, add it
             else:
                 list_of_dirs[label] = testpath
         if len(err_msg):
-            logs.err(
+            log.err(
                 "Errors occured while parsing user directories:",
                 err_msg,
                 "please see '--help' for more information", abort=1)
@@ -51,9 +50,9 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.option("-c", "--set-defaults", "set_default",
               default=None, is_flag=True,
               help="Set default values for run options (WIP)")
-@click.option("-l", "--tee", "log", show_envvar=True,
-              default=False, is_flag=True,
-              help="Log the whole stdout/stderr")
+#@click.option("-l", "--tee", "log", show_envvar=True,
+#              default=False, is_flag=True,
+#              help="Log the whole stdout/stderr")
 @click.option("-d", "--detach", "detach",
               default=True, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously")
@@ -75,7 +74,7 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap, override, set_default, dirs) -> None:
+def run(ctx, profilename, output, detach, status, resume, pause, bootstrap, override, set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -85,23 +84,23 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     """
     # parse non-run situations
     if bootstrap:
-        logs.info("Bootstrapping directories")
-        logs.nimpl("Bootstrap")
+        log.info("Bootstrapping directories")
+        log.nimpl("Bootstrap")
         exit(0)
     elif pause and resume:
-        logs.err("Cannot pause and resume the run at the same time!", abort=1)
+        log.err("Cannot pause and resume the run at the same time!", abort=1)
     elif pause:
-        logs.nimpl("pause")
+        log.nimpl("pause")
         exit(0)
     elif resume:
-        logs.nimpl("resume")
+        log.nimpl("resume")
         exit(0)
     elif status:
-        logs.nimpl("status")
+        log.nimpl("status")
         exit(0)
     elif set_default:
-        logs.nimpl("set_defaults")
-        #files.open_in_editor("defaults")
+        log.nimpl("set_defaults")
+        #io.open_in_editor("defaults")
         exit(0)
 
     # fill validation run_setttings
@@ -111,30 +110,28 @@ def run(ctx, profilename, output, log, detach, status, resume, pause, bootstrap,
     run_setttings['color'] = ctx.obj['color']
     run_setttings['pfname'] = profilename
     run_setttings['output'] = os.path.join(os.path.abspath(output), ".pcvs")
-    run_setttings['tee'] = log
+    #run_setttings['tee'] = log
     run_setttings['bg'] = detach
     run_setttings['force'] = override
 
     (scope, label) = pvProfile.extract_profile_from_token(profilename)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
-        logs.err("Please use a valid profile name:",
-                 "No '{}' found!".format(profilename), abort=1)
+        log.err("Please use a valid profile name:",
+                "No '{}' found!".format(profilename), abort=1)
     else:
         pf.load_from_disk()
-
-    
-    logs.banner()
-    logs.print_header("Prepare Environment")
+    log.banner()
+    log.print_header("Prepare Environment")
     pvRun.prepare(run_setttings, dirs, pf)
 
-    logs.print_header("Process benchmarks")
+    log.print_header("Process benchmarks")
     start = time.time()
     pvRun.process()
-    logs.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
+    log.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
     
-    logs.print_header("Validation Start")
+    log.print_header("Validation Start")
     pvRun.run()
 
-    logs.print_header("Finalization")
+    log.print_header("Finalization")
     pvRun.terminate()

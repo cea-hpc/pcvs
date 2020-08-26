@@ -2,14 +2,13 @@ import sys
 import click
 import logging
 import pprint
-from pcvsrt import globals
 
 try:
     import cowsay
 except ImportError:
     pass
 
-
+LINELENGTH = 93
 FORMAT = "%(levelname)s: %(message)s"
 enrich_display = False
 vb_array = {
@@ -100,7 +99,7 @@ def utf(k):
 
 def print_header(s, out=True):
     hdr_char = utf('hdr')
-    str_len = globals.LINELENGTH - (len(s) + 2)  # surrounding spaces
+    str_len = LINELENGTH - (len(s) + 2)  # surrounding spaces
     begin = hdr_char * int(str_len / 2)
     end = begin + (hdr_char * (str_len % 2 != 0))
 
@@ -282,7 +281,7 @@ def banner():
         r"""                                    """,
     ]
 
-    if globals.LINELENGTH < max(map(lambda x: len(x), logo)):
+    if LINELENGTH < max(map(lambda x: len(x), logo)):
         short_banner()
         return
     else:

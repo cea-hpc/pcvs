@@ -1,5 +1,5 @@
 from addict import Dict
-import pprint
+
 
 class Settings(Dict):
     def __setitem__(self, param, value):
@@ -7,9 +7,8 @@ class Settings(Dict):
             value = Dict(value)
         Dict.__setitem__(self, param, value)
 
+    def serialize(self):
+        return self.to_dict()
 
-settings = Settings()
 
-
-def serialize():
-    return settings.to_dict()
+sysTable = Settings()

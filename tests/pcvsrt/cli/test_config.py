@@ -33,7 +33,7 @@ def test_list(scope, kind, caplog):
     'kind',
     ['all', 'compiler', 'runtime', 'machine', 'criterion', 'group'])
 def test_list_scope(kind):
-    for scope in pcvsrt.globals.storage_order():
+    for scope in pcvsrt.helpers.io.storage_order():
         _ = run_and_test('config', 'list', ".".join([scope, kind]))
 
 

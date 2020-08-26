@@ -3,15 +3,14 @@ import yaml
 
 from pcvsrt import config as pvConfig
 from pcvsrt import profile as pvProfile
-from pcvsrt import globals as pvGlobals
-from pcvsrt import logs
 from pcvsrt.cli.config import commands as cmdConfig
+from pcvsrt.helpers import io, log
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
     pvProfile.init()
     flat_array = []
-    for scope in pvGlobals.storage_order():
+    for scope in io.storage_order():
         for elt in pvProfile.PROFILE_EXISTING[scope]:
             flat_array.append(scope + "." + elt[0])
 
@@ -51,36 +50,36 @@ def profile_list(ctx, token):
                                                               single="left")
 
     if label:
-        logs.warn("no LABEL required for this command")
+        log.warn("no LABEL required for this command")
 
-    pvGlobals.check_valid_scope(scope)
+    io.check_valid_scope(scope)
 
-    logs.print_header("Profile View")
+    log.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)
     if not profiles:
-        logs.print_item("None")
+        log.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pvGlobals.storage_order():
+        for sc in io.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0]
                             for elt in [array for array in profiles[sc]]])
             if not names:
-                logs.print_item("{: <6s}: {}".format(sc.upper(),
-                                                     logs.cl('None',
+                log.print_item("{: <6s}: {}".format(sc.upper(),
+                                                    log.cl('None',
                                                              'bright_black')))
             else:
-                logs.print_item("{: <6s}: {}".format(sc.upper(),
-                                                     ", ".join(names)))
+                log.print_item("{: <6s}: {}".format(sc.upper(),
+                                                    ", ".join(names)))
     else:
         names = sorted([x[0] for x in profiles])
-        logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+        log.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
 
     # in case verbosity is enabled, add scope paths
-    logs.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(pvGlobals.storage_order()):
-        logs.info("{}. {}: {}".format(
-            i+1, scope.upper(), pvGlobals.STORAGES[scope]))
+    log.info("Scopes are ordered as follows:")
+    for i, scope in enumerate(io.storage_order()):
+        log.info("{}. {}: {}".format(
+            i+1, scope.upper(), io.STORAGES[scope]))
 
 
 @profile.command(name="show",
@@ -96,19 +95,19 @@ def profile_show(ctx, token):
         pf.load_from_disk()
         pf.display()
     else:
-        logs.err("Profile '{}' not found!".format(token))
+        log.err("Profile '{}' not found!".format(token))
     pass
 
 
 def profile_interactive_select():
     composition = {}
-    logs.enrich_print("Hello! I'm Tux and I'm here to assist you building a "
-                      "valid profile from a combination of configuration blocks."
-                      " Lists are based on currently found files on "
-                      "your system. If possible, a default block  will be"
-                      " loaded".format(len(pvConfig.CONFIG_BLOCKS)), skippable=True)
+    log.enrich_print("Hello! I'm Tux and I'm here to assist you building a "
+                     "valid profile from a combination of configuration blocks."
+                     "Lists are based on currently found files on "
+                     "your system. If possible, a default block  will be"
+                     " loaded".format(len(pvConfig.CONFIG_BLOCKS)), skippable=True)
     for kind in pvConfig.CONFIG_BLOCKS:
-        logs.print_section("Pick up a {}".format(kind.capitalize()))
+        log.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
         for scope, avails in pvConfig.list_blocks(kind).items():
             for elt in avails:
@@ -120,7 +119,7 @@ def profile_interactive_select():
         except ValueError:
             default = None
         for i, cell in enumerate(choices):
-            logs.print_item("{}: {}".format(i + 1, cell))
+            log.print_item("{}: {}".format(i + 1, cell))
         while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
         (scope, _, label) = pvConfig.extract_config_from_token(
@@ -172,7 +171,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
 
     pf = pvProfile.Profile(p_label, p_scope)
     if pf.is_found():
-        logs.err("A profile named '{}' already exist!".format(
+        log.err("A profile named '{}' already exist!".format(
             pf.full_name), abort=1)
 
     pf_blocks = {}
@@ -183,7 +182,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
         pf.clone(base)
         pass
     elif interactive:
-        logs.print_header("profile view (build)")
+        log.print_header("profile view (build)")
         pf_blocks = profile_interactive_select()
         pf.fill(pf_blocks)
     else:
@@ -193,23 +192,23 @@ def profile_build(ctx, token, interactive, blocks, clone):
             if cur.is_found() and b_kind not in pf_blocks.keys():
                 pf_blocks[b_kind] = cur
             else:
-                logs.err("Issue with '{}'".format(block))
+                log.err("Issue with '{}'".format(block))
                 if not cur.is_found():
-                    logs.err("Such configuration does not exist!")
+                    log.err("Such configuration does not exist!")
                 else:
-                    logs.err(
+                    log.err(
                         "'{}' kind is set twice".format(b_kind.upper()),
                         "First is '{}'".format(pf_blocks[b_kind].full_name))
-                logs.err("", abort=1)
+                log.err("", abort=1)
         pf.fill(pf_blocks)
 
-    logs.print_header("profile view")
+    log.print_header("profile view")
     pf.flush_to_disk()
     # pf.display()
 
-    logs.print_section("final profile (registered as {})".format(pf.scope))
+    log.print_section("final profile (registered as {})".format(pf.scope))
     for k, v in pf_blocks.items():
-        logs.print_item("{: >9s}: {}".format(
+        log.print_item("{: >9s}: {}".format(
             k.upper(), ".".join([v.scope, v.short_name])))
 
 
@@ -228,12 +227,12 @@ def profile_destroy(ctx, token):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            logs.err("err", abort=1)
+            log.err("err", abort=1)
         else:
             pf.delete()
     else:
-        logs.err("Profile '{}' not found!".format(label),
-                 "Please check the 'list' command", abort=1)
+        log.err("Profile '{}' not found!".format(label),
+                "Please check the 'list' command", abort=1)
 
 
 @profile.command(name="alter",
@@ -250,12 +249,12 @@ def profile_alter(ctx, token, editor):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            logs.err("err", abort=1)
+            log.err("err", abort=1)
         else:
             pf.open_editor(editor)
     else:
-        logs.err("Profile '{}' not found!".format(label),
-                 "Please check the 'list' command", abort=1)
+        log.err("Profile '{}' not found!".format(label),
+                "Please check the 'list' command", abort=1)
 
 
 @profile.command(name="import",
@@ -272,7 +271,7 @@ def profile_import(ctx, token, src_file):
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
         pf.flush_to_disk()
     else:
-        logs.err("Cannot import into an already created profile!", abort=1)
+        log.err("Cannot import into an already created profile!", abort=1)
 
 
 @profile.command(name="export",

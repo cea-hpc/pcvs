@@ -1,16 +1,15 @@
 import click
 import yaml
 
-from pcvsrt import globals as pvGlobals
 from pcvsrt import config as pvConfig
-from pcvsrt import logs
+from pcvsrt.helpers import log, io
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
     pvConfig.init()
     flat_array = []
     for kind in pvConfig.CONFIG_BLOCKS:
-        for scope in pvGlobals.storage_order():
+        for scope in io.storage_order():
             for elt in pvConfig.CONFIG_EXISTING[kind][scope]:
                 flat_array.append(scope + "." + kind + "." + str(elt[0]))
 
@@ -45,23 +44,23 @@ def config_list_single_kind(kind, scope) -> None:
     # retrieve blocks to print
     blocks = pvConfig.list_blocks(kind, scope)
     if not blocks:
-        logs.print_item("None")
+        log.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in pvGlobals.storage_order():
+        for sc in io.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
-                logs.print_item("{: <6s}: {}".format(
+                log.print_item("{: <6s}: {}".format(
                                 sc.upper(),
-                                logs.cl('None', 'bright_black')))
+                                log.cl('None', 'bright_black')))
             else:
-                logs.print_item("{: <6s}: {}".format(
+                log.print_item("{: <6s}: {}".format(
                                 sc.upper(),
                                 ", ".join(names)))
     else:
         names = sorted([x[0] for x in blocks])
-        logs.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+        log.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
 
 
 @config.command(name="list", short_help="List available configuration blocks")
@@ -83,7 +82,7 @@ def config_list(ctx, token) -> None:
         (scope, kind, label) = pvConfig.extract_config_from_token(
             token, pair="left", single="center")
     if label:
-        logs.warn("no LABEL required for this command")
+        log.warn("no LABEL required for this command")
 
     # special cases for 'list' command:
     # - no 'label' are required (ignored otherwise)
@@ -93,19 +92,19 @@ def config_list(ctx, token) -> None:
     else:
         pvConfig.check_valid_kind(kind)
         kinds = [kind]
-    pvGlobals.check_valid_scope(scope)
+    io.check_valid_scope(scope)
 
-    logs.print_header("Configuration view")
+    log.print_header("Configuration view")
 
     for k in kinds:
-        logs.print_section("Kind '{}'".format(k.upper()))
+        log.print_section("Kind '{}'".format(k.upper()))
         config_list_single_kind(k, scope)
 
     # in case verbosity is enabled, add scope paths
-    logs.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(pvGlobals.storage_order()):
-        logs.info("{}. {}: {}".format(
-            i+1, scope.upper(), pvGlobals.STORAGES[scope]))
+    log.info("Scopes are ordered as follows:")
+    for i, scope in enumerate(io.storage_order()):
+        log.info("{}. {}: {}".format(
+            i+1, scope.upper(), io.STORAGES[scope]))
 
 
 @config.command(name="show",
@@ -129,7 +128,7 @@ def config_show(ctx, token) -> None:
     else:
         sc = scope
         sc = "any" if sc is None else sc
-        logs.err("No '{}' configuration found at {} level!".format(
+        log.err("No '{}' configuration found at {} level!".format(
             label, sc), abort=1)
 
 
@@ -158,8 +157,8 @@ def config_create(ctx, token, clone) -> None:
         (c_scope, c_kind, c_label) = pvConfig.extract_config_from_token(
             clone, pair='span')
         if c_kind is not None and c_kind != kind:
-            logs.err("Can only clone from a conf. blocks with the same KIND!",
-                     abort=1)
+            log.err("Can only clone from a conf. blocks with the same KIND!",
+                    abort=1)
         base = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
         base.load_from_disk()
     else:
@@ -171,7 +170,7 @@ def config_create(ctx, token, clone) -> None:
         copy.clone(base)
         copy.flush_to_disk()
     else:
-        logs.err("Configuration '{}' already exists!".format(
+        log.err("Configuration '{}' already exists!".format(
             copy.full_name), abort=1)
 
 
@@ -196,8 +195,8 @@ def config_destroy(ctx, token) -> None:
     if c.is_found():
         c.delete()
     else:
-        logs.err("Configuration '{}' not found!".format(label),
-                 "Please check the 'list' command", abort=1)
+        log.err("Configuration '{}' not found!".format(label),
+                "Please check the 'list' command", abort=1)
 
 
 @config.command(name="edit", short_help="edit the config block")
@@ -222,7 +221,7 @@ def config_edit(ctx, token, editor) -> None:
         block.open_editor(editor)
         block.flush_to_disk()
     else:
-        logs.err("Cannot open this configuration: does not exist!", abort=1)
+        log.err("Cannot open this configuration: does not exist!", abort=1)
 
 
 @config.command(name="import", short_help="Import config from a file")
@@ -245,7 +244,7 @@ def config_import(ctx, token, in_file) -> None:
         obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
         obj.flush_to_disk()
     else:
-        logs.err("Cannot import into an already created conf. block!", abort=1)
+        log.err("Cannot import into an already created conf. block!", abort=1)
 
 
 @config.command(name="export", short_help="Export config into a file")
@@ -266,4 +265,4 @@ def config_export(ctx, token, out_file):
     if obj.is_found():
         out_file.write(yaml.dump(obj.dump()))
     else:
-        logs.err("Failed to export '{}': not found!".format(token), abort=1)
+        log.err("Failed to export '{}': not found!".format(token), abort=1)
