@@ -4,6 +4,7 @@ import yaml
 from addict import Dict
 
 from pcvsrt.helpers import io, log, lowtest
+from pcvsrt.criterion import Criterion, Combinations
 from pcvsrt.helpers.system import sysTable
 
 
@@ -26,12 +27,21 @@ class Test:
         string += "</job>"
         return string
 
+    @staticmethod
+    def finalize_file(path, package, content):
+        fn = os.path.join(path, "list_of_tests.xml")
+        with open(fn, 'w') as fh:
+            fh.write("<jobSuite>")
+            fh.write(content)
+            fh.write("</jobSuite>")
+        return fn
 
-class TEDescriptor(yaml.YAMLObject):
+
+class TEDescriptor:
     @classmethod
-    def init_system_wide(cls, crit, base_it):
-        cls._sys_crit = Dict(crit)
-        cls._base_it = base_it
+    def init_system_wide(cls, base_criterion_name):
+        cls._sys_crit = sysTable.criterion.iterators
+        cls._base_it = base_criterion_name
 
     
     def __init__(self, name, node, label, subprefix):
@@ -40,115 +50,123 @@ class TEDescriptor(yaml.YAMLObject):
                 "Unable to build a TestDescription "
                 "from the given node (got {})".format(type(node)), abort=1)
         self._te_name = name
-        self._te_pkg = ".".join([label, subprefix.replace('/', '.')])
+        self._te_label = node.get('label', self._te_name)
+        self._te_pkg = ".".join([label, subprefix.replace('/', '.')]) if subprefix else label
+        
         _, self._srcdir, _, self._buildir = io.generate_local_variables(label, subprefix)
-        self._node = Dict(node)
+        self._build = Dict(node.get('build', None))
+        self._run = Dict(node.get('run', None))
+
+        if 'program' in self._run.get('iterate', {}):
+            self._program_criterion = {k: Criterion(k, v, True) for k, v in self._run.iterate.program.items()}
+        else:
+            self._program_criterion = None
+
+        self._validation = Dict(node.get('validate', None))
+        self._artifacts = Dict(node.get('artifacts', None))
+        self._template = node.get('group', None)
+
         self._full_name = ".".join([self._te_pkg, self._te_name])
-        self._criterion = Dict()
+        
+        self._configure_criterions()
+        self._compatibility_support(node.get('_compat', None))
 
-        self._refine_iterators()
-        self._compatibility_support()
-
-    def _compatibility_support(self):
-        if '_compat' not in self._node:
+    def _compatibility_support(self, compat):
+        if compat is None:
             return
-        for k in self._node._compat:
+        for k in compat:
             if 'chdir' in k:
-                if 'build' in self._node and 'cwd' not in self._node.build:
-                    self._node.build.cwd = self._node._compat[k]
-                if 'run' in self._node and 'cwd' not in self._node.run:
-                    self._node.run.cwd = self._node._compat[k]
+                if self._build and 'cwd' not in self._build:
+                    self._build.cwd = compat[k]
+                if self._run and 'cwd' not in self._run:
+                    self._run.cwd = compat[k]
             
             if 'type' in k:
-                if self._node._compat[k] in ['build', 'complete']:
-                    self._node.build.dummy = True
-                if self._node._compat[k] in ['run', 'complete']:
-                    self._node.run.dummy = True
+                if compat[k] in ['build', 'complete']:
+                    self._build.dummy = True
+                if compat[k] in ['run', 'complete']:
+                    self._run.dummy = True
 
             elif 'bin' in k:
-                if 'build' in self._node and 'binary' not in self._node.build:
-                    self._node.build.binary = self._node._compat[k]
-                if 'run' in self._node and 'program' not in self._node.run:
-                    self._node.run.program = self._node._compat[k]
-                
-        self._node.pop("_compat")
+                if self._build and 'binary' not in self._build:
+                    self._build.binary = compat[k]
+                if self._run and 'program' not in self._run:
+                    self._run.program = compat[k]
 
-    def _refine_iterators(self):
-        it_node = self._node.run
-        if 'iterate' not in it_node:
+    def _configure_criterions(self):
+        if 'iterate' not in self._run:
             self._criterion = self._sys_crit
         else:
-            te_keys = self._node.iterate.keys()
+            te_keys = self._run.iterate.keys()
             tmp = {}
             for k_sys, v_sys in self._sys_crit.items():
                 # if key is overriden by the test
                 if k_sys in te_keys:
-                    values = lowtest.unfold_sequence(v_sys['values'], self._sys_crit[k_sys]['values'])
-                    if not values:
+                    cur_criterion = Criterion(k_sys, self._run.iterate[k_sys])
+                    cur_criterion.expand_values()
+                    cur_criterion.intersect(v_sys)
+                    if cur_criterion.is_empty():
                         log.warn("No valid intersection found for '{}, Discard".format(k_sys))
                     else:
-                        tmp[k_sys] = values
+                        tmp[k_sys] = cur_criterion
                 else:  # key is not overriden
                     tmp[k_sys] = v_sys
 
-            # now build program iterators
-            if 'program' in it_node.iterate:
-                self._criterion_user = it_node.iterate.program.keys()
-                tmp.update(it_node.iterate.program)
             self._criterion = tmp
+            # now build program iterators
+            [elt.expand_values() for elt in self._program_criterion.values()]  
 
     def __build_from_sources(self):
         command = list()
-        build_node = self._node.build
-        lang = lowtest.detect_source_lang(build_node.files)
+        lang = lowtest.detect_source_lang(self._build.files)
         command.append(sysTable.compiler.commands.get(lang, 'echo'))
-        command.append(lowtest.prepare_cmd_build_variants(build_node.variants))
-        command.append('{}'.format(build_node.get('cflags', '')))
-        command.append('{}'.format(" ".join([build_node.files])))
-        command.append('{}'.format(build_node.get('ldflags', '')))
+        command.append(lowtest.prepare_cmd_build_variants(self._build.variants))
+        command.append('{}'.format(self._build.get('cflags', '')))
+        command.append('{}'.format(" ".join(self._build.files)))
+        command.append('{}'.format(self._build.get('ldflags', '')))
 
-        binary = self._node.build.sources.binary if 'binary' in self._node.build.sources else self._te_name
+        binary = self._build.sources.binary if 'binary' in self._build.sources else self._te_name
         command.append('-o {}'.format(os.path.join(self._buildir, binary)))
 
-        if 'cwd' in self._node.build:
-            command.insert(0, "cd {} &&".format(self._node.build.cwd))
+        if 'cwd' in self._build:
+            command.insert(0, "cd {} &&".format(self._build.cwd))
         
         return " ".join(command)
 
     def __build_from_makefile(self):
-        build_node = self._node.build
         command = ["make"]
-        if 'files' in build_node:
-            basepath = os.path.dirname(build_node.files)
-            command.append("-f {}".format(" ".join([build_node.files])))
+        if 'files' in self._build:
+            basepath = os.path.dirname(self._build.files[0])
+            command.append("-f {}".format(" ".join(self._build.files)))
         else:
             basepath = self._srcdir
         
         command.append("-C {}".format(basepath))
-        command.append("{}".format(build_node.make.get('target', '')))
+        command.append("{}".format(self._build.make.get('target', '')))
         command.append('PCVS_CC="{}"'.format(sysTable.compiler.commands.get('cc', '')))
         command.append('PCVS_CXX="{}"'.format(sysTable.compiler.commands.get('cxx', '')))
         command.append('PCVS_CU="{}"'.format(sysTable.compiler.commands.get('cu', '')))
         command.append('PCVS_FC="{}"'.format(sysTable.compiler.commands.get('fc', '')))
         command.append('PCVS_CFLAGS="{} {}"'.format(
-            lowtest.prepare_cmd_build_variants(build_node.variants),
-            build_node.get('cflags', '')
+            lowtest.prepare_cmd_build_variants(self._build.variants),
+            self._build.get('cflags', '')
         ))
-        command.append('PCVS_LDFLAGS="{}"'.format(build_node.get('ldflags', '')))
-            
+        command.append('PCVS_LDFLAGS="{}"'.format(self._build.get('ldflags', '')))
         return " ".join(command)
 
     def __construct_compil_tests(self):
         deps = []
-        build_node = self._node.build
+        
+        if not isinstance(self._build.files, list):
+            self._build.files = list(self._build.files)
 
-        if 'make' in build_node:
+        if 'make' in self._build:
             command = self.__build_from_makefile()
         else:
             command = self.__build_from_sources()
             
         try:
-            for d in build_node['depends_on']:
+            for d in self._build['depends_on']:
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
         except KeyError:
             pass
@@ -158,9 +176,9 @@ class TEDescriptor(yaml.YAMLObject):
             command=command,
             constraint="compilation",
             dep=deps,
-            time=self._node.validate.time.get("mean_time", None),
-            delta=self._node.validate.time.get("tolerance", None),
-            rc=self._node.validate.get("expect_exit", 0),
+            time=self._validation.time.get("mean_time", None),
+            delta=self._validation.time.get("tolerance", None),
+            rc=self._validation.get("expect_exit", 0),
             resources=1,
             extras=None,
             postscript=None
@@ -169,40 +187,41 @@ class TEDescriptor(yaml.YAMLObject):
     def __construct_runtime_tests(self):
         #TODO: handle runtime filters (dynamic import)
 
-        for comb in lowtest.gen_combinations(self._criterion):
+        for comb in Combinations({**self._criterion, **self._program_criterion}).generate():
             # TODO: filter according to runtime capabilities
-            deps = [self._full_name] if 'build' in self._node else []
-            try:
-                for d in self._node.run.get('depends_on', []):
-                    deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
-            except KeyError:
-                pass
+            deps = [self._full_name] if self._build else []
+            for d in self._run.get('depends_on', []):
+                deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
 
-            command = lowtest.prepare_run_command(
-                comb,
-                {k: v for k, v in self._criterion.items() if k in self._criterion_user},
-                os.path.join(self._buildir, self._node.run.get('program', 'a.out'))
-            )
+            envs, args, params = comb.translate_to_command()
+
+            command = [
+                " ".join(envs),
+                sysTable.runtime.program,
+                " ".join(args),
+                os.path.join(self._buildir, self._run.get('program', self._build.get('binary', 'a.out'))),
+                " ".join(params)
+            ]
 
             yield Test(
-                name="_".join([self._full_name, lowtest.stringify_combination(comb)]),
-                command=command,
+                name="_".join([self._full_name, comb.translate_to_str()]),
+                command=" ".join(command),
                 dep=deps,
-                time=self._node.validate.time.get("mean_time", None),
-                delta=self._node.validate.time.get("tolerance", None),
-                rc=self._node.validate.get("expect_exit", 0),
-                resources=comb[self._base_it] if self._base_it in comb else 1,
+                time=self._validation.time.get("mean_time", None),
+                delta=self._validation.time.get("tolerance", None),
+                rc=self._validation.get("expect_exit", 0),
+                resources=comb.get(self._base_it, 1),
                 extras=None,
-                postscript=self._node.validate.script.get('path', None),
+                postscript=self._validation.script.get('path', None),
                 build=None
             )
 
     def construct_tests(self):
-        if 'build' in self._node:
+        if self._build:
             yield from self.__construct_compil_tests()
 
-        if 'run' in self._node:
+        if self._run:
             yield from self.__construct_runtime_tests()
 
     def __repr__(self):
-        return repr(self._node)
+        return repr(self._build) + repr(self._run) + repr(self._validation)

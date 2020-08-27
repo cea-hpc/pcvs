@@ -9,8 +9,9 @@ from subprocess import CalledProcessError
 
 import yaml
 
-from pcvsrt import config, engine, profile, test
+from pcvsrt import config, criterion, profile, test
 from pcvsrt.helpers import io, log
+from pcvsrt.test import Test, TEDescriptor
 from pcvsrt.helpers.system import sysTable
 
 
@@ -108,8 +109,12 @@ def prepare(run_settings, dirs_dict, pf):
     log.print_section("Build third-party tools")
     __build_tools()
 
-    log.print_section("Initialize the test engine")
-    engine.initialize()
+    log.print_section("Load and initialize validation criterions")
+    criterion.initialize_from_system()
+    # Pick on criterion used as 'resources' by JCHRONOSS
+    # this is set by the run configuration
+    # TODO: replace resource here by the one read from config
+    TEDescriptor.init_system_wide('n_node')
 
 
 def __replace_yaml_token(stream, src, build, prefix):   
@@ -235,8 +240,8 @@ def process_dyn_setup_scripts(setup_files):
                 continue
             stream = ""
             for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            sysTable.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
+                stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
+            sysTable.validation.xmls.append(Test.finalize_file(cur_build, label, stream))
     return err  
 
 def process_static_yaml_files(yaml_files):
@@ -257,8 +262,8 @@ def process_static_yaml_files(yaml_files):
             except Exception as e:
                 log.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
             for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in test.TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            sysTable.validation.xmls.append(engine.finalize_file(cur_build, label, stream))
+                stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
+            sysTable.validation.xmls.append(Test.finalize_file(cur_build, label, stream))
     return err
 
 

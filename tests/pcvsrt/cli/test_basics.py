@@ -1,9 +1,12 @@
-import pcvsrt
-import pytest
 import os
+
 import click
-from .cli_testing import run_and_test, isolated_fs
+import pytest
+import logging
+import pcvsrt
 from pcvsrt.helpers import log
+
+from .cli_testing import isolated_fs, run_and_test
 
 
 def test_cmd():
@@ -31,10 +34,23 @@ def test_terminal_size():
         assert(len(line) <= 20)
 
     res = run_and_test('-w 0', 'config', 'list')
-    print([len(i) for i in res.output.split("\n")])
-    assert(max([len(l) for l in res.output]) == click.get_terminal_size()[0])
+    assert(max([len(l) for l in res.output.split('\n')]) == click.get_terminal_size()[0])
 
 
-def test_wrong_command():
+def test_verbosity(caplog):
+    caplog.set_level(logging.DEBUG)
+    res = run_and_test('-vv', 'config', 'list')
+    print(caplog.text)
+    assert('Scopes are ordered as follows' in caplog.text)
+
+
+def test_local_path(caplog):
+    caplog.set_level(logging.DEBUG)
+    with isolated_fs():
+        res = run_and_test('-v', 'config', 'list')
+        assert("LOCAL: " + os.getcwd() + '/.pcvsrt' in caplog.text)
+
+
+def test_bad_command():
     res = run_and_test('wrong_command', success=False)
     assert('No such command' in res.output)
