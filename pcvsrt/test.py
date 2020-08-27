@@ -4,15 +4,19 @@ import yaml
 from addict import Dict
 
 from pcvsrt.helpers import io, log, lowtest
-from pcvsrt.criterion import Criterion, Combinations
+from pcvsrt.criterion import Criterion, Serie
 from pcvsrt.helpers.system import sysTable
 
 
 class Test:
+    """A basic test representation, from one step to concretize the logic
+    to the JCHRONOSS input datastruct."""
     def __init__(self, **kwargs):
+        """register a new test"""
         self._array = kwargs
     
     def serialize(self):
+        """Serialize the test to the logic: currently an XML node"""
         string = "<job>"
         string += "{}".format(lowtest.xml_setif(self._array, 'name'))
         string += "{}".format(lowtest.xml_setif(self._array, 'command'))
@@ -23,12 +27,18 @@ class Test:
         string += "{}".format(lowtest.xml_setif(self._array, 'resources'))
         string += "{}".format(lowtest.xml_setif(self._array, 'extras'))
         string += "{}".format(lowtest.xml_setif(self._array, 'postscript'))
-        string += "<constraints>{}</constraints>".format(lowtest.xml_setif(self._array, 'constraint'))
+        string += "<constraints>{}</constraints>".format(
+            lowtest.xml_setif(self._array, 'constraint'))
         string += "</job>"
         return string
 
     @staticmethod
     def finalize_file(path, package, content):
+        """Once a serie of tests, to be packaged together, has been
+        serialized, this static function will complete the stream by writing
+        down the logic to the proper file
+        
+        TODO: Maybe do this through a script callable by tests"""
         fn = os.path.join(path, "list_of_tests.xml")
         with open(fn, 'w') as fh:
             fh.write("<jobSuite>")
@@ -38,16 +48,19 @@ class Test:
 
 
 class TEDescriptor:
+    """Maps to a program description, as read by YAML user files"""
     @classmethod
     def init_system_wide(cls, base_criterion_name):
+        """Initialize system-wide information (to shorten accesses)"""
         cls._sys_crit = sysTable.criterion.iterators
         cls._base_it = base_criterion_name
 
     
     def __init__(self, name, node, label, subprefix):
+        """load a new TEDescriptor from a given YAML node"""
         if not isinstance(node, dict):
             log.err(
-                "Unable to build a TestDescription "
+                "Unable to build a TestDescriptor "
                 "from the given node (got {})".format(type(node)), abort=1)
         self._te_name = name
         self._te_label = node.get('label', self._te_name)
@@ -72,21 +85,30 @@ class TEDescriptor:
         self._compatibility_support(node.get('_compat', None))
 
     def _compatibility_support(self, compat):
+        """Convert tricky keywords from old syntax too complex to be handled
+        by the automatic converter."""
         if compat is None:
             return
         for k in compat:
+            # the old 'chdir' may be used by run & build
+            # but should not be set for one if the whole 
+            # parent node does not exist
             if 'chdir' in k:
                 if self._build and 'cwd' not in self._build:
                     self._build.cwd = compat[k]
                 if self._run and 'cwd' not in self._run:
                     self._run.cwd = compat[k]
             
+            # the old 'type' keyword disappeared. Still, the 'complete'
+            # keyword must be handled to create both nodes 'build' & 'run'
             if 'type' in k:
                 if compat[k] in ['build', 'complete']:
                     self._build.dummy = True
                 if compat[k] in ['run', 'complete']:
                     self._run.dummy = True
 
+            # same as for chdir, 'bin' may be used by both build & run
+            # but should set either not existing already
             elif 'bin' in k:
                 if self._build and 'binary' not in self._build:
                     self._build.binary = compat[k]
@@ -94,11 +116,14 @@ class TEDescriptor:
                     self._run.program = compat[k]
 
     def _configure_criterions(self):
+        """Prepare the list of components this TE will be built against"""
+        # if this TE does not override anything: trivial
         if 'iterate' not in self._run:
             self._criterion = self._sys_crit
         else:
             te_keys = self._run.iterate.keys()
             tmp = {}
+            # browse declared criterions (system-wide)
             for k_sys, v_sys in self._sys_crit.items():
                 # if key is overriden by the test
                 if k_sys in te_keys:
@@ -117,6 +142,8 @@ class TEDescriptor:
             [elt.expand_values() for elt in self._program_criterion.values()]  
 
     def __build_from_sources(self):
+        """Specific to build rule, where the compilation is made from a
+        collection of source files"""
         command = list()
         lang = lowtest.detect_source_lang(self._build.files)
         command.append(sysTable.compiler.commands.get(lang, 'echo'))
@@ -134,6 +161,8 @@ class TEDescriptor:
         return " ".join(command)
 
     def __build_from_makefile(self):
+        """Specific to build rule, where the compilation is managed by 
+        a makefile"""
         command = ["make"]
         if 'files' in self._build:
             basepath = os.path.dirname(self._build.files[0])
@@ -155,17 +184,21 @@ class TEDescriptor:
         return " ".join(command)
 
     def __construct_compil_tests(self):
+        """Meta-function steering compilation tests"""
         deps = []
         
+        # ensure consistency when 'files' node is used
         if not isinstance(self._build.files, list):
             self._build.files = list(self._build.files)
 
+        # a  'make' node prevails
         if 'make' in self._build:
             command = self.__build_from_makefile()
         else:
             command = self.__build_from_sources()
             
         try:
+            # collect dependencies
             for d in self._build['depends_on']:
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
         except KeyError:
@@ -185,10 +218,11 @@ class TEDescriptor:
         )
     
     def __construct_runtime_tests(self):
+        """function steering tests to be run by the runtime command"""
         #TODO: handle runtime filters (dynamic import)
 
-        for comb in Combinations({**self._criterion, **self._program_criterion}).generate():
-            # TODO: filter according to runtime capabilities
+        # for each combination generated from the collection of criterions
+        for comb in Serie({**self._criterion, **self._program_criterion}).generate():
             deps = [self._full_name] if self._build else []
             for d in self._run.get('depends_on', []):
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
@@ -217,11 +251,12 @@ class TEDescriptor:
             )
 
     def construct_tests(self):
+        """Meta function to triggeer test construction"""
         if self._build:
             yield from self.__construct_compil_tests()
-
         if self._run:
             yield from self.__construct_runtime_tests()
 
     def __repr__(self):
+        """internal representation, for auto-dumping"""
         return repr(self._build) + repr(self._run) + repr(self._validation)
