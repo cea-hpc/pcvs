@@ -2,8 +2,8 @@ import os
 import time
 import click
 
-from pcvsrt import run as pvRun
-from pcvsrt import profile as pvProfile
+from pcvsrt.cli.run import backend as pvRun
+from pcvsrt.cli.profile import backend as pvProfile
 from pcvsrt.cli.profile import commands as cmdProfile
 from pcvsrt.helpers import io, log
 

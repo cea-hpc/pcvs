@@ -5,13 +5,19 @@ import os
 import click
 import pkg_resources
 
-from pcvsrt import config, profile, bank
 from pcvsrt.helpers import log, io
 
 from pcvsrt.cli.config import commands as cmdConfig
+from pcvsrt.cli.config import backend as pvConfig
+
 from pcvsrt.cli.profile import commands as cmdProfile
+from pcvsrt.cli.profile import backend as pvProfile
+
 from pcvsrt.cli.run import commands as cmdRun
+from pcvsrt.cli.run import backend as pvRun
+
 from pcvsrt.cli.bank import commands as cmdBank
+from pcvsrt.cli.bank import backend as pvBank
 
 
 CONTEXT_SETTINGS = dict(
@@ -64,9 +70,9 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
     io.set_local_path(ctx.obj['exec'])
 
     # detections
-    config.init()
-    profile.init()
-    bank.init()
+    pvConfig.init()
+    pvProfile.init()
+    pvBank.init()
 
 
 @cli.command(

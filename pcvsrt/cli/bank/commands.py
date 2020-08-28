@@ -1,7 +1,7 @@
 import os
 
 import click
-from pcvsrt import bank as pvBank
+from pcvsrt.cli.bank import backend as pvBank
 from pcvsrt.helpers import log, io
 
 

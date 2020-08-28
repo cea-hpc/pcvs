@@ -1,7 +1,6 @@
 from .cli_testing import run_and_test, isolated_fs
 import pytest
 from pytest_mock import mocker
-from pcvsrt import config as pvConfig
 
 
 def test_cmd():

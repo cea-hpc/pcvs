@@ -4,8 +4,8 @@ import os
 
 import jsonschema
 import yaml
-import pkg_resources
 
+import pcvsrt
 from pcvsrt.helpers import io, log
 from pcvsrt.helpers.system import sysTable
 
@@ -111,14 +111,14 @@ class ConfigurationScheme:
     def validate(self, conf):
 
         assert (isinstance(conf, ConfigurationBlock))
-        stream = pkg_resources.resource_string(
-            __name__,
-            'schemes/{}-scheme.json'.format(conf._kind)),
-        
-        log.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
-        return
-        schema = json.load(stream)
-        jsonschema.validate(instance=conf._details, schema=schema)
+
+        with open(os.path.join(
+                pcvsrt.ROOTPATH,
+                'schemes/{}-scheme.json'.format(conf._kind)), 'r') as fh:
+            log.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
+            return
+            schema = json.load(fh)
+            jsonschema.validate(instance=conf._details, schema=schema)
 
 
 class ConfigurationBlock:
@@ -175,10 +175,10 @@ class ConfigurationBlock:
             self.check()
 
     def load_template(self):
-        stream = pkg_resources.resource_string(
-            __name__,
-            'templates/{}-format.yml'.format(self._kind))
-        self.fill(yaml.load(stream, Loader=yaml.FullLoader))
+        with open(os.path.join(
+                    pcvsrt.ROOTPATH,
+                    'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
+            self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 
     def flush_to_disk(self):
         self._file = compute_path(self._kind, self._name, self._scope)

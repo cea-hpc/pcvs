@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from pcvsrt import config
+from pcvsrt.cli.config import backend as config
 from pcvsrt.helpers import io, log
 
 PROFILE_STORAGES = dict()

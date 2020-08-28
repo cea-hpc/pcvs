@@ -1,7 +1,7 @@
 import click
 import yaml
 
-from pcvsrt import config as pvConfig
+from pcvsrt.cli.config import backend as pvConfig
 from pcvsrt.helpers import log, io
 
 

@@ -9,7 +9,7 @@ from subprocess import CalledProcessError
 
 import yaml
 
-from pcvsrt import config, criterion, profile, test
+from pcvsrt import criterion, test
 from pcvsrt.helpers import io, log
 from pcvsrt.test import Test, TEDescriptor
 from pcvsrt.helpers.system import sysTable
@@ -242,7 +242,7 @@ def process_dyn_setup_scripts(setup_files):
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
             sysTable.validation.xmls.append(Test.finalize_file(cur_build, label, stream))
-    return err  
+    return err
 
 def process_static_yaml_files(yaml_files):
     err = []
@@ -279,12 +279,28 @@ def run():
     build = os.path.join(sysTable.validation.jchronoss.exec)
     verb = min(2, sysTable.validation.verbose)
     files = sysTable.validation.xmls
+    batch_wrapper = ""
+    compil_batch_wrapper = ""
+    is_simulation = "--fake"
 
     cmd = [
         prog,
+        "--long-names"
         "--verbosity={}".format(verb),
-        "--build", build,
-        "--nb-resources={}".format(sysTable.machine.nodes)
+        "--build=", build,
+        "--nb-resources={}".format(sysTable.machine.nodes),
+        "--nb-slaves={}".format(sysTable.machine.concurrent_run),
+        batch_wrapper,
+        compil_batch_wrapper,
+        formats,
+        "-expect-success",
+        "--keep={}".format(1),
+        "--policy={}".format(0),
+        "--maxt-slave={]".format(0),
+        "--mint-slave={}".format(0),
+        "--size-flow={}".format(0),
+        "--autokill={}".format(100000),
+        is_simulation
        ] + files
     
     log.info("JCHRONOSS: '{}'".format(" ".join(cmd)))
