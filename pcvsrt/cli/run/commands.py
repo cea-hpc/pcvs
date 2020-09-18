@@ -1,11 +1,15 @@
 import os
 import time
 import click
+import yaml
+import pprint
 
+from pcvsrt.helpers import io, log, system
 from pcvsrt.cli.run import backend as pvRun
 from pcvsrt.cli.profile import backend as pvProfile
+from pcvsrt.cli.bank import backend as pvBank
+
 from pcvsrt.cli.profile import commands as cmdProfile
-from pcvsrt.helpers import io, log
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -44,12 +48,15 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cmdProfile.compl_list_token,
               type=str, show_envvar=True, help="an existing profile")
-@click.option("-o", "--output", "output", default=".", show_envvar=True,
+@click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
               help="Where artefacts will be stored during/after the run")
 @click.option("-c", "--set-defaults", "set_default",
               default=None, is_flag=True,
               help="Set default values for run options (WIP)")
+@click.option("-s", '--validation', "validation_file",
+              default=None, show_envvar=True, type=str,
+              help="Validation settings file")
 #@click.option("-l", "--tee", "log", show_envvar=True,
 #              default=False, is_flag=True,
 #              help="Log the whole stdout/stderr")
@@ -71,10 +78,21 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.option("-f", "--override", "override",
               default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
+@click.option("-d", "--dry-run", "simulated",
+             default=None, is_flag=True,
+             help="Reproduce the whole process without actually running tests")
+@click.option("-a", "--anonymize", "anon",
+              default=None, is_flag=True,
+              help="Purge final archive from sensitive data (HOME, USER...)")
+@click.option("-e", "--export", "export",
+              default=None, 
+              help="Which bank will store data instead of creating an archive")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, detach, status, resume, pause, bootstrap, override, set_default, dirs) -> None:
+def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
+            override, anon, validation_file, simulated, export,
+            set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -104,26 +122,43 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap, over
         exit(0)
 
     # fill validation run_setttings
-    run_setttings = {}
-    # for any 'None' value, a load from default should be made
-    run_setttings['verbose'] = ctx.obj['verbose']
-    run_setttings['color'] = ctx.obj['color']
-    run_setttings['pfname'] = profilename
-    run_setttings['output'] = os.path.join(os.path.abspath(output), ".pcvs")
-    #run_setttings['tee'] = log
-    run_setttings['bg'] = detach
-    run_setttings['force'] = override
+    settings = system.Settings()
+
+    cfg_val = system.CfgValidation(validation_file)
+
+    cfg_val.override('verbose', ctx.obj['verbose'])
+    cfg_val.override('color', ctx.obj['color'])
+    cfg_val.override('output', output)
+    cfg_val.override('background', detach)
+    cfg_val.override('override', override)
+    cfg_val.override('dirs', dirs)
+    cfg_val.override('simulated', simulated)
+    cfg_val.override('anonymize', anon)
 
     (scope, label) = pvProfile.extract_profile_from_token(profilename)
+    
     pf = pvProfile.Profile(label, scope)
+    cfg_val.override('pf_name', pf.full_name)
+    
     if not pf.is_found():
         log.err("Please use a valid profile name:",
                 "No '{}' found!".format(profilename), abort=1)
     else:
         pf.load_from_disk()
+        
+        settings.runtime = system.CfgRuntime(pf.runtime)
+        settings.compiler = system.CfgCompiler(pf.compiler)
+        settings.machine = system.CfgMachine(pf.machine)
+        settings.criterion = system.CfgCriterion(pf.criterion)
+        settings.group = system.CfgTemplate(pf.group)
+
+    settings.dirs = dirs
+    settings.validation = cfg_val
+
+    system.save_as_global(settings)
     log.banner()
     log.print_header("Prepare Environment")
-    pvRun.prepare(run_setttings, dirs, pf)
+    pvRun.prepare(settings)
 
     log.print_header("Process benchmarks")
     start = time.time()

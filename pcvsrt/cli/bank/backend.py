@@ -1,39 +1,53 @@
 import os
 import glob
 
-from pcvsrt.helpers import io
+import yaml
+
+from pcvsrt.helpers import io, log
 
 BANKS = dict()
-BANKS_STORAGE = ""
-
+BANK_STORAGE=""
 
 def init():
-    global BANKS, BANKS_STORAGE
-    BANKS_STORAGE = os.path.join(io.STORAGES['user'], 'saves/banks')
-    for f in glob.glob(os.path.join(BANKS_STORAGE, '*')):
-        BANKS[os.path.basename(f)] = open(f, 'r').read()
+    global BANKS, BANK_STORAGE
+    BANK_STORAGE = os.path.join(io.STORAGES['user'], "saves/banks.yml")
+    try:
+        with open(BANK_STORAGE, 'r') as f:
+            BANKS = yaml.load(f, Loader=yaml.FullLoader)
+    except FileNotFoundError:
+        pass
 
 
 def list_banks():
     return BANKS
 
 
-def compute_path(name):
-    return os.path.join(BANKS_STORAGE, name)
+def flush_to_disk():
+    global BANKS, BANK_STORAGE
+    try:
+        with open(BANK_STORAGE, 'w') as f:
+            yaml.dump(BANKS, f)
+    except IOError as e:
+        log.err("Failure while saving the banks.yml", '{}'.format(e), abort=1)
 
 
 class Bank:
-    def __init__(self, name, bank_path):
-        self._bank_path = bank_path
-        self._file = compute_path(name)
+    def __init__(self, name, bank_path=None):
+        self._name = name
+
+        if bank_path is None and name in BANKS.keys():
+            self._path = BANKS[self._name]
+
+    def register(self):
+        BANKS[self._name] = self._path
     
     def exists(self):
-        return os.path.isfile(self._file)
-    
-    def flush_to_disk(self):
+        global BANKS
+        return len([i for i in BANKS.keys() if i == self._name]) == 1
 
-        if not os.path.isdir(BANKS_STORAGE):
-            os.makedirs(BANKS_STORAGE)
-        
-        with open(self._file, 'w') as f:
-            f.write(self._bank_path)
+    def save(self, k, v):
+        pass
+
+    def load(self, k):
+        pass
+

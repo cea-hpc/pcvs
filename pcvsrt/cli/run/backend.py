@@ -1,29 +1,30 @@
 import glob
 import os
 import pathlib
+import fileinput
 import pprint
 import shutil
 import subprocess
 import tarfile
+from datetime import datetime
 from subprocess import CalledProcessError
 
 import yaml
 
 from pcvsrt import criterion, test
-from pcvsrt.helpers import io, log
+from pcvsrt.helpers import io, log, system
 from pcvsrt.test import Test, TEDescriptor
-from pcvsrt.helpers.system import sysTable
 
 
 def __print_summary():
-    n = sysTable.validation
-    log.print_section("Validation details:")
-    log.print_item("Loaded profile: '{}'".format(n.pfname))
+    n = system.get('validation')
+    log.print_section("Summary:")
+    log.print_item("Loaded profile: '{}'".format(n.pf_name))
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
     log.print_item("User directories:")
-    width = max([len(i) for i in sysTable.rootdirs])
-    for k, v in sysTable.rootdirs.items():
+    width = max([len(i) for i in n.dirs])
+    for k, v in system.get('validation').dirs.items():
         log.print_item("{:<{width}}: {:<{width}}".format(k.upper(), v, width=width), depth=2)
     # log.print_item(": {}".format())
 
@@ -31,7 +32,7 @@ def __print_summary():
 def __build_jchronoss():
     archive_name = None
     # Compute JCHRONOSS paths & store themf
-    val_node = sysTable.validation
+    val_node = system.get('validation')
     src_prefix = os.path.join(val_node.output, "cache/src")
     inst_prefix = os.path.join(val_node.output, "cache/install")
     exec_prefix = os.path.join(val_node.output, "cache/exec")
@@ -49,17 +50,18 @@ def __build_jchronoss():
                                 src_prefix, "jchronoss-*/CMakeLists.txt"))[0])
 
     # CD to build dir
-    with io.cwd(os.path.join(src_prefix, "build")):
-        command = "cmake {} -DCMAKE_INSTALL_PREFIX={} -DENABLE_OPENMP=OFF -DENABLE_COLOR={} && make install".format(
-            src_prefix, inst_prefix,
-            "ON" if val_node.color else "OFF"
+    #with io.cwd(os.path.join(src_prefix, "build")):
+    command = "cmake {0} -B{1} -DCMAKE_INSTALL_PREFIX={2} -DENABLE_OPENMP=OFF -DENABLE_COLOR={3} && make -C {1} install".format(
+        src_prefix, os.path.join(src_prefix, "build"), inst_prefix,
+        "ON" if val_node.color else "OFF"
         )
-        try:
-            _ = subprocess.check_call(
-                command, shell=True,
-                stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        except CalledProcessError:
-            log.err("Failed to build JCHRONOSS:", abort=1)
+    log.info("cmd: {}".format(command))
+    try:
+        _ = subprocess.check_call(
+            command, shell=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    except CalledProcessError:
+        log.err("Failed to build JCHRONOSS:", abort=1)
 
     io.create_or_clean_path(exec_prefix)
 
@@ -79,31 +81,28 @@ def __build_tools():
     __setup_webview()
 
 
-def prepare(run_settings, dirs_dict, pf):
+def prepare(run_settings):
     log.print_section("Prepare environment")
     log.print_item("build configuration tree")
 
-    sysTable.validation = run_settings
-    sysTable.validation.xmls = list()
-    sysTable.rootdirs = dirs_dict
-    sysTable.compiler = pf.compiler
-    sysTable.runtime = pf.runtime
-    sysTable.group = pf.group
-    sysTable.machine = pf.machine
-    sysTable.criterion = pf.criterion
-
+    valcfg = system.get('validation')
     log.print_item("Check whether build directory is valid")
-    buildir = os.path.join(sysTable.validation.output, "test_suite")
+    buildir = os.path.join(valcfg.output, "test_suite")
     # if a previous build exists
     if os.path.isdir(buildir):
-        if not sysTable.validation.force:
-            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(sysTable.validation.output), abort=1)
+        if not valcfg.override:
+            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(valcfg.output), abort=1)
         else:
             log.print_item("Cleaning up {}".format(buildir), depth=2)
             io.create_or_clean_path(buildir)
+            io.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
+            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'))
+            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'))
+            io.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
+        
 
     log.print_item("Create subdirs for each provided directories")
-    for label in sysTable.rootdirs.keys():
+    for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label))
 
     log.print_section("Build third-party tools")
@@ -117,7 +116,7 @@ def prepare(run_settings, dirs_dict, pf):
     TEDescriptor.init_system_wide('n_node')
 
 
-def __replace_yaml_token(stream, src, build, prefix):   
+def __replace_yaml_token(stream, src, build, prefix):
     tokens = {
         '@BUILDPATH@': os.path.join(build, prefix),
         '@SRCPATH@': os.path.join(src, prefix),
@@ -155,7 +154,7 @@ def __load_yaml_file(f, src, build, prefix):
         log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
 
     if convert:
-        log.info("Attempt to use legacy syntax for {}".format(f))
+        log.debug("Attempt to use legacy syntax for {}".format(f))
         obj = yaml.load(__replace_yaml_token(__load_yaml_file_legacy(f), src, build, prefix), Loader=yaml.FullLoader)
         if log.get_verbosity('debug'):
             convert_file = os.path.join(os.path.split(f)[0], "convert-pcvs.yml")
@@ -173,11 +172,10 @@ def __print_progbar_walker(elt):
 
 def process():
     log.print_section("Load from filesystem")
-    path_dict = sysTable.rootdirs
+    path_dict = system.get('validation').dirs
     setup_files = list()
     yaml_files = list()
 
-    log.info("Discovery user directories: {}".format(pprint.pformat(path_dict)))
     # discovery may take a while with some systems
     log.print_item("PCVS-related file detection")
     # iterate over user directories
@@ -210,12 +208,39 @@ def process():
     if len(errors):
         log.err("Issues while loading benchmarks:")
         for elt in errors:
-            log.err("  - {}: {}".format(elt[0], elt[1]))
+            log.err("  - {}:  {}".format(elt[0], elt[1]))
         log.err("", abort=1)
+
+
+def build_envvar_from_configuration(current_node, parent_prefix="pcvs"):
+    stream = ""
+    for k, v in current_node.items():
+        if v is None:
+            v = ''
+        if isinstance(v, dict):
+            stream += build_envvar_from_configuration(v, parent_prefix+"_"+k)
+            continue
+        elif v is None:
+            v = ''
+        elif isinstance(v, bool):
+            v = "0" if v is False else True
+        elif isinstance(v, list):
+            v = "'"+" ".join(v)+"'"
+        else:
+            v = "'"+str(v)+"'"
+
+        stream += "{}_{}={}\n".format(parent_prefix, k, v)
+    return stream
 
 
 def process_dyn_setup_scripts(setup_files):
     err = []
+    log.print_item("Convert configuation to Shell variables")
+
+    with open(os.path.join(system.get('validation').output, 'conf.env'), 'w') as fh:
+        fh.write(build_envvar_from_configuration(system.get()))
+        fh.close()
+
     log.print_item("Manage dynamic files (scripts)")
     with log.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
@@ -241,7 +266,7 @@ def process_dyn_setup_scripts(setup_files):
             stream = ""
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            sysTable.validation.xmls.append(Test.finalize_file(cur_build, label, stream))
+            system.get('validation').xmls.append(Test.finalize_file(cur_build, label, stream))
     return err
 
 def process_static_yaml_files(yaml_files):
@@ -263,47 +288,49 @@ def process_static_yaml_files(yaml_files):
                 log.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            sysTable.validation.xmls.append(Test.finalize_file(cur_build, label, stream))
+            system.get('validation').xmls.append(Test.finalize_file(cur_build, label, stream))
     return err
 
 
 def run():
     __print_summary()
-    log.print_item("Save Configurations for later use")
-    with open(os.path.join(sysTable.validation.output, "conf.yml"), 'w') as conf_fh:
-        yaml.dump(sysTable.serialize(), conf_fh)
+    log.print_item("Save Configurations into {}".format(system.get('validation').output))
+    with open(os.path.join(system.get('validation').output, "conf.yml"), 'w') as conf_fh:
+        yaml.dump(system.get().serialize(), conf_fh)
     
     log.print_section("Run the Orchestrator (JCHRONOSS)")
 
-    prog = os.path.join(sysTable.validation.jchronoss.install, "bin/jchronoss")
-    build = os.path.join(sysTable.validation.jchronoss.exec)
-    verb = min(2, sysTable.validation.verbose)
-    files = sysTable.validation.xmls
-    batch_wrapper = ""
-    compil_batch_wrapper = ""
-    is_simulation = "--fake"
+    valcfg = system.get('validation')
+    macfg = system.get('machine')
 
-    cmd = [
-        prog,
-        "--long-names"
-        "--verbosity={}".format(verb),
-        "--build=", build,
-        "--nb-resources={}".format(sysTable.machine.nodes),
-        "--nb-slaves={}".format(sysTable.machine.concurrent_run),
-        batch_wrapper,
-        compil_batch_wrapper,
-        formats,
-        "-expect-success",
-        "--keep={}".format(1),
-        "--policy={}".format(0),
-        "--maxt-slave={]".format(0),
-        "--mint-slave={}".format(0),
-        "--size-flow={}".format(0),
-        "--autokill={}".format(100000),
-        is_simulation
-       ] + files
+    launcher = "--launcher={}".format(macfg.wrapper.alloc) if 'alloc' in macfg.wrapper else ''
+    clauncher = "--compil-launcher={}".format(macfg.wrapper.run) if 'run' in macfg.wrapper else ''  
     
-    log.info("JCHRONOSS: '{}'".format(" ".join(cmd)))
+    cmd = [
+        os.path.join(valcfg.jchronoss.install, "bin/jchronoss"),
+        "--long-names",
+        "--verbosity={}".format(min(2, valcfg.verbose)),
+        "--build={}".format(valcfg.jchronoss.exec),
+        "--nb-resources={}".format(macfg.nodes),
+        "--nb-slaves={}".format(macfg.concurrent_run),
+        launcher,
+        clauncher,
+        "--output-format={}".format(",".join(valcfg.result.format)),
+        "--expect-success",
+        "--keep={}".format(valcfg.result.log),
+        "--policy={}".format(0),
+        "--maxt-slave={}".format(macfg.batch_maxtime),
+        "--mint-slave={}".format(macfg.batch_mintime),
+        "--size-flow={}".format(valcfg.result.logsz),
+        "--autokill={}".format(100000),
+        "--fake" if valcfg.simulated else ""
+       ] + valcfg.xmls
+    
+    # Filtering is required to prune
+    # empty strings (translated to './.' through subprocess)
+    cmd = list(filter(None, cmd))
+    
+    log.info("cmd: '{}'".format(" ".join(cmd)))
     try:
         #raise subprocess.CalledProcessError()
         subprocess.check_call(cmd)
@@ -311,12 +338,106 @@ def run():
         log.err("JCHRONOSS returned non-zero exit code!", abort=1)
 
 
+def anonymize_line(line):
+    print(line)
+    return line \
+            .replace(os.environ['HOME'], '${HOME}') \
+            .replace(os.environ['USER'], '${USER}')
+
+def anonymize_archive():
+    config = system.get('validation')
+    archive_prefix = os.path.join(config.output, 'save_for_export')
+    outdir = config.output
+    for root, dirs, files in os.walk(archive_prefix):
+        for f in files:
+            if not (f.endswith(('.xml', '.json', '.yml', '.txt', '.md', '.html'))):
+                continue
+            with fileinput.FileInput(os.path.join(root, f),
+                                     inplace=True,
+                                     backup=".raw") as fh:
+                for line in fh:
+                    print(
+                        line.replace(outdir, '${PCVS_RUN_DIRECTORY}')
+                            .replace(os.environ['HOME'], '${HOME}')
+                            .replace(os.environ['USER'], '${USER}'),
+                        end='')
+            
+
+def save_for_export(f, dest=None):
+    config = system.get('validation')
+    # if dest is not given, 'dest' will be the same dirtree with
+    # extra 'safe_for_export' sudir below 'outdir'
+    # otherwise, just use the given dest instead of replacing
+    if dest is None:
+        dest = f
+    dest = dest.replace(config.output, os.path.join(config.output, 'save_for_export'))
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    
+    try:
+        if os.path.isfile(f):
+            shutil.copyfile(f, dest)
+        elif os.path.isdir(f):
+            shutil.copytree(f, dest)
+        else:
+            log.err("{}".format(f))
+    except FileNotFoundError as e:
+        log.warn("Unable to copy {}:".format(f), '{}'.format(e))
+
+
 def terminate():
-    log.print_section("Build final results archive")
-    log.print_item("Prune non-printable characters")
-    log.print_item("Remove undesired data")
-    log.print_item("Extract base information")
-    log.print_item("Save user-defined artifacts")
+    archive_name = "pcvsrun_{}".format(datetime.now().strftime('%Y%m%d%H%M%S'))
+    outdir = system.get('validation').output
 
     if shutil.which("xsltproc") is not None:
         log.print_section("Generate static reporting webpages")
+        try:
+            cmd = [
+                os.path.join(system.get('validation').jchronoss.src,
+                             'tools/webview/webview_gen_all.sh'),
+                "--new={}".format(os.path.join(outdir, "test_suite"))
+            ]
+            log.info('cmd: {}'.format(" ".join(cmd)))
+            subprocess.check_call(cmd, stdout=subprocess.DEVNULL)
+            log.print_item("Browsing: {}".format(
+                os.path.join(system.get('validation').jchronoss.src,
+                             'tools/webview/webview/generated/main.html')))
+        except (CalledProcessError, FileNotFoundError) as e:
+            log.warn("Unable to run the webview:", "{}".format(e))
+
+    log.print_section("Prepare results for export")
+
+    log.print_item("Save results")
+    # copy file before anonymizing them
+    for root, dirs, files in os.walk(os.path.join(outdir, "test_suite")):
+        for file in files:
+            # TODO: save user-defined artifacts
+            if file.endswith(('.json', '.xml', '.yml')):
+                save_for_export(os.path.join(root, file))
+
+    save_for_export(os.path.join(outdir, 'conf.yml'))
+    save_for_export(os.path.join(outdir, 'conf.env'))
+    save_for_export(os.path.join(system.get('validation').jchronoss.src,
+                                 "tools/webview"),
+                    os.path.join(outdir, 'webview'))
+
+    if system.get('validation').anonymize:
+        log.print_item("Anonymize the final archive")
+        anonymize_archive()
+
+    log.print_item("Save user-defined artifacts")
+    log.warn('TODO user-defined artifact')
+
+    log.print_item("Generate the archive")
+
+    with io.cwd(outdir):
+        cmd = [
+            "tar",
+            "czf",
+            "{0}.tar.gz".format(archive_name),
+            "save_for_export"
+        ]
+        try:
+            log.info('cmd: {}'.format(" ".join(cmd)))
+            subprocess.check_call(cmd)
+        except CalledProcessError as e:
+            log.err("Fail to create an archive:", "{}".format(e), abort=1)

@@ -3,9 +3,8 @@ import os
 import yaml
 from addict import Dict
 
-from pcvsrt.helpers import io, log, lowtest
+from pcvsrt.helpers import io, log, lowtest, system
 from pcvsrt.criterion import Criterion, Serie
-from pcvsrt.helpers.system import sysTable
 
 
 class Test:
@@ -52,10 +51,9 @@ class TEDescriptor:
     @classmethod
     def init_system_wide(cls, base_criterion_name):
         """Initialize system-wide information (to shorten accesses)"""
-        cls._sys_crit = sysTable.criterion.iterators
+        cls._sys_crit = system.get('criterion').iterators
         cls._base_it = base_criterion_name
 
-    
     def __init__(self, name, node, label, subprefix):
         """load a new TEDescriptor from a given YAML node"""
         if not isinstance(node, dict):
@@ -146,7 +144,7 @@ class TEDescriptor:
         collection of source files"""
         command = list()
         lang = lowtest.detect_source_lang(self._build.files)
-        command.append(sysTable.compiler.commands.get(lang, 'echo'))
+        command.append(system.get('compiler').commands.get(lang, 'echo'))
         command.append(lowtest.prepare_cmd_build_variants(self._build.variants))
         command.append('{}'.format(self._build.get('cflags', '')))
         command.append('{}'.format(" ".join(self._build.files)))
@@ -154,6 +152,8 @@ class TEDescriptor:
 
         binary = self._build.sources.binary if 'binary' in self._build.sources else self._te_name
         command.append('-o {}'.format(os.path.join(self._buildir, binary)))
+        # save it
+        self._build.sources.binary = binary
 
         if 'cwd' in self._build:
             command.insert(0, "cd {} &&".format(self._build.cwd))
@@ -172,10 +172,10 @@ class TEDescriptor:
         
         command.append("-C {}".format(basepath))
         command.append("{}".format(self._build.make.get('target', '')))
-        command.append('PCVS_CC="{}"'.format(sysTable.compiler.commands.get('cc', '')))
-        command.append('PCVS_CXX="{}"'.format(sysTable.compiler.commands.get('cxx', '')))
-        command.append('PCVS_CU="{}"'.format(sysTable.compiler.commands.get('cu', '')))
-        command.append('PCVS_FC="{}"'.format(sysTable.compiler.commands.get('fc', '')))
+        command.append('PCVS_CC="{}"'.format(system.get('compiler').commands.get('cc', '')))
+        command.append('PCVS_CXX="{}"'.format(system.get('compiler').commands.get('cxx', '')))
+        command.append('PCVS_CU="{}"'.format(system.get('compiler').commands.get('cu', '')))
+        command.append('PCVS_FC="{}"'.format(system.get('compiler').commands.get('fc', '')))
         command.append('PCVS_CFLAGS="{} {}"'.format(
             lowtest.prepare_cmd_build_variants(self._build.variants),
             self._build.get('cflags', '')
@@ -222,18 +222,17 @@ class TEDescriptor:
         #TODO: handle runtime filters (dynamic import)
 
         # for each combination generated from the collection of criterions
-        for comb in Serie({**self._criterion, **self._program_criterion}).generate():
+        for comb in self.serie.generate():
             deps = [self._full_name] if self._build else []
             for d in self._run.get('depends_on', []):
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
 
             envs, args, params = comb.translate_to_command()
-
             command = [
                 " ".join(envs),
-                sysTable.runtime.program,
+                system.get('runtime').program,
                 " ".join(args),
-                os.path.join(self._buildir, self._run.get('program', self._build.get('binary', 'a.out'))),
+                os.path.join(self._buildir, self._run.get('program', self._build.sources.get('binary', 'a.out'))),
                 " ".join(params)
             ]
 
@@ -252,6 +251,7 @@ class TEDescriptor:
 
     def construct_tests(self):
         """Meta function to triggeer test construction"""
+        self.serie = Serie({**self._criterion, **self._program_criterion})
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:

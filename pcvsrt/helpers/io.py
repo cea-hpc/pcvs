@@ -3,8 +3,7 @@ import shutil
 import subprocess
 from contextlib import contextmanager
 
-from pcvsrt.helpers import log
-from pcvsrt.helpers.system import sysTable
+from pcvsrt.helpers import log, system
 
 ROOTPATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 STORAGES = {
@@ -32,7 +31,9 @@ def __determine_local_prefix(path, prefix):
 def create_or_clean_path(prefix):
     if os.path.isdir(prefix):
         shutil.rmtree(prefix)
-    os.mkdir(prefix)
+        os.mkdir(prefix)
+    elif os.path.isfile(prefix):
+        os.remove(prefix)
 
 
 def set_local_path(path):
@@ -58,9 +59,9 @@ def check_valid_scope(s):
 
 
 def generate_local_variables(label, subprefix):
-    base_srcdir = sysTable.rootdirs[label]
+    base_srcdir = system.get('validation').dirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
-    base_buildir = os.path.join(sysTable.validation.output, "test_suite", label)
+    base_buildir = os.path.join(system.get('validation').output, "test_suite", label)
     cur_buildir = os.path.join(base_buildir, subprefix)
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
@@ -77,12 +78,16 @@ def cwd(path):
         os.chdir(oldpwd)
 
 
-def open_in_editor(path, e=None):
+def open_in_editor(*paths, e=None):
     editor = e if e is not None else os.environ['EDITOR']
     if shutil.which(editor) is None:
         log.err("'{}' is not a valid editor.".format(editor),
                 "Please see the '-e' option!", abort=1)
-    subprocess.run([editor, path])
+    cmd = [
+        editor
+    ] + list(paths)
+    log.info("cmd: {}".format(" ".join(cmd)))
+    subprocess.check_call(cmd)
 
 
 class MetaDict(dict):

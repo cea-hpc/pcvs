@@ -1,7 +1,8 @@
 import itertools
+from addict import Dict
+import math
 
-from pcvsrt.helpers import log
-from pcvsrt.helpers.system import sysTable
+from pcvsrt.helpers import log, system, lowtest
 
 
 class Combination:
@@ -94,9 +95,14 @@ class Serie:
     def generate(self):
         """Generator to build each combination"""
         for combination in list(itertools.product(*self._values)):
+            d = {self._keys[i]: val for i, val in enumerate(combination)}
+
+            if not lowtest.valid_combination(d):
+                continue
+            
             yield Combination(
                 self._dict, 
-                {self._keys[i]: val for i, val in enumerate(combination)}
+                d
             )
 
 
@@ -122,8 +128,6 @@ class Criterion:
         if isinstance(self._values, int) or isinstance(self._values, str):
             self._values = [self._values]
 
-        # values are unique for a single criterion
-        self._values = set(self._values)
 
     def intersect(self, other):
         """Update the calling Criterion with the interesection of the current
@@ -204,16 +208,57 @@ class Criterion:
         a runtime to another"""
         return self._alias[val] if val in self._alias else val
 
+    @staticmethod
+    def __convert_sequence_to_list(dic, s=-1, e=-1):
+        assert(len(dic.keys()) == 1)
+        name = list(dic.keys())[0]
+        node = dic[name]
+        
+        values = []
+        start = s if 'from' not in node else node['from']
+        end = e if 'to' not in node else node['to']
+        of = 1 if 'of' not in node else node['of']
+
+        if name.lower() in ['seq', 'sequence']:
+            values = range(start, end+1, of)
+        elif name.lower() in ['mul', 'multiplication']:
+            cur = start if start > 0 else 1
+            while cur < end:
+                values.append(cur)
+                cur *= of
+        elif name.lower() in ['fact', 'factor']:
+            mult = 1
+            for i in range(start, start+of):
+                if i % of == 0:
+                    mult = i
+            values = range(mult, end+1, of)
+        elif name.lower() in ['pow', 'power']:
+            cur = start if start > 1 else 2
+            while cur < end:
+                values.append(cur)
+                cur = cur ** of
+        elif name.lower() in ['powerof']:
+            if start < 1:
+                start = 1
+            start = math.ceil(start**(1/of))
+            end = math.floor(end**(1/of))
+            for i in range(start, end+1):
+                values.append(i**of)
+        else:
+            log.warn("failure in Criterion sequence!")
+
+        return values
+
     def expand_values(self):
         """Browse values for the current criterion and make it ready to
         generate combinations"""
         values = []
         if self._numeric is True:
             for v in self._values:
-                if isinstance(v, int):
+                if isinstance(v, dict):
+                    values += self.__convert_sequence_to_list(v, s=0, e=100)
+                elif isinstance(v, (int, float, str)):
                     values.append(v)
-                elif isinstance(v, str):
-                    values.append(self.__convert_str_to_int(v))
                 else:
                     raise TypeError("Only accept int or sequence (as string)"
                                     " as values for numeric iterators")
@@ -230,10 +275,10 @@ def initialize_from_system():
 
     TODO: Move this function elsewhere."""
     # sanity checks
-    assert (sysTable.runtime.iterators)
+    assert (system.get('runtime').iterators)
     # raw YAML objects
-    runtime_iterators = sysTable.runtime.iterators
-    criterion_iterators = sysTable.criterion.iterators
+    runtime_iterators = system.get('runtime').iterators
+    criterion_iterators = system.get('criterion').iterators
     it_to_remove = []
     log.print_item("Prune undesired iterators from the run")
 
@@ -254,10 +299,10 @@ def initialize_from_system():
 
     # register the new dict {criterion_name: Criterion object}
     # the criterion object gathers both information from runtime & criterion
-    sysTable.criterion.iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
+    system.get('criterion').iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
 
     # convert any sequence into valid range of integers for
     # numeric criterions
     log.print_item("Expand possible iterator expressions")
-    for criterion in sysTable.criterion.iterators.values():
+    for criterion in system.get('criterion').iterators.values():
         criterion.expand_values()

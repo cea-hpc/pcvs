@@ -2,11 +2,13 @@ import itertools
 import os
 import pprint
 import re
+import importlib
+import base64
 from xml.sax.saxutils import escape
-
 from addict import Dict
 
-from pcvsrt.helpers.system import sysTable
+from pcvsrt.helpers import system
+
 
 # ######################################
 # ####### COMMAND MANAGEMENT ###########
@@ -35,19 +37,21 @@ def detect_source_lang(array_of_files):
     # order matters: if sources contains multiple languages, the first
     # appearing in this list will be considered as the main language
     for i in ['f08', 'f03', 'f95', 'f90', 'f77', 'fc','cxx', 'cc']:
-        if i in langs and i in sysTable.compiler.commands:
+        if i in langs and i in system.get('compiler').commands:
             return i
     return 'cc'
 
 
 def prepare_cmd_build_variants(variants=[], comb=None):
-    return " ".join(sysTable.compiler.variants[i].args for i in variants)
+    return " ".join(system.get('compiler').variants[i].args for i in variants)
+
 
 def xml_escape(s):
     return escape(s, entities={
         "'": "&apos;",
         "\"": "&quot;"
     })
+
 
 def xml_setif(elt, k, tag=None):
     if tag is None:
@@ -59,3 +63,32 @@ def xml_setif(elt, k, tag=None):
             return "<"+tag+">"+xml_escape(str(elt[k]))+"</"+tag+">"
     else:
         return ""
+
+first = True
+runtime_filter = None
+def valid_combination(dic):
+    global first, runtime_filter
+    rt = system.get('runtime')
+    val = system.get('validation')
+    if first is True and rt.plugin:
+        first = False
+        rt.pluginfile =  os.path.join(val.output, "cache/rt-plugin.py")
+        with open(rt.pluginfile, 'w') as fh:
+            fh.write(base64.b64decode(rt.plugin).decode('ascii'))
+        
+        spec = importlib.util.spec_from_file_location("pcvsrt.user-rt-plugin",
+                                                      rt.pluginfile)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+
+        if hasattr(mod, 'check_valid_combination') and \
+           callable(mod.check_valid_combination):
+            runtime_filter = mod.check_valid_combination
+            # add here any relevant information to be accessed by modules
+            mod.sys_nodes = system.get('machine').nodes
+            mod.sys_cores_per_node = system.get('machine').cores_per_node
+
+    if runtime_filter:
+        return runtime_filter(dic)
+    else:
+        return True

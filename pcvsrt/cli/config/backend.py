@@ -1,9 +1,13 @@
+import base64
+from base64 import b64encode
 import glob
 import json
 import os
 
 import jsonschema
 import yaml
+import tempfile
+import shutil
 
 import pcvsrt
 from pcvsrt.helpers import io, log
@@ -226,6 +230,50 @@ class ConfigurationBlock:
     def open_editor(self, e=None):
         assert (self._file is not None)
         assert (os.path.isfile(self._file))
-        io.open_in_editor(self._file, e)
+
+        fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
+        fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
+        with open(self._file, 'r') as f:
+            stream = yaml.load(f, Loader=yaml.FullLoader)
+            if stream:
+                yaml.dump(stream, fname)
+
+            if self._kind == 'runtime':
+                if stream and 'plugin' in stream:
+                    content = base64.b64decode(stream['plugin']).decode('ascii')
+                else:
+                    content = """import math
+
+def check_valid_combination(dict_of_combinations=dict()):
+    # this dict maps keys (it name) with values (it value)
+    # returns True if the combination should be used
+    return True
+"""
+            fplugin.write(content)
+            fplugin.flush()
+        try:
+            io.open_in_editor(fname.name, fplugin.name, e=e)
+        except:
+            log.warn("Issue with opening the conf. block. Stop!")
+            return
+        
+        # reset cursors
+        fname.seek(0)
+        fplugin.seek(0)
+
+        #now, dump back temp file to the original saves
+        with open(self._file, 'w') as f:
+            stream = yaml.load(fname, Loader=yaml.FullLoader)
+            if stream is None:
+                stream = dict()
+            stream_plugin = fplugin.read()
+            if self._kind == 'runtime' and len(stream_plugin) > 0:
+                stream['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+            yaml.dump(stream, f)
+
+        # delete temp files (replace by 'with...' ?)
+        fname.close()
+        fplugin.close()
+        
         self.load_from_disk()
         self.check()

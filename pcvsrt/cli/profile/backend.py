@@ -1,7 +1,8 @@
 import glob
 import os
-
+import tempfile
 import yaml
+import base64
 
 from pcvsrt.cli.config import backend as config
 from pcvsrt.helpers import io, log
@@ -152,10 +153,41 @@ class Profile:
                 log.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
-        assert (self._file is not None)
-        assert (os.path.isfile(self._file))
+        fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
+        fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
+        with open(self._file, 'r') as f:
+            stream = yaml.load(f, Loader=yaml.FullLoader)
+            if stream:
+                yaml.dump(stream, fname)
 
-        io.open_in_editor(self._file, e)
+            if stream and 'plugin' in stream['runtime']:
+                content = base64.b64decode(stream['runtime']['plugin']).decode('ascii')
+                fplugin.write(content)
+                fplugin.flush()
+        try:
+            io.open_in_editor(fname.name, fplugin.name, e=e)
+        except:
+            log.warn("Issue with opening the conf. block. Stop!")
+            return
+        
+        # reset cursors
+        fname.seek(0)
+        fplugin.seek(0)
+
+        #now, dump back temp file to the original saves
+        with open(self._file, 'w') as f:
+            stream = yaml.load(fname, Loader=yaml.FullLoader)
+            if stream is None:
+                stream = dict()
+            stream_plugin = fplugin.read()
+            if len(stream_plugin) > 0:
+                stream['runtime']['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+            yaml.dump(stream, f)
+
+        # delete temp files (replace by 'with...' ?)
+        fname.close()
+        fplugin.close()
+        
         self.load_from_disk()
 
     @property
