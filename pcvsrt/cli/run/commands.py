@@ -134,6 +134,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     cfg_val.override('dirs', dirs)
     cfg_val.override('simulated', simulated)
     cfg_val.override('anonymize', anon)
+    cfg_val.override('exported_to', export)
 
     (scope, label) = pvProfile.extract_profile_from_token(profilename)
     

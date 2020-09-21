@@ -28,12 +28,13 @@ def __determine_local_prefix(path, prefix):
     return os.path.join(cur, prefix)
 
 
-def create_or_clean_path(prefix):
-    if os.path.isdir(prefix):
-        shutil.rmtree(prefix)
+def create_or_clean_path(prefix, is_dir=True):
+    if is_dir:
+        if os.path.isdir(prefix): shutil.rmtree(prefix)
         os.mkdir(prefix)
-    elif os.path.isfile(prefix):
-        os.remove(prefix)
+    else:
+        if os.path.isfile(prefix): os.remove(prefix)
+
 
 
 def set_local_path(path):

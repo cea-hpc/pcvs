@@ -1,5 +1,5 @@
 import os
-
+import copy
 import yaml
 from addict import Dict
 
@@ -51,8 +51,13 @@ class TEDescriptor:
     @classmethod
     def init_system_wide(cls, base_criterion_name):
         """Initialize system-wide information (to shorten accesses)"""
-        cls._sys_crit = system.get('criterion').iterators
+        cls._sys_crit = system.get('critobj').iterators
         cls._base_it = base_criterion_name
+        cls._nb_instances = 0
+    
+    @classmethod
+    def get_nb_instances(cls):
+        return cls._nb_instances
 
     def __init__(self, name, node, label, subprefix):
         """load a new TEDescriptor from a given YAML node"""
@@ -69,9 +74,9 @@ class TEDescriptor:
         self._run = Dict(node.get('run', None))
 
         if 'program' in self._run.get('iterate', {}):
-            self._program_criterion = {k: Criterion(k, v, True) for k, v in self._run.iterate.program.items()}
+            self._program_criterion = {k: Criterion(k, v, local=True) for k, v in self._run.iterate.program.items()}
         else:
-            self._program_criterion = None
+            self._program_criterion = {}
 
         self._validation = Dict(node.get('validate', None))
         self._artifacts = Dict(node.get('artifacts', None))
@@ -81,6 +86,7 @@ class TEDescriptor:
         
         self._configure_criterions()
         self._compatibility_support(node.get('_compat', None))
+        TEDescriptor._nb_instances += 1
 
     def _compatibility_support(self, compat):
         """Convert tricky keywords from old syntax too complex to be handled
@@ -125,11 +131,18 @@ class TEDescriptor:
             for k_sys, v_sys in self._sys_crit.items():
                 # if key is overriden by the test
                 if k_sys in te_keys:
-                    cur_criterion = Criterion(k_sys, self._run.iterate[k_sys])
+                    cur_criterion = copy.deepcopy(v_sys)
+                    cur_criterion.override(self._run.iterate[k_sys])
+                    
+                    if cur_criterion.is_discarded():
+                        continue
+                    # merge manually some definitions made by
+                    # runtime, as some may be required to expand values:
+                    
                     cur_criterion.expand_values()
                     cur_criterion.intersect(v_sys)
                     if cur_criterion.is_empty():
-                        log.warn("No valid intersection found for '{}, Discard".format(k_sys))
+                        log.debug("No valid intersection found for '{}, Discard".format(k_sys))
                     else:
                         tmp[k_sys] = cur_criterion
                 else:  # key is not overriden
@@ -189,7 +202,7 @@ class TEDescriptor:
         
         # ensure consistency when 'files' node is used
         if not isinstance(self._build.files, list):
-            self._build.files = list(self._build.files)
+            self._build.files = [self._build.files]
 
         # a  'make' node prevails
         if 'make' in self._build:
@@ -250,6 +263,10 @@ class TEDescriptor:
             )
 
     def construct_tests(self):
+        if self._te_name.startswith('.'):
+            # template -> skip
+            return
+
         """Meta function to triggeer test construction"""
         self.serie = Serie({**self._criterion, **self._program_criterion})
         if self._build:

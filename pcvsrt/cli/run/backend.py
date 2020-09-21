@@ -12,7 +12,7 @@ from subprocess import CalledProcessError
 import yaml
 
 from pcvsrt import criterion, test
-from pcvsrt.helpers import io, log, system
+from pcvsrt.helpers import io, log, system, lowtest
 from pcvsrt.test import Test, TEDescriptor
 
 
@@ -22,6 +22,9 @@ def __print_summary():
     log.print_item("Loaded profile: '{}'".format(n.pf_name))
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
+    pprint.pprint(type(system.get('criterion')))
+    log.print_item("Max sys. combinations per TE: {}".format(lowtest.max_number_of_combinations()))
+    log.print_item("Number of TEs: {}".format(lowtest.max_number_of_combinations() * TEDescriptor.get_nb_instances()))
     log.print_item("User directories:")
     width = max([len(i) for i in n.dirs])
     for k, v in system.get('validation').dirs.items():
@@ -96,8 +99,8 @@ def prepare(run_settings):
             log.print_item("Cleaning up {}".format(buildir), depth=2)
             io.create_or_clean_path(buildir)
             io.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
-            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'))
-            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'))
+            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'), is_dir=False)
+            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
         
 
@@ -133,7 +136,7 @@ def __replace_yaml_token(stream, src, build, prefix):
 
 def __load_yaml_file_legacy(f):
     # barely legal to do that...
-    old_group_file = os.path.join(os.path.dirname(__file__), "templates/group-compat.yml")
+    old_group_file = os.path.join(io.ROOTPATH, "templates/group-compat.yml")
     cmd = "pcvs_convert {} --stdout -k te -t {} 2>/dev/null".format(f, old_group_file)
     out = subprocess.check_output(cmd, shell=True)
     return out.decode('utf-8')
@@ -148,8 +151,8 @@ def __load_yaml_file(f, src, build, prefix):
 
         # TODO: Validate input & raise YAMLError if invalid
         #raise yaml.YAMLError("TODO: write validation")
-    except yaml.YAMLError:
-        convert = True
+    #except yaml.YAMLError:
+    #    convert = True
     except Exception as e:
         log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
 
@@ -212,40 +215,45 @@ def process():
         log.err("", abort=1)
 
 
-def build_envvar_from_configuration(current_node, parent_prefix="pcvs"):
-    stream = ""
+def build_env_from_configuration(current_node, parent_prefix="pcvs"):
+    env_dict = dict()
     for k, v in current_node.items():
         if v is None:
             v = ''
         if isinstance(v, dict):
-            stream += build_envvar_from_configuration(v, parent_prefix+"_"+k)
+            env_dict.update(build_env_from_configuration(v, parent_prefix+"_"+k))
             continue
         elif v is None:
             v = ''
-        elif isinstance(v, bool):
-            v = "0" if v is False else True
         elif isinstance(v, list):
-            v = "'"+" ".join(v)+"'"
+            v =  " ".join(map(str, v))
         else:
-            v = "'"+str(v)+"'"
+            v = str(v)
 
-        stream += "{}_{}={}\n".format(parent_prefix, k, v)
-    return stream
+        k = "{}_{}".format(parent_prefix, k).replace('.', '_')
+        env_dict[k] = v
+        
+    return env_dict
+
+
+def __str_dict_as_envvar(d):
+    return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
 
 
 def process_dyn_setup_scripts(setup_files):
     err = []
     log.print_item("Convert configuation to Shell variables")
+    env = os.environ.copy()
+    env.update(build_env_from_configuration(system.get()))
 
     with open(os.path.join(system.get('validation').output, 'conf.env'), 'w') as fh:
-        fh.write(build_envvar_from_configuration(system.get()))
+        fh.write(__str_dict_as_envvar(env))
         fh.close()
 
     log.print_item("Manage dynamic files (scripts)")
     with log.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
             base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
-            env = os.environ.copy()
             
             env['pcvs_src'] = base_src
             env['pcvs_testbuild'] = base_build

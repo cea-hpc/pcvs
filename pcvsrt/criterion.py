@@ -34,6 +34,8 @@ class Combination:
         string = list()
         # each combination is built following: 'defined-prefix+value'
         for n in sorted(self._combination.keys()):
+            if c[n].subtitle == 'SILENT':
+                continue
             string.append(c[n].subtitle +
                           str(self._combination[n]).replace(" ", "-"))
         return "_".join(string)
@@ -110,10 +112,14 @@ class Criterion:
     """A Criterion is the representation of a component each program
     (i.e. test binary) should be run against. A criterion comes with a range of
     possible values, each leading to a different test"""
-    def __init__(self, name, description, local=False):
+    def __init__(self, name, description, local=False, numeric=False):
         """Initialize a criterion from its YAML/dict description"""
         self._name = name
-        self._numeric = description.get('numeric', False) is True
+        if description is None:
+            self._values = None
+            return
+        
+        self._numeric = description.get('numeric', numeric) is True
         self._prefix = description.get('option', '')
         self._after = description.get('position', 'after') == 'after'
         self._alias = description.get('alias', {})
@@ -124,11 +130,11 @@ class Criterion:
         self._str = description.get('subtitle', '')
         self._values = description.get('values', [])
 
-        # convert any scalar value to a set()
-        if isinstance(self._values, int) or isinstance(self._values, str):
-            self._values = [self._values]
-
-
+    # only allow overriding values (for now)
+    def override(self, desc):
+        if 'values' in desc:
+            self._values = desc['values']
+            
     def intersect(self, other):
         """Update the calling Criterion with the interesection of the current
         range of possible values with the one given as a parameters.
@@ -137,13 +143,13 @@ class Criterion:
         system-wide's"""
         assert(isinstance(other, Criterion))
         assert(self._name == other._name)
-
+        
         # None is special value meaning, discard this criterion because
         # irrelevant
         if self._values is None or other._values is None:
             self._values = None
         else:
-            self._values = self._values.intersection(other._values)
+            self._values = set(self._values).intersection(other._values)
 
     def is_empty(self):
         """Is the current set of values empty 
@@ -182,6 +188,10 @@ class Criterion:
     @property
     def subtitle(self):
         return self._str
+
+    @property
+    def numeric(self):
+        return self._numeric
     
     def concretize_value(self, val=''):
         """Return the exact string mapping this criterion, according to the
@@ -253,6 +263,7 @@ class Criterion:
         """Browse values for the current criterion and make it ready to
         generate combinations"""
         values = []
+
         if self._numeric is True:
             for v in self._values:
                 if isinstance(v, dict):
@@ -265,7 +276,7 @@ class Criterion:
         else:
             values = self._values
         # now ensure values are unique
-        self._values = list(set(values))
+        self._values = set(values)
 
         # TODO: handle criterion dependency (ex: n_mpi: ['n_node * 2'])
 
@@ -299,10 +310,10 @@ def initialize_from_system():
 
     # register the new dict {criterion_name: Criterion object}
     # the criterion object gathers both information from runtime & criterion
-    system.get('criterion').iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
-
+    system.get('critobj').iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
+    
     # convert any sequence into valid range of integers for
     # numeric criterions
     log.print_item("Expand possible iterator expressions")
-    for criterion in system.get('criterion').iterators.values():
+    for criterion in system.get('critobj').iterators.values():
         criterion.expand_values()

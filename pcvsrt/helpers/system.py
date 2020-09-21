@@ -96,7 +96,7 @@ class CfgValidation(CfgBase):
         self.set_ifnot('xmls', list())
         self.set_ifnot('simulated', False)
         self.set_ifnot('anonymize', False)
-        self.set_ifnot('export', None)
+        self.set_ifnot('exported_to', None)
 
         if 'format' not in self.result:
             self.result.formats = ['json']
@@ -109,7 +109,6 @@ class CfgValidation(CfgBase):
         if k == 'output' and v is not None:
             os.path.join(os.path.abspath(v), ".pcvs")
         CfgBase.override(self, k, v)
-
 
 
 class Settings(Dict):
@@ -136,6 +135,7 @@ def save_as_global(obj):
 
 def get(cat=None):
     if cat is not None:
-        assert(cat in sysTable)
+        if cat not in sysTable:
+            sysTable[cat] = Dict()
         return sysTable[cat]
     return sysTable

@@ -92,3 +92,10 @@ def valid_combination(dic):
         return runtime_filter(dic)
     else:
         return True
+
+def max_number_of_combinations():
+    product = 1
+    c = system.get('criterion').iterators
+    for k in c:
+        product *= len(c[k]['values'])
+    return product
