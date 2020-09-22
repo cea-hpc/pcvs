@@ -86,7 +86,7 @@ def open_in_editor(*paths, e=None):
                 "Please see the '-e' option!", abort=1)
     cmd = [
         editor
-    ] + list(paths)
+    ] + list(filter(None, paths))
     log.info("cmd: {}".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 

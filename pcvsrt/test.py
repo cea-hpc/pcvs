@@ -1,6 +1,7 @@
 import os
 import copy
 import yaml
+import pprint
 from addict import Dict
 
 from pcvsrt.helpers import io, log, lowtest, system
@@ -70,6 +71,15 @@ class TEDescriptor:
         self._te_pkg = ".".join([label, subprefix.replace('/', '.')]) if subprefix else label
         
         _, self._srcdir, _, self._buildir = io.generate_local_variables(label, subprefix)
+
+        # before doint anything w/ node:
+        # arregate the 'group' definitions with the TE
+        # to get all the fields in their final form
+        if 'group' in node:
+            assert(node['group'] in system.get('group').keys())
+            tmp = Dict(system.get('group')[node['group']])
+            tmp.update(Dict(node))
+            node = tmp
         self._build = Dict(node.get('build', None))
         self._run = Dict(node.get('run', None))
 

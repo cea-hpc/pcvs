@@ -232,13 +232,15 @@ class ConfigurationBlock:
         assert (os.path.isfile(self._file))
 
         fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
-        fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
+        fplugin = None
+        if self._kind == 'runtime':
+            fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
         with open(self._file, 'r') as f:
             stream = yaml.load(f, Loader=yaml.FullLoader)
             if stream:
                 yaml.dump(stream, fname)
 
-            if self._kind == 'runtime':
+            if fplugin:
                 if stream and 'plugin' in stream:
                     content = base64.b64decode(stream['plugin']).decode('ascii')
                 else:
@@ -249,31 +251,32 @@ def check_valid_combination(dict_of_combinations=dict()):
     # returns True if the combination should be used
     return True
 """
-            fplugin.write(content)
-            fplugin.flush()
+                fplugin.write(content)
+                fplugin.flush()
         try:
-            io.open_in_editor(fname.name, fplugin.name, e=e)
+            io.open_in_editor(fname.name, fplugin.name if fplugin else None, e=e)
         except:
             log.warn("Issue with opening the conf. block. Stop!")
             return
         
-        # reset cursors
-        fname.seek(0)
-        fplugin.seek(0)
-
         #now, dump back temp file to the original saves
         with open(self._file, 'w') as f:
+            fname.seek(0)
             stream = yaml.load(fname, Loader=yaml.FullLoader)
             if stream is None:
                 stream = dict()
-            stream_plugin = fplugin.read()
-            if self._kind == 'runtime' and len(stream_plugin) > 0:
-                stream['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+
+            if fplugin:
+                fplugin.seek(0)
+                stream_plugin = fplugin.read()
+                if len(stream_plugin) > 0:
+                    stream['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
             yaml.dump(stream, f)
 
         # delete temp files (replace by 'with...' ?)
         fname.close()
-        fplugin.close()
+        if fplugin:
+            fplugin.close()
         
         self.load_from_disk()
         self.check()
