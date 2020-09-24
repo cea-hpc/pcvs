@@ -22,7 +22,6 @@ def __print_summary():
     log.print_item("Loaded profile: '{}'".format(n.pf_name))
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
-    pprint.pprint(type(system.get('criterion')))
     log.print_item("Max sys. combinations per TE: {}".format(lowtest.max_number_of_combinations()))
     log.print_item("Number of TEs: {}".format(lowtest.max_number_of_combinations() * TEDescriptor.get_nb_instances()))
     log.print_item("User directories:")
@@ -345,12 +344,6 @@ def run():
     except subprocess.CalledProcessError:
         log.err("JCHRONOSS returned non-zero exit code!", abort=1)
 
-
-def anonymize_line(line):
-    print(line)
-    return line \
-            .replace(os.environ['HOME'], '${HOME}') \
-            .replace(os.environ['USER'], '${USER}')
 
 def anonymize_archive():
     config = system.get('validation')

@@ -67,6 +67,7 @@ class TEDescriptor:
                 "Unable to build a TestDescriptor "
                 "from the given node (got {})".format(type(node)), abort=1)
         self._te_name = name
+        self._skipped = name.startswith('.')
         self._te_label = node.get('label', self._te_name)
         self._te_pkg = ".".join([label, subprefix.replace('/', '.')]) if subprefix else label
         
@@ -153,6 +154,7 @@ class TEDescriptor:
                     cur_criterion.intersect(v_sys)
                     if cur_criterion.is_empty():
                         log.debug("No valid intersection found for '{}, Discard".format(k_sys))
+                        self._skipped = True
                     else:
                         tmp[k_sys] = cur_criterion
                 else:  # key is not overriden
@@ -273,8 +275,7 @@ class TEDescriptor:
             )
 
     def construct_tests(self):
-        if self._te_name.startswith('.'):
-            # template -> skip
+        if self._skipped:
             return
 
         """Meta function to triggeer test construction"""
