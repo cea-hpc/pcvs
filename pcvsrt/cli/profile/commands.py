@@ -257,6 +257,28 @@ def profile_alter(ctx, token, editor):
                 "Please check the 'list' command", abort=1)
 
 
+@profile.command(name="update",
+                 short_help="Update an existing profile with a given config/file")
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
+@click.option("-f", "--file", "file", envvar="FROMFILE", show_envvar=True,
+              default=None, type=str,
+              help="File to use in place of a config. block")
+@click.pass_context
+def profile_update(ctx, token, editor):
+    (scope, label) = pvProfile.extract_profile_from_token(token)
+    pf = pvProfile.Profile(label, scope)
+    log.nimpl()
+    if pf.is_found():
+        if pf.scope == 'global' and label == 'local':
+            log.err("err", abort=1)
+        else:
+            pf.open_editor(editor)
+    else:
+        log.err("Profile '{}' not found!".format(label),
+                "Please check the 'list' command", abort=1)
+
+
 @profile.command(name="import",
                  short_help="Import a file as a profile")
 @click.argument("token", nargs=1, type=click.STRING,
@@ -272,7 +294,6 @@ def profile_import(ctx, token, src_file):
         pf.flush_to_disk()
     else:
         log.err("Cannot import into an already created profile!", abort=1)
-
 
 @profile.command(name="export",
                  short_help="Export a profile to a file")

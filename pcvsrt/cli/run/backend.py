@@ -270,6 +270,8 @@ def process_dyn_setup_scripts(setup_files):
             except CalledProcessError as e:
                 err += [(f, e)]
                 continue
+            if te_node is None:  # empty file
+                continue
             stream = ""
             for k_elt, v_elt in te_node.items():
                 stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
