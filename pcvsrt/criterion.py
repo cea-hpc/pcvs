@@ -34,7 +34,7 @@ class Combination:
         string = list()
         # each combination is built following: 'defined-prefix+value'
         for n in sorted(self._combination.keys()):
-            if c[n].subtitle == 'SILENT':
+            if not c[n].subtitle:
                 continue
             string.append(c[n].subtitle +
                           str(self._combination[n]).replace(" ", "-"))

@@ -253,11 +253,12 @@ class TEDescriptor:
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
 
             envs, args, params = comb.translate_to_command()
+            program = self._run.program if 'program' in self._run else self._te_name
             command = [
                 " ".join(envs),
                 system.get('runtime').program,
                 " ".join(args),
-                os.path.join(self._buildir, self._run.get('program', self._build.sources.get('binary', 'a.out'))),
+                os.path.join(self._buildir, program),
                 " ".join(params)
             ]
 
