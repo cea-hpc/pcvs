@@ -2,9 +2,6 @@
 program: "/path/to/command"
 args: "--verbose"
 
-# WIP for this one
-plugin: "MPC"
-
 iterators:
     iterator_name:
         option: ""

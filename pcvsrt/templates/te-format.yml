@@ -1,15 +1,14 @@
 ---
 .this_is_a_job:
-    label: "optional name"
     group: "GRPSERIAL"
     build:
         # source files to include (if needed)
         files: "@SRCPATH@/*.c"
         make:
-                target: all
+            target: all
         sources:
-                # program binary (if needed)
-                binary: "a.out"
+            # program binary (if needed)
+            binary: "a.out"
         # dependency scheme
         depends_on: ["this_is_another_test"]
         # extra cflags
@@ -32,7 +31,7 @@
             n_omp:
                 values: ["1:4"]
             program:
-                #name will be used as part of final test-name
+                # name will be used as part of final test-name
                 give_it_a_name:
                     numeric: true
                     type: "argument|environment"
@@ -44,11 +43,11 @@
         depends_on: ["this_is_another_run_test_in_the_same_file"]
         # external modules (suppose a support for modules)
         package_manager:
-                spack:
+            spack:
                 - protobuf@3.1.1
                 - gcc@7.3.0
                 - osu ^${COMPILER_SPACKED} %intel
-                modules:
+            modules:
                 - protobuf
                 - gnu/gcc/7.3.0
         # extra env vars to export before running the job
@@ -57,7 +56,7 @@
             MY_OTHER_VAR: 2
 
     artifacts:
-        #relative to $BUILDPATH
+        # relative to $BUILDPATH
         paths:
             - "./path/1"
             - "./path/2"
@@ -84,6 +83,7 @@
 # depicts an inheritance mechanism.
 real_test:
     build:
-        make_target: all
+        make:
+            target: all
     run:
         <<: *run_part

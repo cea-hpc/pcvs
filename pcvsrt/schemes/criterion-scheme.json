@@ -1,0 +1,26 @@
+{
+    "type": "object",
+    "properties": {
+        "iterators": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "properties" : {
+                        "values": {
+                            "anyOf": [
+                                {"type": "array"},
+                                {"type": "string"},
+                                {"type": "number"}
+                            ]
+                        },
+                        "subtitle": { "type": "string"}
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

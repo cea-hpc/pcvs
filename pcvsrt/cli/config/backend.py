@@ -120,9 +120,11 @@ class ConfigurationScheme:
                 pcvsrt.ROOTPATH,
                 'schemes/{}-scheme.json'.format(conf._kind)), 'r') as fh:
             log.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
-            return
             schema = json.load(fh)
-            jsonschema.validate(instance=conf._details, schema=schema)
+            try:
+                jsonschema.validate(instance=conf._details, schema=schema)
+            except jsonschema.ValidationError as e:
+                log.err("Invalid format for 'compiler:", "{}".format(e), abort=1)
 
 
 class ConfigurationBlock:

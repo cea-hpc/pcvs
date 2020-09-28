@@ -19,6 +19,9 @@ from pcvsrt.cli.run import backend as pvRun
 from pcvsrt.cli.bank import commands as cmdBank
 from pcvsrt.cli.bank import backend as pvBank
 
+from pcvsrt.cli.debug import commands as cmdDebug
+
+
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -112,3 +115,4 @@ cli.add_command(cmdConfig.config)
 cli.add_command(cmdProfile.profile)
 cli.add_command(cmdRun.run)
 cli.add_command(cmdBank.bank)
+cli.add_command(cmdDebug.debug)

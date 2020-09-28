@@ -1,0 +1,38 @@
+{
+    "type": "object",
+    "properties": {
+        "program" : { "type": "string"},
+        "args": { "type": "string"},
+        "plugin": { "type": "string"},
+        "iterators": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "properties": {
+                        "option": { "type": "string"},
+                        "numeric": { "type": "boolean"},
+                        "type": { "type": "string", "enum": ["argument", "environment"]},
+                        "position": { "type": "string", "enum": ["before", "after"]},
+                        "aliases": {
+                            "patternProperties": {
+                                "^.*$": { "type": "string" }
+                            }
+                        }
+                    },
+                    "required": [ "option", "type"]
+                }
+            },
+            "additionalProperties": false
+        },
+        "package_manager": {
+            "type" : "object",
+            "properties": {
+                "spack": { "type": "string"},
+                "module": {"type": "string"}
+            },
+            "additionalProperties": false
+        }
+    },
+    "required": [ "program", "iterators"]
+}
