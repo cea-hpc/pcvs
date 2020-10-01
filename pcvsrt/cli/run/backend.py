@@ -13,7 +13,7 @@ import yaml
 
 from pcvsrt import criterion, test
 from pcvsrt.helpers import io, log, system, lowtest
-from pcvsrt.test import Test, TEDescriptor
+from pcvsrt.test import TestFile, TEDescriptor
 
 
 def __print_summary():
@@ -23,7 +23,6 @@ def __print_summary():
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
     log.print_item("Max sys. combinations per TE: {}".format(lowtest.max_number_of_combinations()))
-    log.print_item("Number of TEs: {}".format(lowtest.max_number_of_combinations() * TEDescriptor.get_nb_instances()))
     log.print_item("User directories:")
     width = max([len(i) for i in n.dirs])
     for k, v in system.get('validation').dirs.items():
@@ -116,54 +115,6 @@ def prepare(run_settings):
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
-
-
-def __replace_yaml_token(stream, src, build, prefix):
-    tokens = {
-        '@BUILDPATH@': os.path.join(build, prefix),
-        '@SRCPATH@': os.path.join(src, prefix),
-        '@ROOTPATH@': src,
-        '@BROOTPATH@': build,
-        '@SPACKPATH@': "TBD",
-        '@HOME@': str(pathlib.Path.home()),
-        '@USER@': os.getlogin()
-    }
-    for k, v in tokens.items():
-        stream = stream.replace(k, v)
-    return stream
-
-
-def __load_yaml_file_legacy(f):
-    # barely legal to do that...
-    old_group_file = os.path.join(io.ROOTPATH, "templates/group-compat.yml")
-    cmd = "pcvs_convert {} --stdout -k te -t {} 2>/dev/null".format(f, old_group_file)
-    out = subprocess.check_output(cmd, shell=True)
-    return out.decode('utf-8')
-
-
-def __load_yaml_file(f, src, build, prefix):
-    convert = False
-    obj = {}
-    try:
-        with open(f, 'r') as fh:
-            obj = yaml.load(__replace_yaml_token(fh.read(), src, build, prefix), Loader=yaml.FullLoader)
-
-        # TODO: Validate input & raise YAMLError if invalid
-        #raise yaml.YAMLError("TODO: write validation")
-    #except yaml.YAMLError:
-    #    convert = True
-    except Exception as e:
-        log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
-
-    if convert:
-        log.debug("Attempt to use legacy syntax for {}".format(f))
-        obj = yaml.load(__replace_yaml_token(__load_yaml_file_legacy(f), src, build, prefix), Loader=yaml.FullLoader)
-        if log.get_verbosity('debug'):
-            convert_file = os.path.join(os.path.split(f)[0], "convert-pcvs.yml")
-            log.debug("Save converted file to {}".format(convert_file))
-            with open(convert_file, 'w') as fh:
-                yaml.dump(obj, fh)
-    return obj
 
 
 def __print_progbar_walker(elt):
@@ -266,16 +217,21 @@ def process_dyn_setup_scripts(setup_files):
                 out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
                     fh.write(out.decode('utf-8'))
-                te_node = __load_yaml_file(out_file, base_src, base_build, subprefix)
+                te_node = test.load_yaml_file(out_file, base_src, base_build, subprefix)
             except CalledProcessError as e:
                 err += [(f, e)]
                 continue
             if te_node is None:  # empty file
                 continue
-            stream = ""
-            for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            system.get('validation').xmls.append(Test.finalize_file(cur_build, label, stream))
+
+            tf = TestFile(file_in=out_file,
+                          path_out=cur_build,
+                          data=te_node,
+                          label=label,
+                          subprefix=subprefix)
+            
+            tf.start_process()
+            system.get('validation').xmls.append(tf.flush_to_disk())
     return err
 
 def process_static_yaml_files(yaml_files):
@@ -289,15 +245,18 @@ def process_static_yaml_files(yaml_files):
             f = os.path.join(cur_src, fname)
             stream = ""
             try:
-                te_node = __load_yaml_file(f, base_src, base_build, subprefix)
+                tf = TestFile(file_in=f,
+                              path_out=cur_build,
+                              label=label,
+                              subprefix=subprefix)
             except (yaml.YAMLError, CalledProcessError) as e:
                 err += [(f, e)]
                 continue
             except Exception as e:
                 log.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
-            for k_elt, v_elt in te_node.items():
-                stream +="".join([t.serialize() for t in TEDescriptor(k_elt, v_elt, label, subprefix).construct_tests()])
-            system.get('validation').xmls.append(Test.finalize_file(cur_build, label, stream))
+            
+            tf.start_process()
+            system.get('validation').xmls.append(tf.flush_to_disk())
     return err
 
 

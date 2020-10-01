@@ -101,7 +101,6 @@ class Serie:
 
             if not lowtest.valid_combination(d):
                 continue
-            
             yield Combination(
                 self._dict, 
                 d

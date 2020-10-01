@@ -2,10 +2,114 @@ import os
 import copy
 import yaml
 import pprint
+import pathlib
+import functools
+import operator
+import subprocess
 from addict import Dict
 
 from pcvsrt.helpers import io, log, lowtest, system
 from pcvsrt.criterion import Criterion, Serie
+
+
+def __load_yaml_file_legacy(f):
+    # barely legal to do that...
+    old_group_file = os.path.join(io.ROOTPATH, "templates/group-compat.yml")
+    cmd = "pcvs_convert {} --stdout -k te -t {} 2>/dev/null".format(f, old_group_file)
+    out = subprocess.check_output(cmd, shell=True)
+    return out.decode('utf-8')
+
+
+def load_yaml_file(f, s, b, p):
+    convert = False
+    obj = {}
+    try:
+        with open(f, 'r') as fh:
+            stream = fh.read()
+            stream = replace_yaml_token(stream, s, b, p)
+            obj = yaml.load(stream, Loader=yaml.FullLoader)
+
+        # TODO: Validate input & raise YAMLError if invalid
+        #raise yaml.YAMLError("TODO: write validation")
+    except yaml.YAMLError:
+        log.err("Yolo")
+        convert = True
+    except Exception as e:
+        log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
+
+    if convert:
+        log.debug("Attempt to use legacy syntax for {}".format(f))
+        obj = yaml.load(__load_yaml_file_legacy(f), Loader=yaml.FullLoader)
+        if log.get_verbosity('debug'):
+            convert_file = os.path.join(os.path.split(f)[0], "convert-pcvs.yml")
+            log.debug("Save converted file to {}".format(convert_file))
+            with open(convert_file, 'w') as fh:
+                yaml.dump(obj, fh)
+    return obj
+
+def replace_yaml_token(stream, src, build, prefix):
+    tokens = {
+        '@BUILDPATH@': os.path.join(build, prefix),
+        '@SRCPATH@': os.path.join(src, prefix),
+        '@ROOTPATH@': src,
+        '@BROOTPATH@': build,
+        '@SPACKPATH@': "TBD",
+        '@HOME@': str(pathlib.Path.home()),
+        '@USER@': os.getlogin()
+    }
+    for k, v in tokens.items():
+        stream = stream.replace(k, v)
+    return stream
+
+
+class TestFile:
+    def __init__(self, file_in, path_out, data=None, label=None, subprefix=None):
+        self._in = file_in
+        self._path_out = path_out
+        self._raw = data
+        self._label = label
+        self._prefix = subprefix
+        self._tests = list()
+        self._debug = dict()
+
+    def start_process(self):
+        src, _, build, _ = io.generate_local_variables(self._label, self._prefix)
+        
+        if self._raw is None:
+            self._raw = load_yaml_file(self._in, src, build, self._prefix)
+            
+        #self._raw = replace_yaml_token(self._raw, src, build, self._prefix)
+        for k, content, in self._raw.items():
+            td = TEDescriptor(k, content, self._label, self._prefix)
+            for test in td.construct_tests():
+                self._tests.append(test)
+            
+            self._debug[k] = td.get_debug()
+
+            self._tests += []
+    
+    def flush_xml_to_disk(self):
+        fn = os.path.join(self._path_out, "list_of_tests.xml")
+        with open(fn, 'w') as fh:
+            fh.write("<jobSuite>")
+            for test in self._tests:
+                fh.write(test.serialize_xml())
+            fh.write("</jobSuite>")
+        
+        if len(self._debug) and system.get('validation').verbose:
+            with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
+                sys_cnt = functools.reduce(operator.mul, [len(v['values']) for v in system.get('criterion').iterators.values()])
+                self._debug['.system-values'] = dict()
+                self._debug['.system-values']['stats'] = dict()
+                for c_k, c_v in system.get('criterion').iterators.items():
+                    self._debug[".system-values"][c_k] = c_v['values']
+                self._debug[".system-values"]['stats']['theoric'] = sys_cnt
+
+                yaml.dump(self._debug, fh, default_flow_style=None)
+        return fn
+
+    def flush_to_disk(self):
+        return self.flush_xml_to_disk()
 
 
 class Test:
@@ -15,7 +119,7 @@ class Test:
         """register a new test"""
         self._array = kwargs
     
-    def serialize(self):
+    def serialize_xml(self):
         """Serialize the test to the logic: currently an XML node"""
         string = "<job>"
         string += "{}".format(lowtest.xml_setif(self._array, 'name'))
@@ -26,26 +130,15 @@ class Test:
         string += "{}".format(lowtest.xml_setif(self._array, 'delta'))
         string += "{}".format(lowtest.xml_setif(self._array, 'resources'))
         string += "{}".format(lowtest.xml_setif(self._array, 'extras'))
-        string += "{}".format(lowtest.xml_setif(self._array, 'postscript'))
+        string += "{}".format(lowtest.xml_setif(self._array, 'postscript', 'postCommand'))
         string += "<constraints>{}</constraints>".format(
             lowtest.xml_setif(self._array, 'constraint'))
         string += "</job>"
         return string
 
-    @staticmethod
-    def finalize_file(path, package, content):
-        """Once a serie of tests, to be packaged together, has been
-        serialized, this static function will complete the stream by writing
-        down the logic to the proper file
-        
-        TODO: Maybe do this through a script callable by tests"""
-        fn = os.path.join(path, "list_of_tests.xml")
-        with open(fn, 'w') as fh:
-            fh.write("<jobSuite>")
-            fh.write(content)
-            fh.write("</jobSuite>")
-        return fn
-
+    def serialize_shell(self):
+        pass
+    
 
 class TEDescriptor:
     """Maps to a program description, as read by YAML user files"""
@@ -54,11 +147,6 @@ class TEDescriptor:
         """Initialize system-wide information (to shorten accesses)"""
         cls._sys_crit = system.get('critobj').iterators
         cls._base_it = base_criterion_name
-        cls._nb_instances = 0
-    
-    @classmethod
-    def get_nb_instances(cls):
-        return cls._nb_instances
 
     def __init__(self, name, node, label, subprefix):
         """load a new TEDescriptor from a given YAML node"""
@@ -92,12 +180,13 @@ class TEDescriptor:
         self._validation = Dict(node.get('validate', None))
         self._artifacts = Dict(node.get('artifacts', None))
         self._template = node.get('group', None)
+        self._debug = self._te_name+":\n"
+        self._effective_cnt = 0
 
         self._full_name = ".".join([self._te_pkg, self._te_name])
         
         self._configure_criterions()
         self._compatibility_support(node.get('_compat', None))
-        TEDescriptor._nb_instances += 1
 
     def _compatibility_support(self, compat):
         """Convert tricky keywords from old syntax too complex to be handled
@@ -153,7 +242,6 @@ class TEDescriptor:
                     cur_criterion.expand_values()
                     cur_criterion.intersect(v_sys)
                     if cur_criterion.is_empty():
-                        log.debug("No valid intersection found for '{}, Discard".format(k_sys))
                         self._skipped = True
                     else:
                         tmp[k_sys] = cur_criterion
@@ -162,7 +250,9 @@ class TEDescriptor:
 
             self._criterion = tmp
             # now build program iterators
-            [elt.expand_values() for elt in self._program_criterion.values()]  
+            for k, elt in self._program_criterion.items():
+                elt.expand_values()
+
 
     def __build_from_sources(self):
         """Specific to build rule, where the compilation is made from a
@@ -175,7 +265,11 @@ class TEDescriptor:
         command.append('{}'.format(" ".join(self._build.files)))
         command.append('{}'.format(self._build.get('ldflags', '')))
 
-        binary = self._build.sources.binary if 'binary' in self._build.sources else self._te_name
+        binary = self._te_name
+        if self._build.sources.binary:
+            binary = self._build.sources.binary
+        elif self._run.program:
+            binary = self._run.program
         command.append('-o {}'.format(os.path.join(self._buildir, binary)))
         # save it
         self._build.sources.binary = binary
@@ -229,6 +323,8 @@ class TEDescriptor:
         except KeyError:
             pass
 
+        self._effective_cnt += 1
+
         yield Test(
             name=self._full_name,
             command=command,
@@ -244,7 +340,6 @@ class TEDescriptor:
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
-        #TODO: handle runtime filters (dynamic import)
 
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
@@ -253,7 +348,12 @@ class TEDescriptor:
                 deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
 
             envs, args, params = comb.translate_to_command()
-            program = self._run.program if 'program' in self._run else self._te_name
+            program = self._te_name
+            if self._run.program:
+                program = self._run.program
+            elif self._build.sources.binary:
+                program = self._build.sources.binary
+
             command = [
                 " ".join(envs),
                 system.get('runtime').program,
@@ -261,6 +361,8 @@ class TEDescriptor:
                 os.path.join(self._buildir, program),
                 " ".join(params)
             ]
+
+            self._effective_cnt+=1
 
             yield Test(
                 name="_".join([self._full_name, comb.translate_to_str()]),
@@ -285,6 +387,21 @@ class TEDescriptor:
             yield from self.__construct_compil_tests()
         if self._run:
             yield from self.__construct_runtime_tests()
+
+    def get_debug(self):
+        user_cnt = functools.reduce(operator.mul, [len(v.values) for v in self._program_criterion.values()])
+        real_cnt = functools.reduce(operator.mul, [len(v.values) for v in self._criterion.values()])
+        self._debug_yaml = dict()
+        
+        for k, v in self._criterion.items():   
+            self._debug_yaml[k] = list(v.values)
+        print(self._debug_yaml)
+        self._debug_yaml['.stats'] = {
+                'theoric': user_cnt * real_cnt,
+                'program_factor': user_cnt,
+                'effective': self._effective_cnt
+        }
+        return self._debug_yaml
 
     def __repr__(self):
         """internal representation, for auto-dumping"""
