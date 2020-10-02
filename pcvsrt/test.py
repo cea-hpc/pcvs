@@ -310,18 +310,13 @@ class TEDescriptor:
         if not isinstance(self._build.files, list):
             self._build.files = [self._build.files]
 
+        deps, command = lowtest.handle_job_deps(self._build, self._te_pkg)
+
         # a  'make' node prevails
         if 'make' in self._build:
-            command = self.__build_from_makefile()
+            command += self.__build_from_makefile()
         else:
-            command = self.__build_from_sources()
-            
-        try:
-            # collect dependencies
-            for d in self._build['depends_on']:
-                deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
-        except KeyError:
-            pass
+            command += self.__build_from_sources()
 
         self._effective_cnt += 1
 
@@ -343,9 +338,9 @@ class TEDescriptor:
 
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
-            deps = [self._full_name] if self._build else []
-            for d in self._run.get('depends_on', []):
-                deps.append(d if '.' in d else ".".join([self._te_pkg, d]))
+            deps, command = lowtest.handle_job_deps(self._build, self._te_pkg)
+            if self._build:
+                deps.append(self._full_name)
 
             envs, args, params = comb.translate_to_command()
             program = self._te_name
@@ -355,6 +350,8 @@ class TEDescriptor:
                 program = self._build.sources.binary
 
             command = [
+                command,
+                " && " if command else "",
                 " ".join(envs),
                 system.get('runtime').program,
                 " ".join(args),

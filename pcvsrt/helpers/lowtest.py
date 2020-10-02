@@ -64,6 +64,21 @@ def xml_setif(elt, k, tag=None):
     else:
         return ""
 
+
+def handle_job_deps(deps_node, pkg_prefix):
+    deps = list()
+    command = ""
+    if 'depends_on' in deps_node:
+        for name, values in deps_node.items():
+            if name == 'test':
+                for d in values:
+                    deps.append(d if '.' in d else ".".join([pkg_prefix, d]))
+            elif name == 'spack':
+                pass
+            elif name == 'module':
+                pass
+    return (deps, command)
+
 first = True
 runtime_filter = None
 def valid_combination(dic):

@@ -40,9 +40,8 @@
         # directory where program should be built
         cwd: "dir/to/build"
         # dependency scheme
-        depends_on: ["this_is_another_run_test_in_the_same_file"]
-        # external modules (suppose a support for modules)
-        package_manager:
+        depends_on:
+            test: ["this_is_another_run_test_in_the_same_file"]
             spack:
                 - protobuf@3.1.1
                 - gcc@7.3.0

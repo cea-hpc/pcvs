@@ -9,7 +9,15 @@
                     "type": "object",
                     "properties": {
                         "files": { "type": "string"},
-                        "depends_on": { "type": "array", "items": { "type": "string"}},
+                        "depends_on": { 
+                            "type": "object",
+                            "properties": {
+                                "^test$": { "type": "array", "items": { "type": "string"}},
+                                "^spack$": { "type": "array", "items": { "type": "string"}},
+                                "^module$": { "type": "array", "items": { "type": "string"}}
+                            },
+                            "additionalProperties": false
+                        },
                         "cflags": { "type": "string"},
                         "ldflags": { "type": "string"},
                         "cwd": { "type": "string"},
@@ -28,7 +36,6 @@
                             },
                             "additionalProperties": false
                         }
-                        
                     },
                     "additionalProperties": false
                 },
@@ -37,7 +44,15 @@
                     "properties": {
                         "program": { "type": "string"},
                         "cwd": { "type": "string"},
-                        "depends_on": { "type": "array", "items": { "type": "string"}},
+                        "depends_on": { 
+                            "type": "object",
+                            "properties": {
+                                "^test$": { "type": "array", "items": { "type": "string"}},
+                                "^spack$": { "type": "array", "items": { "type": "string"}},
+                                "^module$": { "type": "array", "items": { "type": "string"}}
+                            },
+                            "additionalProperties": false
+                        },
                         "package_manager": {
                             "type" : "object",
                             "properties": {
