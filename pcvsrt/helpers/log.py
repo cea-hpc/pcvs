@@ -229,30 +229,37 @@ def progbar(it, print_func=None, **kargs):
                              **kargs)
 
 
-def short_banner():
-    logo = [
-        r"""             ____    ______  _    __  _____""",
-        r"""            / __ \  / ____/ | |  / / / ___/""",
-        r"""           / /_/ / / /      | | / /  \__ \ """,
-        r"""          / ____/ / /___    | |/ /  ___/ / """,
-        r"""         /_/      \____/    |___/  /____/  """,
-        r"""                                                """,
-        r"""      Parallel Computing -- Validation Suite """,
-        r"""             Copyright {} 2017 -- CEA       """.format(utf('copy')),
+def short_banner(string=False):
+    logo =[
+        r"""             ____    ______  _    __  _____       """,
+        r"""            / __ \  / ____/ | |  / / / ___/       """,
+        r"""           / /_/ / / /      | | / /  \__ \        """,
+        r"""          / ____/ / /___    | |/ /  ___/ /        """,
+        r"""         /_/      \____/    |___/  /____/         """,
+        r"""                                                  """,
+        r"""      Parallel Computing -- Validation Suite      """,
+        r"""             Copyright {} 2017 -- CEA             """.format(utf('copy')),
         r""""""
     ]
-
+    s = []
     if linelength < max(map(lambda x: len(x), logo)):
-        click.secho("{}".format(utf("star")*14), fg="green")
-        click.secho("{} PCVS -- RT {}".format(utf("star"), utf('star')), fg="yellow")
-        click.secho("{} CEA {} 2017 {}".format(utf('star'), utf('copy'), utf('star')), fg="red")
-        click.secho("{}".format(utf("star")*14), fg="green")
-        return
+        s = [
+            click.style("{}".format(utf("star")*14), fg="green"),
+            click.style("{} PCVS -- RT {}".format(utf("star"), utf('star')), fg="yellow"),
+            click.style("{} CEA {} 2017 {}".format(utf('star'), utf('copy'), utf('star')), fg="red"),
+            click.style("{}".format(utf("star")*14), fg="green")
+        ]
     else:
-        click.secho("\n".join(logo[0:3]), fg="green")
-        click.secho("\n".join(logo[3:4]), fg="yellow")
-        click.secho("\n".join(logo[4:5]), fg="red")
-        click.secho("\n".join(logo[5:]))
+        s = [
+            click.style("\n".join(logo[0:3]), fg="green"),
+            click.style("\n".join(logo[3:4]), fg="yellow"),
+            click.style("\n".join(logo[4:5]), fg="red"),
+            click.style("\n".join(logo[5:]))
+        ]
+    if string is True:
+        return "\n".join(s)
+    else:
+        click.echo("\n".join(s))
 
 
 def banner():
@@ -304,7 +311,6 @@ def banner():
         r"""                                                        """
         r"""                                    """,
     ]
-
     if linelength < max(map(lambda x: len(x), logo)):
         short_banner()
         return

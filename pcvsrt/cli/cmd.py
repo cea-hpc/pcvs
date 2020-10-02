@@ -20,6 +20,7 @@ from pcvsrt.cli.bank import commands as cmdBank
 from pcvsrt.cli.bank import backend as pvBank
 
 from pcvsrt.cli.debug import commands as cmdDebug
+from pcvsrt.gui import main as cmdGui
 
 
 
@@ -69,6 +70,8 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
     # Click specific-related
     ctx.color = color
 
+    if width is None:
+        width = click.get_terminal_size()[0]
     log.init(verbose, encoding, width, enrich_exp)
     io.set_local_path(ctx.obj['exec'])
 
@@ -116,3 +119,4 @@ cli.add_command(cmdProfile.profile)
 cli.add_command(cmdRun.run)
 cli.add_command(cmdBank.bank)
 cli.add_command(cmdDebug.debug)
+cli.add_command(cmdGui.gui)
