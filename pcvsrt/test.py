@@ -8,7 +8,7 @@ import operator
 import subprocess
 from addict import Dict
 
-from pcvsrt.helpers import io, log, lowtest, system
+from pcvsrt.helpers import io, log, lowtest, system, pm
 from pcvsrt.criterion import Criterion, Serie
 
 
@@ -63,6 +63,9 @@ def replace_yaml_token(stream, src, build, prefix):
 
 
 class TestFile:
+    cc_pm_string = ""
+    rt_pm_string = ""
+
     def __init__(self, file_in, path_out, data=None, label=None, subprefix=None):
         self._in = file_in
         self._path_out = path_out
@@ -71,7 +74,7 @@ class TestFile:
         self._prefix = subprefix
         self._tests = list()
         self._debug = dict()
-
+        
     def start_process(self):
         src, _, build, _ = io.generate_local_variables(self._label, self._prefix)
         
@@ -95,8 +98,50 @@ class TestFile:
             for test in self._tests:
                 fh.write(test.serialize_xml())
             fh.write("</jobSuite>")
+        return fn
+
+    def flush_shell_to_disk(self):
+        fn_xml = os.path.join(self._path_out, "list_of_tests.xml")
+        fn_sh = os.path.join(self._path_out, "list_of_tests.sh")
         
+        if TestFile.cc_pm_string == "" and system.get('compiler').obj:
+            TestFile.cc_pm_string = "\n".join([e.loadenv() for e in system.get('compiler').obj])
+        
+        if TestFile.rt_pm_string == "" and system.get('runtime').obj:
+            TestFile.rt_pm_string = "\n".join([e.loadenv() for e in system.get('runtime').obj])
+
+        with open(fn_xml, 'w') as fh_xml:
+            with open(fn_sh, 'w') as fh_sh:
+                fh_xml.write("<jobSuite>")
+                fh_sh.write(
+                    '#!/bin/sh\n' +
+                    '{pm_string}'.format(pm_string="\n".join([TestFile.cc_pm_string, TestFile.rt_pm_string])) +
+                    'for arg in "$@"; do\n' +
+                    '   case $arg in\n')
+                for test in self._tests:
+                    fh_sh.write(test.serialize_shell())
+                    test.override_cmd("sh {} '{}'".format(fn_sh, test.name))
+
+                    fh_xml.write(test.serialize_xml())
+                fh_sh.write(
+                    '   --list)\n'
+                    '       printf "Available tests to run:\\n"\n'
+                    '       printf " - {list_of_tests}"\n'
+                    '       ;;\n'
+                    '   *)\n'
+                    '       printf "Invalid test-name \'$arg\'\\n"\n'
+                    '       exit 1\n'
+                    '   esac\n'
+                    'done\n'
+                    'ret=$?\n'
+                    'exit $ret\n'.format(list_of_tests="\n - ".join([t.name for t in self._tests])))
+                fh_xml.write("</jobSuite>")
+        return fn_xml
+        
+
+    def flush_to_disk(self):
         if len(self._debug) and system.get('validation').verbose:
+            
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
                 sys_cnt = functools.reduce(operator.mul, [len(v['values']) for v in system.get('criterion').iterators.values()])
                 self._debug['.system-values'] = dict()
@@ -106,10 +151,8 @@ class TestFile:
                 self._debug[".system-values"]['stats']['theoric'] = sys_cnt
 
                 yaml.dump(self._debug, fh, default_flow_style=None)
-        return fn
-
-    def flush_to_disk(self):
-        return self.flush_xml_to_disk()
+        
+        return self.flush_shell_to_disk()
 
 
 class Test:
@@ -119,12 +162,29 @@ class Test:
         """register a new test"""
         self._array = kwargs
     
+    def override_cmd(self, cmd):
+        self._array['command'] = cmd
+    
+    @property
+    def name(self):
+        return self._array['name']
+
     def serialize_xml(self):
         """Serialize the test to the logic: currently an XML node"""
         string = "<job>"
         string += "{}".format(lowtest.xml_setif(self._array, 'name'))
         string += "{}".format(lowtest.xml_setif(self._array, 'command'))
-        string += "<deps>{}</deps>".format(lowtest.xml_setif(self._array, 'dep'))
+
+        if 'dep' in self._array:
+            string += "<deps>"
+            for elt in self._array['dep']:
+                if isinstance(elt, pm.PManager):
+                    # this is handled when building the command
+                    pass
+                else:
+                    string += "<dep>{}</dep>".format(elt)
+            string += "</deps>"
+        
         string += "{}".format(lowtest.xml_setif(self._array, "rc"))
         string += "{}".format(lowtest.xml_setif(self._array, 'time'))
         string += "{}".format(lowtest.xml_setif(self._array, 'delta'))
@@ -137,8 +197,19 @@ class Test:
         return string
 
     def serialize_shell(self):
-        pass
-    
+        pm_string = ""
+        if 'dep' in self._array:
+            pm_string = "{}\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
+            
+        return """
+        "{name}")
+            {pm_string}
+            {cmd}
+            ;;""".format(name=self._array['name'],
+                         pm_string=pm_string,
+                         cmd=self._array['command']
+                        )
+
 
 class TEDescriptor:
     """Maps to a program description, as read by YAML user files"""
@@ -310,13 +381,13 @@ class TEDescriptor:
         if not isinstance(self._build.files, list):
             self._build.files = [self._build.files]
 
-        deps, command = lowtest.handle_job_deps(self._build, self._te_pkg)
+        deps = lowtest.handle_job_deps(self._build, self._te_pkg)
 
         # a  'make' node prevails
         if 'make' in self._build:
-            command += self.__build_from_makefile()
+            command = self.__build_from_makefile()
         else:
-            command += self.__build_from_sources()
+            command = self.__build_from_sources()
 
         self._effective_cnt += 1
 
@@ -338,7 +409,7 @@ class TEDescriptor:
 
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
-            deps, command = lowtest.handle_job_deps(self._build, self._te_pkg)
+            deps = lowtest.handle_job_deps(self._run, self._te_pkg)
             if self._build:
                 deps.append(self._full_name)
 
@@ -350,8 +421,6 @@ class TEDescriptor:
                 program = self._build.sources.binary
 
             command = [
-                command,
-                " && " if command else "",
                 " ".join(envs),
                 system.get('runtime').program,
                 " ".join(args),
@@ -392,7 +461,9 @@ class TEDescriptor:
         
         for k, v in self._criterion.items():   
             self._debug_yaml[k] = list(v.values)
-        print(self._debug_yaml)
+        self._debug_yaml['program'] = dict()
+        for k, v in self._program_criterion.items():   
+            self._debug_yaml['program'][k] = list(v.values)
         self._debug_yaml['.stats'] = {
                 'theoric': user_cnt * real_cnt,
                 'program_factor': user_cnt,

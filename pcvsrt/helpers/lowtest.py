@@ -7,7 +7,7 @@ import base64
 from xml.sax.saxutils import escape
 from addict import Dict
 
-from pcvsrt.helpers import system
+from pcvsrt.helpers import system, pm
 
 
 # ######################################
@@ -67,17 +67,14 @@ def xml_setif(elt, k, tag=None):
 
 def handle_job_deps(deps_node, pkg_prefix):
     deps = list()
-    command = ""
     if 'depends_on' in deps_node:
-        for name, values in deps_node.items():
+        for name, values in deps_node['depends_on'].items():
             if name == 'test':
                 for d in values:
                     deps.append(d if '.' in d else ".".join([pkg_prefix, d]))
-            elif name == 'spack':
-                pass
-            elif name == 'module':
-                pass
-    return (deps, command)
+            else:
+                deps += [d for d in pm.identify_manager({name: values})]
+    return deps
 
 first = True
 runtime_filter = None
