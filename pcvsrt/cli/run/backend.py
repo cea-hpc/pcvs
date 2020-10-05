@@ -62,7 +62,7 @@ def __build_jchronoss():
             command, shell=True,
             stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     except CalledProcessError:
-        log.err("Failed to build JCHRONOSS:", abort=1)
+        log.err("Failed to build JCHRONOSS:")
 
     io.create_or_clean_path(exec_prefix)
 
@@ -92,7 +92,7 @@ def prepare(run_settings):
     # if a previous build exists
     if os.path.isdir(buildir):
         if not valcfg.override:
-            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(valcfg.output), abort=1)
+            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(valcfg.output))
         else:
             log.print_item("Cleaning up {}".format(buildir), depth=2)
             io.create_or_clean_path(buildir)
@@ -162,7 +162,7 @@ def process():
         log.err("Issues while loading benchmarks:")
         for elt in errors:
             log.err("  - {}:  {}".format(elt[0], elt[1]))
-        log.err("", abort=1)
+        log.err("")
 
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
@@ -253,7 +253,7 @@ def process_static_yaml_files(yaml_files):
                 err += [(f, e)]
                 continue
             except Exception as e:
-                log.err("Failed to read the file {}: ".format(f), "{}".format(e), abort=1)
+                log.err("Failed to read the file {}: ".format(f), "{}".format(e))
             
             tf.start_process()
             system.get('validation').xmls.append(tf.flush_to_disk())
@@ -303,7 +303,7 @@ def run():
         #raise subprocess.CalledProcessError()
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError:
-        log.err("JCHRONOSS returned non-zero exit code!", abort=1)
+        log.err("JCHRONOSS returned non-zero exit code!")
 
 
 def anonymize_archive():
@@ -402,4 +402,4 @@ def terminate():
             log.info('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(cmd)
         except CalledProcessError as e:
-            log.err("Fail to create an archive:", "{}".format(e), abort=1)
+            log.err("Fail to create an archive:", "{}".format(e))

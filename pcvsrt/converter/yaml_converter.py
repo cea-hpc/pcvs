@@ -245,10 +245,8 @@ def print_version(ctx, param, value) -> None:
               help="Print the stdout nothing but the converted data")
 @click.argument("input_file", type=click.Path(exists=True, dir_okay=False,
                                               readable=True, allow_dash=True))
-@click.option("-F", "--fancy", "enrich_exp", default=False, is_flag=True,
-              help="Visually enrich your PCVS experience :)")
 @click.pass_context
-def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, scheme, template, stdout) -> None:
+def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template, stdout) -> None:
     """
     Process the conversion from one YAML format to another.
     Conversion specifications are described by the SCHEME file.
@@ -256,15 +254,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
     # Click specific-related
     ctx.color = color
     kind = kind.lower()
-    log.init(verbose, encoding, enrich_exp)
-    log.enrich_print(
-        "Welcome to this PCVS-oriented YAML to YAML converter."
-        "The purpose of this script is to convert files from the old deprecated"
-        " syntax to the new one in a minimal effort. Please note that because"
-        " of the large flexibility allowed by the syntax, the conversion may"
-        " fail and a human proofreading is required to ensure correctness",
-        skippable=True
-    )
+    log.init(verbose, encoding, None)
     log.print_header("YAML Conversion")
 
     if template is None and kind == "te":
@@ -281,7 +271,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, enrich_exp, schem
             stream = open(template, 'r').read() + stream
         data_to_convert = yaml.load(stream, Loader=yaml.FullLoader)
     except yaml.composer.ComposerError as e:
-        log.err("Issue when parsing YAML: ", "{}".format(e), abort=1)
+        log.err("Issue when parsing YAML: ", "{}".format(e))
 
     # load the scheme
     if not scheme:

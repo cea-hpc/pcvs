@@ -39,7 +39,7 @@ def iterate_dirs(ctx, param, value) -> dict:
             log.err(
                 "Errors occured while parsing user directories:",
                 err_msg,
-                "please see '--help' for more information", abort=1)
+                "please see '--help' for more information")
 
     return list_of_dirs
 
@@ -106,7 +106,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         log.nimpl("Bootstrap")
         exit(0)
     elif pause and resume:
-        log.err("Cannot pause and resume the run at the same time!", abort=1)
+        log.err("Cannot pause and resume the run at the same time!")
     elif pause:
         log.nimpl("pause")
         exit(0)
@@ -143,7 +143,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     
     if not pf.is_found():
         log.err("Please use a valid profile name:",
-                "No '{}' found!".format(profilename), abort=1)
+                "No '{}' found!".format(profilename))
     else:
         pf.load_from_disk()
         

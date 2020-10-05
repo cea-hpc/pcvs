@@ -172,7 +172,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     pf = pvProfile.Profile(p_label, p_scope)
     if pf.is_found():
         log.err("A profile named '{}' already exist!".format(
-            pf.full_name), abort=1)
+            pf.full_name))
 
     pf_blocks = {}
 
@@ -199,7 +199,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
                     log.err(
                         "'{}' kind is set twice".format(b_kind.upper()),
                         "First is '{}'".format(pf_blocks[b_kind].full_name))
-                log.err("", abort=1)
+                log.err("")
         pf.fill(pf_blocks)
 
     log.print_header("profile view")
@@ -227,12 +227,12 @@ def profile_destroy(ctx, token):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            log.err("err", abort=1)
+            log.err("err")
         else:
             pf.delete()
     else:
         log.err("Profile '{}' not found!".format(label),
-                "Please check the 'list' command", abort=1)
+                "Please check the 'list' command")
 
 
 @profile.command(name="alter",
@@ -249,12 +249,12 @@ def profile_alter(ctx, token, editor):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            log.err("err", abort=1)
+            log.err("err")
         else:
             pf.open_editor(editor)
     else:
         log.err("Profile '{}' not found!".format(label),
-                "Please check the 'list' command", abort=1)
+                "Please check the 'list' command")
 
 
 @profile.command(name="update",
@@ -271,12 +271,12 @@ def profile_update(ctx, token, editor):
     log.nimpl()
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            log.err("err", abort=1)
+            log.err("err")
         else:
             pf.open_editor(editor)
     else:
         log.err("Profile '{}' not found!".format(label),
-                "Please check the 'list' command", abort=1)
+                "Please check the 'list' command")
 
 
 @profile.command(name="import",
@@ -293,7 +293,7 @@ def profile_import(ctx, token, src_file):
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
         pf.flush_to_disk()
     else:
-        log.err("Cannot import into an already created profile!", abort=1)
+        log.err("Cannot import into an already created profile!")
 
 @profile.command(name="export",
                  short_help="Export a profile to a file")

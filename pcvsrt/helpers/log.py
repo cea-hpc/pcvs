@@ -12,7 +12,6 @@ except ImportError:
 linelength = 93
 FORMAT = "%(levelname)s: %(message)s"
 wrapper = None
-enrich_display = False
 vb_array = {
     'normal': (0, logging.WARNING),
     'info': (1, logging.INFO),
@@ -75,22 +74,14 @@ def __set_encoding(e):
         glyphs['sep_h'] = "\u23BC"
 
 
-def init(verbose, encoding, length, enrich_exp=False):
-    global enrich_display, wrapper, linelength
+def init(verbose, encoding, length):
+    global wrapper, linelength
     __set_logger(verbose)
     __set_encoding(encoding)
 
     if length is not None:
         linelength = length if length > 0 else click.get_terminal_size()[0]
     wrapper = textwrap.TextWrapper(width=linelength)
-    if enrich_exp:
-        if not cowsay:
-            warn(
-                "Unable to enrich your experience without the following modules:",
-                " - cowsay"
-            )
-        else:
-            enrich_display = True
 
 
 def cl(s, color='reset', **args):
@@ -166,53 +157,31 @@ def warn(*msg):
             logging.warning(click.style(line, fg="yellow", bold=True))
 
 
-def err(*msg, abort=0):
-    global enrich_display
+def err(*msg, abort=1):
     for elt in msg:
         for line in elt.split('\n'):
             logging.error(click.style(line, fg="red", bold=True))
 
     if abort:
-        if enrich_display:
-            cowsay.tux(
-                "Im sorry but an unfortunate error forced me to stop this program"
-                "If I'm doing it wrong, feel free to yell at people who coded"
-                " me. Sorry for the inconvenience."
-                )
-        else:
-            logging.error(click.style(
+        logging.error(click.style(
                 "Fatal error(s) above. The program will now stop!",
                 fg="red", bold=True))
         sys.exit(abort)
 
 
 def nimpl(*msg):
-    global enrich_display
-    s = "'{}' not implemented yet! (WIP)".format(*msg)
-    if enrich_display:
-        cowsay.daemon(click.style(s, fg="yellow", bold=True))
-    else:
-        warn(s)
+    cowsay.daemon(click.style("'{}' not implemented yet! (WIP)".format(*msg),
+                  fg="yellow", bold=True))
+    err("")
 
 
 def nreach(*msg):
-    if enrich_display:
-        cowsay.tux(
-            "Uh oh, I reached this point but one ever told me I'll never go "
-            "that far! I'm afraid something really bad happened. Please send "
-            "help, I'm scared! Here are my coordinates: {}".format(*msg))
-    else:
-        err(click.style("{} should not be reached in any way! "
-            "Something went wrong".format(*msg), fg='red', bold=True))
-
-
-def enrich_print(*msg, skippable=False):
-    global enrich_display
-    if enrich_display:
-        cowsay.tux(*msg)
-    elif skippable is False:
-        click.secho(*msg)
-
+    cowsay.tux("""
+    Uh oh, I reached this point but one ever told me I'll never go 
+    that far! I'm afraid something really bad happened. Please send 
+    help, I'm scared! Here are my coordinates: {}
+    """.format(*msg))
+    
 
 def print_n_stop(**kwargs):
     for k, v in kwargs.items():

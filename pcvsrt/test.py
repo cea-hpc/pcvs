@@ -13,29 +13,38 @@ from pcvsrt.criterion import Criterion, Serie
 
 
 def __load_yaml_file_legacy(f):
-    # barely legal to do that...
+    """Legacy version to load a YAML file.
+
+    This function intends to be backward-compatible with old YAML syntax
+    by relying on external converter (not perfect).
+    """
+    # Special case: a 'dummy' group file is required to resolve old 'herit's
     old_group_file = os.path.join(io.ROOTPATH, "templates/group-compat.yml")
-    cmd = "pcvs_convert {} --stdout -k te -t {} 2>/dev/null".format(f, old_group_file)
-    out = subprocess.check_output(cmd, shell=True)
+
+    out = subprocess.check_output(
+        "pcvs_convert {} --stdout -k te -t {}".format(f, old_group_file),
+        stderr=subprocess.DEVNULL,
+        shell=True)
     return out.decode('utf-8')
 
 
-def load_yaml_file(f, s, b, p):
+def load_yaml_file(f, source, build, prefix):
+    """Load a YAML test description file."""
     convert = False
     obj = {}
     try:
         with open(f, 'r') as fh:
             stream = fh.read()
-            stream = replace_yaml_token(stream, s, b, p)
+            stream = replace_yaml_token(stream, source, build, prefix)
             obj = yaml.load(stream, Loader=yaml.FullLoader)
 
         # TODO: Validate input & raise YAMLError if invalid
         #raise yaml.YAMLError("TODO: write validation")
     except yaml.YAMLError:
-        log.err("Yolo")
+        log.err("Yolo", abort=False)
         convert = True
     except Exception as e:
-        log.err("Err loading the YAML file {}:".format(f), "{}".format(e), abort=1)
+        log.err("Err loading the YAML file {}:".format(f), "{}".format(e))
 
     if convert:
         log.debug("Attempt to use legacy syntax for {}".format(f))
@@ -232,7 +241,7 @@ class TEDescriptor:
         if not isinstance(node, dict):
             log.err(
                 "Unable to build a TestDescriptor "
-                "from the given node (got {})".format(type(node)), abort=1)
+                "from the given node (got {})".format(type(node)))
         self._te_name = name
         self._skipped = name.startswith('.')
         self._te_label = node.get('label', self._te_name)

@@ -42,7 +42,7 @@ def bank_create(ctx, name, path, force):
 
     b = pvBank.Bank(name, path)
     if b.exists() and not force:
-        log.err("'{}' already exist, use '-f' to overwrite".format(name), abort=1)
+        log.err("'{}' already exist, use '-f' to overwrite".format(name))
     else:
         b.save()
         pvBank.flush_to_disk()
@@ -62,7 +62,7 @@ def bank_destroy(ctx, name, force):
 
     b = pvBank.Bank(name, path)
     if b.exists() and not force:
-        log.err("'{}' already exist, use '-f' to overwrite".format(name), abort=1)
+        log.err("'{}' already exist, use '-f' to overwrite".format(name))
     else:
         b.save()
         pvBank.flush_to_disk()
@@ -77,7 +77,7 @@ def bank_push_content(ctx, name, attr, obj):
     bank = pvBank.Bank(name)
     if not bank.exists():
         log.err("Unable to push content to a non-existent bank.",
-                "Please use the 'create' command first.", abort=1)
+                "Please use the 'create' command first.")
     else:
         bank.save(attr, obj)
 
@@ -90,6 +90,6 @@ def bank_push_content(ctx, name, attr):
     bank = pvBank.Bank(name)
     if not bank.exists():
         log.err("Unable to push content to a non-existent bank.",
-                "Please use the 'create' command first.", abort=1)
+                "Please use the 'create' command first.")
     else:
         bank.load(attr)

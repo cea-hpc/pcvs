@@ -129,7 +129,7 @@ def config_show(ctx, token) -> None:
         sc = scope
         sc = "any" if sc is None else sc
         log.err("No '{}' configuration found at {} level!".format(
-            label, sc), abort=1)
+            label, sc))
 
 
 @config.command(name="create", short_help="Create/Clone a configuration block")
@@ -171,7 +171,7 @@ def config_create(ctx, token, clone) -> None:
         copy.flush_to_disk()
     else:
         log.err("Configuration '{}' already exists!".format(
-            copy.full_name), abort=1)
+            copy.full_name))
 
 
 @config.command(name="destroy", short_help="Remove a config block")
@@ -196,7 +196,7 @@ def config_destroy(ctx, token) -> None:
         c.delete()
     else:
         log.err("Configuration '{}' not found!".format(label),
-                "Please check the 'list' command", abort=1)
+                "Please check the 'list' command")
 
 
 @config.command(name="edit", short_help="edit the config block")
@@ -221,7 +221,7 @@ def config_edit(ctx, token, editor) -> None:
         block.open_editor(editor)
         block.flush_to_disk()
     else:
-        log.err("Cannot open this configuration: does not exist!", abort=1)
+        log.err("Cannot open this configuration: does not exist!")
 
 
 @config.command(name="import", short_help="Import config from a file")
@@ -244,7 +244,7 @@ def config_import(ctx, token, in_file) -> None:
         obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
         obj.flush_to_disk()
     else:
-        log.err("Cannot import into an already created conf. block!", abort=1)
+        log.err("Cannot import into an already created conf. block!")
 
 
 @config.command(name="export", short_help="Export config into a file")
@@ -265,4 +265,4 @@ def config_export(ctx, token, out_file):
     if obj.is_found():
         out_file.write(yaml.dump(obj.dump()))
     else:
-        log.err("Failed to export '{}': not found!".format(token), abort=1)
+        log.err("Failed to export '{}': not found!".format(token))

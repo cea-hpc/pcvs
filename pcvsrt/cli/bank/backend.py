@@ -28,7 +28,7 @@ def flush_to_disk():
         with open(BANK_STORAGE, 'w') as f:
             yaml.dump(BANKS, f)
     except IOError as e:
-        log.err("Failure while saving the banks.yml", '{}'.format(e), abort=1)
+        log.err("Failure while saving the banks.yml", '{}'.format(e))
 
 
 class Bank:

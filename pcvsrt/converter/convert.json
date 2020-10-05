@@ -75,5 +75,5 @@
 	"te.<name>.accl": "<name>.build.variants+accl",
 	"te.<name>.openmp": "<name>.build.variants+openmp",
 
-	"te.<name>.<te_it>": "<name>.run.iterate.<te_it>"
+	"te.<name>.<te_it>": "<name>.run.iterate.<te_it>.values"
 }

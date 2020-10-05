@@ -83,7 +83,7 @@ def open_in_editor(*paths, e=None):
     editor = e if e is not None else os.environ['EDITOR']
     if shutil.which(editor) is None:
         log.err("'{}' is not a valid editor.".format(editor),
-                "Please see the '-e' option!", abort=1)
+                "Please see the '-e' option!")
     cmd = [
         editor
     ] + list(filter(None, paths))

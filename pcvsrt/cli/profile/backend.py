@@ -14,7 +14,7 @@ PROFILE_EXISTING = dict()
 def extract_profile_from_token(s, single="right"):
     array = s.split(".")
     if len(array) > 2:
-        log.err("Invalid token", abort=1)
+        log.err("Invalid token")
     elif len(array) == 2:
         return (array[0], array[1])
     elif len(array) == 1:
@@ -85,7 +85,7 @@ class Profile:
         if len(check) != len(config.CONFIG_BLOCKS):
             log.err(
                 "All {} configuration blocks are required to build "
-                "a valid profile!".format(len(config.CONFIG_BLOCKS)), abort=1)
+                "a valid profile!".format(len(config.CONFIG_BLOCKS)))
 
         # fill is called either from 'build' (dict of configurationBlock)
         # of from 'clone' (dict of raw file inputs)
@@ -112,7 +112,7 @@ class Profile:
 
     def load_from_disk(self):
         if self._file is None or not os.path.isfile(self._file):
-            log.err("Invalid profile name {}".format(self._name), abort=1)
+            log.err("Invalid profile name {}".format(self._name))
 
         log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:

@@ -57,10 +57,8 @@ def print_version(ctx, param, value):
               is_flag=True, help="Display current version")
 @click.option("-w", "--width", "width", type=int, default=None,
               help="Terminal width (autodetection if omitted")
-@click.option("-F", "--fancy", "enrich_exp", default=False, is_flag=True,
-              help="Visually enrich your PCVS experience :)")
 @click.pass_context
-def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
+def cli(ctx, verbose, color, encoding, exec_path, width):
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
@@ -72,7 +70,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width, enrich_exp):
 
     if width is None:
         width = click.get_terminal_size()[0]
-    log.init(verbose, encoding, width, enrich_exp)
+    log.init(verbose, encoding, width)
     io.set_local_path(ctx.obj['exec'])
 
     # detections

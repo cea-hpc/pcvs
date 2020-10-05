@@ -22,7 +22,7 @@ CONFIG_EXISTING = dict()
 def extract_config_from_token(s, pair="right", single="right"):
     array = s.split(".")
     if len(array) > 3:
-        log.err("Invalid token", abort=1)
+        log.err("Invalid token")
     elif len(array) == 3:
         return (array[0], array[1], array[2])
     elif len(array) == 2:
@@ -124,7 +124,7 @@ class ConfigurationScheme:
             try:
                 jsonschema.validate(instance=conf._details, schema=schema)
             except jsonschema.ValidationError as e:
-                log.err("Invalid format for 'compiler:", "{}".format(e), abort=1)
+                log.err("Invalid format for 'compiler:", "{}".format(e))
 
 
 class ConfigurationBlock:
@@ -172,7 +172,7 @@ class ConfigurationBlock:
 
         if self._file is None or not os.path.isfile(self._file):
             log.err("Invalid name {} for KIND '{}'".format(
-                self._name, self._kind), abort=1)
+                self._name, self._kind))
 
         log.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
