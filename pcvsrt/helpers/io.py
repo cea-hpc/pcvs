@@ -36,7 +36,6 @@ def create_or_clean_path(prefix, is_dir=True):
         if os.path.isfile(prefix): os.remove(prefix)
 
 
-
 def set_local_path(path):
     assert (os.path.isdir(path))
     found = __determine_local_prefix(path, ".pcvsrt")

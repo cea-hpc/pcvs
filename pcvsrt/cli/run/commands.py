@@ -57,9 +57,9 @@ def iterate_dirs(ctx, param, value) -> dict:
 @click.option("-s", '--validation', "validation_file",
               default=None, show_envvar=True, type=str,
               help="Validation settings file")
-#@click.option("-l", "--tee", "log", show_envvar=True,
-#              default=False, is_flag=True,
-#              help="Log the whole stdout/stderr")
+@click.option("-l", "--tee", "tee", show_envvar=True,
+              default=False, is_flag=True,
+              help="Log the whole stdout/stderr")
 @click.option("-d", "--detach", "detach",
               default=True, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously")
@@ -79,8 +79,8 @@ def iterate_dirs(ctx, param, value) -> dict:
               default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
 @click.option("-d", "--dry-run", "simulated",
-             default=None, is_flag=True,
-             help="Reproduce the whole process without actually running tests")
+              default=None, is_flag=True,
+              help="Reproduce the whole process without actually running tests")
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,
               help="Purge final archive from sensitive data (HOME, USER...)")
@@ -91,8 +91,8 @@ def iterate_dirs(ctx, param, value) -> dict:
                 type=str, callback=iterate_dirs)
 @click.pass_context
 def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
-            override, anon, validation_file, simulated, export,
-            set_default, dirs) -> None:
+        override, tee, anon, validation_file, simulated, export,
+        set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -120,6 +120,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         log.nimpl("set_defaults")
         #io.open_in_editor("defaults")
         exit(0)
+
 
     # fill validation run_setttings
     settings = system.Settings()
@@ -157,6 +158,10 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     settings.validation = cfg_val
 
     system.save_as_global(settings)
+
+    if tee:
+        log.init_tee(system.get('validation').output)
+
     log.banner()
     log.print_header("Prepare Environment")
     pvRun.prepare(settings)

@@ -3,6 +3,9 @@ import click
 import logging
 import pprint
 import textwrap
+import sys
+import os
+import subprocess
 
 try:
     import cowsay
@@ -54,6 +57,13 @@ def get_verbosity_str():
     for k, v in vb_array.items():
         if v[0] == verbosity:
             return k
+
+
+def init_tee(path):
+    t = subprocess.Popen(["tee", os.path.join(path, 'out.log')],
+                         stdin=subprocess.PIPE)
+    os.dup2(t.stdin.fileno(), sys.stdout.fileno())
+    os.dup2(t.stdin.fileno(), sys.stderr.fileno())
 
 
 def __set_encoding(e):
