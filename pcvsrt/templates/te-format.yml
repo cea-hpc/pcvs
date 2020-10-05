@@ -10,7 +10,8 @@
             # program binary (if needed)
             binary: "a.out"
         # dependency scheme
-        depends_on: ["this_is_another_test"]
+        depends_on:
+            test: ["this_is_another_test"]
         # extra cflags
         cflags: "extra cflags"
         # extra ldflags
@@ -41,12 +42,13 @@
         cwd: "dir/to/build"
         # dependency scheme
         depends_on:
-            test: ["this_is_another_run_test_in_the_same_file"]
+            test:
+                - "this_is_another_run_test_in_the_same_file"
             spack:
                 - protobuf@3.1.1
                 - gcc@7.3.0
                 - osu ^${COMPILER_SPACKED} %intel
-            modules:
+            module:
                 - protobuf
                 - gnu/gcc/7.3.0
         # extra env vars to export before running the job
@@ -54,11 +56,10 @@
             MY_VAR: 1000.0
             MY_OTHER_VAR: 2
 
-    artifacts:
+    artifact:
         # relative to $BUILDPATH
-        paths:
-            - "./path/1"
-            - "./path/2"
+        obj1: "./path/1"
+        obj2: "./path/2"
 
     # this is a copy/paste from pav2
     validate:

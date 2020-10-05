@@ -65,7 +65,7 @@
                             "type" : "object",
                             "patternProperties": {
                                 "^.*$": {
-                                    "oneOf": [
+                                    "OneOf": [
                                         {"type": "string"},
                                         {"type": "number"}
                                     ]
@@ -117,10 +117,11 @@
                     },
                     "additionalProperties": false
                 },
-                "artifacts": {
+                "artifact": {
                     "type": "object",
-                    "properties": {
-                        
+                    "patternProperties": {
+                        "^.*$": {"type": "string"}
+                        }
                     },
                     "additionalProperties": false
                 }
