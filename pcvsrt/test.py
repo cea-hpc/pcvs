@@ -198,16 +198,24 @@ class Test:
 
     def serialize_shell(self):
         pm_string = ""
+        env = ""
         if 'dep' in self._array:
-            pm_string = "{}\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
-            
+            pm_string = "\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
+        
+        if 'env' in self._array:
+            for e in self._array['env']:
+                env += "{}\n".format(e)
+                env += "export {}\n".format(e.split('=')[0])
+                
         return """
         "{name}")
             {pm_string}
+            {env}
             {cmd}
             ;;""".format(name=self._array['name'],
                          pm_string=pm_string,
-                         cmd=self._array['command']
+                         cmd=self._array['command'],
+                         env=env
                         )
 
 
@@ -406,22 +414,26 @@ class TEDescriptor:
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
-
+        te_env = ["{}='{}'".format(k, v) for k, v in self._run.environment.items()]
+        te_deps = lowtest.handle_job_deps(self._run, self._te_pkg)
+            
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
-            deps = lowtest.handle_job_deps(self._run, self._te_pkg)
+            deps = te_deps
             if self._build:
                 deps.append(self._full_name)
 
-            envs, args, params = comb.translate_to_command()
+            env, args, params = comb.translate_to_command()
+            env += te_env
+
             program = self._te_name
             if self._run.program:
                 program = self._run.program
             elif self._build.sources.binary:
                 program = self._build.sources.binary
 
+            
             command = [
-                " ".join(envs),
                 system.get('runtime').program,
                 " ".join(args),
                 os.path.join(self._buildir, program),
@@ -434,6 +446,7 @@ class TEDescriptor:
                 name="_".join([self._full_name, comb.translate_to_str()]),
                 command=" ".join(command),
                 dep=deps,
+                env=env,
                 time=self._validation.time.get("mean_time", None),
                 delta=self._validation.time.get("tolerance", None),
                 rc=self._validation.get("expect_exit", 0),

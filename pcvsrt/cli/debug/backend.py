@@ -13,4 +13,3 @@ def retrieve_test_script(testname):
         "/".join(prefix),
         "list_of_tests.sh"
     )
-    
