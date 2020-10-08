@@ -134,8 +134,7 @@ class TestFile:
                     fh_xml.write(test.serialize_xml())
                 fh_sh.write(
                     '   --list)\n'
-                    '       printf "Available tests to run:\\n"\n'
-                    '       printf " - {list_of_tests}"\n'
+                    '       printf "{list_of_tests}"\n'
                     '       ;;\n'
                     '   *)\n'
                     '       printf "Invalid test-name \'$arg\'\\n"\n'
@@ -245,10 +244,9 @@ class TEDescriptor:
         self._te_name = name
         self._skipped = name.startswith('.')
         self._te_label = node.get('label', self._te_name)
-        self._te_pkg = ".".join([label, subprefix.replace('/', '.')]) if subprefix else label
+        self._te_pkg = "/".join([label, subprefix]) if subprefix else label
         
         _, self._srcdir, _, self._buildir = io.generate_local_variables(label, subprefix)
-
         # before doint anything w/ node:
         # arregate the 'group' definitions with the TE
         # to get all the fields in their final form
@@ -259,7 +257,7 @@ class TEDescriptor:
             node = tmp
         self._build = Dict(node.get('build', None))
         self._run = Dict(node.get('run', None))
-
+        
         if 'program' in self._run.get('iterate', {}):
             self._program_criterion = {k: Criterion(k, v, local=True) for k, v in self._run.iterate.program.items()}
         else:
@@ -271,7 +269,7 @@ class TEDescriptor:
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
 
-        self._full_name = ".".join([self._te_pkg, self._te_name])
+        self._full_name = "/".join([self._te_pkg, self._te_name])
         
         self._configure_criterions()
         self._compatibility_support(node.get('_compat', None))
@@ -309,6 +307,10 @@ class TEDescriptor:
 
     def _configure_criterions(self):
         """Prepare the list of components this TE will be built against"""
+        if self._run is None:
+            # for now, criterion only applies to run tests
+            return
+
         # if this TE does not override anything: trivial
         if 'iterate' not in self._run:
             self._criterion = self._sys_crit
@@ -477,21 +479,37 @@ class TEDescriptor:
             yield from self.__construct_runtime_tests()
 
     def get_debug(self):
-        user_cnt = functools.reduce(operator.mul, [len(v.values) for v in self._program_criterion.values()])
-        real_cnt = functools.reduce(operator.mul, [len(v.values) for v in self._criterion.values()])
+        user_cnt = 1
+        real_cnt = 1
         self._debug_yaml = dict()
+
+        if self._skipped:
+            return {}
         
-        for k, v in self._criterion.items():   
-            self._debug_yaml[k] = list(v.values)
-        self._debug_yaml['program'] = dict()
-        for k, v in self._program_criterion.items():   
-            self._debug_yaml['program'][k] = list(v.values)
+        # count the compilation run
+        if self._build:
+            real_cnt = 1
+
+        if self._run:
+            for k, v in self._criterion.items():
+                self._debug_yaml[k] = list(v.values)
+                real_cnt *= len(v.values)
+            
+            self._debug_yaml['program'] = dict()
+            for k, v in self._program_criterion.items():   
+                self._debug_yaml['program'][k] = list(v.values)
+                user_cnt *= len(v.values)
+        
         self._debug_yaml['.stats'] = {
-                'theoric': user_cnt * real_cnt,
-                'program_factor': user_cnt,
-                'effective': self._effective_cnt
-        }
+            'theoric': user_cnt * real_cnt,
+            'program_factor': user_cnt,
+            'effective': self._effective_cnt
+            }
         return self._debug_yaml
+    
+    @property
+    def name(self):
+        return self._te_name
 
     def __repr__(self):
         """internal representation, for auto-dumping"""

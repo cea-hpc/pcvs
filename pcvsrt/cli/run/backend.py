@@ -199,10 +199,11 @@ def process_dyn_setup_scripts(setup_files):
     with open(os.path.join(system.get('validation').output, 'conf.env'), 'w') as fh:
         fh.write(__str_dict_as_envvar(env))
         fh.close()
-
+    
     log.print_item("Manage dynamic files (scripts)")
     with log.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
+            log.info("process {} ({})".format(subprefix, label))
             base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
             
             env['pcvs_src'] = base_src
@@ -212,15 +213,22 @@ def process_dyn_setup_scripts(setup_files):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
             try:
-                out = subprocess.check_output([f, subprefix], env=env,
-                                              stderr=subprocess.DEVNULL)
+                fds = subprocess.Popen([f, subprefix], env=env,
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+                fdout, fderr = fds.communicate()
+                if fds.returncode != 0:
+                    err.append((f, fderr.decode('utf-8')))
+                    log.err("{}: {}".format(f, fderr.decode('utf-8')))
+                    continue
                 out_file = os.path.join(cur_build, 'pcvs.yml')
+
                 with open(out_file, 'w') as fh:
-                    fh.write(out.decode('utf-8'))
+                    fh.write(fdout.decode('utf-8'))
                 te_node = test.load_yaml_file(out_file, base_src, base_build, subprefix)
             except CalledProcessError as e:
-                err += [(f, e)]
-                continue
+                pass
+    
             if te_node is None:  # empty file
                 continue
 
@@ -239,18 +247,19 @@ def process_static_yaml_files(yaml_files):
     log.print_item("Process static test files")
     with log.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
+            _, cur_src, _, cur_build = io.generate_local_variables(label, subprefix)
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
-            stream = ""
+
             try:
                 tf = TestFile(file_in=f,
                               path_out=cur_build,
                               label=label,
                               subprefix=subprefix)
             except (yaml.YAMLError, CalledProcessError) as e:
-                err += [(f, e)]
+                print(f, e)
+                err.append((f, e.output))
                 continue
             except Exception as e:
                 log.err("Failed to read the file {}: ".format(f), "{}".format(e))
