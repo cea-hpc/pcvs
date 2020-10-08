@@ -142,7 +142,7 @@ class TestFile:
                     '   esac\n'
                     'done\n'
                     'ret=$?\n'
-                    'exit $ret\n'.format(list_of_tests="\n - ".join([t.name for t in self._tests])))
+                    'exit $ret\n'.format(list_of_tests="\n".join([t.name for t in self._tests])))
                 fh_xml.write("</jobSuite>")
         return fn_xml
         
@@ -207,23 +207,34 @@ class Test:
     def serialize_shell(self):
         pm_string = ""
         env = ""
-        if 'dep' in self._array:
+        match_rules=""
+
+        if self._array['dep'] is not None:
             pm_string = "\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
         
-        if 'env' in self._array:
+        if self._array['env'] is not None:
             for e in self._array['env']:
                 env += "{}\n".format(e)
                 env += "export {}\n".format(e.split('=')[0])
-                
+            
+        if self._array['matchers'] is not None:
+            for k, v in self._array['matchers'].items():
+                expr = v['expr']
+                required = (v.get('expect', True) is True)
+                match_rules += "echo \"$output\" | grep -oP '{}' {}\n".format(expr, ' || exit 1' if required else "")
+
         return """
         "{name}")
-            {pm_string}
+            {pm}
             {env}
-            {cmd}
+            output=`{cmd} 2>&1`
+            echo "$output"
+            {match}
             ;;""".format(name=self._array['name'],
-                         pm_string=pm_string,
+                         pm=pm_string,
                          cmd=self._array['command'],
-                         env=env
+                         env=env,
+                         match=match_rules
                         )
 
 
@@ -409,7 +420,6 @@ class TEDescriptor:
             command = self.__build_from_sources()
 
         self._effective_cnt += 1
-
         yield Test(
             name=self._full_name,
             command=command,
@@ -420,17 +430,19 @@ class TEDescriptor:
             rc=self._validation.get("expect_exit", 0),
             resources=1,
             extras=None,
-            postscript=None
+            postscript=None,
+            env=None,
+            matchers=None
         )
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
         te_env = ["{}='{}'".format(k, v) for k, v in self._run.environment.items()]
         te_deps = lowtest.handle_job_deps(self._run, self._te_pkg)
-            
+        
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
-            deps = te_deps
+            deps = copy.deepcopy(te_deps)
             if self._build:
                 deps.append(self._full_name)
 
@@ -443,7 +455,6 @@ class TEDescriptor:
             elif self._build.sources.binary:
                 program = self._build.sources.binary
 
-            
             command = [
                 system.get('runtime').program,
                 " ".join(args),
@@ -464,7 +475,8 @@ class TEDescriptor:
                 resources=comb.get(self._base_it, 1),
                 extras=None,
                 postscript=self._validation.script.get('path', None),
-                build=None
+                build=None,
+                matchers=self._validation.get('match', None)
             )
 
     def construct_tests(self):

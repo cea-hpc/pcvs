@@ -55,7 +55,7 @@
         environment:
             MY_VAR: 1000.0
             MY_OTHER_VAR: 2
-
+    
     artifact:
         # relative to $BUILDPATH
         obj1: "./path/1"
@@ -69,7 +69,6 @@
             tolerance: 2.0
             kill_after: 20
         match:
-            controller: "./script.py"
             label:
                 expr: '^\d+(\.\d+) received$'
                 expect: true|false
