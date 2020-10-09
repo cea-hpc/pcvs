@@ -47,6 +47,7 @@ class CfgCompiler(CfgBase):
 
         if 'package_manager' in self:
             self.obj = pm.identify_manager(self.package_manager)
+            
 
 
 class CfgRuntime(CfgBase):
@@ -88,7 +89,7 @@ class CfgTemplate(CfgBase):
 class CfgValidation(CfgBase):
     def __init__(self, filename=None):
         if filename is None:
-            filename = os.path.join(os.environ['HOME'], ".pcvsrt/run.conf")
+            filename = os.path.join(os.environ['HOME'], ".pcvsrt/validation.yml")
         super().__init__(filename)
         
         # #### now set default value ####

@@ -18,9 +18,9 @@ def retrieve_test_script(testname, output=None):
         output = "./.pcvs/test_suite"
     # first one is directory name
     # last one is test name
-    prefix = testname.split('.')[:-1]
+    prefix = os.path.dirname(testname)
     return os.path.join(
         output,
-        "/".join(prefix),
+        prefix,
         "list_of_tests.sh"
     )

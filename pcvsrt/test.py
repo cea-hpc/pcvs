@@ -243,7 +243,7 @@ class TEDescriptor:
     @classmethod
     def init_system_wide(cls, base_criterion_name):
         """Initialize system-wide information (to shorten accesses)"""
-        cls._sys_crit = system.get('critobj').iterators
+        cls._sys_crit = system.get('criterion').obj.iterators
         cls._base_it = base_criterion_name
 
     def __init__(self, name, node, label, subprefix):

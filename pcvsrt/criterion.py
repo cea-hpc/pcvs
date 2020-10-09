@@ -309,10 +309,10 @@ def initialize_from_system():
 
     # register the new dict {criterion_name: Criterion object}
     # the criterion object gathers both information from runtime & criterion
-    system.get('critobj').iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
+    system.get('criterion').obj.iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
     
     # convert any sequence into valid range of integers for
     # numeric criterions
     log.print_item("Expand possible iterator expressions")
-    for criterion in system.get('critobj').iterators.values():
+    for criterion in system.get('crioterion').obj.iterators.values():
         criterion.expand_values()
