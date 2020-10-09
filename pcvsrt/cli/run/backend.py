@@ -356,7 +356,7 @@ def save_for_export(f, dest=None):
 
 
 def terminate():
-    archive_name = "pcvsrun_{}".format(datetime.now().strftime('%Y%m%d%H%M%S'))
+    archive_name = "pcvsrun_{}.tar.gz".format(datetime.now().strftime('%Y%m%d%H%M%S'))
     outdir = system.get('validation').output
 
     if shutil.which("xsltproc") is not None:
@@ -404,7 +404,7 @@ def terminate():
         cmd = [
             "tar",
             "czf",
-            "{0}.tar.gz".format(archive_name),
+            "{}".format(archive_name),
             "save_for_export"
         ]
         try:
@@ -412,3 +412,5 @@ def terminate():
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             log.err("Fail to create an archive:", "{}".format(e))
+    
+    return archive_name

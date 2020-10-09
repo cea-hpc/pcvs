@@ -44,7 +44,7 @@ class Bank:
         if bank_path is None and name in BANKS.keys():
             self._path = BANKS[self._name]
         else:
-            self._path = bank_path
+            self._path = str(bank_path)
         
         self._datafile = os.path.join(self._path, "data.yml")
         if os.path.isfile(self._datafile):
@@ -58,7 +58,6 @@ class Bank:
         if os.path.isfile(self._datafile):
             try:
                 with open(self._datafile, 'w') as fh:
-                    pprint.pprint(self._data)
                     yaml.dump(self._data.to_dict(), fh, default_flow_style=None)
             except yaml.YAMLError:
                 log.err("Error while saving bank data file")
@@ -116,8 +115,10 @@ class Bank:
         
         shutil.rmtree(os.path.join(self._path, k))
         self._data.pop(k)
+        self.flush()
     
     def show(self):
+        log.print_section('Path: {}'.format(self._path))
         for k, v in self._data.items():
             log.print_section("{}:".format(k))
             for val in v:

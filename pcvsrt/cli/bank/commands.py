@@ -109,3 +109,21 @@ def bank_load_content(ctx, name, attr, dest):
                 "Please use the 'create' command first.")
     else:
         bank.load(attr, dest)
+
+
+@bank.command(name="delete", short_help="delete an object from datastore")
+@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("attr", nargs=1, required=True)
+@click.confirmation_option(
+    "-f", "--force", "force",
+    prompt="Are your sure to delete repository and its content ?",
+    help="Do not ask for confirmation before deletion")
+@click.pass_context
+def bank_delete_content(ctx, name, attr):
+    bank = pvBank.Bank(name)
+    if not bank.exists():
+        log.err("Unable to modify content from a non-existent bank.",
+                "Please use the 'create' command first.")
+    else:
+        bank.delete(attr)
+        

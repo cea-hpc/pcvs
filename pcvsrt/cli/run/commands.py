@@ -3,6 +3,7 @@ import time
 import click
 import yaml
 import pprint
+from datetime import datetime
 
 from pcvsrt.helpers import io, log, system
 from pcvsrt.cli.run import backend as pvRun
@@ -121,7 +122,12 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         #io.open_in_editor("defaults")
         exit(0)
 
-
+    bank = None
+    if export is not None:
+        bank = pvBank.Bank(export)
+        if not bank.exists():
+            log.err('--export points to a non-existent bank')
+    
     # fill validation run_setttings
     settings = system.Settings()
 
@@ -175,4 +181,10 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     pvRun.run()
 
     log.print_header("Finalization")
-    pvRun.terminate()
+    archive = pvRun.terminate()
+
+    if bank is not None:
+        bank.save(
+            datetime.now().strftime('%Y-%m-%d'),
+            os.path.join(system.get('validation').output, archive)
+        )
