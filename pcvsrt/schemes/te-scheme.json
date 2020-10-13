@@ -1,17 +1,22 @@
 {
     "type": "object",
     "patternProperties": {
-        "^.*$": {
+        "^[^\\.].*$": {
             "type": "object",
             "properties": {
                 "group": { "type": "string"},
                 "build": {
                     "type": "object",
                     "properties": {
-                        "files": { "type": "string"},
+                        "files": {
+                            "OneOf": [
+                                {"type": "string"},
+                                {"type": "array", "items": { "type": "string"}}
+                            ]
+                        },
                         "depends_on": { 
                             "type": "object",
-                            "properties": {
+                            "patternProperties": {
                                 "^test$": { "type": "array", "items": { "type": "string"}},
                                 "^spack$": { "type": "array", "items": { "type": "string"}},
                                 "^module$": { "type": "array", "items": { "type": "string"}}
@@ -46,7 +51,7 @@
                         "cwd": { "type": "string"},
                         "depends_on": { 
                             "type": "object",
-                            "properties": {
+                            "patternProperties": {
                                 "^test$": { "type": "array", "items": { "type": "string"}},
                                 "^spack$": { "type": "array", "items": { "type": "string"}},
                                 "^module$": { "type": "array", "items": { "type": "string"}}
@@ -86,7 +91,14 @@
                                                     "option": { "type": "string"},
                                                     "numeric": { "type": "boolean"},
                                                     "type": { "type": "string", "enum": ["argument", "environment"]},
-                                                    "position": { "type": "string", "enum": ["before", "after"]}
+                                                    "position": { "type": "string", "enum": ["before", "after"]},
+                                                    "values": {
+                                                        "OneOf": [
+                                                            {"type": "array"},
+                                                            {"type": "number"},
+                                                            {"type": "null"}
+                                                        ]
+                                                    }
                                                 }
                                             }
                                         }
@@ -95,7 +107,13 @@
                                 "^.*$": {
                                     "type": "object",
                                     "properties": {
-                                        "values": {"type": "array"}
+                                        "values": {
+                                            "OneOf": [
+                                                {"type": "array"},
+                                                {"type": "number"},
+                                                {"type": "null"}
+                                            ]
+                                        }
                                     }
                                 }
                             },
@@ -107,6 +125,30 @@
                 "validate": {
                     "type": "object",
                     "properties": {
+                        "expect_exit": {"type": "integer"},
+                        "time": {
+                            "type": "object",
+                            "properties": {
+                                "mean_time": {"type": "number", "minimum": 0.0},
+                                "tolerance": {"type": "number", "minimum": 0.0},
+                                "kill_after": {"type": "number", "minimum": 0.0}
+                            },
+                            "additionalProperties": false
+                        },
+                        "match": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^.*$": {
+                                    "type": "object",
+                                    "properties": {
+                                        "expr": {"type": "string"},
+                                        "expect": {"type": "boolean"}
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
                         "script": {
                             "type": "object",
                             "properties": {
@@ -122,12 +164,10 @@
                     "patternProperties": {
                         "^.*$": {"type": "string"}
                         }
-                    },
-                    "additionalProperties": false
-                }
+                },
+                "additionalProperties": false
             },
             "additionalProperties": false
         }
-    },
-    "additionalProperties": false
+    }
 }

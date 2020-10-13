@@ -164,11 +164,12 @@ def config_create(ctx, token, clone) -> None:
     else:
         base = pvConfig.ConfigurationBlock(kind, 'default', None)
         base.load_template()
-
+        
     copy = pvConfig.ConfigurationBlock(kind, label, scope)
     if not copy.is_found():
         copy.clone(base)
         copy.flush_to_disk()
+        copy.open_editor()
     else:
         log.err("Configuration '{}' already exists!".format(
             copy.full_name))
@@ -219,7 +220,6 @@ def config_edit(ctx, token, editor) -> None:
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
         block.open_editor(editor)
-        block.flush_to_disk()
     else:
         log.err("Cannot open this configuration: does not exist!")
 

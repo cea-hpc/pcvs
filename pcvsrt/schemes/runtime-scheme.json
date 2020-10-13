@@ -3,7 +3,7 @@
     "properties": {
         "program" : { "type": "string"},
         "args": { "type": "string"},
-        "plugin": { "type": "string"},
+        "plugin": { "media": {"binaryEncoding": "base64"}},
         "iterators": {
             "type": "object",
             "patternProperties": {
@@ -33,6 +33,6 @@
             },
             "additionalProperties": false
         }
-    },
-    "required": [ "program", "iterators"]
+    }
+    
 }

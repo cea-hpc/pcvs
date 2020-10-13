@@ -1,5 +1,6 @@
 import os
 import copy
+import jsonschema
 import yaml
 import pprint
 import pathlib
@@ -8,7 +9,7 @@ import operator
 import subprocess
 from addict import Dict
 
-from pcvsrt.helpers import io, log, lowtest, system, pm
+from pcvsrt.helpers import io, log, lowtest, system, pm, validation
 from pcvsrt.criterion import Criterion, Serie
 
 
@@ -41,7 +42,6 @@ def load_yaml_file(f, source, build, prefix):
         # TODO: Validate input & raise YAMLError if invalid
         #raise yaml.YAMLError("TODO: write validation")
     except yaml.YAMLError:
-        log.err("Yolo", abort=False)
         convert = True
     except Exception as e:
         log.err("Err loading the YAML file {}:".format(f), "{}".format(e))
@@ -74,6 +74,7 @@ def replace_yaml_token(stream, src, build, prefix):
 class TestFile:
     cc_pm_string = ""
     rt_pm_string = ""
+    val_scheme = None
 
     def __init__(self, file_in, path_out, data=None, label=None, subprefix=None):
         self._in = file_in
@@ -83,21 +84,27 @@ class TestFile:
         self._prefix = subprefix
         self._tests = list()
         self._debug = dict()
+        if TestFile.val_scheme is None:
+            TestFile.val_scheme = validation.ValidationScheme('te')
         
-    def start_process(self):
+    def start_process(self, check=True):
         src, _, build, _ = io.generate_local_variables(self._label, self._prefix)
         
         if self._raw is None:
             self._raw = load_yaml_file(self._in, src, build, self._prefix)
-            
-        #self._raw = replace_yaml_token(self._raw, src, build, self._prefix)
+        
+        if check is True:
+            try:
+                TestFile.val_scheme.validate(self._raw)
+            except jsonschema.ValidationError as e:
+                self._debug['.yaml_errors'].append(e)
+
         for k, content, in self._raw.items():
             td = TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
             
             self._debug[k] = td.get_debug()
-
             self._tests += []
     
     def flush_xml_to_disk(self):
@@ -141,7 +148,6 @@ class TestFile:
                     '       exit 1\n'
                     '   esac\n'
                     'done\n'
-                    'ret=$?\n'
                     'exit $ret\n'.format(list_of_tests="\n".join([t.name for t in self._tests])))
                 fh_xml.write("</jobSuite>")
         return fn_xml
@@ -205,36 +211,38 @@ class Test:
         return string
 
     def serialize_shell(self):
-        pm_string = ""
-        env = ""
-        match_rules=""
+        prepare=""
+        finalize=""
 
         if self._array['dep'] is not None:
-            pm_string = "\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
+            prepare += "\n".join([elt.loadenv() for elt in self._array['dep'] if isinstance(elt, pm.PManager)])
         
         if self._array['env'] is not None:
             for e in self._array['env']:
-                env += "{}\n".format(e)
-                env += "export {}\n".format(e.split('=')[0])
+                prepare += "{}\n".format(e)
+                prepare += "export {}\n".format(e.split('=')[0])
             
         if self._array['matchers'] is not None:
             for k, v in self._array['matchers'].items():
                 expr = v['expr']
                 required = (v.get('expect', True) is True)
-                match_rules += "echo \"$output\" | grep -oP '{}' {}\n".format(expr, ' || exit 1' if required else "")
+                finalize += "echo \"$output\" | grep -oP '{}' {}\n".format(expr, ' || exit 1' if required else "")
+        
+        if self._array['chdir'] is not None:
+            prepare += "cd '{}'\n".format(self._array['chdir'])
+
 
         return """
         "{name}")
-            {pm}
-            {env}
+            {prepare}
             output=`{cmd} 2>&1`
+            ret=$?
             echo "$output"
-            {match}
+            {finalize}
             ;;""".format(name=self._array['name'],
-                         pm=pm_string,
+                         prepare=prepare,
                          cmd=self._array['command'],
-                         env=env,
-                         match=match_rules
+                         finalize=finalize
                         )
 
 
@@ -375,8 +383,6 @@ class TEDescriptor:
         # save it
         self._build.sources.binary = binary
 
-        if 'cwd' in self._build:
-            command.insert(0, "cd {} &&".format(self._build.cwd))
         
         return " ".join(command)
 
@@ -406,6 +412,7 @@ class TEDescriptor:
     def __construct_compil_tests(self):
         """Meta-function steering compilation tests"""
         deps = []
+        chdir = None
         
         # ensure consistency when 'files' node is used
         if not isinstance(self._build.files, list):
@@ -418,6 +425,10 @@ class TEDescriptor:
             command = self.__build_from_makefile()
         else:
             command = self.__build_from_sources()
+
+        if 'cwd' in self._build:
+            chdir = self._build.cwd
+        
 
         self._effective_cnt += 1
         yield Test(
@@ -432,7 +443,8 @@ class TEDescriptor:
             extras=None,
             postscript=None,
             env=None,
-            matchers=None
+            matchers=None,
+            chdir=chdir
         )
     
     def __construct_runtime_tests(self):
@@ -443,6 +455,7 @@ class TEDescriptor:
         # for each combination generated from the collection of criterions
         for comb in self.serie.generate():
             deps = copy.deepcopy(te_deps)
+            chdir = ""
             if self._build:
                 deps.append(self._full_name)
 
@@ -454,6 +467,9 @@ class TEDescriptor:
                 program = self._run.program
             elif self._build.sources.binary:
                 program = self._build.sources.binary
+            
+            if self._run.cwd:
+                chdir = self._run.cwd
 
             command = [
                 system.get('runtime').program,
@@ -476,6 +492,7 @@ class TEDescriptor:
                 extras=None,
                 postscript=self._validation.script.get('path', None),
                 build=None,
+                chdir=chdir,
                 matchers=self._validation.get('match', None)
             )
 

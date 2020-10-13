@@ -1,12 +1,21 @@
 ---
+# List of programs to be used to compile
+# a wide variety of programs
 commands:
+    # C compiler
     cc: "/path/to/cc"
+    # C++ compiler
     cxx: "/pat/to/cxx"
+    # Fortran compiler
     fc: "/path/to/fc"
-    # optional if fc is defined
+    # If a more-specific compiler is required:
     f77: "/path/to/f77"
     f90: "/path/to/f90"
 
+# Variants can add flavour to test requiring them.
+# For instance a test asking for the variant 'openmp'
+# will have its cflags extended with the content of 
+# openmp.args here
 variants:
     openmp:
         args: "-fopenmp"
@@ -17,6 +26,11 @@ variants:
     strict:
         args: "-Werror -Wall -Wextra"
 
+# Manage the compiler through a package manager
+# Before any test to be run, the PM is invoked to load
+# everything required.
+# Note, only a single can be specified but both can be used
+# at the same time
 package_manager:
     spack: "name@version+variants"
     module: "group/flavor/version"

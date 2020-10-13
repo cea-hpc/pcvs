@@ -6,7 +6,7 @@ import pprint
 import shutil
 import subprocess
 import tarfile
-from datetime import datetime
+from datetime import date, datetime
 from subprocess import CalledProcessError
 
 import yaml
@@ -84,6 +84,8 @@ def __build_tools():
 
 def prepare(run_settings):
     log.print_section("Prepare environment")
+    log.print_item("Date: {}".format(
+        system.get('validation').datetime.strftime("%c")))
     log.print_item("build configuration tree")
 
     valcfg = system.get('validation')
@@ -356,7 +358,8 @@ def save_for_export(f, dest=None):
 
 
 def terminate():
-    archive_name = "pcvsrun_{}.tar.gz".format(datetime.now().strftime('%Y%m%d%H%M%S'))
+    archive_name = "pcvsrun_{}.tar.gz".format(
+        system.get('validation').datetime.strftime('%Y%m%d%H%M%S'))
     outdir = system.get('validation').output
 
     if shutil.which("xsltproc") is not None:

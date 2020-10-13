@@ -1,19 +1,49 @@
 ---
+# program path to run any program (can be a name if in $PATH)
 program: "/path/to/command"
+# arguments to use with the program above
 args: "--verbose"
 
+# Declaration of criterion
+# Here is set any element to describe what an criterion iterator does
+# A criterion is small component a test is relying on to be validated
+# For instance, an MPI program has the following components:
+# - number of nodes to be executed on
+# - number of MPI ranks
+# - number of cores allocated for each MPI rank
+# - Type of network to enable inter process communication
+# A single test is a combination of one single value picked up from
+# these components.
 iterators:
+    # please use a short, without-space names
     iterator_name:
+        # option known by the runtime to handle a value of this component
         option: ""
+        # Is the sequence of values only number ?
         numeric: true
-        type: "argument|environment"
-        position: "before|after"
+        # two cases:
+        # - argument -> $PROGRAM $OPTION$VALUE ./a.out
+        # - environment -> $OPTION=$VALUE $PROGRAM ./a.out
+        type: "environment"
+        # should the value put before or after the option name ?
+        position: "before"
+        # value aliasing
+        # To make values uniform across any tests, a configuration may rename
+        # the value to the proper label for its runtime
+        # for instance, 'ib' is used by iterators, translating to 'openib'
+        # when using OpenMPI
         aliases:
             ib: "openib"
             tcp: "tcp"
             shmem: "sm"
             ptl: "portals"
 
+# Manage the runtime through a package manager
+# Before any test to be run, the PM is invoked to load
+# everything required.
+# Note, only a single can be specified but both can be used
+# at the same time
 package_manager:
+    # for Spack, the spec must refer to a single concretization
     spack: "name@version+variants"
     module: "group/flavor/version"

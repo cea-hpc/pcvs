@@ -1,0 +1,52 @@
+{
+    "type": "object",
+    "properties": {
+        "fail_on_error" : { "type": "boolean"},
+        "tee": { "type": "boolean"},
+        "verbose": { 
+            "OneOf": [
+                {"type": "boolean"},
+                {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                }
+            ]
+        },
+        "scheduling": {
+            "type": "object",
+            "properties": {
+                "model": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2
+                },
+                "sched_on": {"type": "string"}
+            },
+            "additionalProperties": false
+        },
+        "result": {
+            "type" : "object",
+            "properties": {
+                "log": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                },
+                "logsz": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "format": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["junit", "json", "yaml"]
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+    
+}

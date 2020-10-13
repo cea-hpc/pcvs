@@ -1,10 +1,39 @@
 ---
+# global validation settings
+# to keep CLI simple
+# this file is not a basic configuration block
+# and should be put into the ~/.pcvsrt/validation.yml
+# to be automatically loaded
+
+# does pcvs return a non-zero exit code if at least a test failed
 fail_on_error: true
+# Use 'tee' to keep the output into a file
 tee: true
-verbose: true
+# enable verbose (can be true, false, 0, 1, 2, 3)
+verbose: 0
+# how to schedule jobs (JCHRONoSS-specific)
 scheduling:
+    # type of scheduling:
+    # 0: 1 test, 1 run, 1 allocation
+    # 1: 1 allocation size (ex: 2 nodes), N similar tests
+    # 2: 1 allocation, NxM arbitrary tests
+    # in case of doubt, use '0'
     model: 2
+    # which criterion is used as a pattern to schedule jobs
     sched_on: "n_node"
+
+# Hob result should be produced
 result:
+    # How much of job stdout/stderr to keep ?
+    # 0 : nothing
+    # 1: Only succeeded tests
+    # 2: Only failed tests
+    # 3: Everything
     log: 2
-    format: ["junit", "json"] 
+    # (Max) number of bytes to keep from stdout for each test:
+    logsz: 1024
+    # Type of result to produce:
+    # "junit": JUni-based XML
+    # "json": JSON format
+    # "yaml"
+    format: ["junit", "json"]

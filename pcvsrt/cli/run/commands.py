@@ -59,7 +59,7 @@ def iterate_dirs(ctx, param, value) -> dict:
               default=None, show_envvar=True, type=str,
               help="Validation settings file")
 @click.option("-l", "--tee", "tee", show_envvar=True,
-              default=False, is_flag=True,
+              default=None, is_flag=True,
               help="Log the whole stdout/stderr")
 @click.option("-d", "--detach", "detach",
               default=True, is_flag=True, show_envvar=True,
@@ -132,7 +132,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     settings = system.Settings()
 
     cfg_val = system.CfgValidation(validation_file)
-
+    cfg_val.override('datetime', datetime.now())
     cfg_val.override('verbose', ctx.obj['verbose'])
     cfg_val.override('color', ctx.obj['color'])
     cfg_val.override('output', output)
@@ -142,6 +142,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     cfg_val.override('simulated', simulated)
     cfg_val.override('anonymize', anon)
     cfg_val.override('exported_to', export)
+    cfg_val.override('tee', tee)
 
     (scope, label) = pvProfile.extract_profile_from_token(profilename)
     
@@ -165,7 +166,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
 
     system.save_as_global(settings)
 
-    if tee:
+    if system.get('validation').tee:
         log.init_tee(system.get('validation').output)
 
     log.banner()
@@ -185,6 +186,6 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
 
     if bank is not None:
         bank.save(
-            datetime.now().strftime('%Y-%m-%d'),
+            system.get('validation').datetime.strftime('%Y-%m-%d'),
             os.path.join(system.get('validation').output, archive)
         )

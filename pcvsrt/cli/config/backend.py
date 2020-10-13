@@ -1,16 +1,12 @@
 import base64
-from base64 import b64encode
 import glob
-import json
 import os
-
-import jsonschema
+import pprint
 import yaml
 import tempfile
-import shutil
 
 import pcvsrt
-from pcvsrt.helpers import io, log
+from pcvsrt.helpers import io, log, validation
 from pcvsrt.helpers.system import sysTable
 
 
@@ -107,26 +103,6 @@ def compute_path(kind, name, scope):
     return os.path.join(CONFIG_STORAGES[scope], kind, name + ".yml")
 
 
-class ConfigurationScheme:
-
-    def __init__(self, kind):
-        pass
-
-    def validate(self, conf):
-
-        assert (isinstance(conf, ConfigurationBlock))
-
-        with open(os.path.join(
-                pcvsrt.ROOTPATH,
-                'schemes/{}-scheme.json'.format(conf._kind)), 'r') as fh:
-            log.warn("VAL. Scheme for KIND '{}'".format(conf._kind))
-            schema = json.load(fh)
-            try:
-                jsonschema.validate(instance=conf._details, schema=schema)
-            except jsonschema.ValidationError as e:
-                log.err("Invalid format for 'compiler:", "{}".format(e))
-
-
 class ConfigurationBlock:
     _template_path = os.path.join(io.ROOTPATH, "share/templates")
 
@@ -165,8 +141,7 @@ class ConfigurationBlock:
         return self._details
 
     def check(self):
-        val = ConfigurationScheme(self._kind)
-        val.validate(self)
+        validation.ValidationScheme(self._kind).validate(self._details)
 
     def load_from_disk(self):
 
@@ -188,7 +163,9 @@ class ConfigurationBlock:
 
     def flush_to_disk(self):
         self._file = compute_path(self._kind, self._name, self._scope)
-
+        
+        self.check()
+        
         log.info("flush {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
 
@@ -197,10 +174,8 @@ class ConfigurationBlock:
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
 
+        
         with open(self._file, 'w') as f:
-            val = ConfigurationScheme(self._kind)
-            val.validate(self)
-
             yaml.safe_dump(self._details, f)
 
     def clone(self, clone):
@@ -231,8 +206,10 @@ class ConfigurationBlock:
 
     def open_editor(self, e=None):
         assert (self._file is not None)
-        assert (os.path.isfile(self._file))
-
+        
+        if not os.path.exists(self._file):
+            return
+        
         fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
         fplugin = None
         if self._kind == 'runtime':
@@ -256,29 +233,31 @@ def check_valid_combination(dict_of_combinations=dict()):
                 fplugin.write(content)
                 fplugin.flush()
         try:
-            io.open_in_editor(fname.name, fplugin.name if fplugin else None, e=e)
+            io.open_in_editor(fname.name,
+                              fplugin.name if fplugin else None,
+                              e=e)
         except:
             log.warn("Issue with opening the conf. block. Stop!")
             return
-        
+       
         #now, dump back temp file to the original saves
-        with open(self._file, 'w') as f:
+        try:
             fname.seek(0)
-            stream = yaml.load(fname, Loader=yaml.FullLoader)
-            if stream is None:
-                stream = dict()
+            self._details = dict(yaml.load(fname, Loader=yaml.FullLoader))
+        except yaml.YAMLError as e:
+            log.err("Failure when editing conf. block:", '{}'.format(e))
+        except TypeError:
+            self._details = dict()
 
-            if fplugin:
-                fplugin.seek(0)
-                stream_plugin = fplugin.read()
-                if len(stream_plugin) > 0:
-                    stream['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
-            yaml.dump(stream, f)
+        if fplugin:
+            fplugin.seek(0)
+            stream_plugin = fplugin.read()
+            if len(stream_plugin) > 0:
+                self._details['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
 
         # delete temp files (replace by 'with...' ?)
         fname.close()
         if fplugin:
             fplugin.close()
         
-        self.load_from_disk()
-        self.check()
+        self.flush_to_disk()

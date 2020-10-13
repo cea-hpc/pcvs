@@ -2,7 +2,9 @@ from addict import Dict
 import os
 import yaml
 import pprint
-from pcvsrt.helpers import log, pm
+
+from pcvsrt.helpers import log, pm, validation
+
 
 class CfgBase(Dict):
    
@@ -13,14 +15,15 @@ class CfgBase(Dict):
             try:
                 with open(param, 'r') as fh:
                     preset = yaml.load(fh, Loader=yaml.FullLoader)
+
             except (IOError, yaml.YAMLError):
-                pass
+                log.err("Error(s) found while load (}".format(param))
         else:
             preset = param
-        
+
         for n in preset:
             self.__setitem__(n, preset[n])
-        
+
     def __setitem__(self, param, value):
         if isinstance(value, dict):
             value = Dict(value)
@@ -44,16 +47,13 @@ class CfgBase(Dict):
 class CfgCompiler(CfgBase):
     def __init__(self, node):
         super().__init__(node)
-
         if 'package_manager' in self:
             self.obj = pm.identify_manager(self.package_manager)
-            
 
 
 class CfgRuntime(CfgBase):
     def __init__(self, node):
         super().__init__(node)
-        
         if 'package_manager' in self:
             self.obj = pm.identify_manager(self.package_manager)
 
@@ -61,7 +61,6 @@ class CfgRuntime(CfgBase):
 class CfgMachine(CfgBase):
     def __init__(self, node):
         super().__init__(node)
-        
         #now, sanity checks
         self.set_ifnot('nodes', 1)
         self.set_ifnot('cores_per_node', 1)
@@ -91,7 +90,9 @@ class CfgValidation(CfgBase):
         if filename is None:
             filename = os.path.join(os.environ['HOME'], ".pcvsrt/validation.yml")
         super().__init__(filename)
-        
+
+        validation.ValidationScheme('settings').validate(self)
+
         # #### now set default value ####
         self.set_ifnot('verbose', 0)
         self.set_ifnot('color', True)
