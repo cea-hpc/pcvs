@@ -1,0 +1,76 @@
+---
+type: object
+properties:
+  default:
+    type: string
+  nodes:
+    type: integer
+  cores_per_node:
+    type: integer
+  batch_mintime:
+    type: integer
+  batch_maxtime:
+    type: integer
+  concurrent_run:
+    type: integer
+  command:
+    type: object
+    properties:
+      alloc:
+        type: string
+      run:
+        type: string
+    additionalProperties: false
+  wrapper:
+    type: object
+    properties:
+      alloc:
+        type: string
+      run:
+        type: string
+    additionalProperties: false
+  partitions:
+    type: array
+    items:
+      type: object
+      patternProperties:
+        "^.*$":
+          type: object
+          properties:
+            nodes:
+              type: integer
+            cores_per_node:
+              type: integer
+            batch_mintime:
+              type: integer
+            batch_maxtime:
+              type: integer
+            concurrent_run:
+              type: integer
+            command:
+              type: object
+              properties:
+                alloc:
+                  type: string
+                run:
+                  type: string
+              additionalProperties: false
+            wrapper:
+              type: object
+              properties:
+                alloc:
+                  type: string
+                run:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+      additionalProperties: false
+  package_manager:
+    type: object
+    properties:
+      spack:
+        type: string
+      module:
+        type: string
+    additionalProperties: false
+additionalProperties: false

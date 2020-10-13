@@ -1,0 +1,181 @@
+type: object
+patternProperties:
+  "^[^\\.].*$":
+    type: object
+    properties:
+      group:
+        type: string
+      build:
+        type: object
+        properties:
+          files:
+            OneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          depends_on:
+            type: object
+            patternProperties:
+              "^test$":
+                type: array
+                items:
+                  type: string
+              "^spack$":
+                type: array
+                items:
+                  type: string
+              "^module$":
+                type: array
+                items:
+                  type: string
+            additionalProperties: false
+          cflags:
+            type: string
+          ldflags:
+            type: string
+          cwd:
+            type: string
+          variants:
+            type: array
+            items:
+              type: string
+          make:
+            type: object
+            properties:
+              target:
+                type: string
+            additionalProperties: false
+          sources:
+            type: object
+            properties:
+              binary:
+                type: string
+            additionalProperties: false
+        additionalProperties: false
+      run:
+        type: object
+        properties:
+          program:
+            type: string
+          cwd:
+            type: string
+          depends_on:
+            type: object
+            patternProperties:
+              "^test$":
+                type: array
+                items:
+                  type: string
+              "^spack$":
+                type: array
+                items:
+                  type: string
+              "^module$":
+                type: array
+                items:
+                  type: string
+            additionalProperties: false
+          package_manager:
+            type: object
+            properties:
+              spack:
+                type: array
+                items:
+                  type: string
+              module:
+                type: array
+                items:
+                  type: string
+            additionalProperties: false
+          environment:
+            type: object
+            patternProperties:
+              "^.*$":
+                OneOf:
+                - type: string
+                - type: number
+            additionalProperties: false
+          iterate:
+            type: object
+            patternProperties:
+              program:
+                type: object
+                properties:
+                  patternProperties:
+                    "^.*$":
+                      type: object
+                      properties:
+                        option:
+                          type: string
+                        numeric:
+                          type: boolean
+                        type:
+                          type: string
+                          enum:
+                          - argument
+                          - environment
+                        position:
+                          type: string
+                          enum:
+                          - before
+                          - after
+                        values:
+                          OneOf:
+                          - type: array
+                          - type: number
+                          - type: 'null'
+              "^.*$":
+                type: object
+                properties:
+                  values:
+                    OneOf:
+                    - type: array
+                    - type: number
+                    - type: 'null'
+            additionalProperties: false
+        additionalProperties: false
+      validate:
+        type: object
+        properties:
+          expect_exit:
+            type: integer
+          time:
+            type: object
+            properties:
+              mean_time:
+                type: number
+                minimum: 0
+              tolerance:
+                type: number
+                minimum: 0
+              kill_after:
+                type: number
+                minimum: 0
+            additionalProperties: false
+          match:
+            type: object
+            patternProperties:
+              "^.*$":
+                type: object
+                properties:
+                  expr:
+                    type: string
+                  expect:
+                    type: boolean
+                additionalProperties: false
+            additionalProperties: false
+          script:
+            type: object
+            properties:
+              path:
+                type: string
+            additionalProperties: false
+        additionalProperties: false
+      artifact:
+        type: object
+        patternProperties:
+          "^.*$":
+            type: string
+      additionalProperties: false
+    additionalProperties: false

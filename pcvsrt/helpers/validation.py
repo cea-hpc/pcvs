@@ -1,9 +1,9 @@
 import jsonschema
 import os
-import json
+import yaml
 
 import pcvsrt
-from pcvsrt.helpers import io, log
+from pcvsrt.helpers import log
 
 
 class ValidationScheme:
@@ -14,10 +14,10 @@ class ValidationScheme:
     def validate(self, content, fail_on_error=True):
         with open(os.path.join(
                 pcvsrt.ROOTPATH,
-                'schemes/{}-scheme.json'.format(self._prefix)
+                'schemes/{}-scheme.yml'.format(self._prefix)
         ), 'r') as fh:
             try:
-                schema = json.load(fh)
+                schema = yaml.load(fh, Loader=yaml.FullLoader)
                 jsonschema.validate(instance=content, schema=schema)
             except jsonschema.ValidationError as e:
                 if fail_on_error:

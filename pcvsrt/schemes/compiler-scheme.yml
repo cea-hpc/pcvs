@@ -1,0 +1,34 @@
+type: object
+properties:
+  commands:
+    type: object
+    properties:
+      cc:
+        type: string
+      cxx:
+        type: string
+      fc:
+        type: string
+      f77:
+        type: string
+      f90:
+        type: string
+    additionalProperties: false
+  variants:
+    type: object
+    patternProperties:
+      "^.*$":
+        type: object
+        properties:
+          args:
+            type: string
+    additionalProperties: false
+  package_manager:
+    type: object
+    properties:
+      spack:
+        type: string
+      module:
+        type: string
+    additionalProperties: false
+additionalProperties: false
