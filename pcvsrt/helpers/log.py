@@ -4,6 +4,7 @@ import logging
 import pprint
 import textwrap
 import sys
+import locale
 import os
 import subprocess
 
@@ -27,8 +28,8 @@ glyphs = {
     'sec': '#',
     'hdr': '=',
     'star': '*',
-    'fail': 'X',
-    'succ': 'V',
+    'fail': click.style('X', fg='red', bold=True),
+    'succ': click.style('V', fg='green'),
     'git': '(git)',
     'time': '(time)',
     'full_pg': '#',
@@ -36,6 +37,25 @@ glyphs = {
     'sep_v': " | ",
     'sep_h': "-"
 }
+
+all_colors = [
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "magenta",
+    "cyan",
+    "white",
+    "bright_black",
+    "bright_red",
+    "bright_green",
+    "bright_yellow",
+    "bright_blue",
+    "bright_magenta",
+    "bright_cyan",
+    "bright_white",
+]
 
 
 def __set_logger(v):
@@ -68,7 +88,7 @@ def init_tee(path):
 
 def __set_encoding(e):
     global glyphs
-    if e and 'utf-' in sys.getdefaultencoding():
+    if e and 'utf-' in locale.getpreferredencoding().lower():
         glyphs['copy'] = '\u00A9'
         glyphs['item'] = '\u27E2'
         glyphs['sec'] = '\u2756'
@@ -82,6 +102,22 @@ def __set_encoding(e):
         glyphs['empty_pg'] = click.style("\u26AC", fg='cyan')
         glyphs['sep_v'] = " \u237F "
         glyphs['sep_h'] = "\u23BC"
+    else:
+        glyphs = {
+            'copy': '(c)',
+            'item': '*',
+            'sec': '#',
+            'hdr': '=',
+            'star': '*',
+            'fail': click.style('X', fg='red', bold=True),
+            'succ': click.style('V', fg='green'),
+            'git': '(git)',
+            'time': '(time)',
+            'full_pg': '#',
+            'empty_pg': '-',
+            'sep_v': " | ",
+            'sep_h': "-"
+    }
 
 
 def init(verbose, encoding, length):
@@ -135,10 +171,10 @@ def print_section(s, out=True):
         return s
 
 
-def print_item(s, depth=1, out=True):
+def print_item(s, depth=1, out=True, with_bullet=True):
     global wrapper
     indent = ("   " * depth)
-    bullet =  indent + "{} ".format(utf('item'))
+    bullet = indent + "{} ".format(utf('item')) if with_bullet is True else ""
     content = "{}".format(s)
 
     wrapper.subsequent_indent = indent + "  "

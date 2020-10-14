@@ -3,3 +3,4 @@ Click>=7.0
 jsonschema
 addict
 urwid
+PrettyTable

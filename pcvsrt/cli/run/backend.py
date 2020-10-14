@@ -124,10 +124,7 @@ def __print_progbar_walker(elt):
         return None
     return "["+elt[0]+"] " + elt[1]
 
-
-def process():
-    log.print_section("Load from filesystem")
-    path_dict = system.get('validation').dirs
+def find_files_to_process(path_dict):
     setup_files = list()
     yaml_files = list()
 
@@ -151,7 +148,12 @@ def process():
                     setup_files.append((label, root.replace(path, '')[1:], f))
                 elif 'pcvs.yml' == f or 'pcvs.yml.in' == f:
                     yaml_files.append((label, root.replace(path, '')[1:], f))
+    return (setup_files, yaml_files)
 
+def process():
+    log.print_section("Load from filesystem")
+    setup_files, yaml_files = find_files_to_process(system.get('validation').dirs)
+    
     log.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
     log.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
 

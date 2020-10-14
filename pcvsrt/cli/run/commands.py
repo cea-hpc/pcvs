@@ -41,7 +41,6 @@ def iterate_dirs(ctx, param, value) -> dict:
                 "Errors occured while parsing user directories:",
                 err_msg,
                 "please see '--help' for more information")
-
     return list_of_dirs
 
 

@@ -1,11 +1,13 @@
 import glob
 import os
+from addict import Dict
 import tempfile
 import yaml
+import jsonschema
 import base64
 
 from pcvsrt.cli.config import backend as config
-from pcvsrt.helpers import io, log
+from pcvsrt.helpers import io, log, validation
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -116,11 +118,18 @@ class Profile:
 
         log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
-            self._details = yaml.safe_load(f)
+            self._details = Dict(yaml.safe_load(f))
+        
 
     def load_template(self):
         log.nimpl()
 
+    def check(self, fail):
+        for kind in config.CONFIG_BLOCKS:
+            if kind not in self._details:
+                raise jsonschema.exceptions.ValidationError("Missing '{}' in profile".format(kind))
+            validation.ValidationScheme(kind).validate(self._details[kind], fail)
+        
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
 

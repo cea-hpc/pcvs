@@ -140,8 +140,8 @@ class ConfigurationBlock:
         self.load_from_disk()
         return self._details
 
-    def check(self):
-        validation.ValidationScheme(self._kind).validate(self._details)
+    def check(self, fail=True):
+        validation.ValidationScheme(self._kind).validate(self._details, fail)
 
     def load_from_disk(self):
 
@@ -153,7 +153,6 @@ class ConfigurationBlock:
             self._name, self._kind, self._scope))
         with open(self._file) as f:
             self._details = yaml.safe_load(f)
-            self.check()
 
     def load_template(self):
         with open(os.path.join(

@@ -17,17 +17,25 @@ properties:
     type: object
     properties:
       alloc:
-        type: string
+        OneOf:
+        - type: string
+        - type: 'null'
       run:
-        type: string
+        OneOf:
+        - type: string
+        - type: 'null'
     additionalProperties: false
   wrapper:
     type: object
     properties:
       alloc:
-        type: string
+        OneOf:
+        - type: string
+        - type: 'null'
       run:
-        type: string
+        OneOf:
+        - type: string
+        - type: 'null'
     additionalProperties: false
   partitions:
     type: array
@@ -51,17 +59,25 @@ properties:
               type: object
               properties:
                 alloc:
-                  type: string
+                  OneOf:
+                  - type: string
+                  - type: 'null'
                 run:
-                  type: string
+                  OneOf:
+                  - type: string
+                  - type: 'null'
               additionalProperties: false
             wrapper:
               type: object
               properties:
                 alloc:
-                  type: string
+                  OneOf:
+                  - type: string
+                  - type: 'null'
                 run:
-                  type: string
+                  OneOf:
+                  - type: string
+                  - type: 'null'
               additionalProperties: false
           additionalProperties: false
       additionalProperties: false
