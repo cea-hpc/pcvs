@@ -68,11 +68,14 @@ class CfgMachine(CfgBase):
 
         if 'default' not in self:
             return
-        assert(self.default in self.partitions)
 
         # override default values by selected partition
-        for key, value in self.partitions[self.default].items():
-            self[key] = value
+        for partition in self.partitions:
+            assert(len(partition.keys()) == 1)
+            name = partition.keys()
+            if name == self.default:
+                for k, v in partition[name].items():
+                    self[k] = v
 
 
 class CfgCriterion(CfgBase):

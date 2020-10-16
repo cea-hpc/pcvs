@@ -2,7 +2,3 @@
 # Please here defines nodes like regular TEs
 # None of these templates will be unrolled
 # names can then be used in `group' field
-GRPMPI:
-    run:
-        iterate:
-            n_omp: ~

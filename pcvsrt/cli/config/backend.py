@@ -133,8 +133,7 @@ class ConfigurationBlock:
         return self._name
 
     def fill(self, raw):
-        assert (isinstance(raw, dict))
-        self._details = raw
+        self._details = raw if raw else dict()
 
     def dump(self):
         self.load_from_disk()

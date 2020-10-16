@@ -313,10 +313,10 @@ def run():
     
     log.info("cmd: '{}'".format(" ".join(cmd)))
     try:
-        #raise subprocess.CalledProcessError()
         subprocess.check_call(cmd)
     except subprocess.CalledProcessError:
-        log.err("JCHRONOSS returned non-zero exit code!")
+        pass
+        #log.err("JCHRONOSS returned non-zero exit code!")
 
 
 def anonymize_archive():
@@ -373,12 +373,12 @@ def terminate():
                 "--new={}".format(os.path.join(outdir, "test_suite"))
             ]
             log.info('cmd: {}'.format(" ".join(cmd)))
-            subprocess.check_call(cmd, stdout=subprocess.DEVNULL)
+            subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             log.print_item("Browsing: {}".format(
                 os.path.join(system.get('validation').jchronoss.src,
                              'tools/webview/webview/generated/main.html')))
         except (CalledProcessError, FileNotFoundError) as e:
-            log.warn("Unable to run the webview:", "{}".format(e))
+            log.warn("Unable to run the webview!")
 
     log.print_section("Prepare results for export")
 

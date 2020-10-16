@@ -101,11 +101,6 @@ def profile_show(ctx, token):
 
 def profile_interactive_select():
     composition = {}
-    log.enrich_print("Hello! I'm Tux and I'm here to assist you building a "
-                     "valid profile from a combination of configuration blocks."
-                     "Lists are based on currently found files on "
-                     "your system. If possible, a default block  will be"
-                     " loaded".format(len(pvConfig.CONFIG_BLOCKS)), skippable=True)
     for kind in pvConfig.CONFIG_BLOCKS:
         log.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
@@ -284,7 +279,6 @@ def profile_update(ctx, token, editor):
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.argument("src_file", type=click.File('r'))
-@click.option("--test", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, token, src_file):
     (scope, label) = pvProfile.extract_profile_from_token(token)

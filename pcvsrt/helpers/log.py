@@ -8,10 +8,6 @@ import locale
 import os
 import subprocess
 
-try:
-    import cowsay
-except ImportError:
-    pass
 
 linelength = 93
 FORMAT = "%(levelname)s: %(message)s"
