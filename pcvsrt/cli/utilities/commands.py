@@ -103,16 +103,17 @@ def check(ctx, dir, encoding, color, configs, profiles):
         system.get('validation').output = "/tmp/test"
         errors = {**errors, **pvUtils.process_check_directory(dir)}
 
+"""
     if errors:
         log.print_section("Classification of errors:")
         table = PrettyTable()
         table.field_names = ["Count", "Type of error"]
         
         for k, v in errors.items():
-            table.add_row([v, base64.b64decode(k).decode('ascii')])
+            table.add_row([v, base64.b64decode(k).decode('utf-8')])
 
         table.align["Count"] = "c"
-        table.align["Type of error"] = ""
+        table.align["Type of error"] = "l"
         table.sortby = "Count"
         table.reversesort = True
         print(table)
@@ -121,3 +122,4 @@ def check(ctx, dir, encoding, color, configs, profiles):
             succ=log.utf('succ'),
             cg=log.cl("Everything is OK!", 'green', bold=True))
         )
+"""

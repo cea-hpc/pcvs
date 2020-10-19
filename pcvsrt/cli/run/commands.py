@@ -71,7 +71,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-s", '--validation', "validation_file",
               default=None, show_envvar=True, type=str,
               help="Validation settings file")
-@click.option("-l", "--tee", "tee", show_envvar=True,
+@click.option("-l/-L", "--tee/--no-tee", "tee", show_envvar=True,
               default=None, is_flag=True,
               help="Log the whole stdout/stderr")
 @click.option("-d", "--detach", "detach",
