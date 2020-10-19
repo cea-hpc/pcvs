@@ -2,6 +2,8 @@ from pcvsrt.helpers.system import Settings
 import click
 import copy
 import base64
+import sys
+import os
 from prettytable import PrettyTable
 import subprocess
 from pcvsrt.helpers import log, io, system
@@ -17,6 +19,7 @@ from pcvsrt.cli.utilities import backend as pvUtils
 @click.pass_context
 def exec(ctx, output, argument, gen_list):
     err = subprocess.STDOUT
+    rc = 0
     if gen_list:
         script_path = pvUtils.retrieve_all_test_scripts(output)
         argument = "--list"
@@ -25,10 +28,18 @@ def exec(ctx, output, argument, gen_list):
         script_path = [pvUtils.retrieve_test_script(argument, output)]
     try:
         for f in script_path:
+            if not os.path.isfile(f):
+                log.err("Unable to find Shell script related to '{}'".format(argument))
+                raise subprocess.CalledProcessError(cmd="Test-script", returncode=1)
             fds = subprocess.Popen(['sh', f, argument], stderr=err)
             fds.communicate()
+            rc = fds.returncode
     except subprocess.CalledProcessError as e:
-        log.err("Error while running the test:", "{}".format(e.output.decode('ascii')))
+        rc = e.returncode
+    except Exception as e:
+        log.err(e)
+    finally:
+        sys.exit(rc)
 
 
 @click.command(name="check", short_help="Ensure future input will be conformant to standards")

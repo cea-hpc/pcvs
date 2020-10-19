@@ -44,6 +44,20 @@ def iterate_dirs(ctx, param, value) -> dict:
     return list_of_dirs
 
 
+def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
+    label = None
+    
+    abspath = os.path.abspath(incomplete)
+    
+    if ':' in incomplete:
+        pass
+    else:
+        pass
+    d = os.path.dirname(abspath)
+    base = os.path.basename(abspath)
+    return ['a' for p in next(os.walk(d))[1] if p.startswith(base)]
+
+
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cmdProfile.compl_list_token,
