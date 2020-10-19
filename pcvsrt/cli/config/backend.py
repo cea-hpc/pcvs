@@ -208,10 +208,16 @@ class ConfigurationBlock:
         if not os.path.exists(self._file):
             return
         
-        fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
+        fname = tempfile.NamedTemporaryFile(
+                mode='w+',
+                prefix="{}-".format(self.full_name),
+                suffix=".yml")
         fplugin = None
         if self._kind == 'runtime':
-            fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
+            fplugin = tempfile.NamedTemporaryFile(
+                mode='w+',
+                prefix="{}-".format(self.full_name),
+                suffix=".py")
         with open(self._file, 'r') as f:
             stream = yaml.load(f, Loader=yaml.FullLoader)
             if stream:

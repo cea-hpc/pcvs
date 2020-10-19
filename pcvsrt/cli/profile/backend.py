@@ -162,8 +162,16 @@ class Profile:
                 log.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
-        fname = tempfile.NamedTemporaryFile(mode='w+', suffix=".yml")
-        fplugin = tempfile.NamedTemporaryFile(mode='w+', suffix=".py")
+        fname = tempfile.NamedTemporaryFile(
+            mode='w+',
+            prefix="{}".format(self.full_name),
+            suffix=".yml"
+        )
+        fplugin = tempfile.NamedTemporaryFile(
+            mode='w+',
+            prefix="{}".format(self.full_name),
+            suffix=".yml"
+        )
         with open(self._file, 'r') as f:
             stream = yaml.load(f, Loader=yaml.FullLoader)
             if stream:
