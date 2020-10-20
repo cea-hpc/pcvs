@@ -240,7 +240,7 @@ def process_dyn_setup_scripts(setup_files):
                           path_out=cur_build,
                           data=te_node,
                           label=label,
-                          subprefix=subprefix)
+                          prefix=subprefix)
             
             tf.start_process()
             system.get('validation').xmls.append(tf.flush_to_disk())
@@ -260,7 +260,7 @@ def process_static_yaml_files(yaml_files):
                 tf = TestFile(file_in=f,
                               path_out=cur_build,
                               label=label,
-                              subprefix=subprefix)
+                              prefix=subprefix)
             except (yaml.YAMLError, CalledProcessError) as e:
                 print(f, e)
                 err.append((f, e.output))
