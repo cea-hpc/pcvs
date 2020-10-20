@@ -139,10 +139,15 @@ class TestFile:
         fn_sh = os.path.join(self._path_out, "list_of_tests.sh")
         
         if TestFile.cc_pm_string == "" and system.get('compiler').obj:
-            TestFile.cc_pm_string = "\n".join([e.loadenv() for e in system.get('compiler').obj])
+            TestFile.cc_pm_string = "\n".join([
+                    e.get(load=True, install=False) for e in system.get('compiler').obj
+                ])
         
         if TestFile.rt_pm_string == "" and system.get('runtime').obj:
-            TestFile.rt_pm_string = "\n".join([e.loadenv() for e in system.get('runtime').obj])
+            TestFile.rt_pm_string = "\n".join([
+                    e.get(load=True, install=False)
+                    for e in system.get('runtime').obj
+                ])
 
         with open(fn_xml, 'w') as fh_xml:
             with open(fn_sh, 'w') as fh_sh:
@@ -248,7 +253,7 @@ class Test:
         # manage package-manager deps
         if self._array['dep'] is not None:
             prep_code += "\n".join([
-                    elt.loadenv()
+                    elt.get(load=True, install=True)
                     for elt in self._array['dep']
                     if isinstance(elt, pm.PManager)
                 ])
@@ -417,7 +422,6 @@ class TEDescriptor:
             # now build program iterators
             for k, elt in self._program_criterion.items():
                 elt.expand_values()
-
 
     def __build_from_sources(self):
         """Specific to build rule, where the compilation is made from a

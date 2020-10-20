@@ -13,7 +13,6 @@ def identify_manager(pm_node):
             pm_node['module'] = [pm_node['module']]
         for elt in pm_node['module']:
             ret.append(ModuleManager(elt))
-
     return ret
 
 
@@ -21,8 +20,11 @@ class PManager:
     def __init__(self, spec):
         pass
 
-    def loadenv(self):
+    def get(self, load, install):
         pass
+
+    def install(self):
+        return
 
 
 class SpackManager(PManager):
@@ -30,8 +32,13 @@ class SpackManager(PManager):
         super().__init__(spec)
         self.spec = spec
 
-    def loadenv(self):
-        return "eval `spack load --sh {}`".format(self.spec)
+    def get(self, load=True, install=True):
+        s = list()
+        if install:
+            s.append("spack install {}".format(self.spec))
+        if load:
+            s.append("eval `spack load --sh {}`".format(self.spec))
+        return "\n".join(s)
 
 
 class ModuleManager(PManager):
@@ -39,5 +46,10 @@ class ModuleManager(PManager):
         super().__init__(spec)
         self.spec = spec
 
-    def loadenv(self):
-        return "module load {}".format(self.spec)
+    def get(self, load=True, install=False):
+        s = ""
+        # 'install' does not mean anything here
+        if load:
+            s += "module load {}".format(self.spec)
+        return s
+
