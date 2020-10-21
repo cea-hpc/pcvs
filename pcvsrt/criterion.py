@@ -53,7 +53,6 @@ class Combination:
         args = []
         envs = []
         params = []
-
         # for each elt, where k is the criterion name, v is the actual value
         for k_elt, v_elt in self._combination.items():
             c = self._criterions[k_elt]
@@ -125,9 +124,12 @@ class Criterion:
         self._is_env = description.get('type', 'argument') == 'environment'
         # this should be only set by per-TE criterion definition
         self._local = local
-
         self._str = description.get('subtitle', '')
         self._values = description.get('values', [])
+        if not isinstance(self._values, list):
+            self._values = [self._values]
+        print(self._name, self._values)
+
 
     # only allow overriding values (for now)
     def override(self, desc):

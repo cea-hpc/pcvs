@@ -16,13 +16,18 @@ class ValidationScheme:
                         ), 'r') as fh:
             self._scheme = yaml.load(fh, Loader=yaml.FullLoader)
 
-    def validate(self, content, fail_on_error=True):
+    def validate(self, content, fail_on_error=True, filepath=None):
         try:
+            if filepath is None:
+                filepath = "'data stream'"
+            
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             if fail_on_error:
-                log.err("Wrong format for '{}':".format(self._prefix),
-                        "{}".format(e))
+                log.err("Wrong format: {} ('{}'):".format(
+                                filepath,
+                                self._prefix),
+                        "{}".format(e.message))
             else:
                 raise e
         except Exception as e:

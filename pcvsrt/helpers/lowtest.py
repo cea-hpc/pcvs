@@ -71,7 +71,7 @@ def handle_job_deps(deps_node, pkg_prefix):
         for name, values in deps_node['depends_on'].items():
             if name == 'test':
                 for d in values:
-                    deps.append(d if '.' in d else ".".join([pkg_prefix, d]))
+                    deps.append(d if '/' in d else "/".join([pkg_prefix, d]))
             else:
                 deps += [d for d in pm.identify_manager({name: values})]
     return deps

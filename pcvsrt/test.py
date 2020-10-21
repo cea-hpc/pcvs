@@ -118,7 +118,7 @@ class TestFile:
         # formatted, not if they are invalid)
         if check is True:
             try:
-                TestFile.val_scheme.validate(self._raw)
+                TestFile.val_scheme.validate(self._raw, filepath=self._in)
             except jsonschema.ValidationError as e:
                 self._debug['.yaml_errors'].append(e)
 
@@ -140,7 +140,8 @@ class TestFile:
         
         if TestFile.cc_pm_string == "" and system.get('compiler').obj:
             TestFile.cc_pm_string = "\n".join([
-                    e.get(load=True, install=False) for e in system.get('compiler').obj
+                    e.get(load=True, install=False)
+                    for e in system.get('compiler').obj
                 ])
         
         if TestFile.rt_pm_string == "" and system.get('runtime').obj:
@@ -462,8 +463,8 @@ class TEDescriptor:
         
         # build the 'make' command
         command.append(
-            '-C {path} {target}'
-            'PCVS_CC="{cc}" PCVS_CXX="{cxx}" PCVS_CU="{cu}" PCVS_FC="{fc}"'
+            '-C {path} {target} '
+            'PCVS_CC="{cc}" PCVS_CXX="{cxx}" PCVS_CU="{cu}" PCVS_FC="{fc}" '
             'PCVS_CFLAGS="{var} {cflags}" PCVS_LDFLAGS="{ldflags}"'.format(
                 path=basepath,
                 target=self._build.make.get('target', ''),
@@ -530,7 +531,7 @@ class TEDescriptor:
         for comb in self._serie.generate():
             # clone deps as it may be updated by each test
             deps = copy.deepcopy(te_deps)
-            chdir = ""
+            chdir = None
             if self._build:
                 deps.append(self._full_name)
 
@@ -539,6 +540,7 @@ class TEDescriptor:
             # the runtime argument to propagate
             # the program parameters to forward
             env, args, params = comb.translate_to_command()
+            
             # append just built env-set to the larger one
             env += te_env
 
