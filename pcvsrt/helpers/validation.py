@@ -10,6 +10,10 @@ class ValidationScheme:
     def __init__(self, name):
         self._prefix = name
 
+        print(os.path.join(
+                            pcvsrt.ROOTPATH,
+                            'schemes/{}-scheme.yml'.format(name)
+                        ))
         with open(os.path.join(
                             pcvsrt.ROOTPATH,
                             'schemes/{}-scheme.yml'.format(name)

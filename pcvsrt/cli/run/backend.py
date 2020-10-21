@@ -378,7 +378,8 @@ def terminate():
                 os.path.join(system.get('validation').jchronoss.src,
                              'tools/webview/webview/generated/main.html')))
         except (CalledProcessError, FileNotFoundError) as e:
-            log.warn("Unable to run the webview!")
+            pass
+            #log.warn("Unable to run the webview!")
 
     log.print_section("Prepare results for export")
 

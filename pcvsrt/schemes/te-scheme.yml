@@ -98,33 +98,41 @@ patternProperties:
             additionalProperties: false
           iterate:
             type: object
-            patternProperties:
+            properties:
               program:
                 type: object
-                properties:
-                  patternProperties:
-                    "^.*$":
-                      type: object
-                      properties:
-                        option:
-                          type: string
-                        numeric:
-                          type: boolean
-                        type:
-                          type: string
-                          enum:
-                          - argument
-                          - environment
-                        position:
-                          type: string
-                          enum:
-                          - before
-                          - after
-                        values:
-                          OneOf:
-                          - type: array
-                          - type: number
-                          - type: 'null'
+                patternProperties:
+                  "^.*$":
+                    type: object
+                    properties:
+                      option:
+                        type: string
+                      numeric:
+                        type: boolean
+                      type:
+                        type: string
+                        enum:
+                        - argument
+                        - environment
+                      position:
+                        type: string
+                        enum:
+                        - before
+                        - after
+                      aliases:
+                        patternProperties:
+                          "^.*$":
+                            type: string
+                      values:
+                        OneOf:
+                        - type: array
+                        - type: number
+                        - type: 'null'
+                      subtitle:
+                        type: string
+                    additionalProperties: false
+                additionalProperties: false
+            patternProperties:
               "^.*$":
                 type: object
                 properties:
@@ -133,6 +141,8 @@ patternProperties:
                     - type: array
                     - type: number
                     - type: 'null'
+                  subtitle:
+                    type: string
             additionalProperties: false
         additionalProperties: false
       validate:

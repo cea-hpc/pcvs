@@ -21,10 +21,11 @@ from pcvsrt.cli.utilities import backend as pvUtils
 @click.argument("argument", type=str, required=False)
 @click.pass_context
 def exec(ctx, output, argument, gen_list, display):
-    err = subprocess.STDOUT
     rc = 0
-    env = {'PCVS_SHOW': display}
-
+    err = subprocess.STDOUT
+    env = copy.deepcopy(os.environ)
+    env.update({'PCVS_SHOW': str(display)})
+    
     if gen_list:
         script_path = pvUtils.retrieve_all_test_scripts(output)
         argument = "--list"
@@ -36,7 +37,10 @@ def exec(ctx, output, argument, gen_list, display):
             if not os.path.isfile(f):
                 log.err("Unable to find Shell script related to '{}'".format(argument))
                 raise subprocess.CalledProcessError(cmd="Test-script", returncode=1)
-            fds = subprocess.Popen(['sh', f, argument], env=env, stderr=err)
+            fds = subprocess.Popen(
+                    ['sh', f, argument],
+                    env=env,
+                    stderr=err)
             fds.communicate()
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
