@@ -94,8 +94,8 @@ def __set_encoding(e):
         glyphs['succ'] = click.style('\u2714', fg="green")
         glyphs['git'] = '\u237F'
         glyphs['time'] = '\U0000231A'
-        glyphs['full_pg'] = click.style("\u2588", fg="bright_black")
-        glyphs['empty_pg'] = click.style("\u26AC", fg='cyan')
+        glyphs['full_pg'] = click.style("\u2022", bold=True, fg="cyan")
+        glyphs['empty_pg'] = click.style("\u25E6", bold=True, fg="bright_black")
         glyphs['sep_v'] = " \u237F "
         glyphs['sep_h'] = "\u23BC"
     else:

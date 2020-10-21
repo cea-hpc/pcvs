@@ -3,20 +3,25 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PCVS-rt's documentation!
-===================================
+PCVS Runtime toolkit
+====================
 
-Contents:
+Parallel Computing - Validation Suite simplifies testing at scale by bringing
+together 
+
+First of all
+------------
+
+.. glossary::
+
+   TE : Decl
+   toto : Decl2
+      This is a test expression
+
+.. centered:: THIS IS CENTRERED
 
 .. toctree::
-   :maxdepth: 2
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+        :maxdepth: 2
+        :caption: Table of Contents
+        
+        Getting-Started

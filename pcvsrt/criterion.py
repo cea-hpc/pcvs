@@ -128,7 +128,6 @@ class Criterion:
         self._values = description.get('values', [])
         if not isinstance(self._values, list):
             self._values = [self._values]
-        print(self._name, self._values)
 
 
     # only allow overriding values (for now)
