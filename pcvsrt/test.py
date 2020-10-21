@@ -286,6 +286,10 @@ class Test:
         return """
         "{name}")
             {prepare}
+            if test "$PCVS_SHOW" = "cmd"; then
+                echo "{cmd}"
+                exit 0
+            fi
             output=`{cmd} 2>&1`
             ret=$?
             echo "$output"
