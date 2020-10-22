@@ -59,8 +59,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PCVS-rt'
-copyright = '2020, CEA'
+project = 'PCVS Runtime Tool'
+copyright = "2020, CEA"
 author = 'Julien Adam'
 
 # The version info for the project you're documenting, acts as replacement for
