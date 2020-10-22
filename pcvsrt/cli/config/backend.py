@@ -3,6 +3,7 @@ import glob
 import os
 import pprint
 import yaml
+from addict import Dict
 import tempfile
 
 import pcvsrt
@@ -137,7 +138,7 @@ class ConfigurationBlock:
 
     def dump(self):
         self.load_from_disk()
-        return self._details
+        return Dict(self._details).to_dict()
 
     def check(self, fail=True):
         validation.ValidationScheme(self._kind).validate(self._details, fail)

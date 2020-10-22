@@ -99,7 +99,7 @@ class Profile:
 
     def dump(self):
         self.load_from_disk()
-        return self._details
+        return Dict(self._details).to_dict()
 
     def is_found(self):
         return self._file is not None
