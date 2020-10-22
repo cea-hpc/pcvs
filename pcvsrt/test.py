@@ -521,10 +521,6 @@ class TEDescriptor:
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
-        te_env = [
-            "{}='{}'".format(k, v)
-            for k, v in self._run.environment.items()
-        ]
         te_deps = lowtest.handle_job_deps(self._run, self._te_pkg)
         
         # for each combination generated from the collection of criterions
@@ -541,9 +537,6 @@ class TEDescriptor:
             # the program parameters to forward
             env, args, params = comb.translate_to_command()
             
-            # append just built env-set to the larger one
-            env += te_env
-
             # attempt to compute program/binary name
             program = self._te_name
             if self._run.program:

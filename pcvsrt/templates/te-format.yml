@@ -50,12 +50,7 @@
                 - osu ^${COMPILER_SPACKED} %intel
             module:
                 - protobuf
-                - gnu/gcc/7.3.0
-        # extra env vars to export before running the job
-        environment:
-            MY_VAR: 1000.0
-            MY_OTHER_VAR: 2
-    
+                - gnu/gcc/7.3.0    
     artifact:
         # relative to $BUILDPATH
         obj1: "./path/1"

@@ -88,14 +88,6 @@ patternProperties:
                 items:
                   type: string
             additionalProperties: false
-          environment:
-            type: object
-            patternProperties:
-              "^.*$":
-                OneOf:
-                - type: string
-                - type: number
-            additionalProperties: false
           iterate:
             type: object
             properties:
