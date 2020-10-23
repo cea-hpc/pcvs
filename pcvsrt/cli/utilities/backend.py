@@ -105,7 +105,8 @@ def process_check_setup_file(filename, prefix):
         with io.cwd(tdir):
             env['pcvs_src'] = os.path.dirname(filename).replace(prefix, '')
             env['pcvs_testbuild'] = tdir
-            os.makedirs(os.path.join(tdir, prefix))
+            if not os.path.isdir(os.path.join(tdir, prefix)):
+                os.makedirs(os.path.join(tdir, prefix))
             proc = subprocess.Popen([filename, prefix], env=env, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             fds = proc.communicate()
             if fds[1]:
@@ -134,6 +135,7 @@ def process_check_yaml_stream(data):
         err_msg = base64.b64encode(str(e).encode('utf-8'))
     except jsonschema.exceptions.ValidationError as e:
         err_msg = base64.b64encode(str(e.message).encode('utf-8'))
+
     
     return (err_msg, token_load, token_yaml)
 
