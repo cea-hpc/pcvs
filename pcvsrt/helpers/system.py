@@ -70,12 +70,8 @@ class CfgMachine(CfgBase):
             return
 
         # override default values by selected partition
-        for partition in self.partitions:
-            assert(len(partition.keys()) == 1)
-            name = partition.keys()
-            if name == self.default:
-                for k, v in partition[name].items():
-                    self[k] = v
+        override_node = [v for d in self.partitions for k, v in d.items() if k == self.default]
+        self.update(override_node[0])
 
 
 class CfgCriterion(CfgBase):
