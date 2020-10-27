@@ -27,8 +27,12 @@ properties:
     type: object
     properties:
       spack:
-        type: string
+        type: array
+        items:
+          type: string
       module:
-        type: string
+        type: array
+        items:
+          type: string
     additionalProperties: false
 additionalProperties: false
