@@ -98,6 +98,7 @@ def prepare(run_settings):
         else:
             log.print_item("Cleaning up {}".format(buildir), depth=2)
             io.create_or_clean_path(buildir)
+            io.create_or_clean_path(os.path.join(valcfg.output, '.pcvs_build'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
             io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'), is_dir=False)
@@ -105,8 +106,11 @@ def prepare(run_settings):
         
 
     log.print_item("Create subdirs for each provided directories")
+    os.makedirs(buildir)
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label))
+    open(os.path.join(valcfg.output, '.pcvs_build'), 'w').close()
+    
 
     log.print_section("Build third-party tools")
     __build_tools()

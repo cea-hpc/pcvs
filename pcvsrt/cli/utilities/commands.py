@@ -1,3 +1,4 @@
+from datetime import datetime
 from pcvsrt.helpers.system import Settings
 import click
 import copy
@@ -20,7 +21,7 @@ from pcvsrt.cli.utilities import backend as pvUtils
               help="Display information instead of executing the command")
 @click.argument("argument", type=str, required=False)
 @click.pass_context
-def exec(ctx, output, argument, gen_list, display):
+def exec(ctx, output, argument, gen_list, display, interactive):
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
@@ -63,7 +64,6 @@ def exec(ctx, output, argument, gen_list, display):
               help="Check correctness for all registered configuation block")
 @click.option("--profiles", "-p", "profiles", default=False, is_flag=True,
               help="Check correctness for all registered profiles")
-
 @click.pass_context
 def check(ctx, dir, encoding, color, configs, profiles):
     log.banner()
@@ -132,3 +132,53 @@ def check(ctx, dir, encoding, color, configs, profiles):
             cg=log.cl("Everything is OK!", 'green', bold=True))
         )
 """
+
+@click.command(name="clean", short_help="Remove artifacts generated from PCVS")
+@click.option("-f", "--force", "force", default=False, is_flag=True,
+              help="Acknowledge there is no way back.")
+@click.option("-d", "--dry-run", "fake", default=False, is_flag=True,
+              help="Print artefacts instead of deleting them")
+@click.option('-i', '--interactive', 'interactive', 
+              is_flag=True, default=False,
+              help="Manage cleanup process interactively")
+@click.argument("paths", required=False, type=click.Path(exists=True), nargs=-1)
+@click.pass_context
+def clean(ctx, force, fake, paths, interactive):
+    if not fake and not force:
+        log.warn("IMPORTANT NOTICE:",
+                 "This command will delete files from previous run(s) and",
+                 "no recovery will be possible after deletion.",
+                 "Please use --force to indicate you acknowledge the risks",
+                 "and will face consequences in case of improper use.",
+                 "",
+                 "To list files to be deleted instead, you may use --dry-run."
+        )
+        sys.exit(0)
+    if not paths:
+        paths = [os.getcwd()]
+
+    log.print_header("DELETION")
+    for path in paths:
+        for root, dirs, files in os.walk(path):
+            # current root need to be cleaned
+            if '.pcvs_build' in files:
+                log.print_section("Found build: {}".format(root))
+                for f in files:
+                    if f.startswith('pcvsrun_') and f.endswith('.tar.gz'):
+                        arch_date = datetime.strptime(
+                            f.replace('pcvsrun_', '').replace('.tar.gz', ''),
+                            "%Y%m%d%H%M%S"
+                        )
+                        delta = datetime.now() - arch_date
+                        if fake:
+                            log.print_item('Age: {} day{:<1}: {}'.format(
+                                delta.days,
+                                "s" if delta.days > 1 else '',
+                                f))
+                            continue
+                        elif interactive:
+                            if not click.confirm('{}: ({} days ago) ?'.format(f, delta.days)):
+                                continue
+                        os.remove(os.path.join(root, f))
+                        log.print_item('deleted {}'.format(f))
+                dirs[:] = []

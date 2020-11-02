@@ -1,6 +1,5 @@
 from .cli_testing import run_and_test, isolated_fs
 import pytest
-from pytest_mock import mocker
 
 
 def test_cmd():
