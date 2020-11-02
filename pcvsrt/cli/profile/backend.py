@@ -119,7 +119,6 @@ class Profile:
         log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
-        
 
     def load_template(self):
         log.nimpl()

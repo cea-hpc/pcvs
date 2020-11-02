@@ -1,6 +1,8 @@
 import glob
 import os
 import pathlib
+from shutil import SameFileError
+from addict import Dict
 import fileinput
 import pprint
 import shutil
@@ -82,7 +84,7 @@ def __build_tools():
     __setup_webview()
 
 
-def prepare(run_settings):
+def prepare(run_settings, reuse=False):
     log.print_section("Prepare environment")
     log.print_item("Date: {}".format(
         system.get('validation').datetime.strftime("%c")))
@@ -96,19 +98,19 @@ def prepare(run_settings):
         if not valcfg.override:
             log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(valcfg.output))
         else:
-            log.print_item("Cleaning up {}".format(buildir), depth=2)
-            io.create_or_clean_path(buildir)
+            if not reuse:
+                log.print_item("Cleaning up {}".format(buildir), depth=2)
+                io.create_or_clean_path(buildir)
             io.create_or_clean_path(os.path.join(valcfg.output, '.pcvs_build'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
             io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'), is_dir=False)
             io.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
-        
-
+    
     log.print_item("Create subdirs for each provided directories")
-    os.makedirs(buildir)
+    os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
-        os.makedirs(os.path.join(buildir, label))
+        os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, '.pcvs_build'), 'w').close()
     
 
@@ -281,7 +283,7 @@ def run():
     __print_summary()
     log.print_item("Save Configurations into {}".format(system.get('validation').output))
     with open(os.path.join(system.get('validation').output, "conf.yml"), 'w') as conf_fh:
-        yaml.dump(system.get().serialize(), conf_fh)
+        yaml.dump(system.get().serialize(), conf_fh, default_flow_style=None)
     
     log.print_section("Run the Orchestrator (JCHRONOSS)")
 
@@ -396,7 +398,7 @@ def terminate():
                 save_for_export(os.path.join(root, file))
 
     save_for_export(os.path.join(outdir, 'conf.yml'))
-    save_for_export(os.path.join(outdir, 'conf.env'))
+    #save_for_export(os.path.join(outdir, 'conf.env'))
     save_for_export(os.path.join(system.get('validation').jchronoss.src,
                                  "tools/webview"),
                     os.path.join(outdir, 'webview'))
@@ -424,3 +426,32 @@ def terminate():
             log.err("Fail to create an archive:", "{}".format(e))
     
     return archive_name
+
+
+def dup_another_build(build_dir, outdir):
+    settings = None
+    
+    # First, load the whole config
+    with open(os.path.join(build_dir, 'conf.yml'), 'r') as fh:
+            d = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+            settings = system.Settings(d)
+    
+    # second, copy any xml/sh files to be reused
+    for root, _, files, in os.walk(build_dir):
+        for f in files:
+            if f in ('list_of_tests.xml', 'list_of_tests.sh', 'conf.env'):
+                src = os.path.join(root, f)
+                rel_file = os.path.relpath(
+                    src,
+                    start=os.path.abspath(build_dir))
+                dest = os.path.join(outdir, rel_file)
+
+                os.makedirs(os.path.dirname(dest), exist_ok=True)
+                try:
+                    shutil.copy(src, dest)
+                except SameFileError:
+                    pass
+
+    settings.validation.output = outdir
+    return settings
+        

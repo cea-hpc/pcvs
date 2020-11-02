@@ -40,7 +40,7 @@ def bank_show(ctx, name):
 
     b = pvBank.Bank(name)
     if not b.exists():
-        log.err("'{}' does not exist".format(name))
+        raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         b.show()
 
@@ -59,7 +59,7 @@ def bank_create(ctx, name, path):
 
     b = pvBank.Bank(name, path)
     if b.exists():
-        log.err("'{}' already exist".format(name))
+        raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
         b.register()
         pvBank.flush_to_disk()
@@ -79,7 +79,7 @@ def bank_destroy(ctx, name):
     log.print_header("Bank View")
     b = pvBank.Bank(name)
     if not b.exists():
-        log.err("'{}' does not exist".format(name))
+        raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         b.unregister()
         pvBank.flush_to_disk()
@@ -95,7 +95,7 @@ def bank_save_content(ctx, name, attr, obj):
     previously-registered bank NAME"""
     bank = pvBank.Bank(name)
     if not bank.exists():
-        log.err("Unable to save content into a non-existent bank.",
+        raise click.BadArgumentUsage("Unable to save content into a non-existent bank.",
                 "Please use the 'create' command first.")
     else:
         bank.save(attr, obj)
@@ -113,7 +113,7 @@ def bank_load_content(ctx, name, attr, dest):
     NAME"""
     bank = pvBank.Bank(name)
     if not bank.exists():
-        log.err("Unable to load content from a non-existent bank.",
+        raise click.BadArgumentUsage("Unable to load content from a non-existent bank.",
                 "Please use the 'create' command first.")
     else:
         bank.load(attr, dest)
@@ -131,7 +131,7 @@ def bank_delete_content(ctx, name, attr):
     """Delete anyobject under ATTR label from the previously-registered bank NAME"""
     bank = pvBank.Bank(name)
     if not bank.exists():
-        log.err("Unable to modify content from a non-existent bank.",
+        raise click.BadArgumentUsage("Unable to modify content from a non-existent bank.",
                 "Please use the 'create' command first.")
     else:
         bank.delete(attr)

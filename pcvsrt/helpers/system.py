@@ -85,9 +85,16 @@ class CfgTemplate(CfgBase):
 
 
 class CfgValidation(CfgBase):
+    default_valfile = os.path.join(os.environ['HOME'], ".pcvsrt/validation.yml")
+
+    def get_valfile(override):
+        if override is None:
+            override = CfgValidation.default_valfile
+        return override
+
     def __init__(self, filename=None):
         if filename is None:
-            filename = os.path.join(os.environ['HOME'], ".pcvsrt/validation.yml")
+            filename = CfgValidation.default_valfile
         super().__init__(filename)
 
         validation.ValidationScheme('settings').validate(self)
@@ -128,7 +135,7 @@ class Settings(Dict):
         super().__setitem__(param, value)
 
     def serialize(self):
-        return self.to_dict()
+        return Dict(self).to_dict()
 
 
 sysTable = None

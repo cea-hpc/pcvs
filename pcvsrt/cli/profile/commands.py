@@ -95,7 +95,7 @@ def profile_show(ctx, token):
         pf.load_from_disk()
         pf.display()
     else:
-        log.err("Profile '{}' not found!".format(token))
+        raise click.BadArgumentUsage("Profile '{}' not found!".format(token))
     pass
 
 
@@ -189,11 +189,12 @@ def profile_build(ctx, token, interactive, blocks, clone):
             else:
                 log.err("Issue with '{}'".format(block))
                 if not cur.is_found():
-                    log.err("Such configuration does not exist!")
+                    raise click.BadOptionUsage("-b", "Such configuration does not exist!")
                 else:
-                    log.err(
+                    raise click.BadOptionUsage("-b", "\n".join([ 
                         "'{}' kind is set twice".format(b_kind.upper()),
-                        "First is '{}'".format(pf_blocks[b_kind].full_name))
+                        "First is '{}'".format(pf_blocks[b_kind].full_name)
+                    ]))
                 log.err("")
         pf.fill(pf_blocks)
 
@@ -226,7 +227,7 @@ def profile_destroy(ctx, token):
         else:
             pf.delete()
     else:
-        log.err("Profile '{}' not found!".format(label),
+        raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
                 "Please check the 'list' command")
 
 
@@ -244,12 +245,12 @@ def profile_alter(ctx, token, editor):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
-            log.err("err")
+            raise click.BadArgumentUsage('Wrongly formatted profile token')
         else:
             pf.open_editor(editor)
     else:
-        log.err("Profile '{}' not found!".format(label),
-                "Please check the 'list' command")
+        raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
+                               "Please check the 'list' command")
 
 
 @profile.command(name="update",

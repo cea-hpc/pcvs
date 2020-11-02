@@ -128,7 +128,7 @@ def config_show(ctx, token) -> None:
     else:
         sc = scope
         sc = "any" if sc is None else sc
-        log.err("No '{}' configuration found at {} level!".format(
+        raise click.BadArgumentUsage("No '{}' configuration found at {} level!".format(
             label, sc))
 
 
@@ -157,8 +157,9 @@ def config_create(ctx, token, clone) -> None:
         (c_scope, c_kind, c_label) = pvConfig.extract_config_from_token(
             clone, pair='span')
         if c_kind is not None and c_kind != kind:
-            log.err("Can only clone from a conf. blocks with the same KIND!",
-                    abort=1)
+            raise click.BadArgumentUsage(
+                "Can only clone from a conf. blocks with the same KIND!",
+                abort=1)
         base = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
         base.load_from_disk()
     else:
@@ -171,7 +172,7 @@ def config_create(ctx, token, clone) -> None:
         copy.flush_to_disk()
         copy.open_editor()
     else:
-        log.err("Configuration '{}' already exists!".format(
+        raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
             copy.full_name))
 
 
@@ -196,7 +197,7 @@ def config_destroy(ctx, token) -> None:
     if c.is_found():
         c.delete()
     else:
-        log.err("Configuration '{}' not found!".format(label),
+        raise click.BadArgumentUsage("Configuration '{}' not found!".format(label),
                 "Please check the 'list' command")
 
 
@@ -221,7 +222,7 @@ def config_edit(ctx, token, editor) -> None:
     if block.is_found():
         block.open_editor(editor)
     else:
-        log.err("Cannot open this configuration: does not exist!")
+        raise click.BadArgumentUsage("Cannot open this configuration: does not exist!")
 
 
 @config.command(name="import", short_help="Import config from a file")
@@ -244,7 +245,7 @@ def config_import(ctx, token, in_file) -> None:
         obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
         obj.flush_to_disk()
     else:
-        log.err("Cannot import into an already created conf. block!")
+        raise click.BadArgumentUsage("Cannot import into an already created conf. block!")
 
 
 @config.command(name="export", short_help="Export config into a file")

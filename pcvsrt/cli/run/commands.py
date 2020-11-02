@@ -1,9 +1,12 @@
 import os
 import time
+from typing import Optional
 import click
 import yaml
 import pprint
 from datetime import datetime
+
+from yaml.loader import Loader
 
 from pcvsrt.helpers import io, log, system
 from pcvsrt.cli.run import backend as pvRun
@@ -37,16 +40,15 @@ def iterate_dirs(ctx, param, value) -> dict:
             else:
                 list_of_dirs[label] = testpath
         if len(err_msg):
-            log.err(
-                "Errors occured while parsing user directories:",
-                err_msg,
-                "please see '--help' for more information")
+            raise click.BadArgumentUsage("\n".join([
+                    "While parsing user directories:",
+                    '{}'.format(err_msg),
+                    "please see '--help' for more information"
+                ]))
     return list_of_dirs
 
 
 def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
-    label = None
-    
     abspath = os.path.abspath(incomplete)
     
     if ':' in incomplete:
@@ -65,7 +67,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
               help="Where artefacts will be stored during/after the run")
-@click.option("-c", "--set-defaults", "set_default",
+@click.option("-e", "--edit", "set_default",
               default=None, is_flag=True,
               help="Set default values for run options (WIP)")
 @click.option("-s", '--validation', "validation_file",
@@ -74,21 +76,21 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-l/-L", "--tee/--no-tee", "tee", show_envvar=True,
               default=None, is_flag=True,
               help="Log the whole stdout/stderr")
-@click.option("-d", "--detach", "detach",
+@click.option("--detach", "detach",
               default=True, is_flag=True, show_envvar=True,
-              help="Run the validation asynchronously")
+              help="Run the validation asynchronously (WIP)")
 @click.option("--status", "status",
               default=False, is_flag=True, show_envvar=True,
               help="Display current run progression")
 @click.option("-P", "--pause", "pause",
               default=None, is_flag=True, show_envvar=True,
-              help="Pause the current run")
+              help="Pause the current run [TBD]")
 @click.option("-R", "--resume", "resume",
               default=None, is_flag=True, show_envvar=True,
-              help="Resume a previously paused run")
-@click.option("-b", "--bootstrap", "bootstrap",
+              help="Resume a previously paused run [TBD]")
+@click.option("-B", "--bootstrap", "bootstrap",
               default=False, is_flag=True, show_envvar=True,
-              help="Initialize basic test templates in given directory")
+              help="Initialize basic test templates in given directory [TBD]")
 @click.option("-f", "--override", "override",
               default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
@@ -98,14 +100,17 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,
               help="Purge final archive from sensitive data (HOME, USER...)")
-@click.option("-e", "--export", "export",
+@click.option("-b", "--bank", "bank",
               default=None, 
               help="Which bank will store data instead of creating an archive")
+@click.option("--duplicate", "dup", default=None,
+              type=click.Path(exists=True, file_okay=False), required=False,
+              help="Reuse previously loaded path(s) (ignores any DIRS argument")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
 def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
-        override, tee, anon, validation_file, simulated, export,
+        override, tee, anon, validation_file, simulated, bank, dup,
         set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -120,7 +125,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         log.nimpl("Bootstrap")
         exit(0)
     elif pause and resume:
-        log.err("Cannot pause and resume the run at the same time!")
+        raise click.BadOptionUsage("Cannot pause and resume the run at the same time!")
     elif pause:
         log.nimpl("pause")
         exit(0)
@@ -131,19 +136,17 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         log.nimpl("status")
         exit(0)
     elif set_default:
-        log.nimpl("set_defaults")
-        #io.open_in_editor("defaults")
+        io.open_in_editor(system.CfgValidation.get_valfile(validation_file))
         exit(0)
 
-    bank = None
-    if export is not None:
-        bank = pvBank.Bank(export)
-        if not bank.exists():
-            log.err('--export points to a non-existent bank')
+    theBank = None
+    if bank is not None:
+        theBank = pvBank.Bank(bank)
+        if not theBank.exists():
+            log.err('--bank points to a non-existent bank')
     
     # fill validation run_setttings
     settings = system.Settings()
-
     cfg_val = system.CfgValidation(validation_file)
     cfg_val.override('datetime', datetime.now())
     cfg_val.override('verbose', ctx.obj['verbose'])
@@ -154,28 +157,30 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     cfg_val.override('dirs', dirs)
     cfg_val.override('simulated', simulated)
     cfg_val.override('anonymize', anon)
-    cfg_val.override('exported_to', export)
+    cfg_val.override('exported_to', bank)
     cfg_val.override('tee', tee)
-
-    (scope, label) = pvProfile.extract_profile_from_token(profilename)
     
-    pf = pvProfile.Profile(label, scope)
-    cfg_val.override('pf_name', pf.full_name)
-    
-    if not pf.is_found():
-        log.err("Please use a valid profile name:",
-                "No '{}' found!".format(profilename))
+    if dup is not None:
+        try:
+            settings = pvRun.dup_another_build(dup, cfg_val.output)
+            #TODO: for now, none of the CLI options overrides duplicated build
+            # except 'output'
+        except FileNotFoundError:
+            raise click.BadOptionUsage("--duplicate", "{} is not a valid build directory!".format(dup))
     else:
+        (scope, label) = pvProfile.extract_profile_from_token(profilename)
+        pf = pvProfile.Profile(label, scope)
+        if not pf.is_found():
+            log.err("Please use a valid profile name:",
+                    "No '{}' found!".format(profilename))
         pf.load_from_disk()
-        
+        cfg_val.override('pf_name', pf.full_name)
         settings.runtime = system.CfgRuntime(pf.runtime)
         settings.compiler = system.CfgCompiler(pf.compiler)
         settings.machine = system.CfgMachine(pf.machine)
         settings.criterion = system.CfgCriterion(pf.criterion)
         settings.group = system.CfgTemplate(pf.group)
-
-    settings.dirs = dirs
-    settings.validation = cfg_val
+        settings.validation = cfg_val
 
     system.save_as_global(settings)
 
@@ -184,12 +189,16 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
 
     log.banner()
     log.print_header("Prepare Environment")
-    pvRun.prepare(settings)
+    pvRun.prepare(settings, dup is not None)
 
     log.print_header("Process benchmarks")
-    start = time.time()
-    pvRun.process()
-    log.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
+    if dup:
+        log.print_section("Reusing previously generated inputs")
+        log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
+    else:
+        start = time.time()
+        pvRun.process()
+        log.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
     
     log.print_header("Validation Start")
     pvRun.run()
@@ -197,8 +206,8 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     log.print_header("Finalization")
     archive = pvRun.terminate()
 
-    if bank is not None:
-        bank.save(
+    if theBank is not None:
+        theBank.save(
             system.get('validation').datetime.strftime('%Y-%m-%d'),
             os.path.join(system.get('validation').output, archive)
         )

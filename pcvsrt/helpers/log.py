@@ -212,9 +212,7 @@ def err(*msg, abort=1):
 
 
 def nimpl(*msg):
-    cowsay.daemon(click.style("'{}' not implemented yet! (WIP)".format(*msg),
-                  fg="yellow", bold=True))
-    err("")
+    err("This is not implemented (yet)!")
 
 
 def nreach(*msg):
