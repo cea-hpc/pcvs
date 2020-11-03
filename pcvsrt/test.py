@@ -244,16 +244,18 @@ class Test:
 
     def serialize_shell(self):
         """Serialize test logic to its Shell representation"""
-        prep_code = ""
+        pm_code = ""
+        cd_code = ""
+        env_code = ""
         final_code = ""
 
         # if changing directory is required by the test
         if self._array['chdir'] is not None:
-            prep_code += "cd '{}'\n".format(self._array['chdir'])
+            cd_code += "cd '{}'\n".format(self._array['chdir'])
 
         # manage package-manager deps
         if self._array['dep'] is not None:
-            prep_code += "\n".join([
+            pm_code += "\n".join([
                     elt.get(load=True, install=True)
                     for elt in self._array['dep']
                     if isinstance(elt, pm.PManager)
@@ -262,8 +264,7 @@ class Test:
         # manage environment variables defined in TE
         if self._array['env'] is not None:
             for e in self._array['env']:
-                prep_code += "{}\n".format(e)
-                prep_code += "export {}\n".format(e.split('=')[0])
+                env_code += "{}; export {}\n".format(e, e.split('=')[0])
 
         # if test should be validated through a matching regex
         if self._array['matchers'] is not None:
@@ -286,18 +287,24 @@ class Test:
         
         return """
         "{name}")
-            {prepare}
-            if test "$PCVS_SHOW" = "cmd"; then
-                echo "{cmd}"
-                exit 0
-            fi
+            case "$PCVS_SHOW" in
+                env) echo "{env_code}"; exit 0;;
+                cmd) echo "{cmd}"; exit 0;;
+                loads) echo "{pm_esc}"; exit 0;;
+            esac
+            {cd_code}
+            {pm_code}
+            {env_code}
             output=`{cmd} 2>&1`
             ret=$?
             echo "$output"
             {finalize}
             ;;""".format(
+                    cd_code=cd_code,
+                    pm_code=pm_code,
+                    pm_esc=pm_code.replace(r'$', r'\$').replace(r'`', r'\`'),
+                    env_code=env_code,
                     name=self._array['name'],
-                    prepare=prep_code,
                     cmd=self._array['command'],
                     finalize=final_code
                 )

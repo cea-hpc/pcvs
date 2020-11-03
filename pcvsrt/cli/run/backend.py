@@ -189,10 +189,8 @@ def build_env_from_configuration(current_node, parent_prefix="pcvs"):
             v =  " ".join(map(str, v))
         else:
             v = str(v)
-
         k = "{}_{}".format(parent_prefix, k).replace('.', '_')
         env_dict[k] = v
-        
     return env_dict
 
 

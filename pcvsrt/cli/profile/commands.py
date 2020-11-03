@@ -228,7 +228,7 @@ def profile_destroy(ctx, token):
             pf.delete()
     else:
         raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
-                "Please check the 'list' command")
+                                     "Please check the 'list' command")
 
 
 @profile.command(name="alter",

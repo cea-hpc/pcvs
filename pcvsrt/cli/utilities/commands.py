@@ -17,11 +17,11 @@ from pcvsrt.cli.utilities import backend as pvUtils
 @click.option('-l', '--list', 'gen_list', is_flag=True,
               help='List available tests (may take a while)')
 @click.option("-s", "--show", "display",
-              type=click.Choice(['cmd']), default=None,
+              type=click.Choice(['cmd', 'env', 'loads']), default=None,
               help="Display information instead of executing the command")
 @click.argument("argument", type=str, required=False)
 @click.pass_context
-def exec(ctx, output, argument, gen_list, display, interactive):
+def exec(ctx, output, argument, gen_list, display):
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
