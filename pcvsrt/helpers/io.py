@@ -79,9 +79,23 @@ def cwd(path):
     finally:
         os.chdir(oldpwd)
 
+def assert_editor_valid(override=None):
+    editor = "Undefined"
+    try:
+        if override is None:
+            editor = os.environ['EDITOR']
+        else:
+            editor = override
+        if shutil.which(editor, mode=os.X_OK) is None:
+            raise Exception
+    except:
+        log.err("'{}' is not a valid program.".format(editor),
+                "Please use --editor or set $EDITOR appropriately")
+
+    return editor
 
 def open_in_editor(*paths, e=None):
-    editor = e if e is not None else os.environ['EDITOR']
+    editor = assert_editor_valid(e)
     if shutil.which(editor) is None:
         log.err("'{}' is not a valid editor.".format(editor),
                 "Please see the '-e' option!")

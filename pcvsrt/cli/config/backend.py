@@ -208,6 +208,8 @@ class ConfigurationBlock:
         
         if not os.path.exists(self._file):
             return
+
+        e = io.assert_editor_valid(e)
         
         fname = tempfile.NamedTemporaryFile(
                 mode='w+',
