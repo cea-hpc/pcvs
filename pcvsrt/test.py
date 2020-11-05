@@ -155,7 +155,7 @@ class TestFile:
                 fh_xml.write("<jobSuite>")
                 fh_sh.write(
                     '#!/bin/sh\n' +
-                    '{pm_string}'.format(pm_string="\n".join([
+                    '{pm_string}\n'.format(pm_string="\n".join([
                             TestFile.cc_pm_string,
                             TestFile.rt_pm_string
                         ])) +
