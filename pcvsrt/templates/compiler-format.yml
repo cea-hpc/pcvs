@@ -32,5 +32,7 @@ variants:
 # Note, only a single can be specified but both can be used
 # at the same time
 package_manager:
-    spack: "name@version+variants"
-    module: "group/flavor/version"
+    spack:
+    - "name@version+variants"
+    module:
+    - "group/flavor/version"
