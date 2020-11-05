@@ -1,6 +1,7 @@
 ---
 .this_is_a_job:
     group: "GRPSERIAL"
+    tag: ["a", "b"]
     build:
         # source files to include (if needed)
         files: "@SRCPATH@/*.c"

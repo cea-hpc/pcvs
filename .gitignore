@@ -21,3 +21,5 @@
 tags
 build/
 .vscode/
+.pcvs/
+.pcvsrt/

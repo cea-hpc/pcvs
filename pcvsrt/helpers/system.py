@@ -8,21 +8,13 @@ from pcvsrt.helpers import log, pm, validation
 
 class CfgBase(Dict):
    
-    def __init__(self, param, *args, **kwargs):
+    def __init__(self, node, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        preset = None
-        if isinstance(param, str) and os.path.isfile(param):
-            try:
-                with open(param, 'r') as fh:
-                    preset = yaml.load(fh, Loader=yaml.FullLoader)
 
-            except (IOError, yaml.YAMLError):
-                log.err("Error(s) found while load (}".format(param))
-        else:
-            preset = param
+        assert(isinstance(node, dict))
 
-        for n in preset:
-            self.__setitem__(n, preset[n])
+        for n in node:
+            self.__setitem__(n, node[n])
 
     def __setitem__(self, param, value):
         if isinstance(value, dict):
@@ -93,9 +85,18 @@ class CfgValidation(CfgBase):
         return override
 
     def __init__(self, filename=None):
+        node = Dict()
         if filename is None:
             filename = CfgValidation.default_valfile
-        super().__init__(filename)
+
+        if os.path.isfile(filename):
+            try:
+                with open(filename, 'r') as fh:
+                    node = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+            except (IOError, yaml.YAMLError):
+                log.err("Error(s) found while loading (}".format(filename))
+
+        super().__init__(node)
 
         validation.ValidationScheme('settings').validate(self)
 
@@ -111,6 +112,13 @@ class CfgValidation(CfgBase):
         self.set_ifnot('simulated', False)
         self.set_ifnot('anonymize', False)
         self.set_ifnot('exported_to', None)
+        self.set_ifnot('result', {"format": ['json']})
+
+        # Annoying here:
+        # self.result should be allowed even without the 'set_ifnot' above
+        # but because of inheritance, it does not result as a Dict()
+        # As the 'set_ifnot' is required, it is solving the issue
+        # but this corner-case should be remembered as it WILL happen again :(
 
         if 'format' not in self.result:
             self.result.formats = ['json']

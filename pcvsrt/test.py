@@ -351,6 +351,11 @@ class TEDescriptor:
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
         self._full_name = "/".join([self._te_pkg, self._te_name])
+        self._tags = node.get('tag', list())
+
+        # allow tags to be given as array OR a single string
+        if not isinstance(self._tags, list):
+            self._tags = [self._tags]
         
         # if TE used program-level criterions
         if 'program' in self._run.get('iterate', {}):
@@ -496,6 +501,8 @@ class TEDescriptor:
         if not isinstance(self._build.files, list):
             self._build.files = [self._build.files]
 
+
+
         # manage deps (tests, pms...)
         deps = lowtest.handle_job_deps(self._build, self._te_pkg)
 
@@ -508,13 +515,15 @@ class TEDescriptor:
         if 'cwd' in self._build:
             chdir = self._build.cwd
 
+        constraints = ["compilation"] + self._tags
+        
         # count number of built tests
         self._effective_cnt += 1
 
         yield Test(
             name=self._full_name,
             command=command,
-            constraint="compilation",
+            constraint=constraints,
             dep=deps,
             time=self._validation.time.get("mean_time", None),
             delta=self._validation.time.get("tolerance", None),
@@ -567,6 +576,7 @@ class TEDescriptor:
                 name="_".join([self._full_name, comb.translate_to_str()]),
                 command=command,
                 dep=deps,
+                constraint=self._tags,
                 env=env,
                 time=self._validation.time.get("mean_time", None),
                 delta=self._validation.time.get("tolerance", None),

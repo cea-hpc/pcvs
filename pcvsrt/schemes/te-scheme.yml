@@ -5,6 +5,10 @@ patternProperties:
     properties:
       group:
         type: string
+      tag:
+        type: array
+        items:
+          type: string
       build:
         type: object
         properties:
