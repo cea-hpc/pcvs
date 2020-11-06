@@ -1,42 +1,6 @@
 ---
 type: object
 properties:
-  default:
-    type: string
-  nodes:
-    type: integer
-  cores_per_node:
-    type: integer
-  batch_mintime:
-    type: integer
-  batch_maxtime:
-    type: integer
-  concurrent_run:
-    type: integer
-  command:
-    type: object
-    properties:
-      alloc:
-        OneOf:
-        - type: string
-        - type: 'null'
-      run:
-        OneOf:
-        - type: string
-        - type: 'null'
-    additionalProperties: false
-  wrapper:
-    type: object
-    properties:
-      alloc:
-        OneOf:
-        - type: string
-        - type: 'null'
-      run:
-        OneOf:
-        - type: string
-        - type: 'null'
-    additionalProperties: false
   partitions:
     type: array
     items:
@@ -44,43 +8,38 @@ properties:
       patternProperties:
         "^.*$":
           type: object
-          properties:
+          properties: &raw_properties
             nodes:
               type: integer
             cores_per_node:
               type: integer
-            batch_mintime:
-              type: integer
-            batch_maxtime:
-              type: integer
             concurrent_run:
               type: integer
-            command:
+            job_manager:
               type: object
               properties:
-                alloc:
-                  OneOf:
-                  - type: string
-                  - type: 'null'
+                mintime:
+                  type: integer
+                maxtime:
+                  type: integer
+                allocate: &alloc_node
+                  type: object
+                  properties:
+                    program: {"type": "string"}
+                    args: {"type": "string"}
+                    wrapper: {"type": "string"}
+                  additionalProperties: false
                 run:
-                  OneOf:
-                  - type: string
-                  - type: 'null'
-              additionalProperties: false
-            wrapper:
-              type: object
-              properties:
-                alloc:
-                  OneOf:
-                  - type: string
-                  - type: 'null'
-                run:
-                  OneOf:
-                  - type: string
-                  - type: 'null'
+                  <<: *alloc_node
+                batch:
+                  <<: *alloc_node
               additionalProperties: false
           additionalProperties: false
       additionalProperties: false
+
+  <<: *raw_properties
+  default_partition:
+    type: string
   package_manager:
     type: object
     properties:

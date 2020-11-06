@@ -58,12 +58,18 @@ class CfgMachine(CfgBase):
         self.set_ifnot('cores_per_node', 1)
         self.set_ifnot('concurrent_run', 1)
 
-        if 'default' not in self:
+        if 'default_partition' not in self:
             return
 
         # override default values by selected partition
-        override_node = [v for d in self.partitions for k, v in d.items() if k == self.default]
+        override_node = [v for d in self.partitions for k, v in d.items() if k == self.default_partition]
+        #only care for the first match (is two identical partition name possible ? 
         self.update(override_node[0])
+
+        #redirect to direct programs if no wrapper is defined
+        for kind in ['allocate', 'run', 'batch']:
+            if not self.job_manager[kind].wrapper and self.job_manager[kind].program:
+                self.job_manager[kind].wrapper = self.job_manager[kind].program
 
 
 class CfgCriterion(CfgBase):

@@ -288,8 +288,8 @@ def run():
     valcfg = system.get('validation')
     macfg = system.get('machine')
 
-    launcher = "--launcher={}".format(macfg.wrapper.alloc) if 'alloc' in macfg.wrapper else ''
-    clauncher = "--compil-launcher={}".format(macfg.wrapper.run) if 'run' in macfg.wrapper else ''  
+    launcher = "--launcher={}".format(macfg.job_manager.allocate.wrapper) if 'wrapper' in macfg.job_manager.allocate else ''
+    clauncher = "--compil-launcher={}".format(macfg.job_manager.run.wrapper) if 'wrapper' in macfg.job_manager.run else ''
     
     cmd = [
         os.path.join(valcfg.jchronoss.install, "bin/jchronoss"),
@@ -304,8 +304,8 @@ def run():
         "--expect-success",
         "--keep={}".format(valcfg.result.log),
         "--policy={}".format(0),
-        "--maxt-slave={}".format(macfg.batch_maxtime),
-        "--mint-slave={}".format(macfg.batch_mintime),
+        "--maxt-slave={}".format(macfg.job_manager.maxtime),
+        "--mint-slave={}".format(macfg.job_manager.mintime),
         "--size-flow={}".format(valcfg.result.logsz),
         "--autokill={}".format(100000),
         "--fake" if valcfg.simulated else ""
