@@ -123,7 +123,7 @@ class Profile:
     def load_template(self):
         log.nimpl()
 
-    def check(self, fail):
+    def check(self, fail=True):
         for kind in config.CONFIG_BLOCKS:
             if kind not in self._details:
                 raise jsonschema.exceptions.ValidationError("Missing '{}' in profile".format(kind))
@@ -131,6 +131,7 @@ class Profile:
         
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
+        self.check()
 
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
@@ -191,13 +192,18 @@ class Profile:
         fplugin.seek(0)
 
         #now, dump back temp file to the original saves
+        stream = yaml.load(fname, Loader=yaml.FullLoader)
+        if stream is None:
+            stream = dict()
+        stream_plugin = fplugin.read()
+        if len(stream_plugin) > 0:
+            stream['runtime']['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+
+        #just check the outcome is valid
+        self.fill(stream)
+        self.check(fail=True)
+
         with open(self._file, 'w') as f:
-            stream = yaml.load(fname, Loader=yaml.FullLoader)
-            if stream is None:
-                stream = dict()
-            stream_plugin = fplugin.read()
-            if len(stream_plugin) > 0:
-                stream['runtime']['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
             yaml.dump(stream, f)
 
         # delete temp files (replace by 'with...' ?)
