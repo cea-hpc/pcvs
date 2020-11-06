@@ -58,7 +58,7 @@ class CfgMachine(CfgBase):
         self.set_ifnot('cores_per_node', 1)
         self.set_ifnot('concurrent_run', 1)
 
-        if 'default_partition' not in self:
+        if 'default_partition' not in self or 'partitions' not in self:
             return
 
         # override default values by selected partition
