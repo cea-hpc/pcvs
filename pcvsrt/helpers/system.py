@@ -121,7 +121,7 @@ class CfgValidation(CfgBase):
         # but this corner-case should be remembered as it WILL happen again :(
 
         if 'format' not in self.result:
-            self.result.formats = ['json']
+            self.result.format = ['json']
         if 'log' not in self.result:
             self.result.log = 2
         if 'logsz' not in self.result:
