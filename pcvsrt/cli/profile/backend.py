@@ -162,6 +162,12 @@ class Profile:
                 log.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
+        assert (self._file is not None)
+        
+        if not os.path.exists(self._file):
+            return
+
+        e = io.assert_editor_valid(e)
         fname = tempfile.NamedTemporaryFile(
             mode='w+',
             prefix="{}".format(self.full_name),
@@ -170,7 +176,7 @@ class Profile:
         fplugin = tempfile.NamedTemporaryFile(
             mode='w+',
             prefix="{}".format(self.full_name),
-            suffix=".yml"
+            suffix=".py"
         )
         with open(self._file, 'r') as f:
             stream = yaml.load(f, Loader=yaml.FullLoader)
@@ -179,8 +185,16 @@ class Profile:
 
             if stream and 'plugin' in stream['runtime']:
                 content = base64.b64decode(stream['runtime']['plugin']).decode('ascii')
-                fplugin.write(content)
-                fplugin.flush()
+            else:
+                content = """import math
+
+def check_valid_combination(dict_of_combinations=dict()):
+    # this dict maps keys (it name) with values (it value)
+    # returns True if the combination should be used
+    return True
+"""
+            fplugin.write(content)
+            fplugin.flush()
         try:
             io.open_in_editor(fname.name, fplugin.name, e=e)
         except:
