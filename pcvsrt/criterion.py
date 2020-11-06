@@ -315,5 +315,5 @@ def initialize_from_system():
     # convert any sequence into valid range of integers for
     # numeric criterions
     log.print_item("Expand possible iterator expressions")
-    for criterion in system.get('crioterion').obj.iterators.values():
+    for criterion in system.get('criterion').obj.iterators.values():
         criterion.expand_values()
