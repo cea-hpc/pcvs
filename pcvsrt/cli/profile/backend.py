@@ -234,6 +234,23 @@ def check_valid_combination(dict_of_combinations=dict()):
         fplugin.close()
         
         self.load_from_disk()
+    
+    def split_into_configs(self, prefix, blocklist=config.CONFIG_BLOCKS, scope=None):
+        objs = list()
+        if 'all' in blocklist:
+            blocklist = config.CONFIG_BLOCKS
+        if scope is None:
+            scope = self._scope
+
+        for name in blocklist:
+            c = config.ConfigurationBlock(name, prefix, scope)
+            if c.is_found():
+                log.err("{} already exist!".format(c.full_name))
+            else:
+                c.fill(self._details[name])
+                objs.append(c)
+        return objs
+
 
     @property
     def compiler(self):

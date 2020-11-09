@@ -302,3 +302,43 @@ def profile_export(ctx, token, dest_file):
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         dest_file.write(yaml.dump(pf.dump()))
+
+@profile.command(name="split",
+                 short_help="Recreate conf. blocks based on a profile")
+@click.argument("token", nargs=1, type=click.STRING,
+                autocompletion=compl_list_token)
+@click.option("-n", "--name", "name", default="default",
+              help="name of the basic block to create (should not exist!)"
+        )
+@click.option("-b", "--block", "block_opt", nargs=1, type=click.STRING,
+            help="Re-build only a profile subset", default="all")
+@click.option("-s", "--scope", "scope",
+              type=click.Choice(io.storage_order()), default=None,
+              help="Default scope to store the split (default: same as profile)")
+@click.pass_context
+def profile_decompose_profile(ctx, token, name, block_opt, scope):
+    (p_scope, p_label) = pvProfile.extract_profile_from_token(token)
+
+    blocks = [e.strip() for e in block_opt.split(',')]
+    for b in blocks:
+        if b == 'all':
+            blocks = pvConfig.CONFIG_BLOCKS
+            break
+        if b not in pvConfig.CONFIG_BLOCKS:
+            raise click.BadOptionUsage("--block", "{} is not a valid component.".format(b))
+
+    pf = pvProfile.Profile(p_label, p_scope)
+    if not pf.is_found():
+        click.BadArgumentUsage("Cannot decompose an non-existent profile: '{}'".format(token))
+    else:
+        pf.load_from_disk()
+
+
+    log.print_section('"Create the subsequent configuration blocks:')
+    for c in pf.split_into_configs(name, blocks, scope):
+        log.print_item(c.full_name)
+        c.flush_to_disk()
+
+
+
+

@@ -13,7 +13,7 @@ from pcvsrt.helpers.system import sysTable
 
 
 CONFIG_STORAGES = dict()
-CONFIG_BLOCKS = list()
+CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
 
 
@@ -47,7 +47,6 @@ def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_STORAGES = {k: os.path.join(v, "saves")
                        for k, v in io.STORAGES.items()}
-    CONFIG_BLOCKS = {'compiler', 'runtime', 'machine', 'criterion', 'group'}
     CONFIG_EXISTING = {}
 
     # this first loop defines configuration order
@@ -135,7 +134,7 @@ class ConfigurationBlock:
         return self._name
 
     def fill(self, raw):
-        self._details = raw if raw else dict()
+        self._details = Dict(raw)
 
     def dump(self):
         self.load_from_disk()
@@ -153,7 +152,7 @@ class ConfigurationBlock:
         log.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         with open(self._file) as f:
-            self._details = yaml.safe_load(f)
+            self._details = Dict(yaml.safe_load(f))
 
     def load_template(self):
         with open(os.path.join(
@@ -174,9 +173,8 @@ class ConfigurationBlock:
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
 
-        
         with open(self._file, 'w') as f:
-            yaml.safe_dump(self._details, f)
+            yaml.safe_dump(self._details.to_dict(), f)
 
     def clone(self, clone):
         assert (isinstance(clone, ConfigurationBlock))
@@ -251,7 +249,7 @@ def check_valid_combination(dict_of_combinations=dict()):
         #now, dump back temp file to the original saves
         try:
             fname.seek(0)
-            self._details = dict(yaml.load(fname, Loader=yaml.FullLoader))
+            self._details = Dict(yaml.load(fname, Loader=yaml.FullLoader))
         except yaml.YAMLError as e:
             log.err("Failure when editing conf. block:", '{}'.format(e))
         except TypeError:
