@@ -84,6 +84,39 @@ def __build_tools():
     __setup_webview()
 
 
+def __check_valid_program(p, succ=None, fail=None):
+    if not p:
+        return
+    try:
+        filepath = shutil.which(p)
+        res = os.access(filepath, mode=os.X_OK)
+    except TypeError:  #which() can return None
+        res = False
+
+    if res is True and succ is not None:
+        succ("'{}' found at '{}'".format(os.path.basename(p), filepath))
+
+    if res is False and fail is not None:
+        fail("{} not found or not a executable".format(p))
+
+    return res
+
+
+def __check_defined_program_validity():
+    # exhaustive list of user-defined program to exist before starting:
+    __check_valid_program(system.get('machine').job_manager.allocate.program, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('machine').job_manager.allocate.wrapper, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('machine').job_manager.run.program, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('machine').job_manager.run.wrapper, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('machine').job_manager.batch.program, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('machine').job_manager.batch.wrapper, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('compiler').commands.cc, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('compiler').commands.cxx, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('compiler').commands.fc, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('compiler').commands.f77, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('compiler').commands.f90, succ=log.print_item, fail=log.err)
+    __check_valid_program(system.get('runtime').program, succ=log.print_item, fail=log.err)
+
 def prepare(run_settings, reuse=False):
     log.print_section("Prepare environment")
     log.print_item("Date: {}".format(
@@ -116,6 +149,9 @@ def prepare(run_settings, reuse=False):
 
     log.print_section("Build third-party tools")
     __build_tools()
+
+    #log.print_section("Ensure user-defined programs exist")
+    #__check_defined_program_validity()
 
     log.print_section("Load and initialize validation criterions")
     criterion.initialize_from_system()
