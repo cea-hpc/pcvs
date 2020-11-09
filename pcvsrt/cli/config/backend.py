@@ -5,6 +5,7 @@ import pprint
 import yaml
 from addict import Dict
 import tempfile
+import jsonschema
 
 import pcvsrt
 from pcvsrt.helpers import io, log, validation
@@ -261,6 +262,19 @@ def check_valid_combination(dict_of_combinations=dict()):
             stream_plugin = fplugin.read()
             if len(stream_plugin) > 0:
                 self._details['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+
+        try:
+            self.check(fail=False)
+        except jsonschema.exceptions.ValidationError as e:
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".yml.rej", prefix=self.full_name, delete=False) as rej_fh:
+                yaml.dump(stream, rej_fh)
+            
+                log.err("Invalid format: {}".format(e.message),
+                        "Rejected file: {}".format(rej_fh.name),
+                        "You may use 'pcvs check' to validate external resource",
+                        "before the importation.")
+
+
 
         # delete temp files (replace by 'with...' ?)
         fname.close()

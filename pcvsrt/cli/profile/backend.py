@@ -215,7 +215,16 @@ def check_valid_combination(dict_of_combinations=dict()):
 
         #just check the outcome is valid
         self.fill(stream)
-        self.check(fail=True)
+        try:
+            self.check(fail=False)
+        except jsonschema.exceptions.ValidationError as e:
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".yml.rej", prefix=self.full_name, delete=False) as rej_fh:
+                yaml.dump(stream, rej_fh)
+            
+                log.err("Invalid format: {}".format(e.message),
+                        "Rejected file: {}".format(rej_fh.name),
+                        "You may use 'pcvs check' to validate external resource",
+                        "before the importation.")
 
         with open(self._file, 'w') as f:
             yaml.dump(stream, f)
