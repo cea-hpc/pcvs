@@ -563,8 +563,9 @@ class TEDescriptor:
             if self._run.cwd:
                 chdir = self._run.cwd
 
-            command = "{runtime} {args} {program} {params}".format(
+            command = "{runtime} {runtime_args} {args} {program} {params}".format(
                 runtime=system.get('runtime').program,
+                runtime_args=system.get('runtime').get('args', ''),
                 args=" ".join(args),
                 program=os.path.join(self._buildir, program),
                 params=" ".join(params)
