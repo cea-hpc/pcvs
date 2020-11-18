@@ -1,6 +1,7 @@
 from pcvsrt.helpers import log
 
-def identify_manager(pm_node):
+
+def identify(pm_node):
     ret = list()
     if 'spack' in pm_node:
         if not isinstance(pm_node['spack'], list):
@@ -52,4 +53,3 @@ class ModuleManager(PManager):
         if load:
             s += "module load {}".format(self.spec)
         return s
-

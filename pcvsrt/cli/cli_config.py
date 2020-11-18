@@ -1,15 +1,15 @@
 import click
 import yaml
 
-from pcvsrt.cli.config import backend as pvConfig
-from pcvsrt.helpers import log, io
+from pcvsrt.backend import config as pvConfig
+from pcvsrt.helpers import log, utils
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
     pvConfig.init()
     flat_array = []
     for kind in pvConfig.CONFIG_BLOCKS:
-        for scope in io.storage_order():
+        for scope in utils.storage_order():
             for elt in pvConfig.CONFIG_EXISTING[kind][scope]:
                 flat_array.append(scope + "." + kind + "." + str(elt[0]))
 
@@ -47,7 +47,7 @@ def config_list_single_kind(kind, scope) -> None:
         log.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in io.storage_order():
+        for sc in utils.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
@@ -92,7 +92,7 @@ def config_list(ctx, token) -> None:
     else:
         pvConfig.check_valid_kind(kind)
         kinds = [kind]
-    io.check_valid_scope(scope)
+    utils.check_valid_scope(scope)
 
     log.print_header("Configuration view")
 
@@ -102,9 +102,9 @@ def config_list(ctx, token) -> None:
 
     # in case verbosity is enabled, add scope paths
     log.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(io.storage_order()):
+    for i, scope in enumerate(utils.storage_order()):
         log.info("{}. {}: {}".format(
-            i+1, scope.upper(), io.STORAGES[scope]))
+            i+1, scope.upper(), utils.STORAGES[scope]))
 
 
 @config.command(name="show",

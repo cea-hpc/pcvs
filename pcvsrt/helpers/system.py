@@ -1,9 +1,10 @@
-from addict import Dict
 import os
-import yaml
 import pprint
 
-from pcvsrt.helpers import log, pm, validation
+import yaml
+from addict import Dict
+
+from pcvsrt.helpers import log, package_manager, utils
 
 
 class CfgBase(Dict):
@@ -40,14 +41,14 @@ class CfgCompiler(CfgBase):
     def __init__(self, node):
         super().__init__(node)
         if 'package_manager' in self:
-            self.obj = pm.identify_manager(self.package_manager)
+            self.obj = package_manager.identify(self.package_manager)
 
 
 class CfgRuntime(CfgBase):
     def __init__(self, node):
         super().__init__(node)
         if 'package_manager' in self:
-            self.obj = pm.identify_manager(self.package_manager)
+            self.obj = package_manager.identify(self.package_manager)
 
 
 class CfgMachine(CfgBase):
@@ -104,7 +105,7 @@ class CfgValidation(CfgBase):
 
         super().__init__(node)
 
-        validation.ValidationScheme('settings').validate(self)
+        utils.ValidationScheme('settings').validate(self)
 
         # #### now set default value ####
         self.set_ifnot('verbose', 0)

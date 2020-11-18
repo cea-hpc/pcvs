@@ -1,14 +1,15 @@
-from datetime import datetime
-from pcvsrt.helpers.system import Settings
-import click
 import copy
-import base64
-import sys
 import os
-from prettytable import PrettyTable
 import subprocess
-from pcvsrt.helpers import log, io, system
-from pcvsrt.cli.utilities import backend as pvUtils
+import sys
+from datetime import datetime
+
+import click
+from prettytable import PrettyTable
+
+from pcvsrt.backend import utilities as pvUtils
+from pcvsrt.helpers import log, system
+from pcvsrt.helpers.system import Settings
 
 
 @click.command(name="exec", short_help="Running aspecific test")

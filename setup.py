@@ -3,7 +3,7 @@ import subprocess
 
 current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE)
 
-with open("README", 'r') as f:
+with open("README.md", 'r') as f:
     desc = f.read()
 
 with open('requirements.txt') as f:
@@ -30,7 +30,7 @@ setuptools.setup(
 
     entry_points='''
         [console_scripts]
-        pcvs=pcvsrt.cli.cmd:cli
+        pcvs=pcvsrt.main:cli
         pcvs_convert=pcvsrt.converter.yaml_converter:main
     ''',
 

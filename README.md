@@ -55,7 +55,11 @@ Click, there should not be more information displayed that printing the `--help`
 
 	# be sure to have sphinx installed first
 	pip3 install sphinx
+	# readthedocs theme may not be included within Sphinx now:
+	pip3 install sphinx_rtd_theme
+	
 	cd ./docs
 	make  # will list available doc formats
 	make man  # NOT the CLI man pages, but the general documentation
 	make html  # readthedocs-based
+	

@@ -2,15 +2,15 @@ import base64
 import glob
 import os
 import pprint
+import tempfile
+
+import jsonschema
 import yaml
 from addict import Dict
-import tempfile
-import jsonschema
 
 import pcvsrt
-from pcvsrt.helpers import io, log, validation
+from pcvsrt.helpers import log, utils
 from pcvsrt.helpers.system import sysTable
-
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
@@ -18,6 +18,16 @@ CONFIG_EXISTING = dict()
 
 
 def extract_config_from_token(s, pair="right", single="right"):
+    """Extract config tokens (scope,kind,name) from user's string
+
+    Args:
+        s (string): the input string
+        pair (str, optional): padding side when only 2 tokens found. Defaults to "right".
+        single (str, optional): padding side when only 1 token found. Defaults to "right".
+
+    Returns:
+        3-string-tuple: mapping (scope, kind, name), any of them may be null
+    """
     array = s.split(".")
     if len(array) > 3:
         log.err("Invalid token")
@@ -46,13 +56,13 @@ def extract_config_from_token(s, pair="right", single="right"):
 def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_STORAGES = {k: os.path.join(v, "saves")
-                       for k, v in io.STORAGES.items()}
+                       for k, v in utils.STORAGES.items()}
     CONFIG_EXISTING = {}
 
     # this first loop defines configuration order
     for block in CONFIG_BLOCKS:
         CONFIG_EXISTING[block] = {}
-        priority_paths = io.storage_order()
+        priority_paths = utils.storage_order()
         priority_paths.reverse()
         for token in priority_paths:  # reverse order (overriding)
             CONFIG_EXISTING[block][token] = []
@@ -89,7 +99,7 @@ def check_valid_kind(s):
 def check_existing_name(kind, name, scope):
     assert (kind in CONFIG_BLOCKS)
     path = None
-    scopes = io.storage_order() if scope is None else [scope]
+    scopes = utils.storage_order() if scope is None else [scope]
 
     for sc in scopes:
         for pair in CONFIG_EXISTING[kind][sc]:
@@ -105,11 +115,11 @@ def compute_path(kind, name, scope):
 
 
 class ConfigurationBlock:
-    _template_path = os.path.join(io.ROOTPATH, "share/templates")
+    _template_path = os.path.join(utils.ROOTPATH, "share/templates")
 
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
-        io.check_valid_scope(scope)
+        utils.check_valid_scope(scope)
         self._kind = kind
         self._name = name
         self._details = {}
@@ -141,7 +151,7 @@ class ConfigurationBlock:
         return Dict(self._details).to_dict()
 
     def check(self, fail=True):
-        validation.ValidationScheme(self._kind).validate(self._details, fail)
+        utils.ValidationScheme(self._kind).validate(self._details, fail)
 
     def load_from_disk(self):
 
@@ -208,7 +218,7 @@ class ConfigurationBlock:
         if not os.path.exists(self._file):
             return
 
-        e = io.assert_editor_valid(e)
+        e = utils.assert_editor_valid(e)
         
         fname = tempfile.NamedTemporaryFile(
                 mode='w+',
@@ -239,7 +249,7 @@ def check_valid_combination(dict_of_combinations=dict()):
                 fplugin.write(content)
                 fplugin.flush()
         try:
-            io.open_in_editor(fname.name,
+            utils.open_in_editor(fname.name,
                               fplugin.name if fplugin else None,
                               e=e)
         except:

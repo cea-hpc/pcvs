@@ -1,21 +1,33 @@
 import pcvsrt
 import pytest
 import os
-from .cli_testing import run_and_test, isolated_fs
+from .conftest import run_and_test, isolated_fs
+
+@pytest.fixture(params=[None] + pcvsrt.cli.cli_config.backend.CONFIG_BLOCKS)
+def config_kind(request):
+    return request.param
+
+@pytest.fixture(params=[None] + pcvsrt.helpers.utils.storage_order())
+def config_scope(request):
+    return request.param
+
+class config_mocker:
+    pass
 
 def test_cmd():
     res = run_and_test('config')
     assert('Usage:' in res.output)
 
-@pytest.mark.parametrize(
-    'kind',
-    [None, 'all', 'compiler', 'runtime', 'machine', 'criterion', 'group'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_list(scope, kind, caplog):
 
-    token = ".".join(filter(None, (scope, kind)))
 
-    if scope and kind is None:
+def test_list_all(config_scope, caplog):
+    return test_list(config_scope, 'all', caplog)
+
+def test_list(config_scope, config_kind, caplog):
+
+    token = ".".join(filter(None, (config_scope, config_kind)))
+
+    if config_scope and config_kind is None:
         caplog.clear()
         res = run_and_test('config', 'list', token, success=False)
         assert ("Invalid " in caplog.text)
@@ -23,18 +35,15 @@ def test_list(scope, kind, caplog):
         res = run_and_test('config', 'list', token)
         assert (res.exit_code == 0)
 
-    if scope and kind:
+    if config_scope and config_kind:
         caplog.clear()
         res = run_and_test('config', 'list', token+".test")
         assert ("no LABEL required for this command" in caplog.text)
 
 
-@pytest.mark.parametrize(
-    'kind',
-    ['all', 'compiler', 'runtime', 'machine', 'criterion', 'group'])
-def test_list_scope(kind):
-    for scope in pcvsrt.helpers.io.storage_order():
-        _ = run_and_test('config', 'list', ".".join([scope, kind]))
+def test_list_scope(config_kind, config_scope):
+    for scope in pcvsrt.helpers.utils.storage_order():
+        _ = run_and_test('config', 'list', ".".join([scope, config_kind]))
 
 
 def test_list_wrong(caplog):
@@ -51,13 +60,9 @@ def test_list_wrong(caplog):
     assert ('Invalid token' in caplog.text)
 
 
-@pytest.mark.parametrize( 
-    'kind',
-    ['compiler', 'runtime', 'machine', 'criterion', 'group'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_show(scope, kind, caplog):
+def test_show(config_scope, config_kind, caplog):
     with isolated_fs():
-        token = ".".join(filter(None, (scope, kind, 'test-show')))
+        token = ".".join(filter(None, (config_scope, config_kind, 'test-show')))
         _ = run_and_test('config', 'create', token)
         _ = run_and_test('config', 'show', token)
         caplog.clear()
@@ -65,26 +70,18 @@ def test_show(scope, kind, caplog):
         assert("configuration found at" in caplog.text)
 
 
-@pytest.mark.parametrize(
-    'kind',
-    ['compiler', 'runtime', 'machine', 'criterion', 'group'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_create(scope, kind, caplog):
+def test_create(config_scope, config_kind, caplog):
     with isolated_fs():
-        label = ".".join(filter(None, (scope, kind, 'creat')))
+        label = ".".join(filter(None, (config_scope, config_kind, 'creat')))
         _ = run_and_test('config', 'create', label)
         caplog.clear()
         _ = run_and_test('config', 'create', label, success=False)
         assert ("already exists!" in caplog.text)
 
 
-@pytest.mark.parametrize(
-    'kind',
-    ['compiler', 'runtime', 'machine', 'criterion', 'group'])
-@pytest.mark.parametrize('scope', ['local'])
-def test_clone(scope, kind, caplog):
+def test_clone(config_scope, config_kind, caplog):
     with isolated_fs():
-        basename = ".".join(filter(None, (scope, kind, 'base')))
+        basename = ".".join(filter(None, (config_scope, config_kind, 'base')))
         copyname = basename+"-copy"
         _ = run_and_test('config', 'create', basename)
         caplog.clear()
@@ -96,27 +93,24 @@ def test_clone(scope, kind, caplog):
         _ = run_and_test('config', 'create', copyname+"none", "--from", "err", success=False)
         assert('Invalid ' in caplog.text)
         
-        if kind == 'compiler':
-            basename = basename.replace(kind, 'runtime')
+        if config_kind == 'compiler':
+            basename = basename.replace(config_kind, 'runtime')
         else:
-            basename = basename.replace(kind, 'compiler')
+            basename = basename.replace(config_kind, 'compiler')
 
         caplog.clear()
         _ = run_and_test('config', 'create', copyname + "-none", "--from",basename, success=False)
         assert('with the same KIND' in caplog.text)
 
 
-@pytest.mark.parametrize('kind', [None, 'compiler', 'runtime', 'group', 'machine', 'criterion'])
-@pytest.mark.parametrize('scope', [None, 'local']
-)
-def test_destroy(scope, kind, caplog):
+def test_destroy(config_scope, config_kind, caplog):
     with isolated_fs():
-        token = ".".join(filter(None, (scope, kind, 'test')))
+        token = ".".join(filter(None, (scoconfig_scopepe, config_kind, 'test')))
         
         # only invalid cases for creating a conf:
-        if kind is None:
+        if config_kind is None:
             _ = run_and_test('config', 'create', token, success=False)
-            if scope is None:
+            if config_scope is None:
                 assert("You must specify" in caplog.text)
             else:
                 assert ("Invalid KIND 'local'" in caplog.text)
@@ -133,9 +127,7 @@ def test_destroy(scope, kind, caplog):
         assert("not found!" in caplog.text)
         
 
-@pytest.mark.parametrize('kind', ['compiler', 'runtime', 'group', 'machine', 'criterion'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_import(scope, kind, caplog):
+def test_import(config_scope, config_kind, caplog):
     with isolated_fs():
         fn = './tmp-file.yml'
         with open(fn, 'w') as f:
@@ -144,7 +136,7 @@ def test_import(scope, kind, caplog):
                 key: 'value'
             """)
 
-        token = ".".join(filter(None, (scope, kind, 'test')))
+        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
         caplog.clear()
         res = run_and_test('config', 'import', token, success=False)
         assert ("Missing argument" in res.output)
@@ -161,12 +153,10 @@ def test_import(scope, kind, caplog):
         assert ("No such file or directory" in res.output)
 
 
-@pytest.mark.parametrize( 'kind', ['compiler', 'runtime', 'group', 'machine', 'criterion'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_export(scope, kind, caplog):
+def test_export(config_scope, config_kind, caplog):
     with isolated_fs():
         fn = "./tmp-file.yml"
-        token = ".".join(filter(None, (scope, kind, 'test')))
+        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
 
         caplog.clear()
         _ = run_and_test('config', 'create', token)
@@ -185,11 +175,9 @@ def test_export(scope, kind, caplog):
 
 
 
-@pytest.mark.parametrize( 'kind', ['compiler', 'runtime', 'group', 'machine', 'criterion'])
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_edit(scope, kind, caplog):
+def test_edit(config_scope, config_kind, caplog):
     with isolated_fs():
-        token = ".".join(filter(None, (scope, kind, 'test')))
+        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
         caplog.clear()
         _ = run_and_test('config', 'create', token)
         _ = run_and_test('config', 'edit', '-e', 'cat', token)

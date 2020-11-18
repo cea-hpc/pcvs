@@ -1,21 +1,18 @@
+import fileinput
 import glob
 import os
-import pathlib
-from shutil import SameFileError
-from addict import Dict
-import fileinput
 import pprint
 import shutil
 import subprocess
 import tarfile
-from datetime import date, datetime
+from shutil import SameFileError
 from subprocess import CalledProcessError
 
 import yaml
+from addict import Dict
 
-from pcvsrt import criterion, test
-from pcvsrt.helpers import io, log, system, lowtest
-from pcvsrt.test import TestFile, TEDescriptor
+from pcvsrt.helpers import criterion, log, system, test, utils
+from pcvsrt.helpers.test import TEDescriptor, TestFile
 
 
 def __print_summary():
@@ -24,7 +21,7 @@ def __print_summary():
     log.print_item("Loaded profile: '{}'".format(n.pf_name))
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
-    log.print_item("Max sys. combinations per TE: {}".format(lowtest.max_number_of_combinations()))
+    log.print_item("Max sys. combinations per TE: {}".format(criterion.max_number_of_combinations()))
     log.print_item("User directories:")
     width = max([len(i) for i in n.dirs])
     for k, v in system.get('validation').dirs.items():
@@ -41,9 +38,9 @@ def __build_jchronoss():
     exec_prefix = os.path.join(val_node.output, "cache/exec")
     # FIXME: Dirty way to locate the archive
     # find & extract the jchronoss archive
-    for f in glob.glob(os.path.join(io.ROOTPATH, "../**/jchronoss-*"), recursive=True):
+    for f in glob.glob(os.path.join(utils.ROOTPATH, "../**/jchronoss-*"), recursive=True):
         if 'jchronoss-' in f:
-            archive_name = os.path.join(io.ROOTPATH, f)
+            archive_name = os.path.join(utils.ROOTPATH, f)
             break
     assert(archive_name)
     tarfile.open(os.path.join(archive_name)).extractall(src_prefix)
@@ -53,7 +50,7 @@ def __build_jchronoss():
                                 src_prefix, "jchronoss-*/CMakeLists.txt"))[0])
 
     # CD to build dir
-    #with io.cwd(os.path.join(src_prefix, "build")):
+    #with utils.cwd(os.path.join(src_prefix, "build")):
     command = "cmake {0} -B{1} -DCMAKE_INSTALL_PREFIX={2} -DENABLE_OPENMP=OFF -DENABLE_COLOR={3} && make -C {1} install".format(
         src_prefix, os.path.join(src_prefix, "build"), inst_prefix,
         "ON" if val_node.color else "OFF"
@@ -66,7 +63,7 @@ def __build_jchronoss():
     except CalledProcessError:
         log.err("Failed to build JCHRONOSS:")
 
-    io.create_or_clean_path(exec_prefix)
+    utils.create_or_clean_path(exec_prefix)
 
     val_node.jchronoss.src = src_prefix
     val_node.jchronoss.exec = exec_prefix 
@@ -133,12 +130,12 @@ def prepare(run_settings, reuse=False):
         else:
             if not reuse:
                 log.print_item("Cleaning up {}".format(buildir), depth=2)
-                io.create_or_clean_path(buildir)
-            io.create_or_clean_path(os.path.join(valcfg.output, '.pcvs_build'), is_dir=False)
-            io.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
-            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'), is_dir=False)
-            io.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'), is_dir=False)
-            io.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
+                utils.create_or_clean_path(buildir)
+            utils.create_or_clean_path(os.path.join(valcfg.output, '.pcvs_build'), is_dir=False)
+            utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
+            utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'), is_dir=False)
+            utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'), is_dir=False)
+            utils.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
     
     log.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
@@ -248,7 +245,7 @@ def process_dyn_setup_scripts(setup_files):
     with log.progbar(setup_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
             log.info("process {} ({})".format(subprefix, label))
-            base_src, cur_src, base_build, cur_build = io.generate_local_variables(label, subprefix)
+            base_src, cur_src, base_build, cur_build = utils.generate_local_variables(label, subprefix)
             
             env['pcvs_src'] = base_src
             env['pcvs_testbuild'] = base_build
@@ -291,7 +288,7 @@ def process_static_yaml_files(yaml_files):
     log.print_item("Process static test files")
     with log.progbar(yaml_files, print_func=__print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            _, cur_src, _, cur_build = io.generate_local_variables(label, subprefix)
+            _, cur_src, _, cur_build = utils.generate_local_variables(label, subprefix)
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
@@ -446,7 +443,7 @@ def terminate():
 
     log.print_item("Generate the archive")
 
-    with io.cwd(outdir):
+    with utils.cwd(outdir):
         cmd = [
             "tar",
             "czf",
@@ -488,4 +485,3 @@ def dup_another_build(build_dir, outdir):
 
     settings.validation.output = outdir
     return settings
-        

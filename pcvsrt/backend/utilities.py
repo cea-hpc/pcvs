@@ -1,23 +1,21 @@
-import os
-from pcvsrt.helpers.log import utf
 import base64
-import jsonschema
-import tempfile
-import subprocess
-from pcvsrt.helpers import validation
-import yaml
+import os
 import pprint
+import subprocess
+import tempfile
+
+import jsonschema
+import yaml
 from prettytable import PrettyTable
 
+from pcvsrt.backend import config, profile, run
+from pcvsrt.helpers import log, utils
+from pcvsrt.helpers.log import utf
 
-from pcvsrt.cli.run import commands as cmdRun
-from pcvsrt.cli.config import commands as cmdConfig
-from pcvsrt.cli.config import backend as pvConfig
-from pcvsrt.cli.profile import commands as cmdProfile
-from pcvsrt.cli.profile import backend as pvProfile
+#from pcvsrt.cli import cli_config
+#from pcvsrt.cli import cli_profile
+#from pcvsrt.cli import cli_run
 
-from pcvsrt.helpers import io, log
-from pcvsrt.cli.run import backend as pvRun
 
 
 def retrieve_all_test_scripts(output=None):
@@ -49,12 +47,12 @@ def process_check_configs():
     t.field_names = ["Valid", "ID"]
     t.align['ID'] = "l"
 
-    for kind in pvConfig.CONFIG_BLOCKS:
-        for scope in io.storage_order():
-            for blob in pvConfig.list_blocks(kind, scope):
+    for kind in config.CONFIG_BLOCKS:
+        for scope in utils.storage_order():
+            for blob in config.list_blocks(kind, scope):
                 token = log.utf('fail')
                 err_msg = ""
-                obj = pvConfig.ConfigurationBlock(kind, blob[0], scope)
+                obj = config.ConfigurationBlock(kind, blob[0], scope)
                 obj.load_from_disk()
 
                 try:
@@ -76,10 +74,10 @@ def process_check_profiles():
     t.field_names = ["Valid", "ID"]
     t.align['ID'] = "l"
     
-    for scope in io.storage_order():
-        for blob in pvProfile.list_profiles(scope):
+    for scope in utils.storage_order():
+        for blob in profile.list_profiles(scope):
             token = log.utf('fail')
-            obj = pvProfile.Profile(blob[0], scope)
+            obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
                 obj.check(fail=False)
@@ -99,10 +97,10 @@ def process_check_setup_file(filename, prefix):
     token = utf('fail')
     data = None
     env = os.environ
-    env.update(pvRun.build_env_from_configuration({}))
+    env.update(run.build_env_from_configuration({}))
     try:
         tdir = tempfile.mkdtemp()
-        with io.cwd(tdir):
+        with utils.cwd(tdir):
             env['pcvs_src'] = os.path.dirname(filename).replace(prefix, '')
             env['pcvs_testbuild'] = tdir
             if not os.path.isdir(os.path.join(tdir, prefix)):
@@ -119,7 +117,7 @@ def process_check_setup_file(filename, prefix):
         
     return (err_msg, token, data)
 
-scheme = validation.ValidationScheme('te')
+scheme = utils.ValidationScheme('te')
 def process_check_yaml_stream(data):
     global scheme
     token_load = token_yaml = "{}".format(utf('fail'))
@@ -141,7 +139,7 @@ def process_check_yaml_stream(data):
 
 def process_check_directory(dir):
     errors = dict()
-    setup_files, yaml_files = pvRun.find_files_to_process({os.path.basename(dir): dir})
+    setup_files, yaml_files = run.find_files_to_process({os.path.basename(dir): dir})
 
     if setup_files:
         log.print_section('Analyzing scripts: (script{s}YAML{s}valid)'.format(s=log.utf('sep_v')))

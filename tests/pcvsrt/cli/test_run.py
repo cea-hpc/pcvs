@@ -1,4 +1,4 @@
-from .cli_testing import run_and_test, isolated_fs
+from .conftest import run_and_test, isolated_fs
 import pcvsrt
 import os
 

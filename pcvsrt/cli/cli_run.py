@@ -1,19 +1,14 @@
 import os
 import time
-from typing import Optional
-import click
-import yaml
-import pprint
 from datetime import datetime
 
-from yaml.loader import Loader
+import click
 
-from pcvsrt.helpers import io, log, system
-from pcvsrt.cli.run import backend as pvRun
-from pcvsrt.cli.profile import backend as pvProfile
-from pcvsrt.cli.bank import backend as pvBank
-
-from pcvsrt.cli.profile import commands as cmdProfile
+from pcvsrt.backend import bank as pvBank
+from pcvsrt.backend import profile as pvProfile
+from pcvsrt.backend import run as pvRun
+from pcvsrt.cli import cli_profile
+from pcvsrt.helpers import log, system, utils
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -62,7 +57,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
-              autocompletion=cmdProfile.compl_list_token,
+              autocompletion=cli_profile.compl_list_token,
               type=str, show_envvar=True, help="an existing profile")
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
@@ -136,7 +131,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         log.nimpl("status")
         exit(0)
     elif set_default:
-        io.open_in_editor(system.CfgValidation.get_valfile(validation_file))
+        utils.open_in_editor(system.CfgValidation.get_valfile(validation_file))
         exit(0)
 
     theBank = None

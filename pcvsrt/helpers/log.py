@@ -1,13 +1,12 @@
-import sys
-import click
-import logging
-import pprint
-import textwrap
-import sys
 import locale
+import logging
 import os
+import pprint
 import subprocess
+import sys
+import textwrap
 
+import click
 
 linelength = 93
 FORMAT = "%(levelname)s: %(message)s"

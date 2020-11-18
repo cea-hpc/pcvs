@@ -1,17 +1,17 @@
-import itertools
+import base64
+import importlib
 import os
 import pprint
 import re
-import importlib
-import base64
 from xml.sax.saxutils import escape
+
 from addict import Dict
 
-from pcvsrt.helpers import system, pm
+from pcvsrt.helpers import package_manager, system
 
 
 # ######################################
-# ####### COMMAND MANAGEMENT ###########
+# ##### TEST: INPUT TRANSFORMATION #####
 # ######################################
 def detect_source_lang(array_of_files):
     langs = Dict()
@@ -46,6 +46,18 @@ def prepare_cmd_build_variants(variants=[], comb=None):
     return " ".join(system.get('compiler').variants[i].args for i in variants)
 
 
+def handle_job_deps(deps_node, pkg_prefix):
+    deps = list()
+    if 'depends_on' in deps_node:
+        for name, values in deps_node['depends_on'].items():
+            if name == 'test':
+                for d in values:
+                    deps.append(d if '/' in d else "/".join([pkg_prefix, d]))
+            else:
+                deps += [d for d in package_manager.identify({name: values})]
+    return deps
+
+
 def xml_escape(s):
     return escape(s, entities={
         "'": "&apos;",
@@ -63,51 +75,3 @@ def xml_setif(elt, k, tag=None):
             return "<"+tag+">"+xml_escape(str(elt[k]))+"</"+tag+">"
     else:
         return ""
-
-
-def handle_job_deps(deps_node, pkg_prefix):
-    deps = list()
-    if 'depends_on' in deps_node:
-        for name, values in deps_node['depends_on'].items():
-            if name == 'test':
-                for d in values:
-                    deps.append(d if '/' in d else "/".join([pkg_prefix, d]))
-            else:
-                deps += [d for d in pm.identify_manager({name: values})]
-    return deps
-
-first = True
-runtime_filter = None
-def valid_combination(dic):
-    global first, runtime_filter
-    rt = system.get('runtime')
-    val = system.get('validation')
-    if first is True and rt.plugin:
-        first = False
-        rt.pluginfile =  os.path.join(val.output, "cache/rt-plugin.py")
-        with open(rt.pluginfile, 'w') as fh:
-            fh.write(base64.b64decode(rt.plugin).decode('ascii'))
-        
-        spec = importlib.util.spec_from_file_location("pcvsrt.user-rt-plugin",
-                                                      rt.pluginfile)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-
-        if hasattr(mod, 'check_valid_combination') and \
-           callable(mod.check_valid_combination):
-            runtime_filter = mod.check_valid_combination
-            # add here any relevant information to be accessed by modules
-            mod.sys_nodes = system.get('machine').nodes
-            mod.sys_cores_per_node = system.get('machine').cores_per_node
-
-    if runtime_filter:
-        return runtime_filter(dic)
-    else:
-        return True
-
-def max_number_of_combinations():
-    product = 1
-    c = system.get('criterion').iterators
-    for k in c:
-        product *= len(c[k]['values'])
-    return product

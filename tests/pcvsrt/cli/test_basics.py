@@ -6,7 +6,7 @@ import logging
 import pcvsrt
 from pcvsrt.helpers import log
 
-from .cli_testing import isolated_fs, run_and_test
+from .conftest import isolated_fs, run_and_test
 
 
 def test_cmd():

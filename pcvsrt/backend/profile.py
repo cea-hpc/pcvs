@@ -1,13 +1,14 @@
+import base64
 import glob
 import os
-from addict import Dict
 import tempfile
-import yaml
-import jsonschema
-import base64
 
-from pcvsrt.cli.config import backend as config
-from pcvsrt.helpers import io, log, validation
+import jsonschema
+import yaml
+from addict import Dict
+
+from pcvsrt.backend import config
+from pcvsrt.helpers import log, utils
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -31,10 +32,10 @@ def extract_profile_from_token(s, single="right"):
 def init():
     global PROFILE_EXISTING, PROFILE_STORAGES
     PROFILE_STORAGES = {k: os.path.join(
-        v, "saves/profile") for k, v in io.STORAGES.items()}
+        v, "saves/profile") for k, v in utils.STORAGES.items()}
     PROFILE_EXISTING = {}
     # this first loop defines configuration order
-    priority_paths = io.storage_order()
+    priority_paths = utils.storage_order()
     priority_paths.reverse()
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
@@ -45,7 +46,7 @@ def init():
 
 def check_existing_name(name, scope):
     path = None
-    scopes = io.storage_order() if scope is None else [scope]
+    scopes = utils.storage_order() if scope is None else [scope]
     for sc in scopes:
         for pair in PROFILE_EXISTING[sc]:
             if name == pair[0]:
@@ -73,7 +74,7 @@ def list_profiles(scope=None):
 
 class Profile:
     def __init__(self, name, scope=None):
-        io.check_valid_scope(scope)
+        utils.check_valid_scope(scope)
         self._name = name
         self._scope = scope
         self._details = {}
@@ -127,7 +128,7 @@ class Profile:
         for kind in config.CONFIG_BLOCKS:
             if kind not in self._details:
                 raise jsonschema.exceptions.ValidationError("Missing '{}' in profile".format(kind))
-            validation.ValidationScheme(kind).validate(self._details[kind], fail)
+            utils.ValidationScheme(kind).validate(self._details[kind], fail)
         
     def flush_to_disk(self):
         self._file = compute_path(self._name, self._scope)
@@ -167,7 +168,7 @@ class Profile:
         if not os.path.exists(self._file):
             return
 
-        e = io.assert_editor_valid(e)
+        e = utils.assert_editor_valid(e)
         fname = tempfile.NamedTemporaryFile(
             mode='w+',
             prefix="{}".format(self.full_name),
@@ -196,7 +197,7 @@ def check_valid_combination(dict_of_combinations=dict()):
             fplugin.write(content)
             fplugin.flush()
         try:
-            io.open_in_editor(fname.name, fplugin.name, e=e)
+            utils.open_in_editor(fname.name, fplugin.name, e=e)
         except:
             log.warn("Issue with opening the conf. block. Stop!")
             return

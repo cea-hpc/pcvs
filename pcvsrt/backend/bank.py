@@ -1,12 +1,12 @@
-import pprint
-import os
 import glob
-from addict import Dict
+import os
+import pprint
 import shutil
 
 import yaml
+from addict import Dict
 
-from pcvsrt.helpers import io, log
+from pcvsrt.helpers import log, utils
 
 BANKS = dict()
 BANK_STORAGE=""
@@ -17,7 +17,7 @@ def init():
     $USER_STORAGE/banks.yml
     """
     global BANKS, BANK_STORAGE
-    BANK_STORAGE = os.path.join(io.STORAGES['user'], "saves/banks.yml")
+    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "saves/banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
             BANKS = yaml.load(f, Loader=yaml.FullLoader)
@@ -145,5 +145,3 @@ class Bank:
             log.print_section("{}:".format(k))
             for val in v:
                 log.print_item('{}'.format(val))
-
-

@@ -5,24 +5,10 @@ import os
 import click
 import pkg_resources
 
-from pcvsrt.helpers import log, io
-
-from pcvsrt.cli.config import commands as cmdConfig
-from pcvsrt.cli.config import backend as pvConfig
-
-from pcvsrt.cli.profile import commands as cmdProfile
-from pcvsrt.cli.profile import backend as pvProfile
-
-from pcvsrt.cli.run import commands as cmdRun
-from pcvsrt.cli.run import backend as pvRun
-
-from pcvsrt.cli.bank import commands as cmdBank
-from pcvsrt.cli.bank import backend as pvBank
-
-from pcvsrt.cli.utilities import commands as cmdUtils
-from pcvsrt.gui import main as cmdGui
-
-
+from pcvsrt.backend import bank, config, profile
+from pcvsrt.cli import (cli_bank, cli_config, cli_gui, cli_profile, cli_run,
+                        cli_utilities)
+from pcvsrt.helpers import utils, log
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -71,12 +57,12 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     if width is None:
         width = click.get_terminal_size()[0]
     log.init(verbose, encoding, width)
-    io.set_local_path(ctx.obj['exec'])
+    utils.set_local_path(ctx.obj['exec'])
 
     # detections
-    pvConfig.init()
-    pvProfile.init()
-    pvBank.init()
+    config.init()
+    profile.init()
+    bank.init()
 
 
 @cli.command(
@@ -112,11 +98,11 @@ def cli_doc(ctx, category):
     log.print_item("WIP")
 
 
-cli.add_command(cmdConfig.config)
-cli.add_command(cmdProfile.profile)
-cli.add_command(cmdRun.run)
-cli.add_command(cmdBank.bank)
-cli.add_command(cmdUtils.exec)
-cli.add_command(cmdUtils.check)
-cli.add_command(cmdUtils.clean)
-cli.add_command(cmdGui.gui)
+cli.add_command(cli_config.config)
+cli.add_command(cli_profile.profile)
+cli.add_command(cli_run.run)
+cli.add_command(cli_bank.bank)
+cli.add_command(cli_utilities.exec)
+cli.add_command(cli_utilities.check)
+cli.add_command(cli_utilities.clean)
+cli.add_command(cli_gui.gui)

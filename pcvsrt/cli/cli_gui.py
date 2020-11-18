@@ -1,8 +1,9 @@
+import click
 import urwid
 import urwid.curses_display
-import click
 
 from pcvsrt.helpers import log
+
 
 @click.command("gui", short_help="Gui-based PCVS")
 @click.pass_context

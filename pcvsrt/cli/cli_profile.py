@@ -1,16 +1,16 @@
 import click
 import yaml
 
-from pcvsrt.cli.config import backend as pvConfig
-from pcvsrt.cli.config import commands as cmdConfig
-from pcvsrt.cli.profile import backend as pvProfile
-from pcvsrt.helpers import io, log
+from pcvsrt.backend import config as pvConfig
+from pcvsrt.backend import profile as pvProfile
+from pcvsrt.cli import cli_config
+from pcvsrt.helpers import log, utils
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
     pvProfile.init()
     flat_array = []
-    for scope in io.storage_order():
+    for scope in utils.storage_order():
         for elt in pvProfile.PROFILE_EXISTING[scope]:
             flat_array.append(scope + "." + elt[0])
 
@@ -52,7 +52,7 @@ def profile_list(ctx, token):
     if label:
         log.warn("no LABEL required for this command")
 
-    io.check_valid_scope(scope)
+    utils.check_valid_scope(scope)
 
     log.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)
@@ -60,7 +60,7 @@ def profile_list(ctx, token):
         log.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
-        for sc in io.storage_order():
+        for sc in utils.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0]
                             for elt in [array for array in profiles[sc]]])
@@ -77,9 +77,9 @@ def profile_list(ctx, token):
 
     # in case verbosity is enabled, add scope paths
     log.info("Scopes are ordered as follows:")
-    for i, scope in enumerate(io.storage_order()):
+    for i, scope in enumerate(utils.storage_order()):
         log.info("{}. {}: {}".format(
-            i+1, scope.upper(), io.STORAGES[scope]))
+            i+1, scope.upper(), utils.STORAGES[scope]))
 
 
 @profile.command(name="show",
@@ -131,7 +131,7 @@ def profile_interactive_select():
               help="Build the profile by interactively selecting conf. blocks")
 @click.option("-b", "--block", "blocks", multiple=True,
               default=False, show_envvar=True,
-              autocompletion=cmdConfig.compl_list_token,
+              autocompletion=cli_config.compl_list_token,
               help="non-interactive option to build a profile")
 @click.option("-f", "--from", "clone", show_envvar=True,
               default=None, type=click.STRING,
@@ -313,7 +313,7 @@ def profile_export(ctx, token, dest_file):
 @click.option("-b", "--block", "block_opt", nargs=1, type=click.STRING,
             help="Re-build only a profile subset", default="all")
 @click.option("-s", "--scope", "scope",
-              type=click.Choice(io.storage_order()), default=None,
+              type=click.Choice(utils.storage_order()), default=None,
               help="Default scope to store the split (default: same as profile)")
 @click.pass_context
 def profile_decompose_profile(ctx, token, name, block_opt, scope):
@@ -338,7 +338,3 @@ def profile_decompose_profile(ctx, token, name, block_opt, scope):
     for c in pf.split_into_configs(name, blocks, scope):
         log.print_item(c.full_name)
         c.flush_to_disk()
-
-
-
-

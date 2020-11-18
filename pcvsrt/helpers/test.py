@@ -1,16 +1,19 @@
-import os
 import copy
-import jsonschema
-import yaml
-import pprint
-import pathlib
 import functools
 import operator
+import os
+import pathlib
+import pprint
 import subprocess
+
+import jsonschema
+import yaml
 from addict import Dict
 
-from pcvsrt.helpers import io, log, lowtest, system, pm, validation
-from pcvsrt.criterion import Criterion, Serie
+from pcvsrt import ROOTPATH
+from pcvsrt.helpers import log, system, test_transform, utils
+from pcvsrt.helpers.criterion import Criterion, Serie
+from pcvsrt.helpers.package_manager import PManager
 
 
 class TestFileError(Exception):
@@ -25,7 +28,7 @@ def __load_yaml_file_legacy(f):
     by relying on external converter (not perfect).
     """
     # Special case: old files required non-existing tags to be resolved
-    old_group_file = os.path.join(io.ROOTPATH, "templates/group-compat.yml")
+    old_group_file = os.path.join(ROOTPATH, "templates/group-compat.yml")
 
     proc = subprocess.Popen(
         "pcvs_convert '{}' --stdout -k te -t '{}'".format(
@@ -101,11 +104,11 @@ class TestFile:
         self._tests = list()
         self._debug = dict()
         if TestFile.val_scheme is None:
-            TestFile.val_scheme = validation.ValidationScheme('te')
+            TestFile.val_scheme = utils.ValidationScheme('te')
         
     def start_process(self, check=True):
         """Load the YAML file and map YAML nodes to Test()"""
-        src, _, build, _ = io.generate_local_variables(
+        src, _, build, _ = utils.generate_local_variables(
             self._label,
             self._prefix)
         
@@ -222,20 +225,20 @@ class Test:
     def serialize_xml(self):
         """Serialize the test to the logic: currently an XML node"""
         desc = "<job>{name}{cmd}{rc}{time}{dlt}{res}{deps}{cst}</job>".format(
-            name=lowtest.xml_setif(self._array, 'name'),
-            cmd=lowtest.xml_setif(self._array, 'command'),
-            rc=lowtest.xml_setif(self._array, 'rc'),
-            time=lowtest.xml_setif(self._array, 'time'),
-            dlt=lowtest.xml_setif(self._array, 'delta'),
-            res=lowtest.xml_setif(self._array, 'resources'),
+            name=test_transform.xml_setif(self._array, 'name'),
+            cmd=test_transform.xml_setif(self._array, 'command'),
+            rc=test_transform.xml_setif(self._array, 'rc'),
+            time=test_transform.xml_setif(self._array, 'time'),
+            dlt=test_transform.xml_setif(self._array, 'delta'),
+            res=test_transform.xml_setif(self._array, 'resources'),
             cst="<constraints>{}</constraints>".format(
-                    lowtest.xml_setif(self._array, 'constraint')
+                    test_transform.xml_setif(self._array, 'constraint')
                 ),
             deps="<deps>{}</deps>".format(
                     "".join([
                         "<dep>{}</dep>".format(elt)
                         for elt in self._array.get('dep', {})
-                        if not isinstance(elt, pm.PManager)
+                        if not isinstance(elt, PManager)
                         ]
                     )
                 )
@@ -258,7 +261,7 @@ class Test:
             pm_code += "\n".join([
                     elt.get(load=True, install=True)
                     for elt in self._array['dep']
-                    if isinstance(elt, pm.PManager)
+                    if isinstance(elt, PManager)
                 ])
         
         # manage environment variables defined in TE
@@ -329,7 +332,7 @@ class TEDescriptor:
         self._te_label = node.get('label', self._te_name)
         self._te_pkg = "/".join([label, subprefix]) if subprefix else label
         
-        _, self._srcdir, _, self._buildir = io.generate_local_variables(
+        _, self._srcdir, _, self._buildir = utils.generate_local_variables(
                 label,
                 subprefix
             )
@@ -443,7 +446,7 @@ class TEDescriptor:
     def __build_from_sources(self):
         """Specific to build rule, where the compilation is made from a
         collection of source files"""
-        lang = lowtest.detect_source_lang(self._build.files)
+        lang = test_transform.detect_source_lang(self._build.files)
         binary = self._te_name
 
         if self._build.sources.binary:
@@ -454,7 +457,7 @@ class TEDescriptor:
 
         command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
             cc=system.get('compiler').commands.get(lang, 'echo'),
-            var=lowtest.prepare_cmd_build_variants(self._build.variants),
+            var=test_transform.prepare_cmd_build_variants(self._build.variants),
             cflags=self._build.get('cflags', ''),
             files=" ".join(self._build.files),
             ldflags=self._build.get('ldflags', ''),
@@ -484,7 +487,7 @@ class TEDescriptor:
                 cxx=system.get('compiler').commands.get('cxx', ''),
                 fc=system.get('compiler').commands.get('fc', ''),
                 cu=system.get('compiler').commands.get('cu', ''),
-                var=lowtest.prepare_cmd_build_variants(self._build.variants),
+                var=test_transform.prepare_cmd_build_variants(self._build.variants),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', '')
             )
@@ -503,8 +506,8 @@ class TEDescriptor:
 
 
 
-        # manage deps (tests, pms...)
-        deps = lowtest.handle_job_deps(self._build, self._te_pkg)
+        # manage deps (tests, package_managers...)
+        deps = test_transform.handle_job_deps(self._build, self._te_pkg)
 
         # a  'make' node prevails over other build system (for now)
         if 'make' in self._build:
@@ -537,7 +540,7 @@ class TEDescriptor:
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
-        te_deps = lowtest.handle_job_deps(self._run, self._te_pkg)
+        te_deps = test_transform.handle_job_deps(self._run, self._te_pkg)
         
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
