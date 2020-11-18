@@ -1,11 +1,11 @@
 import os
-from pcvsrt import BACKUP_NAMEDIR, BUILD_NAMEDIR
+from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
 import pprint
 
 import yaml
 from addict import Dict
 
-from pcvsrt.helpers import log, package_manager, utils
+from pcvs.helpers import log, package_manager, utils
 
 
 class CfgBase(Dict):

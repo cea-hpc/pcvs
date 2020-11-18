@@ -1,10 +1,10 @@
 import os
-from pcvsrt import BUILD_NAMEDIR
+from pcvs import BUILD_NAMEDIR
 
 import click
 
-from pcvsrt.backend import report as pvReport
-from pcvsrt.helpers import log
+from pcvs.backend import report as pvReport
+from pcvs.helpers import log
 
 
 @click.command('report', short_help="Manage PCVS result reporting interface")

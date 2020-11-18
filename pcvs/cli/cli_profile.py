@@ -1,10 +1,10 @@
 import click
 import yaml
 
-from pcvsrt.backend import config as pvConfig
-from pcvsrt.backend import profile as pvProfile
-from pcvsrt.cli import cli_config
-from pcvsrt.helpers import log, utils
+from pcvs.backend import config as pvConfig
+from pcvs.backend import profile as pvProfile
+from pcvs.cli import cli_config
+from pcvs.helpers import log, utils
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover

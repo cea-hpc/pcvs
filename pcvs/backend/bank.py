@@ -6,7 +6,7 @@ import shutil
 import yaml
 from addict import Dict
 
-from pcvsrt.helpers import log, utils
+from pcvs.helpers import log, utils
 
 BANKS = dict()
 BANK_STORAGE=""

@@ -1,5 +1,5 @@
 from .conftest import run_and_test, isolated_fs
-import pcvsrt
+import pcvs
 import os
 
 

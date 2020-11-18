@@ -7,8 +7,8 @@ import jsonschema
 import yaml
 from addict import Dict
 
-from pcvsrt.backend import config
-from pcvsrt.helpers import log, utils
+from pcvs.backend import config
+from pcvs.helpers import log, utils
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()

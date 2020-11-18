@@ -1,7 +1,7 @@
 import fileinput
 import glob
 import os
-from pcvsrt import BACKUP_NAMEDIR, BUILD_NAMEDIR
+from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
 import pprint
 import shutil
 import subprocess
@@ -12,9 +12,9 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvsrt import BUILD_IDFILE
-from pcvsrt.helpers import criterion, log, system, test, utils
-from pcvsrt.helpers.test import TEDescriptor, TestFile
+from pcvs import BUILD_IDFILE
+from pcvs.helpers import criterion, log, system, test, utils
+from pcvs.helpers.test import TEDescriptor, TestFile
 
 
 def __print_summary():

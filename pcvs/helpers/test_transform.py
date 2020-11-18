@@ -7,7 +7,7 @@ from xml.sax.saxutils import escape
 
 from addict import Dict
 
-from pcvsrt.helpers import package_manager, system
+from pcvs.helpers import package_manager, system
 
 
 # ######################################

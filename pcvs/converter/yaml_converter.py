@@ -8,7 +8,7 @@ import click
 import pkg_resources
 import yaml
 
-from pcvsrt.helpers import log
+from pcvs.helpers import log
 
 desc_dict = dict()
 
@@ -167,7 +167,7 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
             log.info("DISCARDING {}".format(k))
             if warn_if_missing:
                 log.warn("Key {} undeclared in spec.".format(k))
-                set_with(output, ['pcvsrt_missing'] + k.split("."), v)
+                set_with(output, ['pcvs_missing'] + k.split("."), v)
             else:
                 set_with(output, k.split("."), v)
     return output
@@ -211,7 +211,7 @@ def print_version(ctx, param, value) -> None:
     """print converter version number, tied to PCVS version number """
     if not value or ctx.resilient_parsing:
         return
-    version = pkg_resources.require("pcvsrt")[0].version
+    version = pkg_resources.require("pcvs")[0].version
     click.echo('YAML Converter (Part of PCVS) -- version {}'.format(version))
     ctx.exit()
 
@@ -307,7 +307,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     log.print_item("Pruning templates from the final data")
     invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
     log.info("Prune the following:", "{}".format(pprint.pformat(invalid_nodes)))
-    [final_data.pop(x, None) for x in invalid_nodes + ["pcvsrt_missing"]]
+    [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
     
     log.info("Final layout:", "{}".format(pprint.pformat(final_data)))
 

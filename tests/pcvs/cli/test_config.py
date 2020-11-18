@@ -1,13 +1,13 @@
-import pcvsrt
+import pcvs
 import pytest
 import os
 from .conftest import run_and_test, isolated_fs
 
-@pytest.fixture(params=[None] + pcvsrt.cli.cli_config.backend.CONFIG_BLOCKS)
+@pytest.fixture(params=[None] + pcvs.cli.cli_config.backend.CONFIG_BLOCKS)
 def config_kind(request):
     return request.param
 
-@pytest.fixture(params=[None] + pcvsrt.helpers.utils.storage_order())
+@pytest.fixture(params=[None] + pcvs.helpers.utils.storage_order())
 def config_scope(request):
     return request.param
 
@@ -42,7 +42,7 @@ def test_list(config_scope, config_kind, caplog):
 
 
 def test_list_scope(config_kind, config_scope):
-    for scope in pcvsrt.helpers.utils.storage_order():
+    for scope in pcvs.helpers.utils.storage_order():
         _ = run_and_test('config', 'list', ".".join([scope, config_kind]))
 
 

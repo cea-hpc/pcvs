@@ -2,8 +2,8 @@ import os
 
 import click
 
-from pcvsrt.backend import bank as pvBank
-from pcvsrt.helpers import log
+from pcvs.backend import bank as pvBank
+from pcvs.helpers import log
 
 
 def compl_list_banks(ctx, args, incomplete):

@@ -8,13 +8,13 @@ import jsonschema
 import yaml
 from prettytable import PrettyTable
 
-from pcvsrt.backend import config, profile, run
-from pcvsrt.helpers import log, utils
-from pcvsrt.helpers.log import utf
+from pcvs.backend import config, profile, run
+from pcvs.helpers import log, utils
+from pcvs.helpers.log import utf
 
-#from pcvsrt.cli import cli_config
-#from pcvsrt.cli import cli_profile
-#from pcvsrt.cli import cli_run
+#from pcvs.cli import cli_config
+#from pcvs.cli import cli_profile
+#from pcvs.cli import cli_run
 
 
 

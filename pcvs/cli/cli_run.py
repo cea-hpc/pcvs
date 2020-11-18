@@ -4,11 +4,11 @@ from datetime import datetime
 
 import click
 
-from pcvsrt.backend import bank as pvBank
-from pcvsrt.backend import profile as pvProfile
-from pcvsrt.backend import run as pvRun
-from pcvsrt.cli import cli_profile
-from pcvsrt.helpers import log, system, utils
+from pcvs.backend import bank as pvBank
+from pcvs.backend import profile as pvProfile
+from pcvs.backend import run as pvRun
+from pcvs.cli import cli_profile
+from pcvs.helpers import log, system, utils
 
 
 def iterate_dirs(ctx, param, value) -> dict:

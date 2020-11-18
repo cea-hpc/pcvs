@@ -1,4 +1,4 @@
-from pcvsrt.helpers import log
+from pcvs.helpers import log
 
 
 def identify(pm_node):

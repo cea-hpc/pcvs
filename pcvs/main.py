@@ -5,10 +5,10 @@ import os
 import click
 import pkg_resources
 
-from pcvsrt.backend import bank, config, profile
-from pcvsrt.cli import (cli_bank, cli_config, cli_gui, cli_profile, cli_run,
+from pcvs.backend import bank, config, profile
+from pcvs.cli import (cli_bank, cli_config, cli_gui, cli_profile, cli_run,
                         cli_utilities, cli_report)
-from pcvsrt.helpers import utils, log
+from pcvs.helpers import utils, log
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -21,7 +21,7 @@ CONTEXT_SETTINGS = dict(
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    version = pkg_resources.require("pcvsrt")[0].version
+    version = pkg_resources.require("pcvs")[0].version
     click.echo('Parallel Computing Validation System (pcvs) -- version {}'.format(version))
     ctx.exit()
 

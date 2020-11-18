@@ -6,8 +6,8 @@ from contextlib import contextmanager
 import jsonschema
 import yaml
 
-from pcvsrt import BACKUP_NAMEDIR, ROOTPATH
-from pcvsrt.helpers import log, system
+from pcvs import BACKUP_NAMEDIR, ROOTPATH
+from pcvs.helpers import log, system
 
 ####################################
 ##    STORAGE SCOPE MANAGEMENT    ##

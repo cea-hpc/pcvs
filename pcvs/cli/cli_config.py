@@ -1,8 +1,8 @@
 import click
 import yaml
 
-from pcvsrt.backend import config as pvConfig
-from pcvsrt.helpers import log, utils
+from pcvs.backend import config as pvConfig
+from pcvs.helpers import log, utils
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover

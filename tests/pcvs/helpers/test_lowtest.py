@@ -1,4 +1,4 @@
-import pcvsrt
+import pcvs
 import pytest
 import os
 

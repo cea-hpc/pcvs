@@ -10,10 +10,10 @@ import jsonschema
 import yaml
 from addict import Dict
 
-from pcvsrt import ROOTPATH
-from pcvsrt.helpers import log, system, test_transform, utils
-from pcvsrt.helpers.criterion import Criterion, Serie
-from pcvsrt.helpers.package_manager import PManager
+from pcvs import ROOTPATH
+from pcvs.helpers import log, system, test_transform, utils
+from pcvs.helpers.criterion import Criterion, Serie
+from pcvs.helpers.package_manager import PManager
 
 
 class TestFileError(Exception):

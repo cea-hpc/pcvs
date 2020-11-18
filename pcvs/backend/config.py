@@ -8,9 +8,9 @@ import jsonschema
 import yaml
 from addict import Dict
 
-import pcvsrt
-from pcvsrt.helpers import log, utils
-from pcvsrt.helpers.system import sysTable
+import pcvs
+from pcvs.helpers import log, utils
+from pcvs.helpers.system import sysTable
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
@@ -166,7 +166,7 @@ class ConfigurationBlock:
 
     def load_template(self):
         with open(os.path.join(
-                    pcvsrt.ROOTPATH,
+                    ROOTPATH,
                     'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 

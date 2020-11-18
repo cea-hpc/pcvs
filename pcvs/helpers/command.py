@@ -1,6 +1,6 @@
 import subprocess
 
-from pcvsrt.helpers import log
+from pcvs.helpers import log
 
 
 class Command:

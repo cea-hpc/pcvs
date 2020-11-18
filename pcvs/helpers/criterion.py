@@ -6,7 +6,7 @@ import os
 
 from addict import Dict
 
-from pcvsrt.helpers import log, system
+from pcvs.helpers import log, system
 
 
 def max_number_of_combinations():
@@ -341,7 +341,7 @@ def valid_combination(dic):
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
         
-        spec = importlib.util.spec_from_file_location("pcvsrt.user-rt-plugin",
+        spec = importlib.util.spec_from_file_location("pcvs.user-rt-plugin",
                                                       rt.pluginfile)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)

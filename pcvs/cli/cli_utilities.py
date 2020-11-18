@@ -7,9 +7,9 @@ from datetime import datetime
 import click
 from prettytable import PrettyTable
 
-from pcvsrt.backend import utilities as pvUtils
-from pcvsrt.helpers import log, system
-from pcvsrt.helpers.system import Settings
+from pcvs.backend import utilities as pvUtils
+from pcvs.helpers import log, system
+from pcvs.helpers.system import Settings
 
 
 @click.command(name="exec", short_help="Running aspecific test")

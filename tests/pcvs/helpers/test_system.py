@@ -1,7 +1,7 @@
 from addict import Dict
 import pytest
 
-from pcvsrt.helpers import system as s
+from pcvs.helpers import system as s
 
 
 def test_save_global_object():

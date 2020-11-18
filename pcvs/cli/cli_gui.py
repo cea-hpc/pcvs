@@ -2,7 +2,7 @@ import click
 import urwid
 import urwid.curses_display
 
-from pcvsrt.helpers import log
+from pcvs.helpers import log
 
 
 @click.command("gui", short_help="Gui-based PCVS")
