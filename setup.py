@@ -11,7 +11,7 @@ with open('requirements.txt') as f:
 
 
 setuptools.setup(
-    name="pcvsrt",
+    name="pcvs",
     version=current_version.stdout.decode("utf-8"),
     license="CeCILL-C",
     author="Julien Adam",
@@ -25,13 +25,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        "pcvsrt": ["schemes/*.yml", "templates/*.yml"],
+        "pcvs": ["schemes/*.yml", "templates/*.yml"],
         },
 
     entry_points='''
         [console_scripts]
-        pcvs=pcvsrt.main:cli
-        pcvs_convert=pcvsrt.converter.yaml_converter:main
+        pcvs=pcvs.main:cli
+        pcvs_convert=pcvs.converter.yaml_converter:main
     ''',
 
     classifiers=[
