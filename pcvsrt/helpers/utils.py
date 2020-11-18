@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import jsonschema
 import yaml
 
-from pcvsrt import ROOTPATH
+from pcvsrt import BACKUP_NAMEDIR, ROOTPATH
 from pcvsrt.helpers import log, system
 
 ####################################
@@ -14,8 +14,8 @@ from pcvsrt.helpers import log, system
 ####################################
 STORAGES = {
     'global': ROOTPATH,
-    'user': os.path.join(os.environ['HOME'], ".pcvsrt"),
-    'local': os.path.join(os.getcwd(), '.pcvsrt')
+    'user': os.path.join(os.environ['HOME'], BACKUP_NAMEDIR),
+    'local': os.path.join(os.getcwd(), BACKUP_NAMEDIR)
 }
 
 
@@ -48,11 +48,11 @@ def __determine_local_prefix(path, prefix):
 
 def set_local_path(path):
     assert (os.path.isdir(path))
-    found = __determine_local_prefix(path, ".pcvsrt")
+    found = __determine_local_prefix(path, BACKUP_NAMEDIR)
 
     # if local is the same as user path, discard
     if found in STORAGES.values():
-        found = os.path.join(path, ".pcvsrt")
+        found = os.path.join(path, BACKUP_NAMEDIR)
     STORAGES['local'] = found
 
 ####################################

@@ -208,11 +208,11 @@ def replace_placeholder(tmp, refs) -> dict:
 
 
 def print_version(ctx, param, value) -> None:
-    """print converter version number, tied to PCVS-RT version number """
+    """print converter version number, tied to PCVS version number """
     if not value or ctx.resilient_parsing:
         return
     version = pkg_resources.require("pcvsrt")[0].version
-    click.echo('YAML Converter (pcvs-rt Suite) -- version {}'.format(version))
+    click.echo('YAML Converter (Part of PCVS) -- version {}'.format(version))
     ctx.exit()
 
 

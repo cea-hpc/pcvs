@@ -162,7 +162,7 @@ def clean(ctx, force, fake, paths, interactive):
     for path in paths:
         for root, dirs, files in os.walk(path):
             # current root need to be cleaned
-            if '.pcvs_build' in files:
+            if BUILD_IDFILE in files:
                 log.print_section("Found build: {}".format(root))
                 for f in files:
                     if f.startswith('pcvsrun_') and f.endswith('.tar.gz'):

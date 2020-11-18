@@ -16,7 +16,7 @@ def test_cmd():
 
 def test_version():
     res = run_and_test('--version')
-    assert ("PCVS Runtime Tool (pcvs-rt) -- version" in res.output)
+    assert ("Parallel Computing Validation System (pcvs) -- version" in res.output)
 
 
 def test_help():

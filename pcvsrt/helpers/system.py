@@ -1,4 +1,5 @@
 import os
+from pcvsrt import BACKUP_NAMEDIR, BUILD_NAMEDIR
 import pprint
 
 import yaml
@@ -84,7 +85,7 @@ class CfgTemplate(CfgBase):
 
 
 class CfgValidation(CfgBase):
-    default_valfile = os.path.join(os.environ['HOME'], ".pcvsrt/validation.yml")
+    default_valfile = os.path.join(os.environ['HOME'], BACKUP_NAMEDIR, "validation.yml")
 
     def get_valfile(override):
         if override is None:
@@ -111,7 +112,7 @@ class CfgValidation(CfgBase):
         self.set_ifnot('verbose', 0)
         self.set_ifnot('color', True)
         self.set_ifnot('pf_name', 'default')
-        self.set_ifnot('output', os.path.join(os.getcwd(), ".pcvs"))
+        self.set_ifnot('output', os.path.join(os.getcwd(), BUILD_NAMEDIR))
         self.set_ifnot('background', False)
         self.set_ifnot('override', False)
         self.set_ifnot('dirs', '.')
@@ -136,7 +137,7 @@ class CfgValidation(CfgBase):
         
     def override(self, k, v):
         if k == 'output' and v is not None:
-            os.path.join(os.path.abspath(v), ".pcvs")
+            os.path.join(os.path.abspath(v), BUILD_NAMEDIR)
         CfgBase.override(self, k, v)
 
 

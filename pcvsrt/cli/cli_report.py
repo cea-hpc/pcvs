@@ -1,8 +1,9 @@
 import os
+from pcvsrt import BUILD_NAMEDIR
 
 import click
 
-from pcvsrt.cli.report import backend as pvReport
+from pcvsrt.backend import report as pvReport
 from pcvsrt.helpers import log
 
 
@@ -14,10 +15,9 @@ from pcvsrt.helpers import log
 def report(ctx, mode, path):
     inputs = list()
     if path is None:
-        path = os.path.join(os.getcwd(), '.pcvs')
+        path = os.path.join(os.getcwd(), BUILD_NAMEDIR)
 
-
-    if not os.path.isfile(os.path.join(path, '.pcvs_build')):
+    if not os.path.isfile(os.path.join(path, BUILD_IDFILE)):
         log.err('{} is not a build directory. Abort.'.format(path))
 
     path = os.path.join(path, 'test_suite')
@@ -26,7 +26,6 @@ def report(ctx, mode, path):
         for f in files:
             if f.startswith('output-') and f.endswith('-list_of_tests.xml.json'):
                 inputs.append(os.path.join(root, f))
-    print(inputs)
 
     if mode == "web":
         pvReport.run_webserver(path)

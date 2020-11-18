@@ -20,7 +20,7 @@ from pcvsrt.helpers.log import utf
 
 def retrieve_all_test_scripts(output=None):
     if output is None:
-        output = "./.pcvs/test_suite"
+        output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
     l = list()
     for root, _, files in os.walk(output):
         for f in files:
@@ -31,7 +31,7 @@ def retrieve_all_test_scripts(output=None):
 
 def retrieve_test_script(testname, output=None):
     if output is None:
-        output = "./.pcvs/test_suite"
+        output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
     # first one is directory name
     # last one is test name
     prefix = os.path.dirname(testname)
