@@ -1,5 +1,5 @@
-recursive-include pcvsrt/schemes *.json
-recursive-include pcvsrt/templates *.yml
+recursive-include pcvs/schemes *.json
+recursive-include pcvs/templates *.yml
 
 include utils/get_version
 include .version

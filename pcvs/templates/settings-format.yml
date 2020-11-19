@@ -2,7 +2,7 @@
 # global validation settings
 # to keep CLI simple
 # this file is not a basic configuration block
-# and should be put into the ~/.pcvsrt/validation.yml
+# and should be put into the ~/.pcvs/validation.yml
 # to be automatically loaded
 
 # does pcvs return a non-zero exit code if at least a test failed

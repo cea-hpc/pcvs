@@ -23,7 +23,7 @@ The following walkthrouh will guide you step by step to properly install PCVS an
 3. **temporarily** copy a proper JCHRONOSS archive within PCVS installation (to be removed):
 
 	# if installed under the virtualenv
-	cp /archive/jchronoss-$version.tar.gz ./build/lib/pythonX.Y/site-packages/pcvsrt/
+	cp /archive/jchronoss-$version.tar.gz ./build/lib/pythonX.Y/site-packages/pcvs/
 	# if installed in 'editable' mode (`pip install -e`)
 	mkdir -p ./data/third_party/
 	cp /archive/jchronoss-$version.tar.gz ./data/third_party/

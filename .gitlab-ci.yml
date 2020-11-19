@@ -24,14 +24,14 @@ flake:
     stage: lint
     allow_failure: true
     script:
-    - flake8 ./pcvsrt/
+    - flake8 ./pcvs/
 
 mypy:
     <<: *scope
     stage: lint
     allow_failure: true
     script:
-    - python -m mypy ./pcvsrt/
+    - python -m mypy ./pcvs/
 
 main:
     <<: *scope
@@ -39,7 +39,7 @@ main:
     stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt/cli
+    - pytest ./tests/pcvs/cli
 
 converter:
     <<: *scope
@@ -47,21 +47,21 @@ converter:
     stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt/converter
+    - pytest ./tests/pcvs/converter
 
 helpers:
     <<: *scope
     stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt/helpers
+    - pytest ./tests/pcvs/helpers
 
 full_nr:
     <<: *scope
     stage: coverage
     script:
     - pip install -e .
-    - pytest ./tests/pcvsrt --cov=pcvsrt
+    - pytest ./tests/pcvs --cov=pcvs
 
 
 pip:
@@ -79,7 +79,7 @@ from_sources:
     script:
     - mkdir dist_sources
     - python3 setup.py sdist --formats=gztar
-    - tar xf dist/pcvsrt-*.tar.gz -C $PWD/dist_sources
+    - tar xf dist/pcvs-*.tar.gz -C $PWD/dist_sources
     - python3 $PWD/dist_sources/*/setup.py install
     - pcvs --version
 
