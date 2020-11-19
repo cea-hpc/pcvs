@@ -1,6 +1,5 @@
 import os
-from pcvs import BUILD_NAMEDIR
-
+from pcvs import BUILD_NAMEDIR, BUILD_IDFILE
 import click
 
 from pcvs.backend import report as pvReport
@@ -22,10 +21,5 @@ def report(ctx, mode, path):
 
     path = os.path.join(path, 'test_suite')
 
-    for root, _ , files in os.walk(path):
-        for f in files:
-            if f.startswith('output-') and f.endswith('-list_of_tests.xml.json'):
-                inputs.append(os.path.join(root, f))
-
     if mode == "web":
-        pvReport.run_webserver(path)
+        pvReport.webview_run_server(path)

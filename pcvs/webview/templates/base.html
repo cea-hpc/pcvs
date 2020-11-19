@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>PCVS - Reporting</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico')}}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css')}}"/>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/Chart.min.css')}}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css')}}" />
+
+	<!--<script src="{{ url_for('static', filename='js/dep/sorttable.js')}}" type="text/javascript"></script>-->
+	
+	<script src="{{ url_for('static', filename='js/jquery.min.js') }}" type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"
+		type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/datatables.min.js')}}"
+		type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}" type="text/javascript"></script>
+	<script src="{{ url_for('static', filename='js/custom.js') }}" type="text/javascript"></script>
+
+	{% block extra_head %}
+	{% endblock %}
+
+</head>
+
+<body>
+	<nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
+		<a class="navbar-brand" target="_blank" href="https://hpcframework.com/"><img style="max-height: 18px;"
+			src="{{url_for('static', filename='images/favicon.ico')}}"
+			alt="PCVS logo" /> PCVS</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mynavbar"
+			aria-controls="mynavbar" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class='collapse navbar-collapse' id="mynavbar">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item"><a class="nav-link" href='/'>Home</a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" role="button"
+						data-toggle="dropdown">Sort by</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href='/status/detail?state=failure'>Failures</a>
+						<a class="dropdown-item" href='/tag/list'>Tags</a>
+						<a class="dropdown-item" href='/label/list'>Labels</a>
+					</div>
+				</li>
+
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" role="button"
+						data-toggle="dropdown">About</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="/about">About Us</a>
+						<a class="dropdown-item" href="/doc">Documentation</a>
+					</div>
+				</li>
+				<!--<li class="nav-item"><a class="nav-link" href='/diff'>Trend</a></li>
+				<li class="nav-item"><a class="nav-link" href='/realtime'>Real-Time</a></li>-->
+				
+			</ul>
+		</div>
+	</nav>
+	<script>
+		function page_waiting() {
+			
+			$('#page-body').removeClass("d-block")
+			$('#page-body').addClass("d-none")
+			
+			$('#wait-div').removeClass("d-none")
+			$('#wait-div').addClass("d-flex")
+			
+		}
+		function page_ready() {
+			$('#wait-div').removeClass("d-flex");
+			$('#wait-div').addClass("d-none");
+			
+			$('#page-body').removeClass("d-none");
+			$('#page-body').addClass("d-block");
+		}
+		page_ready();
+
+	</script>
+	<div id="page-body" class="container">
+		{% block body %}
+		Base Page
+		{% endblock %}
+		
+	</div>
+	<div id="wait-div" class="d-none flex-column justify-content-center">
+		<div id="wait-spinners" class="d-inline-flex justify-content-center">
+		<div class="spinner-grow text-danger" role="status"></div>
+		<div class="spinner-grow text-warning" role="status"></div>
+		<div class="spinner-grow text-success" role="status"></div>
+		</div>
+		<span class="sr-only">Loading...</span>
+		<p class="text-center font-weight-bold">Please wait</p>
+	</div>
+	</div>
+	
+	<footer class="page-footer bg-dark text-light container-fluid">
+			<div class="row text-center">
+				<div class="col-sm-3"><img style="max-height: 100px;"
+						src="{{url_for('static', filename='images/full_logo_transparent.png')}}"
+						alt="PCVS logo" /></div>
+				<div class="col-sm-6 align-self-center text-center container-fluid">
+					<h5 class="font-weight-bold">Parallel Computing -- Validation
+						System</h5>
+					<p class="font-weight-light font-italic">Distributed under the CeCILL-C license
+						(LGPL-Compatible), available <a
+							href="http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html">here.</a>
+					</p>
+				</div>
+				<div class="col-sm-3 mt-sm-3 mb-sm-3"><img style="max-height: 100px;"
+						src="{{url_for('static', filename='images/cea_logo.png')}}"
+						alt="CEA logo" /></div>
+			</div>
+	</footer>
+</body>
+
+</html>

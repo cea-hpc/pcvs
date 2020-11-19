@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1 id="main-page-title">PCVS reporting interface</h1>
+
+<p>This mini-webserver gathers validation results processed from <code>{{ main_directory }}</code>
+The content of this main page is still in progress. Here a short list of pages already accessible:
+<ul>
+	<li><a href="/label/list">Label-based results</a></li>
+	<li><a href="/tag/list">Tag-based results</a></li>
+	<li><a href="/status/list">Status-based results</a></li>
+</ul>
+</p>
+
+<div id="stat_cards" class="row">
+<div class="col-sm-3"><div class="card text-center"><div class="card-body">
+<h4 class="card-title">{{"{:,}".format(nb_tests)}}</h4>
+<p class="card-text">Tests in Total</p>
+</div></div></div>
+
+<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
+<h4 class="card-title">{{"{:,}".format(nb_tags)}}</h4>
+<p class="card-text">Unique Tags</p>
+</div></div></div>
+
+<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
+<h4 class="card-title">{{"{:,}".format(nb_labels)}}</h4>
+<p class="card-text">Distinct Labels</p>
+</div></div></div>
+
+<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
+<h4 class="card-title">{{"{:,}".format(nb_files)}}</h4>
+<p class="card-text">Processed Files</p>
+</div></div></div>
+</div>
+
+{% endblock %}

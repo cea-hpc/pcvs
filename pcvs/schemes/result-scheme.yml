@@ -1,0 +1,26 @@
+type: object
+properties:
+  tests:
+    type: array
+    items:
+      type: object
+      properties:
+        command: {"type": "string"}
+        label: {"type": "string"}
+        subtree: {"type": "string"}
+        name: {"type": "string"}
+        full_name: {"type": "string"}
+        result:
+          type: object
+          properties:
+            output: {"type": "string"}
+            status:
+              type: "string"
+              enum: ["success", "error", "failure", "warn"]
+            time: {"type": "number"}
+          additionalProperties: false
+        tags:
+          type: array
+          items: {"type": "string"}
+      additionalProperties: false
+additionalProperties: false

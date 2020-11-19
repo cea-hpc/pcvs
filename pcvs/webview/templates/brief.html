@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#theTable').DataTable({
+			"paging": false,
+			"responsive": true
+		});
+		$("#success_bar").popover({
+			trigger: 'hover',
+			placement: 'auto',
+			title: "Successes",
+			html: true,
+			content: "{{success_nb}} tests ({{success_percent}} %)"
+		});
+		$("#success_bar").css("width", {{ success_percent }}+"%" );
+		
+		$("#failure_bar").popover({
+			trigger: 'hover',
+			placement: 'auto',
+			title: "Failures",
+			html: true,
+			content: "{{failure_nb}} tests ({{failure_percent}} %)"
+		});
+		$("#failure_bar").css("width", {{ failure_percent }}+"%" );
+		
+		$("#warning_bar").popover({
+			trigger: 'hover',
+			placement: 'auto',
+			title: "Non-executable",
+			html: true,
+			content: "{{warning_nb}} tests ({{warning_percent}} %)"
+		});
+		$("#warning_bar").css("width", {{ warning_percent }}+"%" );
+
+		$(".progress").each(function() {
+
+var value = $(this).attr('data-value');
+var left = $(this).find('.progress-left .progress-bar');
+var right = $(this).find('.progress-right .progress-bar');
+
+if (value > 0) {
+  if (value <= 50) {
+    right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
+  } else {
+    right.css('transform', 'rotate(180deg)')
+    left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
+  }
+}
+
+})
+
+function percentageToDegrees(percentage) {
+
+return percentage / 100 * 360
+
+}
+	});
+</script>
+<h2 class="container-fuild text-center">Global overview</h2>
+<div>
+	<div class='progress' aria-valuemin="0" aria-valuemax="100">
+		<div id="error_bar" class='progress-bar bg-danger' role="progressbar"></div>
+		<div id="failure_bar" class='progress-bar bg-danger' role="progressbar"></div>
+		<div id="warning_bar" class='progress-bar bg-warning' role="progressbar"></div>
+		<div id="success_bar" class='progress-bar bg-success' role="progressbar"></div>
+	</div>
+</div>
+
+	
+<h2 class="container-fuild text-center">Per-label results</h2>
+<table id='theTable' class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th>Status Bar</th>
+			<th>Package</th>
+			<th>Errors</th>
+			<th>Failed</th>
+			<th>Skipped</th>
+			<th>Success</th>
+			<th>Total</th>
+		</tr>
+	</thead>
+	<tbody id="details-tbody">
+		<tr>
+			<td>20%</td>
+			<td>LABEL</td>
+			<td>0</td>
+			<td>2</td>
+			<td>0</td>
+			<td>20</td>
+			<td>22</td>
+		</tr>
+		<tr>
+			<td>10%</td>
+			<td>LABEL</td>
+			<td>0</td>
+			<td>2</td>
+			<td>0</td>
+			<td>20</td>
+			<td>22</td>
+		</tr>
+		<tr>
+			<td>10%</td>
+			<td>LABEL</td>
+			<td>0</td>
+			<td>2</td>
+			<td>0</td>
+			<td>20</td>
+			<td>22</td>
+		</tr>
+		<tr>
+			<td>10%</td>
+			<td>LABEL</td>
+			<td>0</td>
+			<td>2</td>
+			<td>0</td>
+			<td>20</td>
+			<td>22</td>
+		</tr>
+	</tbody>
+</table>
+{% endblock %}
