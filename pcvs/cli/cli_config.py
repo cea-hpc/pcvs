@@ -138,8 +138,11 @@ def config_show(ctx, token) -> None:
 @click.option("-f", "--from", "clone",
               default=None, type=str, show_envvar=True,
               help="Valid name to copy (may use scope, e.g. global.label)")
+@click.option("-i/-I", "--interactive/--no-interactive", "interactive",
+              default=False, is_flag=True,
+              help="Directly open the created config block in $EDITOR")
 @click.pass_context
-def config_create(ctx, token, clone) -> None:
+def config_create(ctx, token, clone, interactive) -> None:
     """Create a new configuration block for the given KIND. The newly created
     block will be labeled NAME. It is inherited from a default template. This
     can be overriden by spefifying a CLONE argument.
@@ -170,7 +173,8 @@ def config_create(ctx, token, clone) -> None:
     if not copy.is_found():
         copy.clone(base)
         copy.flush_to_disk()
-        copy.open_editor()
+        if interactive:
+            copy.open_editor()
     else:
         raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
             copy.full_name))

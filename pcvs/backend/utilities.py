@@ -11,6 +11,7 @@ from prettytable import PrettyTable
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, utils
 from pcvs.helpers.log import utf
+from pcvs import (BUILD_NAMEDIR)
 
 #from pcvs.cli import cli_config
 #from pcvs.cli import cli_profile
@@ -18,7 +19,7 @@ from pcvs.helpers.log import utf
 
 
 
-def retrieve_all_test_scripts(output=None):
+def locate_scriptpaths(output=None):
     if output is None:
         output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
     l = list()
@@ -29,18 +30,16 @@ def retrieve_all_test_scripts(output=None):
     return l
 
 
-def retrieve_test_script(testname, output=None):
+def compute_scriptpath_from_testname(testname, output=None):
     if output is None:
         output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
-    # first one is directory name
-    # last one is test name
     prefix = os.path.dirname(testname)
     return os.path.join(
         output,
         prefix,
         "list_of_tests.sh"
     )
-
+    
 def process_check_configs():
     errors = dict()
     t = PrettyTable()

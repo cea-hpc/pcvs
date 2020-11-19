@@ -1,7 +1,6 @@
 import fileinput
 import glob
 import os
-from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
 import pprint
 import shutil
 import subprocess
@@ -12,7 +11,7 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvs import BUILD_IDFILE
+from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR, ROOTPATH, BUILD_IDFILE
 from pcvs.helpers import criterion, log, system, test, utils
 from pcvs.helpers.test import TEDescriptor, TestFile
 
@@ -40,9 +39,9 @@ def __build_jchronoss():
     exec_prefix = os.path.join(val_node.output, "cache/exec")
     # FIXME: Dirty way to locate the archive
     # find & extract the jchronoss archive
-    for f in glob.glob(os.path.join(utils.ROOTPATH, "../**/jchronoss-*"), recursive=True):
+    for f in glob.glob(os.path.join(ROOTPATH, "../**/jchronoss-*"), recursive=True):
         if 'jchronoss-' in f:
-            archive_name = os.path.join(utils.ROOTPATH, f)
+            archive_name = os.path.join(ROOTPATH, f)
             break
     assert(archive_name)
     tarfile.open(os.path.join(archive_name)).extractall(src_prefix)

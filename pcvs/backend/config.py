@@ -8,7 +8,7 @@ import jsonschema
 import yaml
 from addict import Dict
 
-import pcvs
+from pcvs import ROOTPATH
 from pcvs.helpers import log, utils
 from pcvs.helpers.system import sysTable
 
@@ -115,7 +115,7 @@ def compute_path(kind, name, scope):
 
 
 class ConfigurationBlock:
-    _template_path = os.path.join(utils.ROOTPATH, "share/templates")
+    _template_path = os.path.join(ROOTPATH, "share/templates")
 
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)

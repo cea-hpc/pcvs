@@ -29,11 +29,12 @@ def exec(ctx, output, argument, gen_list, display):
     env.update({'PCVS_SHOW': str(display)})
     
     if gen_list:
-        script_path = pvUtils.retrieve_all_test_scripts(output)
+        script_path = pvUtils.locate_scriptpaths(output)
         argument = "--list"
         err = subprocess.DEVNULL
     else:
-        script_path = [pvUtils.retrieve_test_script(argument, output)]
+        script_path = [pvUtils.compute_scriptpath_from_testname(argument, output)]
+        assert(os.path.isfile(script_path))
     try:
         for f in script_path:
             if not os.path.isfile(f):
