@@ -25,7 +25,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        "pcvs": ["schemes/*.yml", "templates/*.yml"],
+        "pcvs": ["schemes/*.yml", "templates/*.yml", "webview"],
         },
 
     entry_points='''

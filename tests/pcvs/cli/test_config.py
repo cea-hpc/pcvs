@@ -2,17 +2,35 @@ import pcvs
 import pytest
 import os
 from .conftest import run_and_test, isolated_fs
+from pcvs.cli import cli_config as tested
 
-@pytest.fixture(params=[None] + pcvs.cli.cli_config.backend.CONFIG_BLOCKS)
+@pytest.fixture(params=pcvs.backend.config.CONFIG_BLOCKS)
 def config_kind(request):
     return request.param
 
-@pytest.fixture(params=[None] + pcvs.helpers.utils.storage_order())
+@pytest.fixture(params=pcvs.helpers.utils.storage_order())
 def config_scope(request):
     return request.param
 
-class config_mocker:
-    pass
+@pytest.fixture()
+def valid_config_tree():
+    return {k: {
+        'local': [('default', "/path/to/default.yml")],
+        'user': [('user-{}'.format(k), "/path/to/user_override.yml")],
+        'global': [('system-wide', "/path/to/system-wide.yml")]
+        } for k in ['compiler', 'runtime', 'machine', 'criterion', 'group']
+        }
+
+
+def test_completion(mocker, valid_config_tree):
+    mocker.patch("pcvs.backend.config.CONFIG_EXISTING", return_value=valid_config_tree)
+    print(tested.compl_list_token(None, None, "local."))
+    assert(tested.compl_list_token(None, None, "local.") == [
+        "local.compiler.default", "local.runtime.default", "local.machine.default",
+        "local.group.default", "local.criterion.default"])
+    assert(tested.compl_list_token(None, None, "user-com") == ["local.compiler.user-compiler"])
+    assert(tested.compl_list_token(None, None, "runtime.sys") == ["global.runtime.system-wide"])
+
 
 def test_cmd():
     res = run_and_test('config')
@@ -105,7 +123,7 @@ def test_clone(config_scope, config_kind, caplog):
 
 def test_destroy(config_scope, config_kind, caplog):
     with isolated_fs():
-        token = ".".join(filter(None, (scoconfig_scopepe, config_kind, 'test')))
+        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
         
         # only invalid cases for creating a conf:
         if config_kind is None:

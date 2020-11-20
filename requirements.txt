@@ -4,3 +4,4 @@ jsonschema
 addict
 urwid
 PrettyTable
+flask

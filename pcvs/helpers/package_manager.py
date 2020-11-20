@@ -18,7 +18,7 @@ def identify(pm_node):
 
 
 class PManager:
-    def __init__(self, spec):
+    def __init__(self, spec=None):
         pass
 
     def get(self, load, install):

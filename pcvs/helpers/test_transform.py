@@ -14,30 +14,30 @@ from pcvs.helpers import package_manager, system
 # ##### TEST: INPUT TRANSFORMATION #####
 # ######################################
 def detect_source_lang(array_of_files):
-    langs = Dict()
+    detect = list()
     for f in array_of_files:
-        if re.match(r'\.(h|H|i|I|s|S|c|c90|c99|c11)$', f):
-            langs.cc = True
-        elif re.match(r'\.C|cc|cxx|cpp|c\+\+$', f):
-            langs.cxx = True
-        elif re.match(r'\.(f|F)(77)$', f):
-            langs.f77 = True
-        elif re.match(r'\.(f|F)90$', f):
-            langs.f90 = True
-        elif re.match(r'\.(f|F)95$', f):
-            langs.f95 = True
-        elif re.match(r'\.(f|F)(20)*03$', f):
-            langs.f03 = True
-        elif re.match(r'\.(f|F)(20)*08$', f):
-            langs.f08 = True
-        elif re.match(r'\.(f|F)$', f):
-            langs.fc = True
+        if re.search(r'\.(h|H|i|I|s|S|c|c90|c99|c11)$', f):
+            detect.append('cc')
+        elif re.search(r'\.C|cc|cxx|cpp|c\+\+$', f):
+            detect.append('cxx')
+        elif re.search(r'\.(f|F)(77)$', f):
+            detect.append('f77')
+        elif re.search(r'\.(f|F)90$', f):
+            detect.append('f90')
+        elif re.search(r'\.(f|F)95$', f):
+            detect.append('f95')
+        elif re.search(r'\.(f|F)(20)*03$', f):
+            detect.append('f03')
+        elif re.search(r'\.(f|F)(20)*08$', f):
+            detect.append('f08')
+        elif re.search(r'\.(f|F)$', f):
+            detect.append('fc')
 
     # now return the first valid language, according to settings
     # order matters: if sources contains multiple languages, the first
     # appearing in this list will be considered as the main language
-    for i in ['f08', 'f03', 'f95', 'f90', 'f77', 'fc','cxx', 'cc']:
-        if i in langs and i in system.get('compiler').commands:
+    for i in ['f08', 'f03', 'f95', 'f90', 'f77', 'fc', 'cxx', 'cc']:
+        if i in detect and i in system.get('compiler').commands:
             return i
     return 'cc'
 
