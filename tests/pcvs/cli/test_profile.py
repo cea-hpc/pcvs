@@ -1,5 +1,16 @@
 from .conftest import run_and_test, isolated_fs
+from pcvs.backend import profile
 import pytest
+
+class MockProfile:
+    def __init(self, name, scope): pass
+    def fill(self, raw): pass
+    def dump(self): pass
+    def is_found(self): pass
+
+@pytest.fixture(autouse=True)
+def mock_profile_obj():
+    profile.Profile = MockProfile
 
 
 def test_cmd():

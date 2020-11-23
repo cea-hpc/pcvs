@@ -3,6 +3,25 @@ import pytest
 import os
 from .conftest import run_and_test, isolated_fs
 from pcvs.cli import cli_config as tested
+from pcvs.backend import config
+
+
+class MockConfig:
+    pass
+
+def mock_blocklist(kind, scope=None):
+    mock = {
+        
+    }
+    if scope is None:
+        return {
+
+        }
+
+@pytest.fixture(autouse=True)
+def mock_config_backend():
+    config.ConfigurationBlock = MockConfig
+    config.list_blocks = mock_blocklist
 
 @pytest.fixture(params=pcvs.backend.config.CONFIG_BLOCKS)
 def config_kind(request):
