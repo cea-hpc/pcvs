@@ -10,23 +10,9 @@ from addict import Dict
 from pcvs.backend import config
 from pcvs.helpers import log, utils
 
+
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
-
-
-def extract_profile_from_token(s, single="right"):
-    array = s.split(".")
-    if len(array) > 2:
-        log.err("Invalid token")
-    elif len(array) == 2:
-        return (array[0], array[1])
-    elif len(array) == 1:
-        if single == "left":
-            return (s, None)
-        else:
-            return (None, s)
-    else:
-        log.nreach()
 
 
 def init():
@@ -44,26 +30,6 @@ def init():
                 (os.path.basename(pfile)[:-4], pfile))
 
 
-def check_existing_name(name, scope):
-    path = None
-    scopes = utils.storage_order() if scope is None else [scope]
-    for sc in scopes:
-        for pair in PROFILE_EXISTING[sc]:
-            if name == pair[0]:
-                path = pair[1]
-                return (sc, path)
-    return (None, None)
-
-
-def check_path(name, scope):
-    return os.path.isfile(compute_path(name, scope))
-
-
-def compute_path(name, scope):
-    assert (scope is not None)
-    return os.path.join(PROFILE_STORAGES[scope], name + ".yml")
-
-
 def list_profiles(scope=None):
     assert (scope in PROFILE_STORAGES.keys() or scope is None)
     if scope is None:
@@ -78,11 +44,29 @@ class Profile:
         self._name = name
         self._scope = scope
         self._details = {}
-        tmp, self._file = check_existing_name(name, scope)
+        self._retrieve_file()
+        if not self._retrieve_file() and self._scope is None:
+            # set a default scope when not specified
+            # to create a new profile
+            self._scope = 'local'
+
+    def _retrieve_file(self):
+        self._file = None
         if self._scope is None:
-            self._scope = 'local' if tmp is None else tmp
+            allowed_scopes = utils.storage_order()
+        else:
+            allowed_scopes = [self._scope]
+
+        for sc in allowed_scopes:
+            for pair in PROFILE_EXISTING[sc]:
+                if self._name == pair[0]:
+                    self._file = pair[1]
+                    self._scope = sc
+                    return True
+        return False
 
     def fill(self, raw):
+        # some checks
         assert (isinstance(raw, dict))
         check = [val for val in config.CONFIG_BLOCKS if val in raw.keys()]
         if len(check) != len(config.CONFIG_BLOCKS):
@@ -103,7 +87,10 @@ class Profile:
         return Dict(self._details).to_dict()
 
     def is_found(self):
-        return self._file is not None
+        try:
+            return os.path.isfile(self._file)
+        except TypeError:
+            return False
 
     @property
     def scope(self):
@@ -129,9 +116,13 @@ class Profile:
             if kind not in self._details:
                 raise jsonschema.exceptions.ValidationError("Missing '{}' in profile".format(kind))
             utils.ValidationScheme(kind).validate(self._details[kind], fail)
-        
+    
+    def compute_path(self):
+        assert (self._scope is not None)
+        self._file = os.path.join(PROFILE_STORAGES[self._scope], self._name + ".yml")
+
     def flush_to_disk(self):
-        self._file = compute_path(self._name, self._scope)
+        self.compute_path()
         self.check()
 
         # just in case the block subprefix does not exist yet
@@ -143,7 +134,7 @@ class Profile:
             yaml.safe_dump(self._details, f)
 
     def clone(self, clone):
-        self._file = compute_path(self._name, self._scope)
+        self.compute_path()
         log.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details

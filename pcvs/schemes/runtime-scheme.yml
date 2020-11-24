@@ -32,9 +32,6 @@ properties:
               "^.*$":
                 type: string
         additionalProperties: false
-        required:
-        - option
-        - type
     additionalProperties: false
   package_manager:
     type: object

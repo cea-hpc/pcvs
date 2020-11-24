@@ -30,6 +30,40 @@ def check_valid_scope(s):
                 "See --help for more information",
                 abort=1)
 
+def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
+    """Extract fields from tokens (a, b, c) from user's string
+
+    Args:
+        s (string): the input string
+        pair (str, optional): padding side when only 2 tokens found. Defaults to "right".
+        single (str, optional): padding side when only 1 token found. Defaults to "right".
+
+    Returns:
+        3-string-tuple: mapping (scope, kind, name), any of them may be null
+    """
+    array = s.split(".")
+    if len(array) > 3:
+        log.err("Invalid token (only up two separators)")
+    elif len(array) == 3:
+        return (array[0], array[1], array[maxsplit-1:])
+    elif len(array) == 2:
+        # two cases: a.b or b.c
+        if pair == 'left':
+            return (array[0], array[1], None)
+        elif pair == 'span':
+            return (array[0], None, array[1])
+        else:
+            return (None, array[0], array[1])
+    elif len(array) == 1:
+        if single == "left":  # pragma: no cover
+            return (s, None, None)
+        elif single == "center":
+            return (None, s, None)
+        else:
+            return (None, None, s)
+    else:  # pragma: no cover
+        log.nreach()
+    return (None, None, None)  # pragma: no cover
 
 def __determine_local_prefix(path, prefix):
     cur = path

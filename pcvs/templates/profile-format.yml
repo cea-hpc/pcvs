@@ -1,0 +1,64 @@
+compiler:
+  commands:
+    cc: mpicc
+    cxx: mpicxx
+    f77: mpifc
+    f90: mpifc
+    fc: mpifc
+  variants:
+    openmp:
+      args: -fopenmp
+criterion:
+  iterators:
+    n_core:
+      subtitle: 'c'
+      values: [4]
+    n_mpi:
+      subtitle: 'n'
+      values: [1, 2]
+    n_node:
+      subtitle: 'N'
+      values: [1]
+    n_omp:
+      subtitle: 'o'
+      values: [2, 4]
+group:
+  GRPMPI:
+    run:
+      iterate:
+        n_omp: {'values': null}
+  GRPOMP:
+    run:
+      iterate:
+        n_mpi: {'values': null} 
+        n_node:  {'values': null} 
+  GRPSERIAL:
+    run:
+      iterate:
+        n_mpi: {'values': null} 
+        n_node:  {'values': null}
+        n_core:  {'values': null}
+        n_omp:  {'values': null}
+machine:
+  nodes: 1
+  cores_per_node: 4
+  job_manager:
+    maxtime: 32500
+    mintime: 1000
+runtime:
+  program: mpirun
+  args: --share-node --clean
+  iterators:
+    n_core:
+      numeric: true
+      option: '-c='
+    n_mpi:
+      numeric: true
+      option: '-n='
+    n_node:
+      numeric: true
+      option: '-N='
+    n_omp:
+      numeric: true
+      option: 'OMP_NUM_THREADS='
+      type: environment

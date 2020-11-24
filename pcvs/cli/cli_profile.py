@@ -46,7 +46,7 @@ def profile_list(ctx, token):
     """
     (scope, label) = (None, None)
     if token:
-        (scope, label) = pvProfile.extract_profile_from_token(token,
+        (scope, label) = utils.extract_infos_from_token(token,
                                                               single="left")
 
     if label:
@@ -89,7 +89,7 @@ def profile_list(ctx, token):
 @click.pass_context
 def profile_show(ctx, token):
     """Prints a detailed view of the NAME profile."""
-    (scope, label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         pf.load_from_disk()
@@ -117,7 +117,7 @@ def profile_interactive_select():
             log.print_item("{}: {}".format(i + 1, cell))
         while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
-        (scope, _, label) = pvConfig.extract_config_from_token(
+        (scope, _, label) = utils.extract_infos_from_token(
             choices[idx], pair="span")
         composition[kind] = pvConfig.ConfigurationBlock(kind, label, scope)
 
@@ -162,7 +162,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     and end with an alphanumeric but no more restrictions are applied
     (e.g. 'mpi-srun-stampede-large' is allowed)
     """
-    (p_scope, p_label) = pvProfile.extract_profile_from_token(token)
+    (p_scope, _, p_label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(p_label, p_scope)
     if pf.is_found():
@@ -172,7 +172,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     pf_blocks = {}
 
     if clone is not None:
-        (c_scope, c_label) = pvProfile.extract_profile_from_token(clone)
+        (c_scope, _, c_label) = utils.extract_infos_from_token(clone, maxsplit=2)
         base = pvProfile.Profile(c_label, c_scope)
         pf.clone(base)
         pass
@@ -182,7 +182,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
         pf.fill(pf_blocks)
     else:
         for block in blocks:
-            (b_sc, b_kind, b_label) = pvConfig.extract_config_from_token(block)
+            (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
             cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
             if cur.is_found() and b_kind not in pf_blocks.keys():
                 pf_blocks[b_kind] = cur
@@ -218,7 +218,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
                 autocompletion=compl_list_token)
 @click.pass_context
 def profile_destroy(ctx, token):
-    (scope, label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
@@ -240,8 +240,7 @@ def profile_destroy(ctx, token):
               help="Open file with EDITOR")
 @click.pass_context
 def profile_alter(ctx, token, editor):
-    (scope, label) = pvProfile.extract_profile_from_token(token)
-
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
@@ -262,7 +261,7 @@ def profile_alter(ctx, token, editor):
               help="File to use in place of a config. block")
 @click.pass_context
 def profile_update(ctx, token, editor):
-    (scope, label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     log.nimpl()
     if pf.is_found():
@@ -282,7 +281,7 @@ def profile_update(ctx, token, editor):
 @click.argument("src_file", type=click.File('r'))
 @click.pass_context
 def profile_import(ctx, token, src_file):
-    (scope, label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
         pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
@@ -297,7 +296,7 @@ def profile_import(ctx, token, src_file):
 @click.argument("dest_file", type=click.File('w'))
 @click.pass_context
 def profile_export(ctx, token, dest_file):
-    (scope, label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
@@ -317,7 +316,7 @@ def profile_export(ctx, token, dest_file):
               help="Default scope to store the split (default: same as profile)")
 @click.pass_context
 def profile_decompose_profile(ctx, token, name, block_opt, scope):
-    (p_scope, p_label) = pvProfile.extract_profile_from_token(token)
+    (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     blocks = [e.strip() for e in block_opt.split(',')]
     for b in blocks:

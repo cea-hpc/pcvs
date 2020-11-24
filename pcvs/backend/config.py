@@ -17,41 +17,6 @@ CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
 
 
-def extract_config_from_token(s, pair="right", single="right"):
-    """Extract config tokens (scope,kind,name) from user's string
-
-    Args:
-        s (string): the input string
-        pair (str, optional): padding side when only 2 tokens found. Defaults to "right".
-        single (str, optional): padding side when only 1 token found. Defaults to "right".
-
-    Returns:
-        3-string-tuple: mapping (scope, kind, name), any of them may be null
-    """
-    array = s.split(".")
-    if len(array) > 3:
-        log.err("Invalid token")
-    elif len(array) == 3:
-        return (array[0], array[1], array[2])
-    elif len(array) == 2:
-        # two cases: a.b or b.c
-        if pair == 'left':
-            return (array[0], array[1], None)
-        elif pair == 'span':
-            return (array[0], None, array[1])
-        else:
-            return (None, array[0], array[1])
-    elif len(array) == 1:
-        if single == "left":  # pragma: no cover
-            return (s, None, None)
-        elif single == "center":
-            return (None, s, None)
-        else:
-            return (None, None, s)
-    else:  # pragma: no cover
-        log.nreach()
-    return (None, None, None)  # pragma: no cover
-
 
 def init():
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
@@ -96,27 +61,7 @@ def check_valid_kind(s):
                 abort=1)
 
 
-def check_existing_name(kind, name, scope):
-    assert (kind in CONFIG_BLOCKS)
-    path = None
-    scopes = utils.storage_order() if scope is None else [scope]
-
-    for sc in scopes:
-        for pair in CONFIG_EXISTING[kind][sc]:
-            if name == pair[0]:
-                path = pair[1]
-                return (sc, path)
-    return (None, None)
-
-
-def compute_path(kind, name, scope):
-    assert (scope is not None)
-    return os.path.join(CONFIG_STORAGES[scope], kind, name + ".yml")
-
-
 class ConfigurationBlock:
-    _template_path = os.path.join(ROOTPATH, "share/templates")
-
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
         utils.check_valid_scope(scope)
@@ -124,9 +69,25 @@ class ConfigurationBlock:
         self._name = name
         self._details = {}
         self._scope = scope
-        tmp, self._file = check_existing_name(kind, name, scope)
-        if self._scope is None:
-            self._scope = 'local' if tmp is None else tmp
+        if not self.retrieve_file() and self._scope is None:
+            self._scope = 'local'
+
+    def retrieve_file(self):
+        assert (self._kind in CONFIG_BLOCKS)
+        path = None
+        scopes = utils.storage_order() if self._scope is None else [self._scope]
+
+        for sc in scopes:
+            for pair in CONFIG_EXISTING[self._kind][sc]:
+                if self._name == pair[0]:
+                    self._file = pair[1]
+                    self._scope = sc
+                    return True
+        return False
+
+    def compute_path(self):
+        assert (self._scope is not None)
+        self._files = os.path.join(CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
 
     def is_found(self):
         return self._file is not None
@@ -171,8 +132,7 @@ class ConfigurationBlock:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 
     def flush_to_disk(self):
-        self._file = compute_path(self._kind, self._name, self._scope)
-        
+        self.compute_path()
         self.check()
         
         log.info("flush {} from '{} ({})'".format(
@@ -191,7 +151,7 @@ class ConfigurationBlock:
         assert (clone._kind == self._kind)
         assert (self._file is None)
 
-        self._file = compute_path(self._kind, self._name, self._scope)
+        self.compute_path()
         log.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details

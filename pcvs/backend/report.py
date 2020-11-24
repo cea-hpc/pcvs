@@ -9,7 +9,7 @@ def locate_json_files(path):
     array = list()
     for root, _, files in os.walk(path):
         for f in files:
-            if f.startswith("pcvsrun-") and f.endswith(".json"):
+            if f.startswith("output-") and f.endswith(".xml.json"):
                 array.append(os.path.join(root, f))
         
     return array

@@ -79,7 +79,7 @@ def config_list(ctx, token) -> None:
     """
     (scope, kind, label) = (None, None, None)
     if token:
-        (scope, kind, label) = pvConfig.extract_config_from_token(
+        (scope, kind, label) = utils.extract_infos_from_token(
             token, pair="left", single="center")
     if label:
         log.warn("no LABEL required for this command")
@@ -119,7 +119,7 @@ def config_show(ctx, token) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
 
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
@@ -155,9 +155,9 @@ def config_create(ctx, token, clone, interactive) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
     if clone is not None:
-        (c_scope, c_kind, c_label) = pvConfig.extract_config_from_token(
+        (c_scope, c_kind, c_label) = utils.extract_infos_from_token(
             clone, pair='span')
         if c_kind is not None and c_kind != kind:
             raise click.BadArgumentUsage(
@@ -195,7 +195,7 @@ def config_destroy(ctx, token) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
 
     c = pvConfig.ConfigurationBlock(kind, label, scope)
     if c.is_found():
@@ -220,7 +220,7 @@ def config_edit(ctx, token, editor) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
 
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
@@ -242,7 +242,7 @@ def config_import(ctx, token, in_file) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found():
@@ -264,7 +264,7 @@ def config_export(ctx, token, out_file):
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
-    (scope, kind, label) = pvConfig.extract_config_from_token(token)
+    (scope, kind, label) = utils.extract_infos_from_token(token)
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
