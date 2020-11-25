@@ -34,7 +34,6 @@ def exec(ctx, output, argument, gen_list, display):
         err = subprocess.DEVNULL
     else:
         script_path = [pvUtils.compute_scriptpath_from_testname(argument, output)]
-        assert(os.path.isfile(script_path))
     try:
         for f in script_path:
             if not os.path.isfile(f):
