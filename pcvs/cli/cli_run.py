@@ -163,7 +163,7 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         except FileNotFoundError:
             raise click.BadOptionUsage("--duplicate", "{} is not a valid build directory!".format(dup))
     else:
-        (scope, label) = utils.extract_infos_from_token(profilename)
+        (scope,_, label) = utils.extract_infos_from_token(profilename, maxsplit=2)
         pf = pvProfile.Profile(label, scope)
         if not pf.is_found():
             log.err("Please use a valid profile name:",
