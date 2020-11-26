@@ -130,7 +130,7 @@ def profile_interactive_select():
               default=False, is_flag=True,
               help="Build the profile by interactively selecting conf. blocks")
 @click.option("-b", "--block", "blocks", multiple=True,
-              default=False, show_envvar=True,
+              default=None, show_envvar=True,
               autocompletion=cli_config.compl_list_token,
               help="non-interactive option to build a profile")
 @click.option("-f", "--from", "clone", show_envvar=True,
@@ -175,29 +175,33 @@ def profile_build(ctx, token, interactive, blocks, clone):
         (c_scope, _, c_label) = utils.extract_infos_from_token(clone, maxsplit=2)
         base = pvProfile.Profile(c_label, c_scope)
         pf.clone(base)
-        pass
     elif interactive:
         log.print_header("profile view (build)")
         pf_blocks = profile_interactive_select()
         pf.fill(pf_blocks)
     else:
-        for block in blocks:
-            (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
-            cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
-            if cur.is_found() and b_kind not in pf_blocks.keys():
-                pf_blocks[b_kind] = cur
-            else:
-                log.err("Issue with '{}'".format(block))
-                if not cur.is_found():
-                    raise click.BadOptionUsage("-b", "Such configuration does not exist!")
+        if len(blocks) > 0:
+            for block in blocks:
+                (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
+                cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
+                if cur.is_found() and b_kind not in pf_blocks.keys():
+                    pf_blocks[b_kind] = cur
                 else:
-                    raise click.BadOptionUsage("-b", "\n".join([ 
-                        "'{}' kind is set twice".format(b_kind.upper()),
-                        "First is '{}'".format(pf_blocks[b_kind].full_name)
-                    ]))
-                log.err("")
-        pf.fill(pf_blocks)
-
+                    log.err("Issue with '{}'".format(block))
+                    if not cur.is_found():
+                        raise click.BadOptionUsage("-b", "Such configuration does not exist!")
+                    else:
+                        raise click.BadOptionUsage("-b", "\n".join([ 
+                            "'{}' kind is set twice".format(b_kind.upper()),
+                            "First is '{}'".format(pf_blocks[b_kind].full_name)
+                        ]))
+                    log.err("")
+            pf.fill(pf_blocks)
+        else:
+            base = pvProfile.Profile('default', None)
+            base.load_template()
+            pf.clone(base)
+        
     log.print_header("profile view")
     pf.flush_to_disk()
     # pf.display()
@@ -227,8 +231,7 @@ def profile_destroy(ctx, token):
         else:
             pf.delete()
     else:
-        raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
-                                     "Please check the 'list' command")
+        raise click.BadArgumentUsage("Profile '{}' not found! Please check the 'list' command".format(label),)
 
 
 @profile.command(name="alter",
