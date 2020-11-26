@@ -42,10 +42,8 @@ def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
         3-string-tuple: mapping (scope, kind, name), any of them may be null
     """
     array = s.split(".")
-    if len(array) > 3:
-        log.err("Invalid token (only up two separators)")
-    elif len(array) == 3:
-        return (array[0], array[1], array[maxsplit-1:])
+    if len(array) >= maxsplit:
+        return (array[0], array[1], ".".join(array[maxsplit-1:]))
     elif len(array) == 2:
         # two cases: a.b or b.c
         if pair == 'left':

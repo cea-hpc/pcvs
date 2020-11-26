@@ -69,8 +69,10 @@ class ConfigurationBlock:
         self._name = name
         self._details = {}
         self._scope = scope
-        if not self.retrieve_file() and self._scope is None:
-            self._scope = 'local'
+        self._file = None
+        self._exists = False
+
+        self.retrieve_file()
 
     def retrieve_file(self):
         assert (self._kind in CONFIG_BLOCKS)
@@ -82,15 +84,17 @@ class ConfigurationBlock:
                 if self._name == pair[0]:
                     self._file = pair[1]
                     self._scope = sc
-                    return True
-        return False
+                    self._exists = True
+                    return
 
-    def compute_path(self):
-        assert (self._scope is not None)
-        self._files = os.path.join(CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
+        # default file position when not found
+        if self._scope is None:
+            self._scope = 'local'
+        self._file = self._files = os.path.join(CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
+        self._exists = False
 
     def is_found(self):
-        return self._file is not None
+        return self._exists
 
     @property
     def full_name(self):
@@ -115,33 +119,40 @@ class ConfigurationBlock:
         utils.ValidationScheme(self._kind).validate(self._details, fail)
 
     def load_from_disk(self):
-
-        if self._file is None or not os.path.isfile(self._file):
+        if not self._exists:
             log.err("Invalid name {} for KIND '{}'".format(
                 self._name, self._kind))
 
+        self.retrieve_file()
+
+        if os.path.isfile(self._file):
+            log.err("Internal error: file {} not found!".format(self._file))
+            
         log.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
 
     def load_template(self):
-        with open(os.path.join(
+        self._exists = True
+        self._file = os.path.join(
                     ROOTPATH,
-                    'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
+                    'templates/{}-format.yml'.format(self._kind))
+        with open(self._file, 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 
     def flush_to_disk(self):
-        self.compute_path()
         self.check()
+        self.retrieve_file()
         
         log.info("flush {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
 
         # just in case the block subprefix does not exist yet
-        prefix_file = os.path.dirname(self._file)
-        if not os.path.isdir(prefix_file):
-            os.makedirs(prefix_file, exist_ok=True)
+        if not self._exists:
+            prefix_file = os.path.dirname(self._file)
+            if not os.path.isdir(prefix_file):
+                os.makedirs(prefix_file, exist_ok=True)
 
         with open(self._file, 'w') as f:
             yaml.safe_dump(self._details.to_dict(), f)
@@ -149,15 +160,17 @@ class ConfigurationBlock:
     def clone(self, clone):
         assert (isinstance(clone, ConfigurationBlock))
         assert (clone._kind == self._kind)
-        assert (self._file is None)
+        assert (not self.is_found())
+        assert(clone.is_found())
 
-        self.compute_path()
-        log.info("Compute target prefix: {}".format(self._file))
+        self.retrieve_file()
         assert(not os.path.isfile(self._file))
+        
+        log.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details
 
     def delete(self):
-        assert (self._file is not None)
+        assert (self.is_found())
         assert (os.path.isfile(self._file))
 
         log.info("remove {} from '{} ({})'".format(

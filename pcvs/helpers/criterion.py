@@ -335,8 +335,8 @@ def valid_combination(dic):
     global first, runtime_filter
     rt = system.get('runtime')
     val = system.get('validation')
-    if first is True and rt.plugin:
-        first = False
+    if first and rt.plugin:
+        first = not first
         rt.pluginfile =  os.path.join(val.output, "cache/rt-plugin.py")
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
