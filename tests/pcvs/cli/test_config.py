@@ -2,7 +2,7 @@ import os
 import pcvs
 import pytest
 import os
-from .conftest import run_and_test
+from .conftest import click_call
 from pcvs.cli import cli_config as tested
 from unittest.mock import patch, Mock
 
@@ -32,7 +32,7 @@ def test_completion(mock_init):
 
 
 def test_cmd():
-    res = run_and_test('config')
+    res = click_call('config')
     assert('Usage:' in res.output)
 
 
@@ -45,34 +45,37 @@ def test_list(config_scope, config_kind, caplog):
 
     if config_scope and config_kind is None:
         caplog.clear()
-        res = run_and_test('config', 'list', token, success=False)
+        res = click_call('config', 'list', token, success=False)
         assert ("Invalid " in caplog.text)
     else:
-        res = run_and_test('config', 'list', token)
+        res = click_call('config', 'list', token)
         assert (res.exit_code == 0)
 
     if config_scope and config_kind:
         caplog.clear()
-        res = run_and_test('config', 'list', token+".test")
+        res = click_call('config', 'list', token+".test")
         assert ("no LABEL required for this command" in caplog.text)
 
 
 def test_list_scope(config_kind, config_scope):
     for scope in pcvs.helpers.utils.storage_order():
-        _ = run_and_test('config', 'list', ".".join([scope, config_kind]))
+        _ = click_call('config', 'list', ".".join([scope, config_kind]))
 
 
 def test_list_wrong(caplog):
     caplog.clear()
-    _ = run_and_test('config', 'list', 'error', success=False)
+    res = click_call('config', 'list', 'error')
+    assert(res.exit_code != 0)
     assert ('Invalid KIND' in caplog.text)
 
     caplog.clear()
-    _ = run_and_test('config', 'list', 'failure.compiler', success=False)
+    res = click_call('config', 'list', 'failure.compiler')
+    assert(res.exit_code != 0)
     assert ('Invalid SCOPE' in caplog.text)
 
     caplog.clear()
-    _ = run_and_test('config', 'list', 'failure.compiler.extra.field', success=False)
+    res = click_call('config', 'list', 'failure.compiler.extra.field')
+    assert(res.exit_code != 0)
     assert ('Invalid SCOPE' in caplog.text)
 
 @patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
@@ -80,7 +83,7 @@ def test_show(mock_config, caplog):
     instance = mock_config.return_value
     instance.is_found.return_value = True
 
-    res = run_and_test('config', 'show', 'dummy-config')
+    res = click_call('config', 'show', 'dummy-config')
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once()
     instance.load_from_disk.assert_called_once()
@@ -88,7 +91,7 @@ def test_show(mock_config, caplog):
 
     instance.reset_mock()
     instance.is_found.return_value = False
-    res = run_and_test('config', 'show', 'dummy-config')
+    res = click_call('config', 'show', 'dummy-config')
     assert(res.exit_code != 0)
     instance.is_found.assert_called_once()
 
@@ -98,7 +101,7 @@ def test_create(mock_config):
     instance = mock_config.return_value
     instance.is_found.return_value = False
     
-    res = run_and_test('config', 'create', 'dummy-config')
+    res = click_call('config', 'create', 'dummy-config')
     assert(res.exit_code == 0)
     instance.load_template.assert_called_once()
     instance.is_found.assert_called_once()
@@ -107,7 +110,7 @@ def test_create(mock_config):
 
     instance.reset_mock()
     instance.is_found.return_value = True
-    res = run_and_test('config', 'create', 'dummy-config')
+    res = click_call('config', 'create', 'dummy-config')
     assert(res.exit_code != 0)
     instance.load_template.assert_called_once()
     instance.is_found.assert_called_once()
@@ -117,7 +120,7 @@ def test_create(mock_config):
 def test_create_with_options(mock_config):
     instance = mock_config.return_value
     instance.is_found.return_value = False
-    res = run_and_test('config', 'create', '-i', 'local.compiler.random')
+    res = click_call('config', 'create', '-i', 'local.compiler.random')
     assert(res.exit_code == 0)
     instance.open_editor.assert_called_once()
 
@@ -126,14 +129,14 @@ def test_create_with_options(mock_config):
 def test_destroy(mock_config):
     instance = mock_config.return_value
     instance.is_found.return_value = True
-    res = run_and_test('config', 'destroy', '-f', "dummy-config")
+    res = click_call('config', 'destroy', '-f', "dummy-config")
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once()
     instance.delete.assert_called_once()
 
     instance.reset_mock()
     instance.is_found.return_value = False
-    res = run_and_test('config', 'destroy', '-f', "dummy-config")
+    res = click_call('config', 'destroy', '-f', "dummy-config")
     assert(res.exit_code != 0)
     instance.is_found.assert_called_once()
     instance.delete.assert_not_called()
@@ -150,20 +153,20 @@ def test_export(caplog):
 def test_edit(mock_config):
     instance = mock_config.return_value
     instance.is_found.return_value = True
-    res = run_and_test('config', 'edit', "dummy-config")
+    res = click_call('config', 'edit', "dummy-config")
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once()
     instance.open_editor.assert_called_once_with(os.environ.get('EDITOR', None))
     
     instance.reset_mock()
-    res = run_and_test('config', 'edit', "dummy-config", "-e", "editor")
+    res = click_call('config', 'edit', "dummy-config", "-e", "editor")
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once()
     instance.open_editor.assert_called_once_with("editor")
 
     instance.reset_mock()
     instance.is_found.return_value = False
-    res = run_and_test('config', 'edit', "dummy-config")
+    res = click_call('config', 'edit', "dummy-config")
     assert(res.exit_code != 0)
     instance.is_found.assert_called_once()
     instance.open_editor.assert_not_called()

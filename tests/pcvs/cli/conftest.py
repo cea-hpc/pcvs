@@ -5,9 +5,8 @@ from pcvs.backend import config
 
 runner = CliRunner()
 
-def run_and_test(*cmd, success=True):
-    res = runner.invoke(cli, cmd)
-    return res
-
+def click_call(*cmd):
+    return runner.invoke(cli, cmd)
+    
 def isolated_fs():
     return runner.isolated_filesystem()

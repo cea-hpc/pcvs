@@ -1,60 +1,77 @@
-from .conftest import run_and_test, isolated_fs
-from pcvs.backend import profile
+from .conftest import click_call
+import pcvs
+from unittest.mock import patch, Mock
 import pytest
-
-class MockProfile:
-    def __init(self, name, scope): pass
-    def fill(self, raw): pass
-    def dump(self): pass
-    def is_found(self): pass
-
-@pytest.fixture(autouse=True)
-def mock_profile_obj():
-    profile.Profile = MockProfile
 
 
 def test_cmd():
-    res = run_and_test('profile')
+    res = click_call('profile')
+    assert(res.exit_code == 0)
     assert('Usage:' in res.output)
 
 
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_list(scope, caplog):
-    token = "" if scope is None else scope
-    _ = run_and_test('profile', 'list', token)
-
-    if scope:
-        caplog.clear()
-        _ = run_and_test('profile', 'list', token+".test")
-        assert ("no LABEL required for this command" in caplog.text)
-
-
-def test_list_wrong(caplog):
-    _ = run_and_test('profile', 'list', 'error', success=False)
-    assert ('Invalid SCOPE' in caplog.text)
-    _ = run_and_test('profile', 'list', 'failure.extra.field', success=False)
-    assert ('Invalid token' in caplog.text)
+@patch('pcvs.backend.profile.PROFILE_EXISTING', {
+        'local': [('default', "/path/to/default.yml")],
+        'user': [('user', "/path/to/user_override.yml")],
+        'global': [('system-wide', "/path/to/system-wide.yml")]
+        })
+@patch('pcvs.backend.profile.init', return_value=None)
+def test_list(mock_init):
+    res = click_call('profile', 'list')
+    assert(res.exit_code == 0)
+    assert('default' in res.output)
+    assert('user' in res.output)
+    assert('system-wide' in res.output)
 
 
-@pytest.mark.parametrize('scope', [None, 'local'])
-def test_build(scope, caplog, mock):
-    #mock.patch.object(pvConfig.ConfigurationBlock, )
-    with isolated_fs():
-        _ = run_and_test('profile', 'build', 'local.default')
+@patch('pcvs.backend.profile.Profile')
+def test_show(mock_pf):
+    instance = mock_pf.return_value
+    instance.is_found.return_value = True
+    res = click_call('profile', 'show', 'local.default')
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.load_from_disk.assert_called()
+    instance.display.assert_called_once()
+
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = click_call('profile', 'show', 'local.default')
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
+    instance.display.assert_not_called()
 
 
-def test_build_wrong(caplog):
-    with isolated_fs():
-        _ = run_and_test('profile', 'build', 'local.default', success=False)
-        assert("configuration blocks are required to build" in caplog.text)
+@patch('pcvs.backend.profile.Profile')
+def test_build(mock_pf):
+    instance = mock_pf.return_value
+    instance.is_found.return_value = False
+    res = click_call('profile', 'build', 'local.default')
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.clone.assert_called()
+    instance.flush_to_disk.assert_called_once()
+
+    instance.reset_mock()
+    instance.is_found.return_value = True
+    res = click_call('profile', 'build', 'local.default')
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
+    instance.flush_to_disk.assert_not_called()
 
 
-def test_destroy(caplog):
-    with isolated_fs():
-        _ = run_and_test('profile', 'build', 'local.default1')
-        _ = run_and_test('profile', 'destroy', 'local.default1', success=False)
-        _ = run_and_test('profile', 'destroy', '-f', 'local.default1')
-        
-        caplog.clear()
-        _ = run_and_test('profile', 'destroy', '-f', 'local.default1', success=False)
-        assert("not found!" in caplog.text)
+@patch('pcvs.backend.profile.Profile')
+def test_destroy(mock_pf):
+    instance = mock_pf.return_value
+    instance.is_found.return_value = True
+    res = click_call('profile', 'destroy', '-f', 'local.default')
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.delete.assert_called_once()
+
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = click_call('profile', 'destroy', '-f', 'local.default')
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
+    instance.delete.assert_not_called()

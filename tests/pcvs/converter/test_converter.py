@@ -4,7 +4,7 @@ from pcvs.converter.yaml_converter import main
 
 runner = CliRunner()
 
-def run_and_test(*cmd, success=True):
+def click_call(*cmd, success=True):
     res = runner.invoke(main, cmd)
     if success:
         assert (res.exit_code == 0)

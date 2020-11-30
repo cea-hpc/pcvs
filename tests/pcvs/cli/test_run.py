@@ -1,20 +1,26 @@
-from .conftest import run_and_test, isolated_fs
+from .conftest import click_call, isolated_fs
+from unittest.mock import patch
 import pcvs
 import os
 
 
 def test_no_userdirs():
     with isolated_fs():
-        _ = run_and_test('run')
+        _ = click_call('run')
 
 
-def test_override(caplog):
+@patch('pcvs.backend.run')
+@patch('pcvs.backend.profile.Profile')
+@patch('pcvs.backend.bank')
+@patch('pcvs.helpers.system')
+def override(mock_sys, mock_bank, mock_pf, mock_run, caplog):
     with isolated_fs():
-        _ = run_and_test('run', '.')
+        res = click_call('run', '.')
+        assert(res.exit_code == 0)
 
-        res = run_and_test('run', '.', success=False)
+        res = click_call('run', '.')
         assert(res.exit_code != 0)    
         assert ("Previous run artifacts found" in caplog.text)
 
         caplog.clear()
-        _ = run_and_test('run', '.', '--override')
+        _ = click_call('run', '.', '--override')
