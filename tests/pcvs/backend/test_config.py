@@ -2,19 +2,14 @@ from pcvs.backend.config import CONFIG_BLOCKS
 from pcvs.backend import config as tested
 from pcvs.helpers import utils
 import pytest
-import glob
+from unittest.mock import patch
 
 
-
-
-def test_init(monkeypatch):
-    def mockglob(path):
-        return [
+@patch('glob.glob', return_value=[
             '/a/b/c/first.yml',
             '/a/b/c/second.yml'
-        ]
-    monkeypatch.setattr(glob, 'glob', mockglob)
-    
+        ])
+def test_init(mock_glob):
     tested.init()
     assert(len(tested.CONFIG_BLOCKS) == 5)
     assert(len([elt for elt in ['compiler', 'runtime', 'group', 'criterion', 'machine'] if elt not in tested.CONFIG_BLOCKS]) == 0)

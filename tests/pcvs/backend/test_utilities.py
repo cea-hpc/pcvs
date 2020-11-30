@@ -2,6 +2,7 @@ from pcvs.backend import utilities as tested
 from pcvs import BUILD_NAMEDIR
 import pytest
 import os
+from unittest.mock import patch
 
 @pytest.fixture(params=[None, "/root"])
 def prefix(request):
@@ -15,16 +16,13 @@ def testname(request):
 def wrong_testname(request):
     return request.param
 
-def test_locate_scriptpaths(monkeypatch, prefix):
-    def mock_filetree(path):
-        return [
+@patch('os.walk', return_value=[
             ('/', ('a', 'b'), ('README.md', 'LIST_OF_TESTS')),
             ('/a', ['c'], ["wrong_list_of_tests.sh"]),
             ('/a/c', [], ["list_of_tests.sh", "a.c"]),
             ('/b', [], ['list_of_tests.sh', "file.txt"]),
-        ]
-    monkeypatch.setattr(os, 'walk', mock_filetree)
-    
+        ])
+def test_locate_scriptpaths(prefix):
     result = tested.locate_scriptpaths(prefix)
     print(result)
     assert(len(result) == 2)

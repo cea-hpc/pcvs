@@ -1,12 +1,10 @@
 from pcvs.helpers import test_transform as tested
+import pcvs
 import pytest
 from addict import Dict
-from pcvs.helpers import system, package_manager
+from unittest.mock import patch
 
-
-def test_lang_detection(monkeypatch):
-    def compiler_get(token):
-        return Dict({
+@patch('pcvs.helpers.system.get', return_value=Dict({
             'commands': {
                 'cc': 'CC',
                 'cxx': 'CXX',
@@ -17,10 +15,8 @@ def test_lang_detection(monkeypatch):
                 'f03': 'F03',
                 'f08': 'F08'
             }
-        })
-    
-    monkeypatch.setattr(system, 'get', compiler_get)
-
+        }))
+def test_lang_detection(mock_sys):
     assert(tested.detect_source_lang(["/path/to/nothing.valid"]) == 'cc')
     assert(tested.detect_source_lang(["/path/to/a.c"]) == 'cc')
     assert(tested.detect_source_lang(["/path/to/a.h"]) == 'cc')
@@ -40,16 +36,14 @@ def test_lang_detection(monkeypatch):
                                       "/path/to/a.f08"]) == 'f08')
     
 
-def test_build_variants(monkeypatch):
-    def mock_compiler_variants(token):
-        return Dict({
+@patch('pcvs.helpers.system.get', return_value=Dict({
             'variants': {
                 'openmp': {'args': '-fopenmp'},
                 'other_variant': {'args': '-fvariant'},
                 'all_errors': {'args': '-Werror'}
             }
-        })
-    monkeypatch.setattr(system, "get", mock_compiler_variants)
+        }))
+def test_build_variants(mock_sys):
     assert("-fopenmp" in tested.prepare_cmd_build_variants(['openmp']))
 
     s = tested.prepare_cmd_build_variants(['openmp', 'all_errors'])
@@ -57,15 +51,9 @@ def test_build_variants(monkeypatch):
     assert('-fvariant' not in s)
 
 
-def test_handle_job_deps(monkeypatch):
-    def mock_pm(keyval):
-        s = list()
-        for k, v in keyval.items():
-            for vv in v:
-                s.append(package_manager.PManager())
-        return s
-
-    monkeypatch.setattr(package_manager, 'identify', mock_pm)
+@patch('pcvs.helpers.package_manager.identify')
+def handle_job_deps(mock_pmlister):
+    #mock_pmlister.return_value = 
     assert(tested.handle_job_deps({'depends_on': {
         'test': ['a', 'b', 'c']
     }}, "prefix") == ["prefix/a", "prefix/b", "prefix/c"])

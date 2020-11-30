@@ -4,6 +4,7 @@ import os
 import yaml
 from pcvs.helpers import package_manager
 from pcvs.helpers import system as s
+from unittest.mock import patch
 
 
 def test_save_global_object():
@@ -40,16 +41,11 @@ def test_serialize():
     })
 
 
-def test_cfg_validation(monkeypatch):
-    def mock_default_file(fp, Loader):
-        assert(os.environ['HOME'] in fp.name)
-        return {}
-    
-    monkeypatch.setattr(yaml, "load", mock_default_file)
-    
+@patch('yaml.load', return_value={})
+def test_cfg_validation(mock_load):
     obj = s.CfgValidation()
-    assert(obj.color == True)
-    assert(obj.simulated == False)
+    assert(obj.color is True)
+    assert(obj.simulated is False)
     assert(obj.dirs == ".")
     assert(obj.pf_name == "default")
     assert(obj.result.format == ['json'])
