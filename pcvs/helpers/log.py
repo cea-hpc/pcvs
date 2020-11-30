@@ -59,7 +59,13 @@ def __set_logger(v):
     verbosity = max(min(v, len(vb_array)-1), 0)
     for _, v in vb_array.items():
         if verbosity == v[0]:
-            logging.basicConfig(format=FORMAT, level=v[1])
+            l = logging.getLogger()
+            l.setLevel(v[1])
+            
+            lh = logging.StreamHandler()
+            lh.setFormatter(logging.Formatter(FORMAT))
+
+            l.addHandler(lh)
 
 
 def get_verbosity(match):

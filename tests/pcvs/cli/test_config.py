@@ -1,27 +1,11 @@
+import os
 import pcvs
 import pytest
 import os
-from .conftest import run_and_test, isolated_fs
+from .conftest import run_and_test
 from pcvs.cli import cli_config as tested
-from pcvs.backend import config
+from unittest.mock import patch, Mock
 
-
-class MockConfig:
-    pass
-
-def mock_blocklist(kind, scope=None):
-    mock = {
-        
-    }
-    if scope is None:
-        return {
-
-        }
-
-@pytest.fixture(autouse=True)
-def mock_config_backend():
-    config.ConfigurationBlock = MockConfig
-    config.list_blocks = mock_blocklist
 
 @pytest.fixture(params=pcvs.backend.config.CONFIG_BLOCKS)
 def config_kind(request):
@@ -31,30 +15,25 @@ def config_kind(request):
 def config_scope(request):
     return request.param
 
-@pytest.fixture()
-def valid_config_tree():
-    return {k: {
+
+@patch('pcvs.backend.config.CONFIG_EXISTING', {k: {
         'local': [('default', "/path/to/default.yml")],
         'user': [('user-{}'.format(k), "/path/to/user_override.yml")],
         'global': [('system-wide', "/path/to/system-wide.yml")]
         } for k in ['compiler', 'runtime', 'machine', 'criterion', 'group']
-        }
-
-
-def test_completion(mocker, valid_config_tree):
-    mocker.patch("pcvs.backend.config.CONFIG_EXISTING", return_value=valid_config_tree)
-    print(tested.compl_list_token(None, None, "local."))
-    assert(tested.compl_list_token(None, None, "local.") == [
+        })
+@patch('pcvs.backend.config.init')
+def test_completion(mock_init):    
+    assert(set(tested.compl_list_token(None, None, "local.")) == {
         "local.compiler.default", "local.runtime.default", "local.machine.default",
-        "local.group.default", "local.criterion.default"])
-    assert(tested.compl_list_token(None, None, "user-com") == ["local.compiler.user-compiler"])
-    assert(tested.compl_list_token(None, None, "runtime.sys") == ["global.runtime.system-wide"])
+        "local.group.default", "local.criterion.default"})
+    assert(set(tested.compl_list_token(None, None, "user-com")) == {"user.compiler.user-compiler"})
+    assert(set(tested.compl_list_token(None, None, "runtime.sys")) == {"global.runtime.system-wide"})
 
 
 def test_cmd():
     res = run_and_test('config')
     assert('Usage:' in res.output)
-
 
 
 def test_list_all(config_scope, caplog):
@@ -94,129 +73,97 @@ def test_list_wrong(caplog):
 
     caplog.clear()
     _ = run_and_test('config', 'list', 'failure.compiler.extra.field', success=False)
-    assert ('Invalid token' in caplog.text)
+    assert ('Invalid SCOPE' in caplog.text)
+
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_show(mock_config, caplog):
+    instance = mock_config.return_value
+    instance.is_found.return_value = True
+
+    res = run_and_test('config', 'show', 'dummy-config')
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.load_from_disk.assert_called_once()
+    instance.display.assert_called_once()
+
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = run_and_test('config', 'show', 'dummy-config')
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
 
 
-def test_show(config_scope, config_kind, caplog):
-    with isolated_fs():
-        token = ".".join(filter(None, (config_scope, config_kind, 'test-show')))
-        _ = run_and_test('config', 'create', token)
-        _ = run_and_test('config', 'show', token)
-        caplog.clear()
-        _ = run_and_test('config', 'show', token + "-none", success=False)
-        assert("configuration found at" in caplog.text)
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_create(mock_config):
+    instance = mock_config.return_value
+    instance.is_found.return_value = False
+    
+    res = run_and_test('config', 'create', 'dummy-config')
+    assert(res.exit_code == 0)
+    instance.load_template.assert_called_once()
+    instance.is_found.assert_called_once()
+    instance.clone.assert_called_once()
+    instance.flush_to_disk.assert_called_once()
+
+    instance.reset_mock()
+    instance.is_found.return_value = True
+    res = run_and_test('config', 'create', 'dummy-config')
+    assert(res.exit_code != 0)
+    instance.load_template.assert_called_once()
+    instance.is_found.assert_called_once()
 
 
-def test_create(config_scope, config_kind, caplog):
-    with isolated_fs():
-        label = ".".join(filter(None, (config_scope, config_kind, 'creat')))
-        _ = run_and_test('config', 'create', label)
-        caplog.clear()
-        _ = run_and_test('config', 'create', label, success=False)
-        assert ("already exists!" in caplog.text)
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_create_with_options(mock_config):
+    instance = mock_config.return_value
+    instance.is_found.return_value = False
+    res = run_and_test('config', 'create', '-i', 'local.compiler.random')
+    assert(res.exit_code == 0)
+    instance.open_editor.assert_called_once()
 
 
-def test_clone(config_scope, config_kind, caplog):
-    with isolated_fs():
-        basename = ".".join(filter(None, (config_scope, config_kind, 'base')))
-        copyname = basename+"-copy"
-        _ = run_and_test('config', 'create', basename)
-        caplog.clear()
-        _ = run_and_test('config', 'create', copyname, "--from", "base")
-        caplog.clear()
-        _ = run_and_test('config', 'create', copyname+"-2", "--from", "local.base")
-        caplog.clear()
-        
-        _ = run_and_test('config', 'create', copyname+"none", "--from", "err", success=False)
-        assert('Invalid ' in caplog.text)
-        
-        if config_kind == 'compiler':
-            basename = basename.replace(config_kind, 'runtime')
-        else:
-            basename = basename.replace(config_kind, 'compiler')
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_destroy(mock_config):
+    instance = mock_config.return_value
+    instance.is_found.return_value = True
+    res = run_and_test('config', 'destroy', '-f', "dummy-config")
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.delete.assert_called_once()
 
-        caplog.clear()
-        _ = run_and_test('config', 'create', copyname + "-none", "--from",basename, success=False)
-        assert('with the same KIND' in caplog.text)
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = run_and_test('config', 'destroy', '-f', "dummy-config")
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
+    instance.delete.assert_not_called()
 
 
-def test_destroy(config_scope, config_kind, caplog):
-    with isolated_fs():
-        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
-        
-        # only invalid cases for creating a conf:
-        if config_kind is None:
-            _ = run_and_test('config', 'create', token, success=False)
-            if config_scope is None:
-                assert("You must specify" in caplog.text)
-            else:
-                assert ("Invalid KIND 'local'" in caplog.text)
-            return
+def test_import(caplog):
+    pass
 
-        caplog.clear()
-        _ = run_and_test('config', 'create', token)
-        caplog.clear()
-        _ = run_and_test('config', 'destroy', token, success=False)
-        caplog.clear()
-        _ = run_and_test('config', 'destroy', '-f', token)
-        caplog.clear()
-        _ = run_and_test('config', 'destroy', '-f', token, success=False)
-        assert("not found!" in caplog.text)
-        
-
-def test_import(config_scope, config_kind, caplog):
-    with isolated_fs():
-        fn = './tmp-file.yml'
-        with open(fn, 'w') as f:
-            f.write("""
-            test:
-                key: 'value'
-            """)
-
-        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
-        caplog.clear()
-        res = run_and_test('config', 'import', token, success=False)
-        assert ("Missing argument" in res.output)
-
-        caplog.clear()
-        _ = run_and_test('config', 'import', token, fn)
-        caplog.clear()
-        _ = run_and_test('config', 'import', token, fn, success=False)
-        assert ("already created" in caplog.text)
-
-        caplog.clear()
-        _ = run_and_test('config', 'destroy', '-f', token)
-        res = run_and_test('config', 'import', token, './non-existent-file', success=False)
-        assert ("No such file or directory" in res.output)
+def test_export(caplog):
+    pass
 
 
-def test_export(config_scope, config_kind, caplog):
-    with isolated_fs():
-        fn = "./tmp-file.yml"
-        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_edit(mock_config):
+    instance = mock_config.return_value
+    instance.is_found.return_value = True
+    res = run_and_test('config', 'edit', "dummy-config")
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.open_editor.assert_called_once_with(os.environ.get('EDITOR', None))
+    
+    instance.reset_mock()
+    res = run_and_test('config', 'edit', "dummy-config", "-e", "editor")
+    assert(res.exit_code == 0)
+    instance.is_found.assert_called_once()
+    instance.open_editor.assert_called_once_with("editor")
 
-        caplog.clear()
-        _ = run_and_test('config', 'create', token)
-
-        caplog.clear()
-        res = run_and_test('config', 'export', token, success=False)
-        assert ("Missing argument" in res.output)
-
-        caplog.clear()
-        _ = run_and_test('config', 'export', token, fn)
-        assert (os.path.isfile(fn))
-        
-        caplog.clear()
-        _ = run_and_test('config', 'export', token+"-err", fn, success=False)
-        assert ("Failed to export" in caplog.text)
-
-
-
-def test_edit(config_scope, config_kind, caplog):
-    with isolated_fs():
-        token = ".".join(filter(None, (config_scope, config_kind, 'test')))
-        caplog.clear()
-        _ = run_and_test('config', 'create', token)
-        _ = run_and_test('config', 'edit', '-e', 'cat', token)
-        _ = run_and_test('config', 'edit', '-e', 'cat', token + "-none", success=False)
-        assert('Cannot open this configuration: does not exist!' in caplog.text)
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = run_and_test('config', 'edit', "dummy-config")
+    assert(res.exit_code != 0)
+    instance.is_found.assert_called_once()
+    instance.open_editor.assert_not_called()

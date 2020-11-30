@@ -161,9 +161,12 @@ def config_create(ctx, token, clone, interactive) -> None:
             clone, pair='span')
         if c_kind is not None and c_kind != kind:
             raise click.BadArgumentUsage(
-                "Can only clone from a conf. blocks with the same KIND!",
-                abort=1)
+                "Can only clone from a conf. blocks with the same KIND!")
         base = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
+        if not base.is_found():
+            raise click.BadArgumentUsage(
+                "There is no such conf.block named '{}'".format(clone)
+                )
         base.load_from_disk()
     else:
         base = pvConfig.ConfigurationBlock(kind, 'default', None)
@@ -196,13 +199,11 @@ def config_destroy(ctx, token) -> None:
     through the `pcvs config --help` command.
     """
     (scope, kind, label) = utils.extract_infos_from_token(token)
-
     c = pvConfig.ConfigurationBlock(kind, label, scope)
     if c.is_found():
         c.delete()
     else:
-        raise click.BadArgumentUsage("Configuration '{}' not found!".format(label),
-                "Please check the 'list' command")
+        raise click.BadArgumentUsage("Configuration '{}' not found!\nPlease check the 'list' command".format(label))
 
 
 @config.command(name="edit", short_help="edit the config block")
