@@ -2,7 +2,7 @@ image: "python:3.7"
 
 before_script:
 - python --version
-- pip install flake8 mypy pytest pytest-cov
+- pip install -r requirements-dev.txt
 
 .scope: &scope
     tags:
@@ -33,7 +33,7 @@ mypy:
     script:
     - python -m mypy ./pcvs/
 
-main:
+cli:
     <<: *scope
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
     stage: unit_tests
@@ -41,13 +41,13 @@ main:
     - pip install -e .
     - pytest ./tests/pcvs/cli
 
-converter:
+backend:
     <<: *scope
     coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
     stage: unit_tests
     script:
     - pip install -e .
-    - pytest ./tests/pcvs/converter
+    - pytest ./tests/pcvs/backend
 
 helpers:
     <<: *scope
@@ -55,14 +55,6 @@ helpers:
     script:
     - pip install -e .
     - pytest ./tests/pcvs/helpers
-
-full_nr:
-    <<: *scope
-    stage: coverage
-    script:
-    - pip install -e .
-    - pytest ./tests/pcvs --cov=pcvs
-
 
 pip:
     <<: *scope
@@ -83,4 +75,17 @@ from_sources:
     - python3 $PWD/dist_sources/*/setup.py install
     - pcvs --version
 
-    
+converter:
+    <<: *scope
+    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+    stage: unit_tests
+    script:
+    - pip install -e .
+    - pytest ./tests/pcvs/converter
+
+coverage:
+    <<: *scope
+    stage: coverage
+    script:
+    - pip install -e .
+    - coverage run --source=./pcvs -m pytest ./tests/
