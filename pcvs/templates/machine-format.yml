@@ -1,38 +1,39 @@
 ---
+name: 'localhost'
 nodes: 1
 # time limit to allocate resources properly
 # Max number of allocation to be made concurrently
 concurrent_run: 5
 # Command to use when interacting with batch manager
 job_manager:
-        mintime: 1000
-        maxtime: 1500
-        allocate:
-                program: "salloc"
-                args: "-p sandy"
-                wrapper: "/path/to/alloc_wrapper"
-        run:
-                program: "srun"
-                args: "-p sandy"
-                wrapper: "/path/to/run_wrapper"
-                #    batch:
-                #comand: "srun"
-                #args: "-p sandy"
-                #wrapper: "/pat/to/batch_wrapper"
+  mintime: 1000
+  maxtime: 1500
+  allocate:
+    program: "salloc"
+    args: "-p sandy"
+    wrapper: "/path/to/alloc_wrapper"
+  run:
+    program: "srun"
+    args: "-p sandy"
+    wrapper: "/path/to/run_wrapper"
+    #  batch:
+    # comand: "srun"
+    # args: "-p sandy"
+    # wrapper: "/pat/to/batch_wrapper"
 # default partition to load (None by default)
 default_partition: 'knl'
 # defines partitions overring settings above
 partitions:
-- knl:
-        nodes: 4
-        cores_per_node: 272
-        job_manager:
-            mintime: 10
-- arm:
-        nodes: 100
-        cores_per_node: 32
-        job_manager:
-            allocate:
-                program: 'mycmd'
-                args: "-k "
-                wrapper: "/another/alloc/wrapper"
+  - name: 'knl'
+    nodes: 4
+    cores_per_node: 272
+    job_manager:
+      mintime: 10
+  - name: 'arm'
+    nodes: 100
+    cores_per_node: 32
+    job_manager:
+      allocate:
+        program: 'mycmd'
+        args: "-k "
+        wrapper: "/another/alloc/wrapper"

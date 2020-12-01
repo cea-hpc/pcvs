@@ -56,6 +56,7 @@ class CfgMachine(CfgBase):
     def __init__(self, node):
         super().__init__(node)
         #now, sanity checks
+        self.set_ifnot('name', 'default')
         self.set_ifnot('nodes', 1)
         self.set_ifnot('cores_per_node', 1)
         self.set_ifnot('concurrent_run', 1)
@@ -64,10 +65,11 @@ class CfgMachine(CfgBase):
             return
 
         # override default values by selected partition
-        override_node = [v for d in self.partitions for k, v in d.items() if k == self.default_partition]
-        #only care for the first match (is two identical partition name possible ? 
-        self.update(override_node[0])
-
+        for elt in self.partitions:
+            if elt.get('name', self.default_partition) == self.default_partition:
+                self.update(elt)
+                break
+        
         #redirect to direct programs if no wrapper is defined
         for kind in ['allocate', 'run', 'batch']:
             if not self.job_manager[kind].wrapper and self.job_manager[kind].program:

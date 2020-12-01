@@ -1,3 +1,4 @@
+---
 compiler:
   commands:
     cc: mpicc
@@ -30,15 +31,15 @@ group:
   GRPOMP:
     run:
       iterate:
-        n_mpi: {'values': null} 
-        n_node:  {'values': null} 
+        n_mpi: {'values': null}
+        n_node: {'values': null}
   GRPSERIAL:
     run:
       iterate:
-        n_mpi: {'values': null} 
-        n_node:  {'values': null}
-        n_core:  {'values': null}
-        n_omp:  {'values': null}
+        n_mpi: {'values': null}
+        n_node: {'values': null}
+        n_core: {'values': null}
+        n_omp: {'values': null}
 machine:
   nodes: 1
   cores_per_node: 4

@@ -5,35 +5,33 @@ properties:
     type: array
     items:
       type: object
-      patternProperties:
-        "^.*$":
+      properties: &raw_properties
+        name:
+          type: string
+        nodes:
+          type: integer
+        cores_per_node:
+          type: integer
+        concurrent_run:
+          type: integer
+        job_manager:
           type: object
-          properties: &raw_properties
-            nodes:
+          properties:
+            mintime:
               type: integer
-            cores_per_node:
+            maxtime:
               type: integer
-            concurrent_run:
-              type: integer
-            job_manager:
+            allocate: &alloc_node
               type: object
               properties:
-                mintime:
-                  type: integer
-                maxtime:
-                  type: integer
-                allocate: &alloc_node
-                  type: object
-                  properties:
-                    program: {"type": "string"}
-                    args: {"type": "string"}
-                    wrapper: {"type": "string"}
-                  additionalProperties: false
-                run:
-                  <<: *alloc_node
-                batch:
-                  <<: *alloc_node
+                program: {"type": "string"}
+                args: {"type": "string"}
+                wrapper: {"type": "string"}
               additionalProperties: false
+            run:
+              <<: *alloc_node
+            batch:
+              <<: *alloc_node
           additionalProperties: false
       additionalProperties: false
 

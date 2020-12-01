@@ -9,9 +9,9 @@ properties:
         properties:
           values:
             anyOf:
-            - type: array
-            - type: string
-            - type: number
+              - type: array
+              - type: string
+              - type: number
           subtitle:
             type: string
         additionalProperties: false

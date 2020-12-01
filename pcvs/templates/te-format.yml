@@ -1,84 +1,83 @@
 ---
 .this_is_a_job:
-    group: "GRPSERIAL"
-    tag: ["a", "b"]
-    build:
-        # source files to include (if needed)
-        files: "@SRCPATH@/*.c"
-        make:
-            target: all
-        sources:
-            # program binary (if needed)
-            binary: "a.out"
-        # dependency scheme
-        depends_on:
-            test: ["this_is_another_test"]
-        # extra cflags
-        cflags: "extra cflags"
-        # extra ldflags
-        ldflags: "extra ldflags"
-        # directory where program should be built
-        cwd: "dir/to/build"
-        # variants describing the job
-        variants:
-            - openmp
-            - accel
+  group: "GRPSERIAL"
+  tag: ["a", "b"]
+  build:
+    # source files to include (if needed)
+    files: "@SRCPATH@/*.c"
+    make:
+      target: all
+    sources:
+      # program binary (if needed)
+      binary: "a.out"
+    # dependency scheme
+    depends_on:
+      test: ["this_is_another_test"]
+    # extra cflags
+    cflags: "extra cflags"
+    # extra ldflags
+    ldflags: "extra ldflags"
+    # directory where program should be built
+    cwd: "dir/to/build"
+    # variants describing the job
+    variants:
+      - openmp
+      - accel
 
-    run: &run_part
-        program: "./a.out"
-        iterate:
-            # runtime iterators
-            n_mpi:
-                values: [2, 4]
-            n_omp:
-                values: ["1:4"]
-            program:
-                # name will be used as part of final test-name
-                give_it_a_name:
-                    numeric: true
-                    type: "argument|environment"
-                    values: ["-iter 1000", "-fast"]
-                    subtitle: "lol"
-        # directory where program should be built
-        cwd: "dir/to/build"
-        # dependency scheme
-        depends_on:
-            test:
-                - "this_is_another_run_test_in_the_same_file"
-            spack:
-                - protobuf@3.1.1
-                - gcc@7.3.0
-                - osu ^${COMPILER_SPACKED} %intel
-            module:
-                - protobuf
-                - gnu/gcc/7.3.0    
-    artifact:
-        # relative to $BUILDPATH
-        obj1: "./path/1"
-        obj2: "./path/2"
+  run: &run_part
+    program: "./a.out"
+    iterate:
+      # runtime iterators
+      n_mpi:
+        values: [2, 4]
+      n_omp:
+        values: ["1:4"]
+      program:
+        # name will be used as part of final test-name
+        give_it_a_name:
+          numeric: true
+          type: "argument|environment"
+          values: ["-iter 1000", "-fast"]
+          subtitle: "lol"
+    # directory where program should be built
+    cwd: "dir/to/build"
+    # dependency scheme
+    depends_on:
+      test:
+        - "this_is_another_run_test_in_the_same_file"
+      spack:
+        - protobuf@3.1.1
+        - gcc@7.3.0
+      module:
+        - protobuf
+        - gnu/gcc/7.3.0
+  artifact:
+    # relative to $BUILDPATH
+    obj1: "./path/1"
+    obj2: "./path/2"
 
-    # this is a copy/paste from pav2
-    validate:
-        expect_exit: 0
-        time:
-            mean_time: 10.0
-            tolerance: 2.0
-            kill_after: 20
-        match:
-            label:
-                expr: '^\d+(\.\d+) received$'
-                expect: true|false
+  # this is a copy/paste from pav2
+  validate:
+    expect_exit: 0
+    time:
+      mean_time: 10.0
+      tolerance: 2.0
+      kill_after: 20
+    match:
+      label:
+        expr: '^\d+(\.\d+) received$'
+        expect: true|false
 
-            label2: 'Total Elapsed: \d+\.\d+ sec.$'
-        script:
-            path: "/path/to/script"
+      label2: 'Total Elapsed: \d+\.\d+ sec.$'
+    script:
+      path: "/path/to/script"
 
 #########################################################
 
 # depicts an inheritance mechanism.
 real_test:
-    build:
-        make:
-            target: all
-    run:
-        <<: *run_part
+  build:
+    make:
+      target: all
+  run:
+    <<: *run_part

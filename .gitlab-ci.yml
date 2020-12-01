@@ -17,8 +17,8 @@ variables:
 stages:
 - warmup
 - tests
-- lint
 - misc
+- lint
 
 clean:
     <<: *scope
@@ -30,13 +30,11 @@ clean:
 flake8:
     <<: *scope
     stage: lint
-    allow_failure: true
     script:
     - tox -e lint
 yaml:
     <<: *scope
     stage: lint
-    allow_failure: true
     script:
     - tox -e yaml-lint
 
@@ -69,6 +67,10 @@ helpers:
 coverage:
     <<: *scope
     stage: misc
+    allow_failure: true
+    artifacts:
+        paths:
+        - .coverage
     script:
     - tox -e report
 

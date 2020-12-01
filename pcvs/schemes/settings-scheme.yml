@@ -1,3 +1,4 @@
+---
 type: object
 properties:
   fail_on_error:
@@ -6,10 +7,10 @@ properties:
     type: boolean
   verbose:
     OneOf:
-    - type: boolean
-    - type: integer
-      minimum: 0
-      maximum: 3
+      - type: boolean
+      - type: integer
+        minimum: 0
+        maximum: 3
   scheduling:
     type: object
     properties:
@@ -35,7 +36,7 @@ properties:
         items:
           type: string
           enum:
-          - junit
-          - json
-          - yaml
+            - junit
+            - json
+            - yaml
     additionalProperties: false

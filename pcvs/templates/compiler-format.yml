@@ -14,7 +14,7 @@ commands:
 
 # Variants can add flavour to test requiring them.
 # For instance a test asking for the variant 'openmp'
-# will have its cflags extended with the content of 
+# will have its cflags extended with the content of
 # openmp.args here
 variants:
     openmp:
@@ -33,6 +33,6 @@ variants:
 # at the same time
 package_manager:
     spack:
-    - "name@version+variants"
+        - "name@version+variants"
     module:
-    - "group/flavor/version"
+        - "group/flavor/version"

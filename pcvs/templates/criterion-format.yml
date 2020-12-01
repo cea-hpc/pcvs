@@ -3,26 +3,26 @@
 # Iterators are only valid if they have been declared
 # previously by the runtime
 iterators:
-    # a criterion name
-    n_node:
-        # the range of values it can take (any type)
-        values: [1, 2, 3, 4]
-        # the prefix to use when labelling test name for this IT
-        subtitle: "N"
-    n_proc:
-        values: [2, 4, 8]
-        subtitle: "p"
-    n_mpi:
-        values: [2, 32]
-        subtitle: "n"
-    n_omp:
-        values: [4, 8]
-        subtitle: "o"
-    n_core:
-        values: [1, 2]
-        subtitle: "c"
+  # a criterion name
+  n_node:
+    # the range of values it can take (any type)
+    values: [1, 2, 3, 4]
+    # the prefix to use when labelling test name for this IT
+    subtitle: "N"
+  n_proc:
+    values: [2, 4, 8]
+    subtitle: "p"
+  n_mpi:
+    values: [2, 32]
+    subtitle: "n"
+  n_omp:
+    values: [4, 8]
+    subtitle: "o"
+  n_core:
+    values: [1, 2]
+    subtitle: "c"
 
-# When iterators are declared as 'numeric' by the runtime, 
+# When iterators are declared as 'numeric' by the runtime,
 # special syntaxes have been introduced to ease the definition
 # of complex series of number. These are called sequences and
 # can be used as a replacement of a single value. They map as
@@ -38,12 +38,10 @@ iterators:
 # - to: upperbound (inclusive)
 # - of: the 'stride/factor/power' to apply
 #
-#
 # Examples:
 # - seq: {from: 2, to: 10, of: 2} --> [2, 4, 6, 8, 10]
 # - mul: {from: 2, to: 10, of: 2} --> [2, 4, 8]
 # - pow: {from: 2, to: 10, of: 2} --> [2, 4]
-
 # - factor: {from: 2, to: 10, of: 2} --> [2, 4, 6, 8, 10]
 # - powerof: {from: 2, to: 10, of: 2} --> [4, 9]
 # - powerof: {from: 1, to: 100, of 3} --> [1, 8, 27, 64]

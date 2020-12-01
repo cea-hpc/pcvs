@@ -1,3 +1,4 @@
+---
 type: object
 patternProperties:
   "^[^\\.].*$":
@@ -14,10 +15,10 @@ patternProperties:
         properties:
           files:
             OneOf:
-            - type: string
-            - type: array
-              items:
-                type: string
+              - type: string
+              - type: array
+                items:
+                  type: string
           depends_on:
             type: object
             patternProperties:
@@ -108,22 +109,22 @@ patternProperties:
                       type:
                         type: string
                         enum:
-                        - argument
-                        - environment
+                          - argument
+                          - environment
                       position:
                         type: string
                         enum:
-                        - before
-                        - after
+                          - before
+                          - after
                       aliases:
                         patternProperties:
                           "^.*$":
                             type: string
                       values:
                         OneOf:
-                        - type: array
-                        - type: number
-                        - type: 'null'
+                          - type: array
+                          - type: number
+                          - type: 'null'
                       subtitle:
                         type: string
                     additionalProperties: false
@@ -134,9 +135,9 @@ patternProperties:
                 properties:
                   values:
                     OneOf:
-                    - type: array
-                    - type: number
-                    - type: 'null'
+                      - type: array
+                      - type: number
+                      - type: 'null'
                   subtitle:
                     type: string
             additionalProperties: false
