@@ -1,8 +1,10 @@
-image: "python:3.7"
+image: "python:3.6"
 
 before_script:
-- python --version
-- pip install -r requirements-dev.txt
+- pip3 install tox
+
+variables:
+    GIT_CLEAN_FLAGS: -fddx -e .coverage
 
 .scope: &scope
     tags:
@@ -13,79 +15,72 @@ before_script:
     - web
 
 stages:
-- install
+- warmup
+- tests
 - lint
-- unit_tests
-- coverage
+- misc
 
+clean:
+    <<: *scope
+    stage: warmup
+    allow_failure: true
+    script:
+    - tox -e clean
 
-flake:
+flake8:
     <<: *scope
     stage: lint
     allow_failure: true
     script:
-    - flake8 ./pcvs/
-
-mypy:
+    - tox -e lint
+yaml:
     <<: *scope
     stage: lint
     allow_failure: true
     script:
-    - python -m mypy ./pcvs/
+    - tox -e yaml-lint
 
 cli:
     <<: *scope
-    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: unit_tests
+    stage: tests
     script:
-    - pip install -e .
-    - pytest ./tests/pcvs/cli
+    - tox -e tests cli
 
 backend:
     <<: *scope
-    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: unit_tests
+    stage: tests
     script:
-    - pip install -e .
-    - pytest ./tests/pcvs/backend
+    - tox -e tests backend
 
 helpers:
     <<: *scope
-    stage: unit_tests
+    stage: tests
     script:
-    - pip install -e .
-    - pytest ./tests/pcvs/helpers
+    - tox -e tests helpers
 
-pip:
-    <<: *scope
-    stage: install
-    script:
-    - pip3 install wheel
-    - python3 setup.py bdist_wheel
-    - pip3 install dist/*.whl
-    - pcvs --version
-
-from_sources:
-    <<: *scope
-    stage: install
-    script:
-    - mkdir dist_sources
-    - python3 setup.py sdist --formats=gztar
-    - tar xf dist/pcvs-*.tar.gz -C $PWD/dist_sources
-    - python3 $PWD/dist_sources/*/setup.py install
-    - pcvs --version
-
-converter:
-    <<: *scope
-    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-    stage: unit_tests
-    script:
-    - pip install -e .
-    - pytest ./tests/pcvs/converter
+      #converter:
+      #    <<: *scope
+      #    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+      #    stage: tests
+      #    script:
+      #    - pip install -e .
+      #    - pytest ./tests/pcvs/converter
 
 coverage:
     <<: *scope
-    stage: coverage
+    stage: misc
     script:
-    - pip install -e .
-    - coverage run --source=./pcvs -m pytest ./tests/
+    - tox -e report
+
+documentation:
+    <<: *scope
+    stage: misc
+    script:
+    - tox -e docs
+
+imports:
+    <<: *scope
+    stage: misc
+    allow_failure: true
+    script:
+    - tox -e imports
