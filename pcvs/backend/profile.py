@@ -7,11 +7,9 @@ import jsonschema
 import yaml
 from addict import Dict
 
+from pcvs import ROOTPATH
 from pcvs.backend import config
 from pcvs.helpers import log, utils
-
-from pcvs import ROOTPATH
-
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()

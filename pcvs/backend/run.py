@@ -11,7 +11,7 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR, ROOTPATH, BUILD_IDFILE
+from pcvs import BACKUP_NAMEDIR, BUILD_IDFILE, BUILD_NAMEDIR, ROOTPATH
 from pcvs.helpers import criterion, log, system, test, utils
 from pcvs.helpers.test import TEDescriptor, TestFile
 

@@ -1,7 +1,8 @@
 import os
-from pcvs import BUILD_NAMEDIR, BUILD_IDFILE
+
 import click
 
+from pcvs import BUILD_IDFILE, BUILD_NAMEDIR
 from pcvs.backend import report as pvReport
 from pcvs.helpers import log
 

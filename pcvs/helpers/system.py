@@ -1,10 +1,10 @@
 import os
-from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
 import pprint
 
 import yaml
 from addict import Dict
 
+from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
 from pcvs.helpers import log, package_manager, utils
 
 

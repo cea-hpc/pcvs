@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, abort
+from flask import Flask, abort, jsonify, render_template, request
 
 
 def create_app(global_tree, test_config=None):

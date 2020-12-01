@@ -8,10 +8,10 @@ import jsonschema
 import yaml
 from prettytable import PrettyTable
 
+from pcvs import BUILD_NAMEDIR
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, utils
 from pcvs.helpers.log import utf
-from pcvs import (BUILD_NAMEDIR)
 
 #from pcvs.cli import cli_config
 #from pcvs.cli import cli_profile

@@ -1,9 +1,12 @@
-from pcvs.webview import create_app
+import json
 import os
 import pprint
-import yaml
-import json
+
 import jsonschema
+import yaml
+
+from pcvs.webview import create_app
+
 
 def locate_json_files(path):
     array = list()

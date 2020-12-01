@@ -10,7 +10,6 @@ guide is shown as follows:
 1. Clone the repository or download the archive on the website.
 2. Create a virtual environment:
 
-	# through virtualenv
 	python3 -m virtualenv ./build
 	source ./build/bin/activate
 	pip3 install .
@@ -20,8 +19,7 @@ guide is shown as follows:
 
 3. **temporarily** copy a proper JCHRONOSS archive within PCVS installation (to be removed):
 
-	# Download a JCHRONOSS release (v1.3 or v1.4)
-	$ wget/curl ...
+	$ curl https://...
 	# then, put it where PCVS is installed
 	# if installed under the virtualenv
 	$ cp jchronoss-$version.tar.gz ./build/lib/pythonX.Y/site-packages/pcvs/

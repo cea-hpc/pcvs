@@ -2,6 +2,5 @@ PyYAML>=5.1
 Click>=7.0
 jsonschema
 addict
-urwid
 PrettyTable
 flask

@@ -6,9 +6,9 @@ import click
 import pkg_resources
 
 from pcvs.backend import bank, config, profile
-from pcvs.cli import (cli_bank, cli_config, cli_gui, cli_profile, cli_run,
-                        cli_utilities, cli_report)
-from pcvs.helpers import utils, log
+from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
+                      cli_utilities)
+from pcvs.helpers import log, utils
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -105,5 +105,5 @@ cli.add_command(cli_bank.bank)
 cli.add_command(cli_utilities.exec)
 cli.add_command(cli_utilities.check)
 cli.add_command(cli_utilities.clean)
-cli.add_command(cli_gui.gui)
+#cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
