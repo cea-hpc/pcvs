@@ -54,7 +54,7 @@ def replace_special_token(stream, src, build, prefix):
         '@BROOTPATH@': build,
         '@SPACKPATH@': "TBD",
         '@HOME@': str(pathlib.Path.home()),
-        '@USER@': os.getlogin()
+        '@USER@': os.environ['USER']
     }
     for k, v in tokens.items():
         stream = stream.replace(k, v)

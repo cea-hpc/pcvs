@@ -31,7 +31,7 @@
       n_mpi:
         values: [2, 4]
       n_omp:
-        values: ["1:4"]
+        values: [1, 2]
       program:
         # name will be used as part of final test-name
         give_it_a_name:
