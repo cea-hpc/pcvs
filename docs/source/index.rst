@@ -46,12 +46,10 @@ original tests (PCVS can go together with other test frameworks).
 
    installation
    getting-started
-   overview
-   reporting
 
 .. toctree::
    :maxdepth: 2
-   :caption: Customizing
+   :caption: Customisation
 
    config
    profile
@@ -63,5 +61,8 @@ original tests (PCVS can go together with other test frameworks).
    :caption: Reference
 
    glossary
-   how-tos
+   faq
+   overview
+   
+
 
