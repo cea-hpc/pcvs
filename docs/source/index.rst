@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-====================
-PCVS Runtime toolkit
-====================
+====================================
+Parallel Computing Validation System
+====================================
 
 PCVS Runtime Toolkit simplifies efforts of testing applications, especially when
 it comes at scale. Most modern applications tested through a large set of tests

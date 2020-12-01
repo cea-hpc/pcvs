@@ -1,14 +1,12 @@
 PCVS Documentation
 ==================
 
-What's all about ? 
-------------------
+Quick installation guide
+------------------------
 
+PCVs is documented through ReStructuredText. which can be found under the `/docs` directory. Althrough an installation guide is already present there, a quick installation
+guide is shown as follows:
 
-Installation
-------------
-
-The following walkthrouh will guide you step by step to properly install PCVS and its dependencies:
 1. Clone the repository or download the archive on the website.
 2. Create a virtual environment:
 
@@ -22,44 +20,46 @@ The following walkthrouh will guide you step by step to properly install PCVS an
 
 3. **temporarily** copy a proper JCHRONOSS archive within PCVS installation (to be removed):
 
+	# Download a JCHRONOSS release (v1.3 or v1.4)
+	$ wget/curl ...
+	# then, put it where PCVS is installed
 	# if installed under the virtualenv
-	cp /archive/jchronoss-$version.tar.gz ./build/lib/pythonX.Y/site-packages/pcvs/
-	# if installed in 'editable' mode (`pip install -e`)
-	mkdir -p ./data/third_party/
-	cp /archive/jchronoss-$version.tar.gz ./data/third_party/
+	$ cp jchronoss-$version.tar.gz ./build/lib/pythonX.Y/site-packages/pcvs/
 
-4. PCVS is now ready to be used!
-
-Enabling completion
--------------------
-
-Based on Python Click interface to manage the CLI, partial completion is available for your shell. Please run the following, **Depending on your shell**, replace <name> with
+4. Enabling completion: Based on Python Click interface to manage the CLI, partial completion is available for your shell. Please run the following, **Depending on your shell**, replace <name> with
 your shell name (ex: bash, zsh,...):
 
 	eval "$(_PCVS_COMPLETE=source_<name> pcvs)"
 
-General documentation
----------------------
+5. PCVS is now ready to be used!
 
-PCVS is currently lacking robust documentation, so feel free to redistribute your comment
-and/or partial notes to the dev team to be integrated. For what it worth, there is two different documentations that can be generated from this repo:
-* The whole CLI documentation, generated through `click-man` (on purpose, this is not a requirement for this project to be installed). But, as this documentation is based on
-Click, there should not be more information displayed that printing the `--help` from the CLI directly:
 
-	# be sure to have click-man properly installed first
-	pip3 install click-man
-	click-man --target $TARGET_MAN pcvs
-	export MANPATH="$TARGET_MAN:$MANPATH"
+Testing
+-------
 
-* The general documentation (readthedocs.io-formatted) through `sphinx`, able to generate multiple formats:
+PCVS brings its own validation system to self-assess. You need tox and appropriate Python
+versions to run (no virtualenv required, handled by tox directly):
 
-	# be sure to have sphinx installed first
-	pip3 install sphinx
-	# readthedocs theme may not be included within Sphinx now:
-	pip3 install sphinx_rtd_theme
-	
-	cd ./docs
-	make  # will list available doc formats
-	make man  # NOT the CLI man pages, but the general documentation
-	make html  # readthedocs-based
-	
+	$ tox # run tests & coverage for all tests (python3.6)
+	$ tox -l # available testenvs:
+	clean  # delete any previous coverage runs
+	tests  # run tests
+	report  # buil reports (coverage.py)
+	yaml-lint  # yaml formatting
+	lint  # code formatting
+	imports  #code proper imports
+	docs   # properly formatted RST documentation
+
+About
+-----
+
+PCVS stands for Parallel Computing Validation System and acts as a effort to help validating complex HPC architecture (compilers, runtimes, resource managers) at scale.
+
+This work is currently supported by the French Alternative Energies and Atomic Energy Commission (CEA). For any question and/or remarks, please contact :
+
+* Julien JAEGER <julien.jaeger@cea.fr>
+
+### Contributors
+
+* Julien ADAM <adamj@paratools.com>
+* Jean-Baptiste BESNARD <jbbesnard@paratools.com>
