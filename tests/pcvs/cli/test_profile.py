@@ -30,15 +30,15 @@ def test_show(mock_pf):
     instance.is_found.return_value = True
     res = click_call('profile', 'show', 'local.default')
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
-    instance.load_from_disk.assert_called()
-    instance.display.assert_called_once()
+    instance.is_found.assert_called_once_with()
+    instance.load_from_disk.assert_called_with()
+    instance.display.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = False
     res = click_call('profile', 'show', 'local.default')
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.display.assert_not_called()
 
 
@@ -48,15 +48,15 @@ def test_build(mock_pf):
     instance.is_found.return_value = False
     res = click_call('profile', 'build', 'local.default')
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
-    instance.clone.assert_called()
-    instance.flush_to_disk.assert_called_once()
+    instance.is_found.assert_called_once_with()
+    instance.clone.assert_called_once_with()
+    instance.flush_to_disk.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = True
     res = click_call('profile', 'build', 'local.default')
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.flush_to_disk.assert_not_called()
 
 
@@ -66,12 +66,12 @@ def test_destroy(mock_pf):
     instance.is_found.return_value = True
     res = click_call('profile', 'destroy', '-f', 'local.default')
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
-    instance.delete.assert_called_once()
+    instance.is_found.assert_called_once_with()
+    instance.delete.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = False
     res = click_call('profile', 'destroy', '-f', 'local.default')
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.delete.assert_not_called()

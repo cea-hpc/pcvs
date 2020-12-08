@@ -85,15 +85,15 @@ def test_show(mock_config, caplog):
 
     res = click_call('config', 'show', 'dummy-config')
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
-    instance.load_from_disk.assert_called_once()
-    instance.display.assert_called_once()
+    instance.is_found.assert_called_once_with()
+    instance.load_from_disk.assert_called_once_with()
+    instance.display.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = False
     res = click_call('config', 'show', 'dummy-config')
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
 
 
 @patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
@@ -103,17 +103,17 @@ def test_create(mock_config):
     
     res = click_call('config', 'create', 'dummy-config')
     assert(res.exit_code == 0)
-    instance.load_template.assert_called_once()
-    instance.is_found.assert_called_once()
-    instance.clone.assert_called_once()
-    instance.flush_to_disk.assert_called_once()
+    instance.load_template.assert_called_once_with()
+    instance.is_found.assert_called_once_with()
+    instance.clone.assert_called_once_with()
+    instance.flush_to_disk.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = True
     res = click_call('config', 'create', 'dummy-config')
     assert(res.exit_code != 0)
-    instance.load_template.assert_called_once()
-    instance.is_found.assert_called_once()
+    instance.load_template.assert_called_once_with()
+    instance.is_found.assert_called_once_with()
 
 
 @patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
@@ -122,7 +122,7 @@ def test_create_with_options(mock_config):
     instance.is_found.return_value = False
     res = click_call('config', 'create', '-i', 'local.compiler.random')
     assert(res.exit_code == 0)
-    instance.open_editor.assert_called_once()
+    instance.open_editor.assert_called_once_with()
 
 
 @patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
@@ -131,14 +131,14 @@ def test_destroy(mock_config):
     instance.is_found.return_value = True
     res = click_call('config', 'destroy', '-f', "dummy-config")
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
-    instance.delete.assert_called_once()
+    instance.is_found.assert_called_once_with()
+    instance.delete.assert_called_once_with()
 
     instance.reset_mock()
     instance.is_found.return_value = False
     res = click_call('config', 'destroy', '-f', "dummy-config")
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.delete.assert_not_called()
 
 
@@ -155,18 +155,18 @@ def test_edit(mock_config):
     instance.is_found.return_value = True
     res = click_call('config', 'edit', "dummy-config")
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.open_editor.assert_called_once_with(os.environ.get('EDITOR', None))
     
     instance.reset_mock()
     res = click_call('config', 'edit', "dummy-config", "-e", "editor")
     assert(res.exit_code == 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.open_editor.assert_called_once_with("editor")
 
     instance.reset_mock()
     instance.is_found.return_value = False
     res = click_call('config', 'edit', "dummy-config")
     assert(res.exit_code != 0)
-    instance.is_found.assert_called_once()
+    instance.is_found.assert_called_once_with()
     instance.open_editor.assert_not_called()

@@ -329,7 +329,7 @@ def profile_decompose_profile(ctx, token, name, block_opt, scope):
         if b not in pvConfig.CONFIG_BLOCKS:
             raise click.BadOptionUsage("--block", "{} is not a valid component.".format(b))
 
-    pf = pvProfile.Profile(p_label, p_scope)
+    pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
         click.BadArgumentUsage("Cannot decompose an non-existent profile: '{}'".format(token))
     else:
