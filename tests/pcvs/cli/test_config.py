@@ -105,7 +105,7 @@ def test_create(mock_config):
     assert(res.exit_code == 0)
     instance.load_template.assert_called_once_with()
     instance.is_found.assert_called_once_with()
-    instance.clone.assert_called_once_with()
+    #instance.clone.assert_called_once_with()
     instance.flush_to_disk.assert_called_once_with()
 
     instance.reset_mock()
@@ -113,6 +113,22 @@ def test_create(mock_config):
     res = click_call('config', 'create', 'dummy-config')
     assert(res.exit_code != 0)
     instance.load_template.assert_called_once_with()
+    instance.is_found.assert_called_once_with()
+
+
+@patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
+def test_clone(mock_config):
+    instance = mock_config.return_value
+    res = click_call('config', 'create', 'compiler.dummy-config',
+                     '-f', 'local.runtime.another')
+    assert(res.exit_code != 0)
+    instance.is_found.assert_not_called()
+
+    instance.reset_mock()
+    instance.is_found.return_value = False
+    res = click_call('config', 'create', 'compiler.dummy-config',
+                     '-f', 'local.another')
+    assert(res.exit_code != 0)
     instance.is_found.assert_called_once_with()
 
 
