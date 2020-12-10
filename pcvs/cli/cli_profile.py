@@ -46,8 +46,8 @@ def profile_list(ctx, token):
     """
     (scope, label) = (None, None)
     if token:
-        (scope, label) = utils.extract_infos_from_token(token,
-                                                              single="left")
+        (scope, _, label) = utils.extract_infos_from_token(token, single="left",
+                                                        maxsplit=2)
 
     if label:
         log.warn("no LABEL required for this command")

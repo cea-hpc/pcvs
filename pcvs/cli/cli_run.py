@@ -58,53 +58,51 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cli_profile.compl_list_token,
-              type=str, show_envvar=True, help="an existing profile")
+              type=str, show_envvar=True,
+              help="Existing and valid profile supporting this run")
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
-              help="Where artefacts will be stored during/after the run")
+              help="F directory where PCVS is allowed to store data")
 @click.option("-e", "--edit", "set_default",
               default=None, is_flag=True,
-              help="Set default values for run options (WIP)")
+              help="Edit default settings to run a validation")
 @click.option("-s", '--validation', "validation_file",
               default=None, show_envvar=True, type=str,
-              help="Validation settings file")
+              help="Define which setting file to use (~/.pcvs/validation.cfg)")
 @click.option("-l/-L", "--tee/--no-tee", "tee", show_envvar=True,
               default=None, is_flag=True,
-              help="Log the whole stdout/stderr")
+              help="Save stdout/stderr in a file in addition to terminal")
 @click.option("--detach", "detach",
               default=True, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously (WIP)")
 @click.option("--status", "status",
               default=False, is_flag=True, show_envvar=True,
-              help="Display current run progression")
+              help="Display current run progression (WIP)")
 @click.option("-P", "--pause", "pause",
               default=None, is_flag=True, show_envvar=True,
-              help="Pause the current run [TBD]")
+              help="Pause the current run (WIP)")
 @click.option("-R", "--resume", "resume",
               default=None, is_flag=True, show_envvar=True,
-              help="Resume a previously paused run [TBD]")
-@click.option("-B", "--bootstrap", "bootstrap",
-              default=False, is_flag=True, show_envvar=True,
-              help="Initialize basic test templates in given directory [TBD]")
-@click.option("-f", "--override", "override",
+              help="Resume a previously paused run (WIP)")
+@click.option("-f/-F", "--override/--no-override", "override",
               default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
 @click.option("-d", "--dry-run", "simulated",
               default=None, is_flag=True,
-              help="Reproduce the whole process without actually running tests")
+              help="Reproduce the whole process without running tests")
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,
-              help="Purge final archive from sensitive data (HOME, USER...)")
+              help="Purge the results from sensitive data (HOME, USER...)")
 @click.option("-b", "--bank", "bank",
               default=None, 
-              help="Which bank will store data instead of creating an archive")
+              help="Which bank will store data in addition to the archive")
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
-              help="Reuse previously loaded path(s) (ignores any DIRS argument")
+              help="Reuse old test directories (no DIRS required)")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
+def run(ctx, profilename, output, detach, status, resume, pause,
         override, tee, anon, validation_file, simulated, bank, dup,
         set_default, dirs) -> None:
     """
@@ -115,12 +113,9 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     found in LIST_OF_DIRS.
     """
     # parse non-run situations
-    if bootstrap:
-        log.info("Bootstrapping directories")
-        log.nimpl("Bootstrap")
-        exit(0)
-    elif pause and resume:
-        raise click.BadOptionUsage("Cannot pause and resume the run at the same time!")
+    if pause and resume:
+        raise click.BadOptionUsage("--pause/--resume",
+                "Cannot pause and resume the run at the same time!")
     elif pause:
         log.nimpl("pause")
         exit(0)
@@ -134,13 +129,14 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         utils.open_in_editor(system.CfgValidation.get_valfile(validation_file))
         exit(0)
 
+    # appropriate bank election
     theBank = None
     if bank is not None:
         theBank = pvBank.Bank(bank)
         if not theBank.exists():
             log.err('--bank points to a non-existent bank')
     
-    # fill validation run_setttings
+    # save the whole run configuration
     settings = system.Settings()
     cfg_val = system.CfgValidation(validation_file)
     cfg_val.override('datetime', datetime.now())
@@ -154,21 +150,29 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
     cfg_val.override('anonymize', anon)
     cfg_val.override('exported_to', bank)
     cfg_val.override('tee', tee)
+    cfg_val.override('target_bank', theBank)
+    cfg_val.override('reused_build', dup)
     
+    # check if another build should cloned
+    # this avoids to re-run combinatorial system twice
     if dup is not None:
         try:
             settings = pvRun.dup_another_build(dup, cfg_val.output)
-            #TODO: for now, none of the CLI options overrides duplicated build
-            # except 'output'
+            #TODO: Currently nothing can be overriden from cloned build except:
+            # - 'output'
         except FileNotFoundError:
-            raise click.BadOptionUsage("--duplicate", "{} is not a valid build directory!".format(dup))
+            raise click.BadOptionUsage(
+                "--duplicate", "{} is not a valid build directory!".format(dup))
     else:
-        (scope,_, label) = utils.extract_infos_from_token(profilename, maxsplit=2)
+        # otherwise create own settings command block
+        (scope, _, label) = utils.extract_infos_from_token(profilename,
+                                                           maxsplit=2)
         pf = pvProfile.Profile(label, scope)
         if not pf.is_found():
             log.err("Please use a valid profile name:",
                     "No '{}' found!".format(profilename))
         pf.load_from_disk()
+
         cfg_val.override('pf_name', pf.full_name)
         settings.runtime = system.CfgRuntime(pf.runtime)
         settings.compiler = system.CfgCompiler(pf.compiler)
@@ -177,32 +181,40 @@ def run(ctx, profilename, output, detach, status, resume, pause, bootstrap,
         settings.group = system.CfgTemplate(pf.group)
         settings.validation = cfg_val
 
+    # save this commanb block as global.
+    # any system.get(...) will use this block as root node
     system.save_as_global(settings)
 
+    # from now, redirect stdout & stderr to the same logfile
     if system.get('validation').tee:
         log.init_tee(system.get('validation').output)
 
     log.banner()
     log.print_header("Prepare Environment")
-    pvRun.prepare(settings, dup is not None)
+    # prepare PCVS and third-party tools
+    pvRun.prepare()
 
     log.print_header("Process benchmarks")
-    if dup:
+    if system.get('validation').reused_build is not None:
         log.print_section("Reusing previously generated inputs")
         log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
     else:
         start = time.time()
         pvRun.process()
-        log.print_section("===> Processing done in {:<.3f} sec(s)".format(time.time() - start))
+        end = time.time()
+        log.print_section(
+                "===> Processing done in {:<.3f} sec(s)".format(start-end))
     
     log.print_header("Validation Start")
+    # real RUN !!
     pvRun.run()
 
     log.print_header("Finalization")
+    # post-actions to build the archive, post-process the webview...
     archive = pvRun.terminate()
 
-    if theBank is not None:
-        theBank.save(
+    if system.get('validation').target_bank:
+        system.get('validation').target_bank.save(
             system.get('validation').datetime.strftime('%Y-%m-%d'),
             os.path.join(system.get('validation').output, archive)
         )
