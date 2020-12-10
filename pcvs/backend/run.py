@@ -22,15 +22,17 @@ def __print_summary():
     log.print_item("Loaded profile: '{}'".format(n.pf_name))
     log.print_item("Built into: {}".format(n.output))
     log.print_item("Verbosity: {}".format(log.get_verbosity_str().capitalize()))
-    log.print_item("Max sys. combinations per TE: {}".format(criterion.max_number_of_combinations()))
     log.print_item("User directories:")
     width = max([len(i) for i in n.dirs])
     for k, v in system.get('validation').dirs.items():
-        log.print_item("{:<{width}}: {:<{width}}".format(k.upper(), v, width=width), depth=2)
-    # log.print_item(": {}".format())
+        log.print_item("{:<{width}}: {:<{width}}".format(
+                            k.upper(),
+                            v,
+                            width=width),
+                       depth=2)
 
 
-def __build_jchronoss():
+def __build_tools():
     archive_name = None
     # Compute JCHRONOSS paths & store themf
     val_node = system.get('validation')
@@ -39,23 +41,34 @@ def __build_jchronoss():
     exec_prefix = os.path.join(val_node.output, "cache/exec")
     # FIXME: Dirty way to locate the archive
     # find & extract the jchronoss archive
-    for f in glob.glob(os.path.join(ROOTPATH, "../**/jchronoss-*"), recursive=True):
+    for f in glob.glob(os.path.join(ROOTPATH, "../**/jchronoss-*"),
+                       recursive=True):
         if 'jchronoss-' in f:
             archive_name = os.path.join(ROOTPATH, f)
             break
-    assert(archive_name)
+
+    if archive_name is None:
+        log.err("JCHRONOSS source archive has not been found.",
+                "For development purpose, JCHRONOSS hasn't been added to PCVS",
+                "Please add manually the archive under {}".format(ROOTPATH))
+    
     tarfile.open(os.path.join(archive_name)).extractall(src_prefix)
 
     # find the exact path to CMakeList.txt
     src_prefix = os.path.dirname(glob.glob(os.path.join(
                                 src_prefix, "jchronoss-*/CMakeLists.txt"))[0])
+    build_prefix = os.path.join(src_prefix, "build")
 
     # CD to build dir
-    #with utils.cwd(os.path.join(src_prefix, "build")):
-    command = "cmake {0} -B{1} -DCMAKE_INSTALL_PREFIX={2} -DENABLE_OPENMP=OFF -DENABLE_COLOR={3} && make -C {1} install".format(
-        src_prefix, os.path.join(src_prefix, "build"), inst_prefix,
-        "ON" if val_node.color else "OFF"
-        )
+    command = "".join([
+                "cmake {} -B{} -DCMAKE_INSTALL_PREFIX={}".format(src_prefix,
+                                                                 build_prefix,
+                                                                 inst_prefix),
+                " -DENABLE_OPENMP=OFF -DENABLE_COLOR={}".format(
+                    "ON" if val_node.color else "OFF"
+                ),
+                " && make -C {} install".format(build_prefix)
+            ])
     log.info("cmd: {}".format(command))
     try:
         _ = subprocess.check_call(
@@ -71,65 +84,41 @@ def __build_jchronoss():
     val_node.jchronoss.install = inst_prefix
 
 
-def __setup_webview():
-    pass
-
-
-def __build_tools():
-    log.print_item("job orchestrator (JCHRONOSS)")
-    __build_jchronoss()
-    log.print_item("Web-based reporting tool")
-    __setup_webview()
-
-
-def __check_valid_program(p, succ=None, fail=None):
-    if not p:
-        return
-    try:
-        filepath = shutil.which(p)
-        res = os.access(filepath, mode=os.X_OK)
-    except TypeError:  #which() can return None
-        res = False
-
-    if res is True and succ is not None:
-        succ("'{}' found at '{}'".format(os.path.basename(p), filepath))
-
-    if res is False and fail is not None:
-        fail("{} not found or not a executable".format(p))
-
-    return res
 
 
 def __check_defined_program_validity():
     # exhaustive list of user-defined program to exist before starting:
-    __check_valid_program(system.get('machine').job_manager.allocate.program, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('machine').job_manager.allocate.wrapper, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('machine').job_manager.run.program, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('machine').job_manager.run.wrapper, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('machine').job_manager.batch.program, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('machine').job_manager.batch.wrapper, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('compiler').commands.cc, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('compiler').commands.cxx, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('compiler').commands.fc, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('compiler').commands.f77, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('compiler').commands.f90, succ=log.print_item, fail=log.err)
-    __check_valid_program(system.get('runtime').program, succ=log.print_item, fail=log.err)
+    utils.check_valid_program(system.get('machine').job_manager.allocate.program)
+    utils.check_valid_program(system.get('machine').job_manager.allocate.wrapper)
+    utils.check_valid_program(system.get('machine').job_manager.run.program)
+    utils.check_valid_program(system.get('machine').job_manager.run.wrapper)
+    utils.check_valid_program(system.get('machine').job_manager.batch.program)
+    utils.check_valid_program(system.get('machine').job_manager.batch.wrapper)
+    return
+    # need to handle package_manager commands to process below
+    # maybe a dummy testfile should be used
+    utils.check_valid_program(system.get('compiler').commands.cc)
+    utils.check_valid_program(system.get('compiler').commands.cxx)
+    utils.check_valid_program(system.get('compiler').commands.fc)
+    utils.check_valid_program(system.get('compiler').commands.f77)
+    utils.check_valid_program(system.get('compiler').commands.f90)
+    utils.check_valid_program(system.get('runtime').program)
 
-def prepare(run_settings, reuse=False):
+def prepare():
     log.print_section("Prepare environment")
     log.print_item("Date: {}".format(
         system.get('validation').datetime.strftime("%c")))
-    log.print_item("build configuration tree")
-
     valcfg = system.get('validation')
+    
     log.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
     # if a previous build exists
     if os.path.isdir(buildir):
         if not valcfg.override:
-            log.err("Previous run artifacts found in {}. Please use '--override' to ignore.".format(valcfg.output))
+            log.err("Previous run artifacts found in {}.".format(valcfg.output),
+                    "Please use '--override' to ignore.")
         else:
-            if not reuse:
+            if valcfg.reused_build is None:
                 log.print_item("Cleaning up {}".format(buildir), depth=2)
                 utils.create_or_clean_path(buildir)
             utils.create_or_clean_path(os.path.join(valcfg.output, BUILD_IDFILE), is_dir=False)
@@ -143,13 +132,12 @@ def prepare(run_settings, reuse=False):
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, BUILD_IDFILE), 'w').close()
-    
 
     log.print_section("Build third-party tools")
     __build_tools()
 
-    #log.print_section("Ensure user-defined programs exist")
-    #__check_defined_program_validity()
+    log.print_section("Ensure user-defined programs exist")
+    __check_defined_program_validity()
 
     log.print_section("Load and initialize validation criterions")
     criterion.initialize_from_system()
@@ -460,29 +448,53 @@ def terminate():
     return archive_name
 
 
+def __copy_file(src, dest):
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    try:
+        shutil.copy(src, dest)
+    except SameFileError:
+        pass
+
 def dup_another_build(build_dir, outdir):
     settings = None
     
     # First, load the whole config
     with open(os.path.join(build_dir, 'conf.yml'), 'r') as fh:
-            d = Dict(yaml.load(fh, Loader=yaml.FullLoader))
-            settings = system.Settings(d)
+        d = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+        settings = system.Settings(d)
     
-    # second, copy any xml/sh files to be reused
-    for root, _, files, in os.walk(build_dir):
-        for f in files:
-            if f in ('list_of_tests.xml', 'list_of_tests.sh', 'conf.env'):
-                src = os.path.join(root, f)
-                rel_file = os.path.relpath(
-                    src,
-                    start=os.path.abspath(build_dir))
-                dest = os.path.join(outdir, rel_file)
-
-                os.makedirs(os.path.dirname(dest), exist_ok=True)
-                try:
-                    shutil.copy(src, dest)
-                except SameFileError:
-                    pass
-
+    # first, clear fields overridden by current run
+    settings.validation.xmls = []
     settings.validation.output = outdir
+    settings.validation.reused_build = build_dir
+
+    # second, copy any xml/sh files to be reused
+    for root, _, files, in os.walk(os.path.join(build_dir, "test_suite")):
+        for f in files:
+            if f in ('dbg-pcvs.yml', 'list_of_tests.xml', 'list_of_tests.sh'):
+                src = os.path.join(root, f)
+                dest = os.path.join(outdir,
+                                    os.path.relpath(
+                                        src,
+                                        start=os.path.abspath(build_dir))
+                                   )
+
+                __copy_file(src, dest)
+
+                if f == "list_of_tests.xml":
+                    settings.validation.xmls.append(dest)
+    
+    # other files
+    for f in ('conf.env'):
+        src = os.path.join(build_dir, f)
+        dest = os.path.join(outdir,
+                            os.path.relpath(
+                                src,
+                                start=os.path.abspath(build_dir))
+                           )
+        if not os.path.isfile(src):
+            continue
+
+        __copy_file(src, dest)
+
     return settings

@@ -152,6 +152,24 @@ def generate_local_variables(label, subprefix):
     cur_buildir = os.path.join(base_buildir, subprefix)
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
+def check_valid_program(p,  succ=log.print_item, fail=log.err):
+    if not p:
+        return
+    try:
+        filepath = shutil.which(p)
+        res = os.access(filepath, mode=os.X_OK)
+    except TypeError:  #which() can return None
+        res = False
+
+    if res is True and succ is not None:
+        succ("'{}' found at '{}'".format(os.path.basename(p), filepath))
+
+    if res is False and fail is not None:
+        fail("{} not found or not a executable".format(p))
+
+    return res
+
+
 
 ####################################
 ####   YAML VALIDATION OBJECT   ####
