@@ -9,13 +9,6 @@ from addict import Dict
 from pcvs.helpers import log, system
 
 
-def max_number_of_combinations():
-    product = 1
-    c = system.get('criterion').iterators
-    for k in c:
-        product *= len(c[k]['values'])
-    return product
-
 class Combination:
     """A combination maps the actual concretization from multiple criterion.
 
@@ -45,7 +38,7 @@ class Combination:
         string = list()
         # each combination is built following: 'defined-prefix+value'
         for n in sorted(self._combination.keys()):
-            if not c[n].subtitle:
+            if c[n].subtitle is None:
                 continue
             string.append(c[n].subtitle +
                           str(self._combination[n]).replace(" ", "-"))
@@ -135,7 +128,7 @@ class Criterion:
         self._is_env = description.get('type', 'argument') == 'environment'
         # this should be only set by per-TE criterion definition
         self._local = local
-        self._str = description.get('subtitle', '')
+        self._str = description.get('subtitle', None)
         self._values = description.get('values', [])
         if not isinstance(self._values, list):
             self._values = [self._values]

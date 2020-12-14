@@ -203,7 +203,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         pvRun.process()
         end = time.time()
         log.print_section(
-                "===> Processing done in {:<.3f} sec(s)".format(start-end))
+                "===> Processing done in {:<.3f} sec(s)".format(end-start))
     
     log.print_header("Validation Start")
     # real RUN !!
