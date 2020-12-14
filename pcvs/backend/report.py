@@ -46,7 +46,7 @@ def build_data_tree(path=os.getcwd(), files=None):
             for test in stream.get('tests', []):
                 cnt_tests += 1
                 test_label = test.get('label', 'NOLABEL')
-                test_tags = test.get('tags', [None])
+                test_tags = test.get('tags', [])
                 test_status = test['result'].get('status', 'error')
 
                 statuses.setdefault(test_status, {
