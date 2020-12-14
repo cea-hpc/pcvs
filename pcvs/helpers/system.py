@@ -122,6 +122,7 @@ class CfgValidation(CfgBase):
         self.set_ifnot('simulated', False)
         self.set_ifnot('anonymize', False)
         self.set_ifnot('exported_to', None)
+        self.set_ifnot('reused_build', None)
         self.set_ifnot('result', {"format": ['json']})
 
         # Annoying here:
