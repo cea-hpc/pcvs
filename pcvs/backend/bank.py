@@ -35,7 +35,10 @@ def flush_to_disk():
     """Save in-memory bank management to disk. This only implies 'banks.yml'"""
     global BANKS, BANK_STORAGE
     try:
-        with open(BANK_STORAGE, 'w') as f:
+        prefix_file = os.path.dirname(BANK_STORAGE)
+        if not os.path.isdir(prefix_file):
+            os.makedirs(prefix_file, exist_ok=True)
+        with open(BANK_STORAGE, 'w+') as f:
             yaml.dump(BANKS, f)
     except IOError as e:
         log.err("Failure while saving the banks.yml", '{}'.format(e))
@@ -50,7 +53,7 @@ class Bank:
         self._name = name
         self._data = Dict()
         self._datafile = None
-
+        
         # If the bank 'path' is not defined but known from global config:
         if bank_path is None and name in BANKS.keys():
             self._path = BANKS[self._name]

@@ -7,6 +7,7 @@ from datetime import datetime
 import click
 from prettytable import PrettyTable
 
+from pcvs import BUILD_IDFILE
 from pcvs.backend import utilities as pvUtils
 from pcvs.helpers import log, system
 from pcvs.helpers.system import Settings

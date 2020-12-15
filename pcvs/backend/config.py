@@ -125,7 +125,7 @@ class ConfigurationBlock:
 
         self.retrieve_file()
 
-        if os.path.isfile(self._file):
+        if not os.path.isfile(self._file):
             log.err("Internal error: file {} not found!".format(self._file))
             
         log.info("load {} from '{} ({})'".format(
