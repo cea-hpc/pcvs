@@ -57,6 +57,24 @@ patternProperties:
               binary:
                 type: string
             additionalProperties: false
+          cmake:
+            type: object
+            properties:
+              vars:
+                type: array
+                items:
+                  type: string
+            additionalProperties: false
+          autotools:
+            type: object
+            properties:
+              autogen:
+                type: boolean
+              params:
+                type: array
+                items:
+                  type: string
+            additionalProperties: false
         additionalProperties: false
       run:
         type: object

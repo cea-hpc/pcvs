@@ -171,7 +171,7 @@ class TestFile:
                     fh_xml.write(test.serialize_xml())
                 fh_sh.write(
                     '   --list)\n'
-                    '       printf "{list_of_tests}"\n'
+                    '       printf "{list_of_tests}\\n"\n'
                     '       ;;\n'
                     '   *)\n'
                     '       printf "Invalid test-name \'$arg\'\\n"\n'
@@ -494,6 +494,88 @@ class TEDescriptor:
         )
         return " ".join(command)
 
+    def __build_from_cmake(self):
+        command = ["cmake"]
+        if 'files' in self._build:
+            command.append(self._build.files[0])
+        else:
+            command.append(self._srcdir)
+        command.append(
+            r"-DCMAKE_C_COMPILER='{cc}' -DCMAKE_CXX_COMPILER='{cxx}' "
+            r"-DCMAKE_FC_COPILER='{fc}' -DCMAKE_CUDA_COMPILER='{cu}' "
+            r"-DCMAKE_C_FLAGS='{var} {cflags}' -DCMAKE_EXE_LINKER_FLAGS='{ldflags}' "
+            r"-G 'Unix Makefiles' "
+            r"-DCMAKE_BINARY_DIR='{build}' "
+            r"-DCMAKE_MODULE_LINKER_FLAGS='{ldflags}' "
+            r"-DCMAKE_SHARED_LINKER_FLAGS='{ldflags}'".format(
+                cc=system.get('compiler').commands.get('cc', ''),
+                cxx=system.get('compiler').commands.get('cxx', ''),
+                fc=system.get('compiler').commands.get('fc', ''),
+                cu=system.get('compiler').commands.get('cu', ''),
+                var=test_transform.prepare_cmd_build_variants(self._build.variants),
+                cflags=self._build.get('cflags', ''),
+                ldflags=self._build.get('ldflags', ''),
+                build=self._buildir
+            )
+        )
+        if 'vars' in self._build['cmake']:
+            command.append("-D"+' -D'.join(self._build['cmake']['vars']))
+
+        self._build.files = [os.path.join(self._buildir, "Makefile")]
+        next_command = self.__build_from_makefile()
+        return " && ".join([" ".join(command), next_command])
+
+    def __build_from_autotools(self):
+        command = []
+        configure_path = ""
+        autogen_path = ""
+
+        if self._build.get('files', False):
+            configure_path = self._build.files[0]
+        else:
+            configure_path = os.path.join(self._srcdir, "configure")
+        
+        print("autogen = ", self._build.autotools)
+        
+        if self._build.autotools.get('autogen', False) is True:
+            autogen_path = os.path.join(
+                                os.path.dirname(configure_path),
+                                "autogen.sh"
+                            )
+            command.append("{} && ".format(autogen_path))
+        
+        command.append(
+            r"{configure} "
+            r"CC='{cc}' CXX='{cxx}' "
+            r"FC='{fc}' NVCC='{cu}' "
+            r"CFLAGS='{var} {cflags}' LDFLAGS='{ldflags}' ".format(
+                configure=configure_path,
+                cc=system.get('compiler').commands.get('cc', ''),
+                cxx=system.get('compiler').commands.get('cxx', ''),
+                fc=system.get('compiler').commands.get('fc', ''),
+                cu=system.get('compiler').commands.get('cu', ''),
+                var=test_transform.prepare_cmd_build_variants(self._build.variants),
+                cflags=self._build.get('cflags', ''),
+                ldflags=self._build.get('ldflags', ''),
+            )
+        )
+        if 'params' in self._build['autotools']:
+            command.append(" ".join(self._build['autotools']['params']))
+
+        self._build.files = [os.path.join(self._buildir, "Makefile")]
+        next_command = self.__build_from_makefile()
+        return " && ".join([" ".join(command), next_command])
+    
+    def __build_command(self):
+        if 'autotools' in self._build:
+            return self.__build_from_autotools()
+        elif 'cmake' in self._build:
+            return self.__build_from_cmake()
+        elif 'make' in self._build:
+            return self.__build_from_makefile()
+        elif 'sources' in self._build:
+            return self.__build_from_sources()
+
     def __construct_compil_tests(self):
         """Meta-function steering compilation tests"""
         deps = []
@@ -501,25 +583,19 @@ class TEDescriptor:
         
         # ensure consistency when 'files' node is used
         # can be a list or a single value
-        if not isinstance(self._build.files, list):
+        if 'files' in self._build and not isinstance(self._build.files, list):
             self._build.files = [self._build.files]
-
-
 
         # manage deps (tests, package_managers...)
         deps = test_transform.handle_job_deps(self._build, self._te_pkg)
-
-        # a  'make' node prevails over other build system (for now)
-        if 'make' in self._build:
-            command = self.__build_from_makefile()
-        else:
-            command = self.__build_from_sources()
 
         if 'cwd' in self._build:
             chdir = self._build.cwd
 
         constraints = ["compilation"] + self._tags
         
+        command = self.__build_command()
+
         # count number of built tests
         self._effective_cnt += 1
 

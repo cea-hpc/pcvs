@@ -5,6 +5,10 @@
   build:
     # source files to include (if needed)
     files: "@SRCPATH@/*.c"
+    autotools:
+      params: ['--disable-bootstrap']
+    cmake:
+      vars: ['CMAKE_VERBOSE_MAKEFILE=ON']
     make:
       target: all
     sources:
