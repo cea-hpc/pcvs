@@ -8,6 +8,7 @@ import click
 import pkg_resources
 import yaml
 
+import pcvs
 from pcvs.helpers import log
 
 desc_dict = dict()
@@ -275,7 +276,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
 
     # load the scheme
     if not scheme:
-        scheme = open(os.path.join(os.path.dirname(__file__), "convert.json"))
+        scheme = open(os.path.join(pcvs.ROOTPATH, "converter/convert.json"))
     log.print_item("Load scheme file: {}".format(scheme.name))
     tmp = json.load(scheme)
 
