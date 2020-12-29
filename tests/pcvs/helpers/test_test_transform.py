@@ -52,7 +52,7 @@ def test_build_variants(mock_sys):
 
 
 @patch('pcvs.helpers.package_manager.identify')
-def handle_job_deps(mock_pmlister):
+def test_handle_job_deps(mock_id):
     #mock_pmlister.return_value = 
     assert(tested.handle_job_deps({'depends_on': {
         'test': ['a', 'b', 'c']
@@ -62,6 +62,28 @@ def handle_job_deps(mock_pmlister):
         'test': ['/a', '/b', '/c']
     }}, "prefix") == ["/a", "/b", "/c"])
 
+    mock_id.return_value = ["spack..p1", "spack..p1c2", "spack..p1p3%c4"]
     assert(len(tested.handle_job_deps({'depends_on': {
         'pm': ['p1', 'p1@c2', 'p1 p3 %c4']
     }}, "prefix")) == 3)
+
+    assert(len(tested.handle_job_deps({}, "")) == 0)
+
+
+def test_xml_escape():
+    assert(tested.xml_escape('"hello, world!"') == "&quot;hello, world!&quot;")
+    assert(tested.xml_escape("'hello, world!'") == "&apos;hello, world!&apos;")
+    assert(tested.xml_escape("hello & world!") == "hello &amp; world!")
+    assert(tested.xml_escape('<hello, world!>') == "&lt;hello, world!&gt;")
+
+
+def test_xml_setif():
+    elt = {
+        "a": "a1",
+        "b": "b1",
+        "c": ["c1", "c2", "c3"]
+    }
+    assert(tested.xml_setif(elt, "a") == "<a>a1</a>")
+    assert(tested.xml_setif(elt, "b", "b_name") == "<b_name>b1</b_name>")
+    assert(tested.xml_setif(elt, "c") == "<c>c1</c><c>c2</c><c>c3</c>")
+    assert(tested.xml_setif(elt, "d") == "")
