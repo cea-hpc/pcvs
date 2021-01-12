@@ -63,10 +63,11 @@ class Profile:
                     self._scope = sc
                     self._exists = True
                     return
-        
+
         if self._scope is None:
             self._scope = 'local'
-        self._file = os.path.join(PROFILE_STORAGES[self._scope], self._name + ".yml")
+        self._file = os.path.join(
+            PROFILE_STORAGES[self._scope], self._name + ".yml")
         self._exists = False
 
     def fill(self, raw):
@@ -108,7 +109,7 @@ class Profile:
 
         if not os.path.isfile(self._file):
             log.err("Internal Error: file {} not found!".format(self._file))
-        
+
         log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
@@ -116,17 +117,17 @@ class Profile:
     def load_template(self):
         self._exists = True
         self._file = os.path.join(
-                    ROOTPATH,
-                    'templates/profile-format.yml')
+            ROOTPATH,
+            'templates/profile-format.yml')
         with open(self._file, 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 
     def check(self, fail=True):
         for kind in config.CONFIG_BLOCKS:
             if kind not in self._details:
-                raise jsonschema.exceptions.ValidationError("Missing '{}' in profile".format(kind))
+                raise jsonschema.exceptions.ValidationError(
+                    "Missing '{}' in profile".format(kind))
             utils.ValidationScheme(kind).validate(self._details[kind], fail)
-    
 
     def flush_to_disk(self):
         self._retrieve_file()
@@ -162,7 +163,7 @@ class Profile:
 
     def open_editor(self, e=None):
         assert (self._file is not None)
-        
+
         if not os.path.exists(self._file):
             return
 
@@ -183,7 +184,8 @@ class Profile:
                 yaml.dump(stream, fname)
 
             if stream and 'plugin' in stream['runtime']:
-                content = base64.b64decode(stream['runtime']['plugin']).decode('ascii')
+                content = base64.b64decode(
+                    stream['runtime']['plugin']).decode('ascii')
             else:
                 content = """import math
 
@@ -196,33 +198,37 @@ def check_valid_combination(dict_of_combinations=dict()):
             fplugin.flush()
         try:
             utils.open_in_editor(fname.name, fplugin.name, e=e)
-        except:
+        except Exception:
             log.warn("Issue with opening the conf. block. Stop!")
             return
-        
+
         # reset cursors
         fname.seek(0)
         fplugin.seek(0)
 
-        #now, dump back temp file to the original saves
+        # now, dump back temp file to the original saves
         stream = yaml.load(fname, Loader=yaml.FullLoader)
         if stream is None:
             stream = dict()
         stream_plugin = fplugin.read()
         if len(stream_plugin) > 0:
-            stream['runtime']['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+            stream['runtime']['plugin'] = base64.b64encode(
+                stream_plugin.encode('ascii'))
 
-        #just check the outcome is valid
+        # just check the outcome is valid
         self.fill(stream)
         try:
             self.check(fail=False)
         except jsonschema.exceptions.ValidationError as e:
-            with tempfile.NamedTemporaryFile(mode="w+", suffix=".yml.rej", prefix=self.full_name, delete=False) as rej_fh:
+            with tempfile.NamedTemporaryFile(mode="w+",
+                                             suffix=".yml.rej",
+                                             prefix=self.full_name,
+                                             delete=False) as rej_fh:
                 yaml.dump(stream, rej_fh)
-            
+
                 log.err("Invalid format: {}".format(e.message),
                         "Rejected file: {}".format(rej_fh.name),
-                        "You may use 'pcvs check' to validate external resource",
+                        "See 'pcvs check' to validate external resource",
                         "before the importation.")
 
         with open(self._file, 'w') as f:
@@ -231,10 +237,10 @@ def check_valid_combination(dict_of_combinations=dict()):
         # delete temp files (replace by 'with...' ?)
         fname.close()
         fplugin.close()
-        
+
         self.load_from_disk()
-    
-    def split_into_configs(self, prefix, blocklist=config.CONFIG_BLOCKS, scope=None):
+
+    def split_into_configs(self, prefix, blocklist, scope=None):
         objs = list()
         if 'all' in blocklist:
             blocklist = config.CONFIG_BLOCKS
@@ -250,7 +256,6 @@ def check_valid_combination(dict_of_combinations=dict()):
                 objs.append(c)
         return objs
 
-
     @property
     def compiler(self):
         return self._details['compiler']
@@ -258,15 +263,15 @@ def check_valid_combination(dict_of_combinations=dict()):
     @property
     def runtime(self):
         return self._details['runtime']
-    
+
     @property
     def criterion(self):
         return self._details['criterion']
-    
+
     @property
     def group(self):
         return self._details['group']
-    
+
     @property
     def machine(self):
         return self._details['machine']

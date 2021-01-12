@@ -1,9 +1,5 @@
 import json
 import os
-import pprint
-
-import jsonschema
-import yaml
 
 from pcvs.webview import create_app
 
@@ -14,7 +10,7 @@ def locate_json_files(path):
         for f in files:
             if f.startswith("output-") and f.endswith(".xml.json"):
                 array.append(os.path.join(root, f))
-        
+
     return array
 
 
@@ -29,20 +25,20 @@ def build_data_tree(path=os.getcwd(), files=None):
     tags = global_tree["tag"]
     statuses = global_tree["status"]
     cnt_tests = 0
-    
-    #with open(os.path.join(os.getcwd(), "result-scheme.yml"), "r") as fh:
+
+    # with open(os.path.join(os.getcwd(), "result-scheme.yml"), "r") as fh:
     #    val_str = yaml.load(fh, Loader=yaml.FullLoader)
-    
+
     for idx, f in enumerate(files):
         print("Dealing with n°{}".format(idx+1))
         with open(f, 'r') as fh:
             stream = json.load(fh)
-            #try:
-            #	jsonschema.validate(instance=stream, schema=val_str)
-            #except jsonschema.exceptions.ValidationError as e:
-            #	print("skip {} (bad formatting): {}".format(f, e))
-            #	continue
-            #TODO: read & store metadata
+            # try:
+            #   jsonschema.validate(instance=stream, schema=val_str)
+            #   except jsonschema.exceptions.ValidationError as e:
+            #   print("skip {} (bad formatting): {}".format(f, e))
+            #   continue
+            # TODO: read & store metadata
             for test in stream.get('tests', []):
                 cnt_tests += 1
                 test_label = test.get('label', 'NOLABEL')
@@ -57,7 +53,7 @@ def build_data_tree(path=os.getcwd(), files=None):
                 })
                 statuses[test_status]["tests"].append(test)
                 statuses[test_status]['metadata']['count'] += 1
-                
+
                 # Per-label
                 labels.setdefault(test_label, {
                     "tests": list(),
@@ -74,7 +70,7 @@ def build_data_tree(path=os.getcwd(), files=None):
                 labels[test_label]['metadata']["count"][test_status] += 1
                 labels[test_label]['metadata']["count"]['total'] += 1
                 labels[test_label]["tests"].append(test)
-                
+
                 for tag in test_tags:
                     tags.setdefault(tag, {
                         "tests": list(),
@@ -93,7 +89,7 @@ def build_data_tree(path=os.getcwd(), files=None):
                     tags[tag]["metadata"]["count"]["total"] += 1
     global_tree['metadata'] = {
         "rootdir": path,
-        "count" : {
+        "count": {
             "tests": cnt_tests,
             "labels": len(labels.keys()),
             "tags": len(tags.keys()),
@@ -101,6 +97,7 @@ def build_data_tree(path=os.getcwd(), files=None):
         }
     }
     return global_tree
+
 
 def webview_run_server(path):
     print("Load YAML files")

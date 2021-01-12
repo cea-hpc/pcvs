@@ -535,8 +535,6 @@ class TEDescriptor:
         else:
             configure_path = os.path.join(self._srcdir, "configure")
         
-        print("autogen = ", self._build.autotools)
-        
         if self._build.autotools.get('autogen', False) is True:
             autogen_path = os.path.join(
                                 os.path.dirname(configure_path),

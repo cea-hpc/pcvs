@@ -1,6 +1,4 @@
-import glob
 import os
-import pprint
 import shutil
 
 import yaml
@@ -9,7 +7,7 @@ from addict import Dict
 from pcvs.helpers import log, utils
 
 BANKS = dict()
-BANK_STORAGE=""
+BANK_STORAGE = ""
 
 
 def init():
@@ -49,17 +47,18 @@ class Bank:
     A bank is initialized at a given mount point on the filesystem and stores
     data in it, following a label-based tree.
     """
+
     def __init__(self, name, bank_path=None):
         self._name = name
         self._data = Dict()
         self._datafile = None
-        
+
         # If the bank 'path' is not defined but known from global config:
         if bank_path is None and name in BANKS.keys():
             self._path = BANKS[self._name]
         else:
             self._path = str(bank_path)
-        
+
         # attempt to load file management configuration stored into the bank
         self._datafile = os.path.join(self._path, "data.yml")
         if os.path.isfile(self._datafile):
@@ -74,7 +73,8 @@ class Bank:
         if os.path.isfile(self._datafile):
             try:
                 with open(self._datafile, 'w') as fh:
-                    yaml.dump(self._data.to_dict(), fh, default_flow_style=None)
+                    yaml.dump(self._data.to_dict(), fh,
+                              default_flow_style=None)
             except yaml.YAMLError:
                 log.err("Error while saving bank data file")
 
@@ -84,9 +84,9 @@ class Bank:
         BANKS[self._name] = self._path
         try:
             open(self._datafile, 'a').close()
-        except FileExistsError as e:
+        except FileExistsError:
             log.err('Registering a dir w/ existing data.yml ?')
-    
+
     def unregister(self):
         """delete a previously registered bank.
         Note this won't delete the directory itself but any PCVS relatives
@@ -95,11 +95,14 @@ class Bank:
         BANKS.pop(self._name, None)
         try:
             os.remove(self._datafile)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             pass
 
     def exists(self):
-        """check if current bank is actually registered into global management"""
+        """
+            check if current bank is actually registered
+            into global management
+        """
         global BANKS
         return len([i for i in BANKS.keys() if i == self._name]) == 1
 
@@ -126,7 +129,7 @@ class Bank:
 
         if k not in self._data:
             log.err("No key named '{}'".format(k))
-        
+
         # copy full content
         for elt in self._data[k]:
             shutil.copy(os.path.join(self._path, k, elt),
@@ -136,11 +139,11 @@ class Bank:
         """Delete data from a the current bank"""
         if k not in self._data:
             log.err("No key named '{}'".format(k))
-        
+
         shutil.rmtree(os.path.join(self._path, k))
         self._data.pop(k)
         self.flush()
-    
+
     def show(self):
         """List bank's content"""
         log.print_section('Path: {}'.format(self._path))

@@ -24,6 +24,7 @@ from pcvs.helpers.system import Settings
 @click.argument("argument", type=str, required=False)
 @click.pass_context
 def exec(ctx, output, argument, gen_list, display):
+    """ This is a doc about exec subcommand """
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
@@ -184,3 +185,19 @@ def clean(ctx, force, fake, paths, interactive):
                         os.remove(os.path.join(root, f))
                         log.print_item('deleted {}'.format(f))
                 dirs[:] = []
+
+
+@click.command(name="scan",
+               short_help="Analyze directories to build up test conf. files")
+@click.argument("paths", default=None, nargs=-1)
+@click.pass_context
+def discover(ctx, paths):
+
+    if not paths:
+        paths = [os.getcwd()]
+    
+    paths = [os.path.abspath(x) for x in paths]
+    
+    for p in paths:
+        log.warn('look for {}'.format(p))
+        pvUtils.process_discover_directory(p)

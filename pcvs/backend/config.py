@@ -1,7 +1,6 @@
 import base64
 import glob
 import os
-import pprint
 import tempfile
 
 import jsonschema
@@ -10,12 +9,10 @@ from addict import Dict
 
 from pcvs import ROOTPATH
 from pcvs.helpers import log, utils
-from pcvs.helpers.system import sysTable
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
-
 
 
 def init():
@@ -76,8 +73,8 @@ class ConfigurationBlock:
 
     def retrieve_file(self):
         assert (self._kind in CONFIG_BLOCKS)
-        path = None
-        scopes = utils.storage_order() if self._scope is None else [self._scope]
+        scopes = utils.storage_order() if self._scope is None else [
+            self._scope]
 
         for sc in scopes:
             for pair in CONFIG_EXISTING[self._kind][sc]:
@@ -90,7 +87,8 @@ class ConfigurationBlock:
         # default file position when not found
         if self._scope is None:
             self._scope = 'local'
-        self._file = self._files = os.path.join(CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
+        self._file = self._files = os.path.join(
+            CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
         self._exists = False
 
     def is_found(self):
@@ -127,7 +125,7 @@ class ConfigurationBlock:
 
         if not os.path.isfile(self._file):
             log.err("Internal error: file {} not found!".format(self._file))
-            
+
         log.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         with open(self._file) as f:
@@ -136,15 +134,15 @@ class ConfigurationBlock:
     def load_template(self):
         self._exists = True
         self._file = os.path.join(
-                    ROOTPATH,
-                    'templates/{}-format.yml'.format(self._kind))
+            ROOTPATH,
+            'templates/{}-format.yml'.format(self._kind))
         with open(self._file, 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))
 
     def flush_to_disk(self):
         self.check()
         self.retrieve_file()
-        
+
         log.info("flush {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
 
@@ -165,7 +163,7 @@ class ConfigurationBlock:
 
         self.retrieve_file()
         assert(not os.path.isfile(self._file))
-        
+
         log.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details
 
@@ -187,16 +185,16 @@ class ConfigurationBlock:
 
     def open_editor(self, e=None):
         assert (self._file is not None)
-        
+
         if not os.path.exists(self._file):
             return
 
         e = utils.assert_editor_valid(e)
-        
+
         fname = tempfile.NamedTemporaryFile(
-                mode='w+',
-                prefix="{}-".format(self.full_name),
-                suffix=".yml")
+            mode='w+',
+            prefix="{}-".format(self.full_name),
+            suffix=".yml")
         fplugin = None
         if self._kind == 'runtime':
             fplugin = tempfile.NamedTemporaryFile(
@@ -210,7 +208,8 @@ class ConfigurationBlock:
 
             if fplugin:
                 if stream and 'plugin' in stream:
-                    content = base64.b64decode(stream['plugin']).decode('ascii')
+                    content = base64.b64decode(
+                        stream['plugin']).decode('ascii')
                 else:
                     content = """import math
 
@@ -223,13 +222,13 @@ def check_valid_combination(dict_of_combinations=dict()):
                 fplugin.flush()
         try:
             utils.open_in_editor(fname.name,
-                              fplugin.name if fplugin else None,
-                              e=e)
-        except:
+                                 fplugin.name if fplugin else None,
+                                 e=e)
+        except Exception:
             log.warn("Issue with opening the conf. block. Stop!")
             return
-       
-        #now, dump back temp file to the original saves
+
+        # now, dump back temp file to the original saves
         try:
             fname.seek(0)
             self._details = Dict(yaml.load(fname, Loader=yaml.FullLoader))
@@ -242,24 +241,26 @@ def check_valid_combination(dict_of_combinations=dict()):
             fplugin.seek(0)
             stream_plugin = fplugin.read()
             if len(stream_plugin) > 0:
-                self._details['plugin'] = base64.b64encode(stream_plugin.encode('ascii'))
+                self._details['plugin'] = base64.b64encode(
+                    stream_plugin.encode('ascii'))
 
         try:
             self.check(fail=False)
         except jsonschema.exceptions.ValidationError as e:
-            with tempfile.NamedTemporaryFile(mode="w+", suffix=".yml.rej", prefix=self.full_name, delete=False) as rej_fh:
+            with tempfile.NamedTemporaryFile(mode="w+",
+                                             suffix=".yml.rej",
+                                             prefix=self.full_name,
+                                             delete=False) as rej_fh:
                 yaml.dump(stream, rej_fh)
-            
+
                 log.err("Invalid format: {}".format(e.message),
                         "Rejected file: {}".format(rej_fh.name),
-                        "You may use 'pcvs check' to validate external resource",
+                        "See 'pcvs check' to validate external resource",
                         "before the importation.")
-
-
 
         # delete temp files (replace by 'with...' ?)
         fname.close()
         if fplugin:
             fplugin.close()
-        
+
         self.flush_to_disk()
