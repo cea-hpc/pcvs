@@ -134,7 +134,7 @@ class CfgValidation(CfgBase):
         if 'format' not in self.result:
             self.result.format = ['json']
         if 'log' not in self.result:
-            self.result.log = 2
+            self.result.log = 1
         if 'logsz' not in self.result:
             self.result.logsz = 1024
         
