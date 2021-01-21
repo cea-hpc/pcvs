@@ -199,5 +199,5 @@ def discover(ctx, paths):
     paths = [os.path.abspath(x) for x in paths]
     
     for p in paths:
-        log.warn('look for {}'.format(p))
+        log.print_section("{}".format(p))
         pvUtils.process_discover_directory(p)

@@ -200,7 +200,6 @@ class BuildSystem:
         self._dirs = dirs
         self._files = files
         self._stream = Dict()
-        log.print_item(self._root)
         
     def __append_listdir(self):
         self._dirs = list()
@@ -216,10 +215,9 @@ class BuildSystem:
 
     def generate_file(self, filename="pcvs.yml"):
         out_file = os.path.join(self._root, filename)
-        print("got {}".format(self._stream))
-        return
         if os.path.isfile(out_file):
-            raise FileExistsError
+            log.warn("template already exist ! Skip.")
+            return
 
         with open(out_file, 'w') as fh:
             yaml.dump(self._stream.to_dict(), fh)
@@ -251,22 +249,23 @@ def process_autotools_suite(root, dirs, files):
     stream[name].build.files = os.path.join(root, "configure")
     stream[name].build.autogen = ('autogen.sh' in files)
     
-    with open(os.path.join(root, 'pcvs.yml'), 'w+') as fh:
-        yaml.safe_dump(stream.to_dict(), fh)
-
 
 def process_discover_directory(path):
 
     for root, dirs, files in os.walk(path):
         obj = None
         if 'configure' in files:
+            n = log.cl("Autotools", "yellow", bold=True)
             obj = AutotoolsBuildSystem(root, dirs, files)
         if 'CMakeLists.txt' in files:
+            n = log.cl("CMake", "cyan", bold=True)
             obj = CMakeBuildSystem(root, dirs, files)
         if 'Makefile' in files:
+            n = log.cl("Make", "red", bold=True)
             obj = MakefileBuildSystem(root, dirs, files)
 
         if obj is not None:
             dirs[:] = []
+            log.print_item("{} [{}]".format(root, n))
             obj.fill()
             obj.generate_file(filename="pcvs.yml")
