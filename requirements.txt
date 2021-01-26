@@ -4,3 +4,4 @@ jsonschema
 addict
 PrettyTable
 flask
+pygit2
