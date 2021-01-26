@@ -284,7 +284,6 @@ class Criterion:
 
         # TODO: handle criterion dependency (ex: n_mpi: ['n_node * 2'])
 
-
 def initialize_from_system():
     """Initialise system-wide criterions
 

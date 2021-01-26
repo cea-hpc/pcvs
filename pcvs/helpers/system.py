@@ -124,6 +124,9 @@ class CfgValidation(CfgBase):
         self.set_ifnot('exported_to', None)
         self.set_ifnot('reused_build', None)
         self.set_ifnot('result', {"format": ['json']})
+        self.set_ifnot('author', {
+            "name": utils.get_current_username(),
+            "email": utils.get_current_usermail()})
 
         # Annoying here:
         # self.result should be allowed even without the 'set_ifnot' above

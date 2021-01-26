@@ -70,6 +70,9 @@ class Profile:
             PROFILE_STORAGES[self._scope], self._name + ".yml")
         self._exists = False
 
+    def get_unique_id(self):
+        return utils.generate_data_hash(str(self._details))
+
     def fill(self, raw):
         # some checks
         assert (isinstance(raw, dict))

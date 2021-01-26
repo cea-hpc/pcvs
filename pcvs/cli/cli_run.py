@@ -174,6 +174,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         pf.load_from_disk()
 
         cfg_val.override('pf_name', pf.full_name)
+        cfg_val.override('pf_hash', pf.get_unique_id())
         settings.runtime = system.CfgRuntime(pf.runtime)
         settings.compiler = system.CfgCompiler(pf.compiler)
         settings.machine = system.CfgMachine(pf.machine)
