@@ -29,7 +29,7 @@ def bank_list(ctx):
     List known repositories, stored under $HOME_STORAGE/banks.yml"""
     log.print_header("Bank View")
     for label, path in pvBank.list_banks().items():
-        log.print_item("{: <8s}: {}".format(label.upper(), path))
+        log.print_item("{:<8}: {}".format(label.upper(), path))
 
 
 @bank.command(name="show", short_help="Display data stored in a repo.")
@@ -39,16 +39,17 @@ def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
     log.print_header("Bank View")
 
-    b = pvBank.Bank(name)
+    b = pvBank.Bank(name, is_new=False)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
-        b.show()
+        b.connect_repository()
+        print(b)
 
 
 @bank.command(name="create", short_help="Register a new bank")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
-@click.argument("path", nargs=1, type=click.Path(exists=True, file_okay=False), required=True)
+@click.argument("path", nargs=1, type=click.Path(exists=False, file_okay=False), required=True)
 @click.pass_context
 def bank_create(ctx, name, path):
     """Create a new bank, named NAME, data will be stored under PATH."""
@@ -58,21 +59,22 @@ def bank_create(ctx, name, path):
     
     path = os.path.abspath(path)
 
-    b = pvBank.Bank(name, path)
+    b = pvBank.Bank(path, name, is_new=True)
     if b.exists():
         raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
-        b.register()
-        pvBank.flush_to_disk()
+        b.connect_repository()  
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.option("-s", "--symlink", is_flag=True,
+              help="Only delete the HOME symbolic link (keep data intact)")
 @click.confirmation_option(
     "-f", "--force", "force",
     prompt="Are your sure to delete repository and its content ?",
     help="Do not ask for confirmation before deletion")
 @click.pass_context
-def bank_destroy(ctx, name):
+def bank_destroy(ctx, name, symlink):
     """Remove the bank NAME from PCVS management. This does not include
     repository deletion. 'data.yml' and bank entry in the configuratino file
     will be removed but existing data are preserved.
@@ -82,9 +84,11 @@ def bank_destroy(ctx, name):
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
-        b.unregister()
-        pvBank.flush_to_disk()
-
+        if not symlink:
+            log.warn("To delete a bank, just remove the directory {}".format(b.prefix))
+        log.print_item("Bank '{}' unlinked".format(name))
+        pvBank.rm_banklink(name)
+        
 
 @bank.command(name="save", short_help="Store an object to the datastore")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
@@ -94,12 +98,7 @@ def bank_destroy(ctx, name):
 def bank_save_content(ctx, name, attr, obj):
     """Save an object OBJ (currently only filepaths) under ATTR label into the
     previously-registered bank NAME"""
-    bank = pvBank.Bank(name)
-    if not bank.exists():
-        raise click.BadArgumentUsage("Unable to save content into a non-existent bank.",
-                "Please use the 'create' command first.")
-    else:
-        bank.save(attr, obj)
+    log.warn("BANK: WIP")
 
 
 @bank.command(name="load", short_help="Load an object from datastore")
@@ -112,13 +111,7 @@ def bank_save_content(ctx, name, attr, obj):
 def bank_load_content(ctx, name, attr, dest):
     """Load  any object under ATTR label from the previously-registered bank
     NAME"""
-    bank = pvBank.Bank(name)
-    if not bank.exists():
-        raise click.BadArgumentUsage("Unable to load content from a non-existent bank.",
-                "Please use the 'create' command first.")
-    else:
-        bank.load(attr, dest)
-
+    log.warn("BANK: WIP")
 
 @bank.command(name="delete", short_help="delete an object from datastore")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
@@ -129,10 +122,4 @@ def bank_load_content(ctx, name, attr, dest):
     help="Do not ask for confirmation before deletion")
 @click.pass_context
 def bank_delete_content(ctx, name, attr):
-    """Delete anyobject under ATTR label from the previously-registered bank NAME"""
-    bank = pvBank.Bank(name)
-    if not bank.exists():
-        raise click.BadArgumentUsage("Unable to modify content from a non-existent bank.",
-                "Please use the 'create' command first.")
-    else:
-        bank.delete(attr)
+    log.warn("BANK: WIP")
