@@ -7,7 +7,7 @@ import click
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
-from pcvs.cli import cli_profile
+from pcvs.cli import cli_profile, cli_bank
 from pcvs.helpers import log, system, utils
 
 
@@ -93,9 +93,8 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,
               help="Purge the results from sensitive data (HOME, USER...)")
-@click.option("-b", "--bank", "bank",
-              default=None, 
-              help="Which bank will store data in addition to the archive")
+@click.option("-b", "--bank", "bank", default=None, autocompletion=cli_bank.compl_bank_projects,
+              help="Which bank will store the run in addition to the archive")
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
@@ -129,13 +128,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         utils.open_in_editor(system.CfgValidation.get_valfile(validation_file))
         exit(0)
 
-    # appropriate bank election
-    theBank = None
-    if bank is not None:
-        theBank = pvBank.Bank(bank)
-        if not theBank.exists():
-            log.err('--bank points to a non-existent bank')
-    
+
     # save the whole run configuration
     settings = system.Settings()
     cfg_val = system.CfgValidation(validation_file)
@@ -150,8 +143,21 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     cfg_val.override('anonymize', anon)
     cfg_val.override('exported_to', bank)
     cfg_val.override('tee', tee)
-    cfg_val.override('target_bank', theBank)
     cfg_val.override('reused_build', dup)
+
+    # appropriate bank election
+    theBank = None
+    theProj = None
+    if bank is not None:
+        bank, theProj = bank.split('@', 1)
+        theBank = pvBank.Bank(name=bank)
+        if not theBank.exists():
+            log.err("'{}' bank does not exist".format(bank))
+
+
+    cfg_val.override('target_bank', theBank)
+    cfg_val.override('target_proj', theProj)
+    
     
     # check if another build should cloned
     # this avoids to re-run combinatorial system twice
@@ -214,8 +220,12 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     # post-actions to build the archive, post-process the webview...
     archive = pvRun.terminate()
 
-    if system.get('validation').target_bank:
-        system.get('validation').target_bank.save(
-            system.get('validation').datetime.strftime('%Y-%m-%d'),
-            os.path.join(system.get('validation').output, archive)
+
+    bank = system.get('validation').target_bank
+    if bank:
+        log.print_item("Upload to the bank '{}'".format(bank.name))
+        bank.connect_repository()
+        bank.save_from_buildir(
+            system.get('validation').target_proj,
+            os.path.join(system.get('validation').output)
         )

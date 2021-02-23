@@ -1,4 +1,6 @@
 import os
+import tarfile
+import tempfile
 import shutil
 from pygit2.repository import Repository
 
@@ -25,21 +27,33 @@ class Bank:
         self._locked = False
 
         global BANKS
-        if name in BANKS.keys():
-            self._root = BANKS[name]
+        if name.lower() in BANKS.keys():
+            self._root = BANKS[name.lower()]
         
         assert(self._root is not None)
 
     @property
     def prefix(self):
         return self._root
+    
+    @property
+    def name(self):
+        return self._name
 
     def exists(self):
         return self._root is not None and os.path.isdir(self._root)
+
+    def list_projects(self):
+        INVALID_REFS = ["refs/heads/master"]
+        # a ref is under the form: 'refs/<bla>/NAME/<hash>
+        return [elt.split('/')[2] for elt in self._repo.references if elt not in INVALID_REFS]
     
     def __str__(self):
+        return str({self._name : self._root})
+
+    def show(self):
         projects = dict()
-        s = ["Projects contained in bank '{}'".format(self._root)]
+        s = ["Projects contained in bank '{}':".format(self._root)]
         for b in self._repo.references:
             if b == 'refs/heads/master':
                 continue
@@ -58,7 +72,8 @@ class Bank:
 
                 s.append("  * {}: {} runs".format(v, nb_parents))
 
-        return "\n".join(s)
+        print("\n".join(s))
+
     def __del__(self):
         self.disconnect_repository()
     
@@ -101,11 +116,12 @@ class Bank:
                 else:
                     log.err("Unable to find a valid bank in {}".format(self._root))
             self._locked = True
+
+        def save_to_global(self):
             global BANKS
-            if self._root not in BANKS.values():
-                if self._name in BANKS:
-                    self._name = self._root
-                add_banklink(self._name, self._root)
+            if self._name in BANKS:
+                self._name = os.path.basename(self._root).lower()
+            add_banklink(self._name, self._root)
                 
     def create_test_blob(self, data):
         assert(isinstance(self._repo, pygit2.Repository))
@@ -152,7 +168,7 @@ class Bank:
     
     def load_config_from_file(self, path):
         with open(os.path.join(path, "conf.yml"), 'r') as fh:
-            self._config = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+            self._config = Dict(yaml.load(fh, Loader=yaml.Loader))
         
     def save_from_buildir(self, tag, buildpath):
         self.load_config_from_file(buildpath)
@@ -166,13 +182,20 @@ class Bank:
                     if not (f.startswith('output-') and f.endswith('.json')):
                         continue
                     with open(os.path.join(root, f), 'r') as fh:
-                        data = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+                        data = Dict(yaml.load(fh, Loader=yaml.Loader))
                         #TODO: validate
                     
                     for elt in data['tests']:
                         self.save_test_from_json(elt)
         self._rootree.write()
         self.finalize_snapshot(tag)
+
+    def save_from_archive(self, tag, archivepath):
+        assert(os.path.isfile(archivepath))
+
+        with tempfile.TemporaryDirectory() as tarpath:
+            tarfile.open(os.path.join(archivepath)).extractall(tarpath)
+            self.save_from_buildir(tag, os.path.join(tarpath, "save_for_export"))
 
     def finalize_snapshot(self, tag):
         # Setup commit metadata:
@@ -227,7 +250,7 @@ def init():
     BANK_STORAGE = os.path.join(utils.STORAGES['user'], "saves/banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
-            BANKS = yaml.load(f, Loader=yaml.FullLoader)
+            BANKS = yaml.load(f, Loader=yaml.Loader)
     except FileNotFoundError:
         # nothing to do, file may not exist
         pass

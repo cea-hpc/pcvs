@@ -416,9 +416,11 @@ def terminate():
     archive_name = "pcvsrun_{}.tar.gz".format(
         system.get('validation').datetime.strftime('%Y%m%d%H%M%S'))
     outdir = system.get('validation').output
+    
+    log.print_section("Exporting results")
 
     if shutil.which("xsltproc") is not None:
-        log.print_section("Generate static reporting webpages")
+        log.print_item("Generate webpages")
         try:
             cmd = [
                 os.path.join(system.get('validation').jchronoss.src,
@@ -428,16 +430,13 @@ def terminate():
             log.info('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(
                 cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            log.print_item("Browsing: {}".format(
+            log.info("Browsing: {}".format(
                 os.path.join(system.get('validation').jchronoss.src,
                              'tools/webview/webview/generated/main.html')))
         except (CalledProcessError, FileNotFoundError):
             pass
-            # log.warn("Unable to run the webview!")
 
-    log.print_section("Prepare results for export")
-
-    log.print_item("Save results")
+    log.print_item("Prepare the archive")
     # copy file before anonymizing them
     for root, _, files in os.walk(os.path.join(outdir, "test_suite")):
         for file in files:
@@ -452,13 +451,13 @@ def terminate():
                     os.path.join(outdir, 'webview'))
 
     if system.get('validation').anonymize:
-        log.print_item("Anonymize the final archive")
+        log.print_item("Anonymizing data")
         anonymize_archive()
 
     log.print_item("Save user-defined artifacts")
-    log.warn('TODO user-defined artifact')
+    #log.warn('TODO user-defined artifact')
 
-    log.print_item("Generate the archive")
+    log.print_item("Create the archive: {}".format(archive_name))
 
     with utils.cwd(outdir):
         cmd = [

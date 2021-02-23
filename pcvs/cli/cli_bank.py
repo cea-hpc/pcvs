@@ -14,6 +14,17 @@ def compl_list_banks(ctx, args, incomplete):
         array.append((k,v))
     return [elt for elt in array if incomplete in elt[0]]
 
+def compl_bank_projects(ctx, args, incomplete):
+    pvBank.init()
+    array = list()
+    for bankname, bankpath in compl_list_banks(None, None, ''):
+        bank = pvBank.Bank(name=bankname, is_new=False)
+        bank.connect_repository()
+        for project in bank.list_projects():
+            array.append((bankname + "@" + project, bankpath))
+
+    return [elt for elt in array if incomplete in elt[0]]
+
 
 @click.group(name="bank", short_help="Persistent data repository management")
 @click.pass_context
@@ -39,12 +50,12 @@ def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
     log.print_header("Bank View")
 
-    b = pvBank.Bank(name, is_new=False)
+    b = pvBank.Bank(name=name, is_new=False)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         b.connect_repository()
-        print(b)
+        b.show()
 
 
 @bank.command(name="create", short_help="Register a new bank")
@@ -59,11 +70,12 @@ def bank_create(ctx, name, path):
     
     path = os.path.abspath(path)
 
-    b = pvBank.Bank(path, name, is_new=True)
+    b = pvBank.Bank(path, name=name, is_new=True)
     if b.exists():
         raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
         b.connect_repository()  
+        b.save_to_global()
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
@@ -80,7 +92,7 @@ def bank_destroy(ctx, name, symlink):
     will be removed but existing data are preserved.
     """
     log.print_header("Bank View")
-    b = pvBank.Bank(name)
+    b = pvBank.Bank(name=name, is_new=False)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
@@ -90,15 +102,23 @@ def bank_destroy(ctx, name, symlink):
         pvBank.rm_banklink(name)
         
 
-@bank.command(name="save", short_help="Store an object to the datastore")
+@bank.command(name="save", short_help="Save a new run to the datastore")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
-@click.argument("attr", nargs=1, required=True)
-@click.argument("obj", nargs=1, required=True)
+@click.argument("path", nargs=1, required=True, type=click.Path(exists=True))
+@click.argument("project", nargs=1, required=False, type=str, default=None)
 @click.pass_context
-def bank_save_content(ctx, name, attr, obj):
-    """Save an object OBJ (currently only filepaths) under ATTR label into the
-    previously-registered bank NAME"""
-    log.warn("BANK: WIP")
+def bank_save_run(ctx, name, path, project):
+    
+    b = pvBank.Bank(name=name)
+    if not b.exists():
+        raise click.BadArgumentUsage("'{}' does not exist".format(name))
+    b.connect_repository()
+    if os.path.isfile(path):
+        b.save_from_archive(project, path)
+    elif os.path.isdir(path):
+        b.save_from_buildir(project, path)
+
+    
 
 
 @bank.command(name="load", short_help="Load an object from datastore")
