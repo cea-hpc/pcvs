@@ -18,7 +18,7 @@ properties:
         type: integer
         minimum: 0
         maximum: 2
-      sched_on:
+      based_on:
         type: string
     additionalProperties: false
   result:

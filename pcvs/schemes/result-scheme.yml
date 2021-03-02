@@ -6,22 +6,37 @@ properties:
     items:
       type: object
       properties:
+        id:
+          type: object:
+          properties:
+            label: {"type": "string"}
+            subtree: {"type": "string"}
+            te_name: {"type": "string"}
+            full_name: {"type": "string"}
+          additionalProperties: false
+          required: ["label", "subtree", "te_name", "full_name"]
         command: {"type": "string"}
-        label: {"type": "string"}
-        subtree: {"type": "string"}
-        name: {"type": "string"}
-        full_name: {"type": "string"}
         result:
           type: object
           properties:
             output: {"type": "string"}
-            status:
+            state:
               type: "string"
-              enum: ["success", "error", "failure", "warn"]
+              enum: ["success", "error", "failure", "warn", "not_run", "other"]
             time: {"type": "number"}
           additionalProperties: false
-        tags:
-          type: array
-          items: {"type": "string"}
+          required: ["state", "time"]
+        data:
+          type: object:
+          properties:
+            tags:
+              type: array
+              items: {"type": "string"}
+            artifacts:
+              type: object
+            metrics:
+              type: object
+            combination:
+              type: object
       additionalProperties: false
 additionalProperties: false

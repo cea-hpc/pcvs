@@ -20,17 +20,15 @@ class Bank:
     def __init__(self, root_path=None, name="default", is_new=False):
         self._root = root_path
         self._repo = None
-        self._new = is_new
         self._config = None
         self._rootree = None
         self._name = name
         self._locked = False
 
         global BANKS
-        if name.lower() in BANKS.keys():
+        if self.exists():
             self._root = BANKS[name.lower()]
         
-        assert(self._root is not None)
 
     @property
     def prefix(self):
@@ -41,7 +39,7 @@ class Bank:
         return self._name
 
     def exists(self):
-        return self._root is not None and os.path.isdir(self._root)
+        return self._name.lower() in BANKS.keys()
 
     def list_projects(self):
         INVALID_REFS = ["refs/heads/master"]
@@ -84,7 +82,7 @@ class Bank:
 
     def connect_repository(self):
         if self._repo is None:
-            if self._new:
+            if not os.path.isfile(os.path.join(self._root, 'HEAD')):
                 try:
                     self._repo = pygit2.init_repository(
                         self._root,
@@ -117,12 +115,12 @@ class Bank:
                     log.err("Unable to find a valid bank in {}".format(self._root))
             self._locked = True
 
-        def save_to_global(self):
-            global BANKS
-            if self._name in BANKS:
-                self._name = os.path.basename(self._root).lower()
-            add_banklink(self._name, self._root)
-                
+    def save_to_global(self):
+        global BANKS
+        if self._name in BANKS:
+            self._name = os.path.basename(self._root).lower()
+        add_banklink(self._name, self._root)
+            
     def create_test_blob(self, data):
         assert(isinstance(self._repo, pygit2.Repository))
         #assert(isinstance(data, str))

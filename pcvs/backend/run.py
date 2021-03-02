@@ -14,6 +14,7 @@ from addict import Dict
 from pcvs import BACKUP_NAMEDIR, BUILD_IDFILE, BUILD_NAMEDIR, ROOTPATH
 from pcvs.helpers import criterion, log, system, test, utils
 from pcvs.helpers.test import TEDescriptor, TestFile
+from pcvs.orchestration import Orchestrator
 
 
 def __print_summary():
@@ -96,7 +97,7 @@ def __check_defined_program_validity():
     utils.check_valid_program(system.get('machine').job_manager.batch.program)
     utils.check_valid_program(system.get('machine').job_manager.batch.wrapper)
     return
-    # need to handle package_manager commands to process below
+    # TODO: need to handle package_manager commands to process below
     # maybe a dummy testfile should be used
     utils.check_valid_program(system.get('compiler').commands.cc)
     utils.check_valid_program(system.get('compiler').commands.cxx)
@@ -139,8 +140,8 @@ def prepare():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, BUILD_IDFILE), 'w').close()
 
-    log.print_section("Build third-party tools")
-    __build_tools()
+    #log.print_section("Build third-party tools")
+    #__build_tools()
 
     log.print_section("Ensure user-defined programs exist")
     __check_defined_program_validity()
@@ -151,6 +152,8 @@ def prepare():
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
+
+    system.get('validation').orchestrator = Orchestrator(system.get())
 
 
 def __print_progbar_walker(elt):
@@ -248,6 +251,8 @@ def process_dyn_setup_scripts(setup_files):
             base_src, cur_src, base_build, cur_build = utils.generate_local_variables(
                 label, subprefix)
 
+            ## prepre to exec pcvs.setup script
+            # 1. setup the env
             env['pcvs_src'] = base_src
             env['pcvs_testbuild'] = base_build
             te_node = None
@@ -255,18 +260,23 @@ def process_dyn_setup_scripts(setup_files):
 
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
+            
             f = os.path.join(cur_src, fname)
+
+            # Run the script
             try:
                 fds = subprocess.Popen([f, subprefix], env=env,
                                        stdout=subprocess.PIPE,
                                        stderr=subprocess.PIPE)
                 fdout, fderr = fds.communicate()
+
                 if fds.returncode != 0:
                     err.append((f, fderr.decode('utf-8')))
-                    log.err("{}: {}".format(f, fderr.decode('utf-8')))
+                    log.info("{}: {}".format(f, fderr.decode('utf-8')))
                     continue
-                out_file = os.path.join(cur_build, 'pcvs.yml')
 
+                # flush the output to $BUILD/pcvs.yml
+                out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
                     fh.write(fdout.decode('utf-8'))
                 te_node = test.load_yaml_file(
@@ -274,17 +284,17 @@ def process_dyn_setup_scripts(setup_files):
             except CalledProcessError:
                 pass
 
+            # If the script did not generate any output, skip
             if te_node is None:  # empty file
                 continue
 
-            tf = TestFile(file_in=out_file,
-                          path_out=cur_build,
-                          data=te_node,
-                          label=label,
-                          prefix=subprefix)
-
-            tf.start_process()
-            system.get('validation').xmls.append(tf.flush_to_disk())
+            # Now create the file handler
+            TestFile(file_in=out_file,
+                path_out=cur_build,
+                data=te_node,
+                label=label,
+                prefix=subprefix
+            ).process()
     return err
 
 
@@ -300,18 +310,18 @@ def process_static_yaml_files(yaml_files):
             f = os.path.join(cur_src, fname)
 
             try:
-                tf = TestFile(file_in=f,
-                              path_out=cur_build,
-                              label=label,
-                              prefix=subprefix)
-                tf.start_process()
-                system.get('validation').xmls.append(tf.flush_to_disk())
+                TestFile(file_in=f,
+                    path_out=cur_build,
+                    label=label,
+                    prefix=subprefix
+                ).process()
             except (yaml.YAMLError, CalledProcessError) as e:
-                print(f, e)
+                # log errors to be printed all at once
                 err.append((f, e.output))
+                log.info("{}: {}".format(f, e.output))
                 continue
             except Exception as e:
-                log.err("Failed to read {}: ".format(f), "{}".format(e))
+                log.info("Failed to read {}: ".format(f), "{}".format(e))
     return err
 
 
@@ -325,6 +335,9 @@ def run():
         yaml.dump(system.get().serialize(), conf_fh, default_flow_style=None)
 
     log.print_section("Run the Orchestrator (JCHRONOSS)")
+    system.get('validation').orchestrator.run()
+    log.warn("SUCCEEDED")
+    return
 
     valcfg = system.get('validation')
     macfg = system.get('machine')

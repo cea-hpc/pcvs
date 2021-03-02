@@ -149,8 +149,10 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     theBank = None
     theProj = None
     if bank is not None:
-        bank, theProj = bank.split('@', 1)
-        theBank = pvBank.Bank(name=bank)
+        array = bank.split('@', 1)
+        if len(array) > 1:
+            theProj = array[1]
+        theBank = pvBank.Bank(name=array[0])
         if not theBank.exists():
             log.err("'{}' bank does not exist".format(bank))
 

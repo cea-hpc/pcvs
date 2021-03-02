@@ -106,7 +106,7 @@ class TestFile:
         if TestFile.val_scheme is None:
             TestFile.val_scheme = utils.ValidationScheme('te')
         
-    def start_process(self, check=True):
+    def process(self, check=True):
         """Load the YAML file and map YAML nodes to Test()"""
         src, _, build, _ = utils.generate_local_variables(
             self._label,
@@ -134,11 +134,10 @@ class TestFile:
             # register debug informations relative to the loaded TEs
             self._debug[k] = td.get_debug()
     
-    def flush_to_disk(self):
+    def __del__(self):
         """Store the given input file into their destination.
         This function dumps the Shell file, used as JCHRONOSS test command
         manager"""
-        fn_xml = os.path.join(self._path_out, "list_of_tests.xml")
         fn_sh = os.path.join(self._path_out, "list_of_tests.sh")
         
         if TestFile.cc_pm_string == "" and system.get('compiler').obj:
@@ -153,41 +152,37 @@ class TestFile:
                     for e in system.get('runtime').obj
                 ])
 
-        with open(fn_xml, 'w') as fh_xml:
-            with open(fn_sh, 'w') as fh_sh:
-                fh_xml.write("<jobSuite>")
-                fh_sh.write(
-                    '#!/bin/sh\n' +
-                    '{pm_string}\n'.format(pm_string="\n".join([
-                            TestFile.cc_pm_string,
-                            TestFile.rt_pm_string
-                        ])) +
-                    'for arg in "$@"; do\n' +
-                    '   case $arg in\n')
-                for test in self._tests:
-                    fh_sh.write(test.serialize_shell())
-                    test.override_cmd("sh {} '{}'".format(fn_sh, test.name))
+        with open(fn_sh, 'w') as fh_sh:
+            fh_sh.write(
+                '#!/bin/sh\n' +
+                '{pm_string}\n'.format(pm_string="\n".join([
+                        TestFile.cc_pm_string,
+                        TestFile.rt_pm_string
+                    ])) +
+                'for arg in "$@"; do\n' +
+                '   case $arg in\n')
 
-                    fh_xml.write(test.serialize_xml())
-                fh_sh.write(
-                    '   --list)\n'
-                    '       printf "{list_of_tests}\\n"\n'
-                    '       ;;\n'
-                    '   *)\n'
-                    '       printf "Invalid test-name \'$arg\'\\n"\n'
-                    '       exit 1\n'
-                    '   esac\n'
-                    'done\n'
-                    'exit $ret\n'.format(list_of_tests="\n".join([
-                                t.name
-                                for t in self._tests
-                            ])))
-                fh_xml.write("</jobSuite>")
+            for test in self._tests:
+                fh_sh.write(test.generate_script())
+                system.get('validation').orchestrator.add_new_job(test)
+
+            fh_sh.write(
+                '   --list)\n'
+                '       printf "{list_of_tests}\\n"\n'
+                '       ;;\n'
+                '   *)\n'
+                '       printf "Invalid test-name \'$arg\'\\n"\n'
+                '       exit 1\n'
+                '   esac\n'
+                'done\n'
+                'exit $ret\n'.format(list_of_tests="\n".join([
+                            t.name
+                            for t in self._tests
+                        ])))
         
-        self.flush_debug_to_disk()
-        return fn_xml
+        self.generate_debug_info()
 
-    def flush_debug_to_disk(self):
+    def generate_debug_info(self):
         """Dump debug info to the appropriate file for the input object"""
         if len(self._debug) and log.get_verbosity('info'):
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
@@ -221,31 +216,39 @@ class Test:
     @property
     def name(self):
         return self._array['name']
+        
+    def get_dim(self, unit="n_node"):
+        return self._array['nb_res']
 
-    def serialize_xml(self):
-        """Serialize the test to the logic: currently an XML node"""
-        desc = "<job>{name}{cmd}{rc}{time}{dlt}{res}{deps}{cst}</job>".format(
-            name=test_transform.xml_setif(self._array, 'name'),
-            cmd=test_transform.xml_setif(self._array, 'command'),
-            rc=test_transform.xml_setif(self._array, 'rc'),
-            time=test_transform.xml_setif(self._array, 'time'),
-            dlt=test_transform.xml_setif(self._array, 'delta'),
-            res=test_transform.xml_setif(self._array, 'resources'),
-            cst="<constraints>{}</constraints>".format(
-                    test_transform.xml_setif(self._array, 'constraint')
-                ),
-            deps="<deps>{}</deps>".format(
-                    "".join([
-                        "<dep>{}</dep>".format(elt)
-                        for elt in self._array.get('dep', {})
-                        if not isinstance(elt, PManager)
-                        ]
-                    )
-                )
-        )
-        return desc
+    def save_final_result(self, rc=0, out=None):
+        self._rc = rc
+        self._out = out
+        self._success = (self._rc == 0)
 
-    def serialize_shell(self):
+    def to_json(self):
+        return {
+            "id" : {
+                "te_name": self._te_name,
+                "label" : self._label,
+                "subtree" : self._subtree,
+                "full_name": self._fullname
+            },
+            "exec": self._cmd,
+            "result": {
+                "state": self._state,
+                "time": self._time,
+                "output": self._output
+            },
+            "data": {
+                "tags": self._tags,
+                "metrics": self._metrics,
+                "artifacts": self._artifacts,
+                "comb": ""
+            }
+        }
+    
+
+    def generate_script(self):
         """Serialize test logic to its Shell representation"""
         pm_code = ""
         cd_code = ""
@@ -440,7 +443,7 @@ class TEDescriptor:
 
             self._criterion = tmp
             # now build program iterators
-            for k, elt in self._program_criterion.items():
+            for _, elt in self._program_criterion.items():
                 elt.expand_values()
 
     def __build_from_sources(self):
@@ -602,6 +605,7 @@ class TEDescriptor:
             command=command,
             constraint=constraints,
             dep=deps,
+            nb_res=1,
             time=self._validation.time.get("mean_time", None),
             delta=self._validation.time.get("tolerance", None),
             rc=self._validation.get("expect_exit", 0),
