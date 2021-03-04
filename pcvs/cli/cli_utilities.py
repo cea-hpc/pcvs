@@ -9,8 +9,8 @@ from prettytable import PrettyTable
 
 from pcvs import BUILD_IDFILE
 from pcvs.backend import utilities as pvUtils
-from pcvs.helpers import log, system
-from pcvs.helpers.system import Settings
+from pcvs.helpers import log
+from pcvs.helpers.system import MetaConfig
 
 
 @click.command(name="exec", short_help="Running aspecific test")
@@ -105,14 +105,9 @@ def check(ctx, dir, encoding, color, configs, profiles):
         log.print_header("Test directories")
         log.print_section("Prepare the environment")
         # first, replace build dir with a temp one
-        settings = Settings()
-        cfg_val = system.CfgValidation()
-        cfg_val.override('output', "/tmp/test")
-        settings.validation = cfg_val
-
-        system.save_as_global(settings)
-
-        system.get('validation').output = "/tmp/test"
+        settings = MetaConfig()
+        cfg_val = settings.bootstrap_validation()
+        cfg_val.set_ifdef('output', "/tmp/test")
         errors = {**errors, **pvUtils.process_check_directory(dir)}
 
 """

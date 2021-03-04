@@ -7,7 +7,8 @@ from xml.sax.saxutils import escape
 
 from addict import Dict
 
-from pcvs.helpers import package_manager, system
+from pcvs.helpers import package_manager
+from pcvs.helpers.system import MetaConfig
 
 
 # ######################################
@@ -37,13 +38,13 @@ def detect_source_lang(array_of_files):
     # order matters: if sources contains multiple languages, the first
     # appearing in this list will be considered as the main language
     for i in ['f08', 'f03', 'f95', 'f90', 'f77', 'fc', 'cxx', 'cc']:
-        if i in detect and i in system.get('compiler').commands:
+        if i in detect and i in MetaConfig.root.compiler.commands:
             return i
     return 'cc'
 
 
 def prepare_cmd_build_variants(variants=[], comb=None):
-    return " ".join(system.get('compiler').variants[i].args for i in variants)
+    return " ".join(MetaConfig.root.compiler.variants[i].args for i in variants)
 
 
 def handle_job_deps(deps_node, pkg_prefix):

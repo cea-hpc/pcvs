@@ -9,7 +9,7 @@ from prettytable import PrettyTable
 
 from pcvs import BUILD_NAMEDIR
 from pcvs.backend import config, profile, run
-from pcvs.helpers import log, utils
+from pcvs.helpers import log, utils, system
 from pcvs.helpers.log import utf
 
 
@@ -115,7 +115,7 @@ def process_check_setup_file(filename, prefix):
     return (err_msg, token, data)
 
 
-scheme = utils.ValidationScheme('te')
+scheme = system.ValidationScheme('te')
 
 
 def process_check_yaml_stream(data):

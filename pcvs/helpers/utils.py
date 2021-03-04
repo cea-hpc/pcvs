@@ -10,7 +10,8 @@ import yaml
 import pygit2
 
 from pcvs import BACKUP_NAMEDIR, ROOTPATH
-from pcvs.helpers import log, system
+from pcvs.helpers import log
+from pcvs.helpers.system import MetaConfig
 
 ####################################
 ##    STORAGE SCOPE MANAGEMENT    ##
@@ -149,9 +150,9 @@ def open_in_editor(*paths, e=None):
 ####################################
 
 def generate_local_variables(label, subprefix):
-    base_srcdir = system.get('validation').dirs[label]
+    base_srcdir = MetaConfig.root.validation.dirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
-    base_buildir = os.path.join(system.get('validation').output, "test_suite", label)
+    base_buildir = os.path.join(MetaConfig.root.validation.output, "test_suite", label)
     cur_buildir = os.path.join(base_buildir, subprefix)
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
@@ -171,41 +172,6 @@ def check_valid_program(p,  succ=log.print_item, fail=log.err):
         fail("{} not found or not a executable".format(p))
 
     return res
-
-
-
-####################################
-####   YAML VALIDATION OBJECT   ####
-####################################
-class ValidationScheme:
-    def __init__(self, name):
-        self._prefix = name
-
-        with open(os.path.join(
-                            ROOTPATH,
-                            'schemes/{}-scheme.yml'.format(name)
-                        ), 'r') as fh:
-            self._scheme = yaml.load(fh, Loader=yaml.FullLoader)
-
-    def validate(self, content, fail_on_error=True, filepath=None):
-        try:
-            if filepath is None:
-                filepath = "'data stream'"
-            
-            jsonschema.validate(instance=content, schema=self._scheme)
-        except jsonschema.exceptions.ValidationError as e:
-            if fail_on_error:
-                log.err("Wrong format: {} ('{}'):".format(
-                                filepath,
-                                self._prefix),
-                        "{}".format(e.message))
-            else:
-                raise e
-        except Exception as e:
-            log.err(
-                "Something wrong happen validating {}".format(self._prefix),
-                '{}'.format(e)
-            )
 
 
 def request_git_attr(k):

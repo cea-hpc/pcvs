@@ -8,7 +8,7 @@ import yaml
 from addict import Dict
 
 from pcvs import ROOTPATH
-from pcvs.helpers import log, utils
+from pcvs.helpers import log, utils, system
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
@@ -114,7 +114,7 @@ class ConfigurationBlock:
         return Dict(self._details).to_dict()
 
     def check(self, fail=True):
-        utils.ValidationScheme(self._kind).validate(self._details, fail)
+        system.ValidationScheme(self._kind).validate(self._details, fail)
 
     def load_from_disk(self):
         if not self._exists:

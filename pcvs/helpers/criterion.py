@@ -6,7 +6,8 @@ import os
 
 from addict import Dict
 
-from pcvs.helpers import log, system
+from pcvs.helpers import log
+from pcvs.helpers.system import MetaConfig
 
 
 class Combination:
@@ -289,10 +290,10 @@ def initialize_from_system():
 
     TODO: Move this function elsewhere."""
     # sanity checks
-    assert (system.get('runtime').iterators)
+    assert (MetaConfig.root.criterion.iterators)
     # raw YAML objects
-    runtime_iterators = system.get('runtime').iterators
-    criterion_iterators = system.get('criterion').iterators
+    runtime_iterators = MetaConfig.root.runtime.iterators
+    criterion_iterators = MetaConfig.root.criterion.iterators
     it_to_remove = []
     log.print_item("Prune undesired iterators from the run")
 
@@ -313,20 +314,21 @@ def initialize_from_system():
 
     # register the new dict {criterion_name: Criterion object}
     # the criterion object gathers both information from runtime & criterion
-    system.get('criterion').obj.iterators = {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove}
+    MetaConfig.root.set_internal('crit_obj', {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove})
     
     # convert any sequence into valid range of integers for
+    
     # numeric criterions
     log.print_item("Expand possible iterator expressions")
-    for criterion in system.get('criterion').obj.iterators.values():
+    for criterion in MetaConfig.root.get_internal('crit_obj').values():
         criterion.expand_values()
 
 first = True
 runtime_filter = None
 def valid_combination(dic):
     global first, runtime_filter
-    rt = system.get('runtime')
-    val = system.get('validation')
+    rt = MetaConfig.root.runtime
+    val = MetaConfig.root.validation
     if first and rt.plugin:
         first = not first
         rt.pluginfile =  os.path.join(val.output, "cache/rt-plugin.py")
@@ -342,8 +344,8 @@ def valid_combination(dic):
            callable(mod.check_valid_combination):
             runtime_filter = mod.check_valid_combination
             # add here any relevant information to be accessed by modules
-            mod.sys_nodes = system.get('machine').nodes
-            mod.sys_cores_per_node = system.get('machine').cores_per_node
+            mod.sys_nodes = MetaConfig.root.machine.nodes
+            mod.sys_cores_per_node = MetaConfig.root.machine.cores_per_node
 
     if runtime_filter:
         return runtime_filter(dic)

@@ -2,129 +2,170 @@ import os
 import pprint
 
 import yaml
+import jsonschema
 from addict import Dict
 
-from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR
+from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR, ROOTPATH
 from pcvs.helpers import log, package_manager, utils
 
 
-class CfgBase(Dict):
-   
-    def __init__(self, node, *args, **kwargs):
+####################################
+####   YAML VALIDATION OBJECT   ####
+####################################
+class ValidationScheme:
+    avail_list = None
+
+    @classmethod
+    def available_schemes(cls):
+
+        if cls.avail_list is None:
+            cls.avail_list = list()
+            for f in os.listdir(os.path.join(ROOTPATH, 'schemes/')):
+                cls.avail_list.append(f.replace('-scheme.yml', ''))
+        
+        return cls.avail_list
+
+    def __init__(self, name):
+        self._prefix = name
+
+        with open(os.path.join(
+                            ROOTPATH,
+                            'schemes/{}-scheme.yml'.format(name)
+                        ), 'r') as fh:
+            self._scheme = yaml.load(fh, Loader=yaml.FullLoader)
+
+    def validate(self, content, fail_on_error=True, filepath=None):
+        try:
+            if filepath is None:
+                filepath = "'data stream'"
+            
+            jsonschema.validate(instance=content, schema=self._scheme)
+        except jsonschema.exceptions.ValidationError as e:
+            if fail_on_error:
+                log.err("Wrong format: {} ('{}'):".format(
+                                filepath,
+                                self._prefix),
+                        "{}".format(e.message))
+            else:
+                raise e
+        except Exception as e:
+            log.err(
+                "Something wrong happen validating {}".format(self._prefix),
+                '{}'.format(e)
+            )
+
+
+class Config(Dict):
+    def __init__(self, d={}, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        assert(isinstance(node, dict))
-
-        for n in node:
-            self.__setitem__(n, node[n])
+        for n in d:
+            self.__setitem__(n, d[n])
+    
+    def validate(self, kw, fail_on_error=True):
+        assert(kw in ValidationScheme.available_schemes())
+        ValidationScheme(kw).validate(self)
 
     def __setitem__(self, param, value):
         if isinstance(value, dict):
             value = Dict(value)
         super().__setitem__(param, value)
 
-    def override(self, key, value):
-        if value is not None:
-            self.__setitem__(key, value)
+    def set_ifdef(self, k, v):
+        if v is not None:
+            self[k] = v
 
-    def set_ifnot(self, key, value):
-        if not self.isset(key):
-            self.__setitem__(key, value)
+    def set_nosquash(self, k, v):
+        if not self.isset(k):
+            self[k] = v
 
     def isset(self, k):
         return k in self
+    
+    def to_dict(self, prune=True):
+        return super().to_dict()
 
-    def serialize(self):
-        return self.to_dict()
-
-
-class CfgCompiler(CfgBase):
-    def __init__(self, node):
-        super().__init__(node)
-        if 'package_manager' in self:
-            self.obj = package_manager.identify(self.package_manager)
-
-
-class CfgRuntime(CfgBase):
-    def __init__(self, node):
-        super().__init__(node)
-        if 'package_manager' in self:
-            self.obj = package_manager.identify(self.package_manager)
+    def from_dict(self, d):
+        for k, v in d.items():
+            self[k] = v
+    
+    def from_file(self, filename):
+        with open(filename, 'r') as fh:
+            d = yaml.safe_load(fh)
+        self.from_dict(d)
 
 
-class CfgMachine(CfgBase):
-    def __init__(self, node):
-        super().__init__(node)
-        #now, sanity checks
-        self.set_ifnot('name', 'default')
-        self.set_ifnot('nodes', 1)
-        self.set_ifnot('cores_per_node', 1)
-        self.set_ifnot('concurrent_run', 1)
+class MetaConfig(Dict):
+    root = None
+    validation_default_file = os.path.join(os.environ['HOME'], BACKUP_NAMEDIR, "validation.yml")
+    
+    def __init__(self, base={}, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if isinstance(base, dict):
+            for k, v in base.items():
+                self[k] = v
+        self['__internal'] = Config()
 
-        if 'default_partition' not in self or 'partitions' not in self:
-            return
+    def __setitem__(self, param, value):
+        assert(isinstance(value, Config))
+        super().__setitem__(param, value)
 
-        # override default values by selected partition
-        for elt in self.partitions:
-            if elt.get('name', self.default_partition) == self.default_partition:
-                self.update(elt)
-                break
+    def bootstrap_generic(self, subnode, node):
+        #self.setdefault(subnode, Config())
+        if subnode not in self:
+            self[subnode] = Config()
         
-        #redirect to direct programs if no wrapper is defined
-        for kind in ['allocate', 'run', 'batch']:
-            if not self.job_manager[kind].wrapper and self.job_manager[kind].program:
-                self.job_manager[kind].wrapper = self.job_manager[kind].program
+        for k, v in node.items():
+            self[subnode][k] = v
+        self[subnode].validate(subnode)
+        return self[subnode]
 
+    def bootstrap_compiler(self, node):
+        subtree = self.bootstrap_generic('compiler', node)
+        if 'package_manager' in subtree:
+            subtree.obj = package_manager.identify(subtree.package_manager)
+        return subtree
 
-class CfgCriterion(CfgBase):
-    def __init__(self, node):
-        super().__init__(node)
+    def bootstrap_runtime(self, node):
+        subtree = self.bootstrap_generic('runtime', node)
+        if 'package_manager' in subtree:
+            subtree.obj = package_manager.identify(subtree.package_manager)
+        return subtree
+    
+    def bootstrap_group(self, node):
+        return self.bootstrap_generic('group', node)
 
-
-class CfgTemplate(CfgBase):
-    def __init__(self, node):
-        super().__init__(node)
-
-
-class CfgValidation(CfgBase):
-    default_valfile = os.path.join(os.environ['HOME'], BACKUP_NAMEDIR, "validation.yml")
-
-    def get_valfile(override):
-        if override is None:
-            override = CfgValidation.default_valfile
-        return override
-
-    def __init__(self, filename=None):
+    def bootstrap_validation_from_file(self, filepath):
         node = Dict()
-        if filename is None:
-            filename = CfgValidation.default_valfile
+        if filepath is None:
+            filepath = self.validation_default_file
 
-        if os.path.isfile(filename):
+        if os.path.isfile(filepath):
             try:
-                with open(filename, 'r') as fh:
+                with open(filepath, 'r') as fh:
                     node = Dict(yaml.load(fh, Loader=yaml.FullLoader))
             except (IOError, yaml.YAMLError):
-                log.err("Error(s) found while loading (}".format(filename))
+                log.err("Error(s) found while loading (}".format(filepath))
+        
+        return self.bootstrap_validation(node)
 
-        super().__init__(node)
-
-        utils.ValidationScheme('settings').validate(self)
+    def bootstrap_validation(self, node):
+        subtree = self.bootstrap_generic('validation', node)
 
         # #### now set default value ####
-        self.set_ifnot('verbose', 0)
-        self.set_ifnot('color', True)
-        self.set_ifnot('pf_name', 'default')
-        self.set_ifnot('output', os.path.join(os.getcwd(), BUILD_NAMEDIR))
-        self.set_ifnot('background', False)
-        self.set_ifnot('override', False)
-        self.set_ifnot('dirs', '.')
-        self.set_ifnot('xmls', list())
-        self.set_ifnot('simulated', False)
-        self.set_ifnot('anonymize', False)
-        self.set_ifnot('exported_to', None)
-        self.set_ifnot('reused_build', None)
-        self.set_ifnot('result', {"format": ['json']})
-        self.set_ifnot('author', {
+        subtree.set_nosquash('verbose', 0)
+        subtree.set_nosquash('color', True)
+        subtree.set_nosquash('pf_name', 'default')
+        subtree.set_nosquash('output', os.path.join(os.getcwd(), BUILD_NAMEDIR))
+        subtree.set_nosquash('background', False)
+        subtree.set_nosquash('override', False)
+        subtree.set_nosquash('dirs', '.')
+        subtree.set_nosquash('xmls', list())
+        subtree.set_nosquash('simulated', False)
+        subtree.set_nosquash('anonymize', False)
+        subtree.set_nosquash('exported_to', None)
+        subtree.set_nosquash('reused_build', None)
+        subtree.set_nosquash('result', {"format": ['json']})
+        subtree.set_nosquash('author', {
             "name": utils.get_current_username(),
             "email": utils.get_current_usermail()})
 
@@ -133,45 +174,55 @@ class CfgValidation(CfgBase):
         # but because of inheritance, it does not result as a Dict()
         # As the 'set_ifnot' is required, it is solving the issue
         # but this corner-case should be remembered as it WILL happen again :(
-
-        if 'format' not in self.result:
-            self.result.format = ['json']
-        if 'log' not in self.result:
-            self.result.log = 1
-        if 'logsz' not in self.result:
-            self.result.logsz = 1024
+        if 'format' not in subtree.result:
+            subtree.result.format = ['json']
+        if 'log' not in subtree.result:
+            subtree.result.log = 1
+        if 'logsz' not in subtree.result:
+            subtree.result.logsz = 1024
         
-    def override(self, k, v):
-        if k == 'output' and v is not None:
-            os.path.join(os.path.abspath(v), BUILD_NAMEDIR)
-        CfgBase.override(self, k, v)
+        return subtree
 
+    def bootstrap_machine(self, node):
+        subtree = self.bootstrap_generic('machine', node)
+        subtree.set_nosquash('name', 'default')
+        subtree.set_nosquash('nodes', 1)
+        subtree.set_nosquash('cores_per_node', 1)
+        subtree.set_nosquash('concurrent_run', 1)
 
-class Settings(Dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        if 'default_partition' not in subtree or 'partitions' not in subtree:
+            return
 
-    def __setitem__(self, param, value):
-        if isinstance(value, dict):
-            value = Dict(value)
-        super().__setitem__(param, value)
+        # override default values by selected partition
+        for elt in subtree.partitions:
+            if elt.get('name', subtree.default_partition) == subtree.default_partition:
+                subtree.update(elt)
+                break
+        
+        #redirect to direct programs if no wrapper is defined
+        for kind in ['allocate', 'run', 'batch']:
+            if not subtree.job_manager[kind].wrapper and subtree.job_manager[kind].program:
+                subtree.job_manager[kind].wrapper = subtree.job_manager[kind].program
+        return subtree
 
-    def serialize(self):
-        return Dict(self).to_dict()
+    def bootstrap_criterion(self, node):
+        return self.bootstrap_generic('criterion', node)
 
+    def set_internal(self, k, v):
+        self['__internal'][k] = v
 
-sysTable = None
+    def get_internal(self, k):
+        if k in self['__internal']:
+            return self['__internal'][k]
+        else:
+            return None
 
+    def dump_for_export(self):
+        res = Dict()
+        for k, v in self.items():
+            if k == '__internal':
+                continue
+            # should ignore __internal
+            res[k] = v
+        return res.to_dict()
 
-def save_as_global(obj):
-    global sysTable
-    assert(isinstance(obj, Settings))
-    sysTable = obj
-
-
-def get(cat=None):
-    if cat is not None:
-        if cat not in sysTable:
-            sysTable[cat] = Dict()
-        return sysTable[cat]
-    return sysTable

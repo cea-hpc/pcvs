@@ -111,6 +111,21 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     May also be provided as a list of directories as described by tests
     found in LIST_OF_DIRS.
     """
+    # first, prepare raw arguments to be usable
+    if output is not None:
+        output = os.path.abspath(output)
+
+    theBank = None
+    theProj = None
+    if bank is not None:
+        array = bank.split('@', 1)
+        if len(array) > 1:
+            theProj = array[1]
+        theBank = pvBank.Bank(name=array[0])
+        if not theBank.exists():
+            log.err("'{}' bank does not exist".format(bank))
+
+
     # parse non-run situations
     if pause and resume:
         raise click.BadOptionUsage("--pause/--resume",
@@ -125,47 +140,35 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         log.nimpl("status")
         exit(0)
     elif set_default:
-        utils.open_in_editor(system.CfgValidation.get_valfile(validation_file))
+        utils.open_in_editor(system.MetaConfig.validation_default_file)
         exit(0)
 
+    global_config = system.MetaConfig()
 
-    # save the whole run configuration
-    settings = system.Settings()
-    cfg_val = system.CfgValidation(validation_file)
-    cfg_val.override('datetime', datetime.now())
-    cfg_val.override('verbose', ctx.obj['verbose'])
-    cfg_val.override('color', ctx.obj['color'])
-    cfg_val.override('output', output)
-    cfg_val.override('background', detach)
-    cfg_val.override('override', override)
-    cfg_val.override('dirs', dirs)
-    cfg_val.override('simulated', simulated)
-    cfg_val.override('anonymize', anon)
-    cfg_val.override('exported_to', bank)
-    cfg_val.override('tee', tee)
-    cfg_val.override('reused_build', dup)
+    # then init the configuration
+    val_cfg = global_config.bootstrap_validation_from_file(validation_file)
 
-    # appropriate bank election
-    theBank = None
-    theProj = None
-    if bank is not None:
-        array = bank.split('@', 1)
-        if len(array) > 1:
-            theProj = array[1]
-        theBank = pvBank.Bank(name=array[0])
-        if not theBank.exists():
-            log.err("'{}' bank does not exist".format(bank))
-
-
-    cfg_val.override('target_bank', theBank)
-    cfg_val.override('target_proj', theProj)
+    # save 'run' parameters into global configuration
+    val_cfg.set_ifdef('datetime', datetime.now())
+    val_cfg.set_ifdef('verbose', ctx.obj['verbose'])
+    val_cfg.set_ifdef('color', ctx.obj['color'])
+    val_cfg.set_ifdef('output', output)
+    val_cfg.set_ifdef('background', detach)
+    val_cfg.set_ifdef('override', override)
+    val_cfg.set_ifdef('dirs', dirs)
+    val_cfg.set_ifdef('simulated', simulated)
+    val_cfg.set_ifdef('anonymize', anon)
+    val_cfg.set_ifdef('exported_to', bank)
+    val_cfg.set_ifdef('tee', tee)
+    val_cfg.set_ifdef('reused_build', dup)
+    val_cfg.set_ifdef('target_bank', theBank)
+    val_cfg.set_ifdef('target_proj', theProj)
     
-    
-    # check if another build should cloned
+    # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if dup is not None:
         try:
-            settings = pvRun.dup_another_build(dup, cfg_val.output)
+            global_config = pvRun.dup_another_build(dup, val_cfg.output)
             #TODO: Currently nothing can be overriden from cloned build except:
             # - 'output'
         except FileNotFoundError:
@@ -181,22 +184,19 @@ def run(ctx, profilename, output, detach, status, resume, pause,
                     "No '{}' found!".format(profilename))
         pf.load_from_disk()
 
-        cfg_val.override('pf_name', pf.full_name)
-        cfg_val.override('pf_hash', pf.get_unique_id())
-        settings.runtime = system.CfgRuntime(pf.runtime)
-        settings.compiler = system.CfgCompiler(pf.compiler)
-        settings.machine = system.CfgMachine(pf.machine)
-        settings.criterion = system.CfgCriterion(pf.criterion)
-        settings.group = system.CfgTemplate(pf.group)
-        settings.validation = cfg_val
+        val_cfg.set_ifdef('pf_name', pf.full_name)
+        val_cfg.set_ifdef('pf_hash', pf.get_unique_id())
+        global_config.bootstrap_compiler(pf.compiler)
+        global_config.bootstrap_runtime(pf.runtime)
+        global_config.bootstrap_machine(pf.machine)
+        global_config.bootstrap_criterion(pf.criterion)
+        global_config.bootstrap_group(pf.group)
 
-    # save this commanb block as global.
-    # any system.get(...) will use this block as root node
-    system.save_as_global(settings)
+    system.MetaConfig.root = global_config
 
     # from now, redirect stdout & stderr to the same logfile
-    if system.get('validation').tee:
-        log.init_tee(system.get('validation').output)
+    if global_config.get('validation').tee:
+        log.init_tee(global_config.get('validation').output)
 
     log.banner()
     log.print_header("Prepare Environment")
@@ -204,7 +204,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     pvRun.prepare()
 
     log.print_header("Process benchmarks")
-    if system.get('validation').reused_build is not None:
+    if global_config.get('validation').reused_build is not None:
         log.print_section("Reusing previously generated inputs")
         log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
     else:
@@ -220,14 +220,13 @@ def run(ctx, profilename, output, detach, status, resume, pause,
 
     log.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
-    archive = pvRun.terminate()
+    pvRun.terminate()
 
-
-    bank = system.get('validation').target_bank
+    bank = global_config.get('validation').target_bank
     if bank:
         log.print_item("Upload to the bank '{}'".format(bank.name))
         bank.connect_repository()
         bank.save_from_buildir(
-            system.get('validation').target_proj,
-            os.path.join(system.get('validation').output)
+            global_config.get('validation').target_proj,
+            os.path.join(global_config.get('validation').output)
         )

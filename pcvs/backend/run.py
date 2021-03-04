@@ -12,106 +12,52 @@ import yaml
 from addict import Dict
 
 from pcvs import BACKUP_NAMEDIR, BUILD_IDFILE, BUILD_NAMEDIR, ROOTPATH
-from pcvs.helpers import criterion, log, system, test, utils
+from pcvs.helpers import criterion, log, test, utils
+from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import TEDescriptor, TestFile
 from pcvs.orchestration import Orchestrator
 
 
 def __print_summary():
-    n = system.get('validation')
+    cfg = MetaConfig.root.validation
     log.print_section("Summary:")
-    log.print_item("Loaded profile: '{}'".format(n.pf_name))
-    log.print_item("Built into: {}".format(n.output))
+    log.print_item("Loaded profile: '{}'".format(cfg.pf_name))
+    log.print_item("Built into: {}".format(cfg.output))
     log.print_item("Verbosity: {}".format(
         log.get_verbosity_str().capitalize()))
     log.print_item("User directories:")
-    width = max([len(i) for i in n.dirs])
-    for k, v in system.get('validation').dirs.items():
+    width = max([len(i) for i in cfg.dirs])
+    for k, v in cfg.dirs.items():
         log.print_item("{:<{width}}: {:<{width}}".format(
             k.upper(),
             v,
             width=width),
             depth=2)
 
-
-def __build_tools():
-    archive_name = None
-    # Compute JCHRONOSS paths & store themf
-    val_node = system.get('validation')
-    src_prefix = os.path.join(val_node.output, "cache/src")
-    inst_prefix = os.path.join(val_node.output, "cache/install")
-    exec_prefix = os.path.join(val_node.output, "cache/exec")
-    # FIXME: Dirty way to locate the archive
-    # find & extract the jchronoss archive
-    for f in glob.glob(os.path.join(ROOTPATH, "../**/jchronoss-*"),
-                       recursive=True):
-        if 'jchronoss-' in f:
-            archive_name = os.path.join(ROOTPATH, f)
-            break
-
-    if archive_name is None:
-        log.err("JCHRONOSS source archive has not been found.",
-                "For development purpose, JCHRONOSS hasn't been added to PCVS",
-                "Please add manually the archive under {}".format(ROOTPATH))
-
-    tarfile.open(os.path.join(archive_name)).extractall(src_prefix)
-
-    # find the exact path to CMakeList.txt
-    src_prefix = os.path.dirname(glob.glob(os.path.join(
-        src_prefix, "jchronoss-*/CMakeLists.txt"))[0])
-    build_prefix = os.path.join(src_prefix, "build")
-
-    # CD to build dir
-    command = "".join([
-        "cmake {} -B{} -DCMAKE_INSTALL_PREFIX={}".format(src_prefix,
-                                                         build_prefix,
-                                                         inst_prefix),
-        " -DENABLE_OPENMP=OFF -DENABLE_COLOR={}".format(
-            "ON" if val_node.color else "OFF"
-        ),
-        " && make -C {} install".format(build_prefix)
-    ])
-    log.info("cmd: {}".format(command))
-    try:
-        _ = subprocess.check_call(
-            command, shell=True,
-            stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    except CalledProcessError:
-        log.err("Failed to build JCHRONOSS:")
-
-    utils.create_or_clean_path(exec_prefix)
-
-    val_node.jchronoss.src = src_prefix
-    val_node.jchronoss.exec = exec_prefix
-    val_node.jchronoss.install = inst_prefix
-
-
 def __check_defined_program_validity():
     # exhaustive list of user-defined program to exist before starting:
-    utils.check_valid_program(system.get(
-        'machine').job_manager.allocate.program)
-    utils.check_valid_program(system.get(
-        'machine').job_manager.allocate.wrapper)
-    utils.check_valid_program(system.get('machine').job_manager.run.program)
-    utils.check_valid_program(system.get('machine').job_manager.run.wrapper)
-    utils.check_valid_program(system.get('machine').job_manager.batch.program)
-    utils.check_valid_program(system.get('machine').job_manager.batch.wrapper)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.allocate.program)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.allocate.wrapper)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.run.program)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.run.wrapper)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.batch.program)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.batch.wrapper)
     return
     # TODO: need to handle package_manager commands to process below
     # maybe a dummy testfile should be used
-    utils.check_valid_program(system.get('compiler').commands.cc)
-    utils.check_valid_program(system.get('compiler').commands.cxx)
-    utils.check_valid_program(system.get('compiler').commands.fc)
-    utils.check_valid_program(system.get('compiler').commands.f77)
-    utils.check_valid_program(system.get('compiler').commands.f90)
-    utils.check_valid_program(system.get('runtime').program)
+    utils.check_valid_program(MetaConfig.root.compiler.commands.cc)
+    utils.check_valid_program(MetaConfig.root.compiler.commands.cxx)
+    utils.check_valid_program(MetaConfig.root.compiler.commands.fc)
+    utils.check_valid_program(MetaConfig.root.compiler.commands.f77)
+    utils.check_valid_program(MetaConfig.root.compiler.commands.f90)
+    utils.check_valid_program(MetaConfig.root.runtime.program)
 
 
 def prepare():
     log.print_section("Prepare environment")
     log.print_item("Date: {}".format(
-        system.get('validation').datetime.strftime("%c")))
-    valcfg = system.get('validation')
+        MetaConfig.root.validation.datetime.strftime("%c")))
+    valcfg = MetaConfig.root.validation
 
     log.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
@@ -153,7 +99,7 @@ def prepare():
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
 
-    system.get('validation').orchestrator = Orchestrator(system.get())
+    MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
 
 def __print_progbar_walker(elt):
@@ -192,7 +138,7 @@ def find_files_to_process(path_dict):
 def process():
     log.print_section("Load from filesystem")
     setup_files, yaml_files = find_files_to_process(
-        system.get('validation').dirs)
+        MetaConfig.root.validation.dirs)
 
     log.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
     log.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
@@ -203,9 +149,9 @@ def process():
 
     log.print_item("Checking for errors")
     if len(errors):
-        log.err("Issues while loading benchmarks:")
+        log.err("Issues while loading benchmarks:", abort=False)
         for elt in errors:
-            log.err("  - {}:  {}".format(elt[0], elt[1]))
+            log.err("  - {}:  {}".format(elt[0], elt[1]), abort=False)
         log.err("")
 
 
@@ -237,9 +183,9 @@ def process_dyn_setup_scripts(setup_files):
     err = []
     log.print_item("Convert configuation to Shell variables")
     env = os.environ.copy()
-    env.update(build_env_from_configuration(system.get()))
+    env.update(build_env_from_configuration(MetaConfig.root))
 
-    env_script = os.path.join(system.get('validation').output, 'conf.env')
+    env_script = os.path.join(MetaConfig.root.validation.output, 'conf.env')
     with open(env_script, 'w') as fh:
         fh.write(__str_dict_as_envvar(env))
         fh.close()
@@ -321,6 +267,7 @@ def process_static_yaml_files(yaml_files):
                 log.info("{}: {}".format(f, e.output))
                 continue
             except Exception as e:
+                err.append((f, e))
                 log.info("Failed to read {}: ".format(f), "{}".format(e))
     return err
 
@@ -328,63 +275,17 @@ def process_static_yaml_files(yaml_files):
 def run():
     __print_summary()
     log.print_item("Save Configurations into {}".format(
-        system.get('validation').output))
+        MetaConfig.root.validation.output))
 
-    conf_file = os.path.join(system.get('validation').output, "conf.yml")
+    conf_file = os.path.join(MetaConfig.root.validation.output, "conf.yml")
     with open(conf_file, 'w') as conf_fh:
-        yaml.dump(system.get().serialize(), conf_fh, default_flow_style=None)
+        yaml.dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
 
-    log.print_section("Run the Orchestrator (JCHRONOSS)")
-    system.get('validation').orchestrator.run()
-    log.warn("SUCCEEDED")
-    return
-
-    valcfg = system.get('validation')
-    macfg = system.get('machine')
-
-    launcher = ""
-    if 'wrapper' in macfg.job_manager.allocate:
-        launcher = "--launcher={}".format(macfg.job_manager.allocate.wrapper)
-
-    clauncher = ""
-    if 'wrapper' in macfg.job_manager.run:
-        clauncher = "--compil-launcher={}".format(
-            macfg.job_manager.run.wrapper)
-
-    cmd = [
-        os.path.join(valcfg.jchronoss.install, "bin/jchronoss"),
-        "--long-names",
-        "--verbosity={}".format(min(2, valcfg.verbose)),
-        "--build={}".format(valcfg.jchronoss.exec),
-        "--nb-resources={}".format(macfg.nodes),
-        "--nb-slaves={}".format(macfg.concurrent_run),
-        launcher,
-        clauncher,
-        "--output-format={}".format(",".join(valcfg.result.format)),
-        "--expect-success",
-        "--keep={}".format(valcfg.result.log),
-        "--policy={}".format(0),
-        "--maxt-slave={}".format(macfg.job_manager.maxtime),
-        "--mint-slave={}".format(macfg.job_manager.mintime),
-        "--size-flow={}".format(valcfg.result.logsz),
-        "--autokill={}".format(100000),
-        "--fake" if valcfg.simulated else ""
-    ] + valcfg.xmls
-
-    # Filtering is required to prune
-    # empty strings (translated to './.' through subprocess)
-    cmd = list(filter(None, cmd))
-
-    log.info("cmd: '{}'".format(" ".join(cmd)))
-    try:
-        subprocess.check_call(cmd)
-    except subprocess.CalledProcessError:
-        pass
-        # log.err("JCHRONOSS returned non-zero exit code!")
-
+    log.print_section("Run the Orchestrator")
+    MetaConfig.root.get_internal('orchestrator').run()
 
 def anonymize_archive():
-    config = system.get('validation')
+    config = MetaConfig.root.validation
     archive_prefix = os.path.join(config.output, 'save_for_export')
     outdir = config.output
     for root, _, files in os.walk(archive_prefix):
@@ -404,7 +305,7 @@ def anonymize_archive():
 
 
 def save_for_export(f, dest=None):
-    config = system.get('validation')
+    config = MetaConfig.root.validation
     # if dest is not given, 'dest' will be the same dirtree with
     # extra 'safe_for_export' sudir below 'outdir'
     # otherwise, just use the given dest instead of replacing
@@ -427,8 +328,8 @@ def save_for_export(f, dest=None):
 
 def terminate():
     archive_name = "pcvsrun_{}.tar.gz".format(
-        system.get('validation').datetime.strftime('%Y%m%d%H%M%S'))
-    outdir = system.get('validation').output
+        MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
+    outdir = MetaConfig.root.validation.output
     
     log.print_section("Exporting results")
 
@@ -436,7 +337,7 @@ def terminate():
         log.print_item("Generate webpages")
         try:
             cmd = [
-                os.path.join(system.get('validation').jchronoss.src,
+                os.path.join(MetaConfig.root.validation.jchronoss.src,
                              'tools/webview/webview_gen_all.sh'),
                 "--new={}".format(os.path.join(outdir, "test_suite"))
             ]
@@ -444,7 +345,7 @@ def terminate():
             subprocess.check_call(
                 cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             log.info("Browsing: {}".format(
-                os.path.join(system.get('validation').jchronoss.src,
+                os.path.join(MetaConfig.root.validation.jchronoss.src,
                              'tools/webview/webview/generated/main.html')))
         except (CalledProcessError, FileNotFoundError):
             pass
@@ -459,11 +360,11 @@ def terminate():
 
     save_for_export(os.path.join(outdir, 'conf.yml'))
     # save_for_export(os.path.join(outdir, 'conf.env'))
-    save_for_export(os.path.join(system.get('validation').jchronoss.src,
-                                 "tools/webview"),
-                    os.path.join(outdir, 'webview'))
+    #save_for_export(os.path.join(MetaConfig.root.validation.jchronoss.src,
+    #                             "tools/webview"),
+    #                os.path.join(outdir, 'webview'))
 
-    if system.get('validation').anonymize:
+    if MetaConfig.root.validation.anonymize:
         log.print_item("Anonymizing data")
         anonymize_archive()
 
@@ -497,22 +398,22 @@ def __copy_file(src, dest):
 
 
 def dup_another_build(build_dir, outdir):
-    settings = None
+    global_config = None
 
     # First, load the whole config
     with open(os.path.join(build_dir, 'conf.yml'), 'r') as fh:
         d = Dict(yaml.load(fh, Loader=yaml.FullLoader))
-        settings = system.Settings(d)
+        global_config = MetaConfig(d)
 
     # first, clear fields overridden by current run
-    settings.validation.xmls = []
-    settings.validation.output = outdir
-    settings.validation.reused_build = build_dir
+    global_config.get('validation').xmls = []
+    global_config.get('validation').output = outdir
+    global_config.get('validation').reused_build = build_dir
 
     # second, copy any xml/sh files to be reused
     for root, _, files, in os.walk(os.path.join(build_dir, "test_suite")):
         for f in files:
-            if f in ('dbg-pcvs.yml', 'list_of_tests.xml', 'list_of_tests.sh'):
+            if f in ('dbg-pcvs.yml', 'list_of_tests.sh'):
                 src = os.path.join(root, f)
                 dest = os.path.join(outdir,
                                     os.path.relpath(
@@ -523,7 +424,7 @@ def dup_another_build(build_dir, outdir):
                 __copy_file(src, dest)
 
                 if f == "list_of_tests.xml":
-                    settings.validation.xmls.append(dest)
+                    global_config.get('validation').xmls.append(dest)
 
     # other files
     for f in ('conf.env'):
@@ -538,4 +439,4 @@ def dup_another_build(build_dir, outdir):
 
         __copy_file(src, dest)
 
-    return settings
+    return global_config

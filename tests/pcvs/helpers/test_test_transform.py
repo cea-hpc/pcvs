@@ -4,7 +4,7 @@ import pytest
 from addict import Dict
 from unittest.mock import patch
 
-@patch('pcvs.helpers.system.get', return_value=Dict({
+@patch('pcvs.helpers.system.MetaConfig.root.compiler', return_value=Dict({
             'commands': {
                 'cc': 'CC',
                 'cxx': 'CXX',
@@ -36,7 +36,7 @@ def test_lang_detection(mock_sys):
                                       "/path/to/a.f08"]) == 'f08')
     
 
-@patch('pcvs.helpers.system.get', return_value=Dict({
+@patch('pcvs.helpers.system.MetaConfig.root.compiler', return_value=Dict({
             'variants': {
                 'openmp': {'args': '-fopenmp'},
                 'other_variant': {'args': '-fvariant'},

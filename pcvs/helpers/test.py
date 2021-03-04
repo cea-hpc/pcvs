@@ -11,9 +11,10 @@ import yaml
 from addict import Dict
 
 from pcvs import ROOTPATH
-from pcvs.helpers import log, system, test_transform, utils
+from pcvs.helpers import log, test_transform, utils, system
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.package_manager import PManager
+from pcvs.helpers.system import MetaConfig
 
 
 class TestFileError(Exception):
@@ -104,7 +105,7 @@ class TestFile:
         self._tests = list()
         self._debug = dict()
         if TestFile.val_scheme is None:
-            TestFile.val_scheme = utils.ValidationScheme('te')
+            TestFile.val_scheme = system.ValidationScheme('te')
         
     def process(self, check=True):
         """Load the YAML file and map YAML nodes to Test()"""
@@ -139,17 +140,18 @@ class TestFile:
         This function dumps the Shell file, used as JCHRONOSS test command
         manager"""
         fn_sh = os.path.join(self._path_out, "list_of_tests.sh")
-        
-        if TestFile.cc_pm_string == "" and system.get('compiler').obj:
+        cobj = MetaConfig.root.get_internal('compiler_pm')
+        if TestFile.cc_pm_string == "" and cobj:
             TestFile.cc_pm_string = "\n".join([
                     e.get(load=True, install=False)
-                    for e in system.get('compiler').obj
+                    for e in cobj
                 ])
         
-        if TestFile.rt_pm_string == "" and system.get('runtime').obj:
+        robj = MetaConfig.root.get_internal('runtime_pm')
+        if TestFile.rt_pm_string == "" and robj:
             TestFile.rt_pm_string = "\n".join([
                     e.get(load=True, install=False)
-                    for e in system.get('runtime').obj
+                    for e in robj
                 ])
 
         with open(fn_sh, 'w') as fh_sh:
@@ -164,7 +166,7 @@ class TestFile:
 
             for test in self._tests:
                 fh_sh.write(test.generate_script())
-                system.get('validation').orchestrator.add_new_job(test)
+                MetaConfig.root.get_internal('orchestrator').add_new_job(test)
 
             fh_sh.write(
                 '   --list)\n'
@@ -191,13 +193,13 @@ class TestFile:
                     operator.mul,
                     [
                         len(v['values'])
-                        for v in system.get('criterion').iterators.values()
+                        for v in MetaConfig.root.criterion.iterators.values()
                     ]
                 )
                 self._debug.setdefault('.system-values', {})
                 self._debug['.system-values'].setdefault('stats', {})
 
-                for c_k, c_v in system.get('criterion').iterators.items():
+                for c_k, c_v in MetaConfig.root.criterion.iterators.items():
                     self._debug[".system-values"][c_k] = c_v['values']
                 self._debug[".system-values"]['stats']['theoric'] = sys_cnt
                 yaml.dump(self._debug, fh, default_flow_style=None)
@@ -220,30 +222,31 @@ class Test:
     def get_dim(self, unit="n_node"):
         return self._array['nb_res']
 
-    def save_final_result(self, rc=0, out=None):
+    def save_final_result(self, rc=0, time=0.0, out=None):
         self._rc = rc
         self._out = out
+        self._time = time
         self._success = (self._rc == 0)
 
     def to_json(self):
         return {
             "id" : {
-                "te_name": self._te_name,
-                "label" : self._label,
-                "subtree" : self._subtree,
-                "full_name": self._fullname
+                "te_name": self._array["te_name"],
+                "label" : "TBD",
+                "subtree" : self._array["subtree"],
+                "full_name": self._array["name"]
             },
-            "exec": self._cmd,
+            "exec": self._array["command"],
             "result": {
-                "state": self._state,
+                "state": self._success,
                 "time": self._time,
-                "output": self._output
+                "output": self._out,
             },
             "data": {
-                "tags": self._tags,
-                "metrics": self._metrics,
-                "artifacts": self._artifacts,
-                "comb": ""
+                "tags": "TBD",
+                "metrics": "TBD",
+                "artifacts": "TBD",
+                "comb": "TBD"
             }
         }
     
@@ -310,7 +313,7 @@ class Test:
                     pm_code=pm_code,
                     pm_esc=pm_code.replace(r'$', r'\$').replace(r'`', r'\`'),
                     env_code=env_code,
-                    name=self._array['name'],
+                        name=self._array['name'],
                     cmd=self._array['command'],
                     finalize=final_code
                 )
@@ -321,7 +324,7 @@ class TEDescriptor:
     @classmethod
     def init_system_wide(cls, base_criterion_name):
         """Initialize system-wide information (to shorten accesses)"""
-        cls._sys_crit = system.get('criterion').obj.iterators
+        cls._sys_crit = MetaConfig.root.get_internal('crit_obj')
         cls._base_it = base_criterion_name
 
     def __init__(self, name, node, label, subprefix):
@@ -343,8 +346,8 @@ class TEDescriptor:
         # arregate the 'group' definitions with the TE
         # to get all the fields in their final form
         if 'group' in node:
-            assert(node['group'] in system.get('group').keys())
-            tmp = Dict(system.get('group')[node['group']])
+            assert(node['group'] in MetaConfig.root.group.keys())
+            tmp = Dict(MetaConfig.root.group[node['group']])
             tmp.update(Dict(node))
             node = tmp
         
@@ -459,7 +462,7 @@ class TEDescriptor:
         self._build.sources.binary = binary
 
         command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
-            cc=system.get('compiler').commands.get(lang, 'echo'),
+            cc=MetaConfig.root.compiler.commands.get(lang, 'echo'),
             var=test_transform.prepare_cmd_build_variants(self._build.variants),
             cflags=self._build.get('cflags', ''),
             files=" ".join(self._build.files),
@@ -486,10 +489,10 @@ class TEDescriptor:
             'PCVS_CFLAGS="{var} {cflags}" PCVS_LDFLAGS="{ldflags}"'.format(
                 path=basepath,
                 target=self._build.make.get('target', ''),
-                cc=system.get('compiler').commands.get('cc', ''),
-                cxx=system.get('compiler').commands.get('cxx', ''),
-                fc=system.get('compiler').commands.get('fc', ''),
-                cu=system.get('compiler').commands.get('cu', ''),
+                cc=MetaConfig.root.compiler.commands.get('cc', ''),
+                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
+                fc=MetaConfig.root.compiler.commands.get('fc', ''),
+                cu=MetaConfig.root.compiler.commands.get('cu', ''),
                 var=test_transform.prepare_cmd_build_variants(self._build.variants),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', '')
@@ -511,10 +514,10 @@ class TEDescriptor:
             r"-DCMAKE_BINARY_DIR='{build}' "
             r"-DCMAKE_MODULE_LINKER_FLAGS='{ldflags}' "
             r"-DCMAKE_SHARED_LINKER_FLAGS='{ldflags}'".format(
-                cc=system.get('compiler').commands.get('cc', ''),
-                cxx=system.get('compiler').commands.get('cxx', ''),
-                fc=system.get('compiler').commands.get('fc', ''),
-                cu=system.get('compiler').commands.get('cu', ''),
+                cc=MetaConfig.root.compiler.commands.get('cc', ''),
+                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
+                fc=MetaConfig.root.compiler.commands.get('fc', ''),
+                cu=MetaConfig.root.compiler.commands.get('cu', ''),
                 var=test_transform.prepare_cmd_build_variants(self._build.variants),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
@@ -551,10 +554,10 @@ class TEDescriptor:
             r"FC='{fc}' NVCC='{cu}' "
             r"CFLAGS='{var} {cflags}' LDFLAGS='{ldflags}' ".format(
                 configure=configure_path,
-                cc=system.get('compiler').commands.get('cc', ''),
-                cxx=system.get('compiler').commands.get('cxx', ''),
-                fc=system.get('compiler').commands.get('fc', ''),
-                cu=system.get('compiler').commands.get('cu', ''),
+                cc=MetaConfig.root.compiler.commands.get('cc', ''),
+                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
+                fc=MetaConfig.root.compiler.commands.get('fc', ''),
+                cu=MetaConfig.root.compiler.commands.get('cu', ''),
                 var=test_transform.prepare_cmd_build_variants(self._build.variants),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
@@ -601,6 +604,8 @@ class TEDescriptor:
         self._effective_cnt += 1
 
         yield Test(
+            te_name=self._te_name,
+            subtree=self._te_pkg,
             name=self._full_name,
             command=command,
             constraint=constraints,
@@ -645,8 +650,8 @@ class TEDescriptor:
                 chdir = self._run.cwd
 
             command = "{runtime} {runtime_args} {args} {program} {params}".format(
-                runtime=system.get('runtime').program,
-                runtime_args=system.get('runtime').get('args', ''),
+                runtime=MetaConfig.root.runtime.program,
+                runtime_args=MetaConfig.root.runtime.get('args', ''),
                 args=" ".join(args),
                 program=os.path.join(self._buildir, program),
                 params=" ".join(params)
@@ -655,11 +660,14 @@ class TEDescriptor:
             self._effective_cnt += 1
 
             yield Test(
+                te_name=self._te_name,
+                subtree=self._te_pkg,
                 name="_".join([self._full_name, comb.translate_to_str()]),
                 command=command,
                 dep=deps,
                 constraint=self._tags,
                 env=env,
+                nb_res=1,
                 time=self._validation.time.get("mean_time", None),
                 delta=self._validation.time.get("tolerance", None),
                 rc=self._validation.get("expect_exit", 0),

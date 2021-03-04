@@ -9,7 +9,7 @@ from addict import Dict
 
 from pcvs import ROOTPATH
 from pcvs.backend import config
-from pcvs.helpers import log, utils
+from pcvs.helpers import log, utils, system
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -130,7 +130,7 @@ class Profile:
             if kind not in self._details:
                 raise jsonschema.exceptions.ValidationError(
                     "Missing '{}' in profile".format(kind))
-            utils.ValidationScheme(kind).validate(self._details[kind], fail)
+            system.ValidationScheme(kind).validate(self._details[kind], fail)
 
     def flush_to_disk(self):
         self._retrieve_file()
