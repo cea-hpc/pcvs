@@ -18,7 +18,7 @@ def compl_bank_projects(ctx, args, incomplete):
     pvBank.init()
     array = list()
     for bankname, bankpath in compl_list_banks(None, None, ''):
-        bank = pvBank.Bank(name=bankname, is_new=False)
+        bank = pvBank.Bank(token=bankname, is_new=False)
         bank.connect_repository()
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
@@ -50,7 +50,7 @@ def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
     log.print_header("Bank View")
 
-    b = pvBank.Bank(name=name, is_new=False)
+    b = pvBank.Bank(token=name, is_new=False)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:

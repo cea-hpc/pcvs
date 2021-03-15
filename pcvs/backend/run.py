@@ -332,24 +332,7 @@ def terminate():
     outdir = MetaConfig.root.validation.output
     
     log.print_section("Exporting results")
-
-    if shutil.which("xsltproc") is not None:
-        log.print_item("Generate webpages")
-        try:
-            cmd = [
-                os.path.join(MetaConfig.root.validation.jchronoss.src,
-                             'tools/webview/webview_gen_all.sh'),
-                "--new={}".format(os.path.join(outdir, "test_suite"))
-            ]
-            log.info('cmd: {}'.format(" ".join(cmd)))
-            subprocess.check_call(
-                cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            log.info("Browsing: {}".format(
-                os.path.join(MetaConfig.root.validation.jchronoss.src,
-                             'tools/webview/webview/generated/main.html')))
-        except (CalledProcessError, FileNotFoundError):
-            pass
-
+    
     log.print_item("Prepare the archive")
     # copy file before anonymizing them
     for root, _, files in os.walk(os.path.join(outdir, "test_suite")):

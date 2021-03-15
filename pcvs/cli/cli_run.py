@@ -115,16 +115,11 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     if output is not None:
         output = os.path.abspath(output)
 
-    theBank = None
-    theProj = None
     if bank is not None:
-        array = bank.split('@', 1)
-        if len(array) > 1:
-            theProj = array[1]
-        theBank = pvBank.Bank(name=array[0])
-        if not theBank.exists():
+        obj = pvBank.Bank(token=bank, path=None)
+        if not obj.exists():
             log.err("'{}' bank does not exist".format(bank))
-
+    
 
     # parse non-run situations
     if pause and resume:
@@ -161,8 +156,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     val_cfg.set_ifdef('exported_to', bank)
     val_cfg.set_ifdef('tee', tee)
     val_cfg.set_ifdef('reused_build', dup)
-    val_cfg.set_ifdef('target_bank', theBank)
-    val_cfg.set_ifdef('target_proj', theProj)
+    val_cfg.set_ifdef('target_bank', bank)
     
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
@@ -222,11 +216,17 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     # post-actions to build the archive, post-process the webview...
     pvRun.terminate()
 
-    bank = global_config.get('validation').target_bank
-    if bank:
-        log.print_item("Upload to the bank '{}'".format(bank.name))
+    bankPath = global_config.get('validation').target_bank
+    
+    bank = pvBank.Bank(token=bankPath)
+    pref_proj = bank.preferred_proj
+    if bank.exists():
+        log.print_item("Upload to the bank '{}{}'".format(
+                bank.name.upper(),
+                " (@{})".format(pref_proj) if pref_proj else ""
+            ))
         bank.connect_repository()
         bank.save_from_buildir(
-            global_config.get('validation').target_proj,
+            None,
             os.path.join(global_config.get('validation').output)
         )

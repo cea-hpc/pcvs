@@ -17,18 +17,28 @@ BANKS = dict()
 BANK_STORAGE = ""
 
 class Bank:
-    def __init__(self, root_path=None, name="default", is_new=False):
-        self._root = root_path
+    def __init__(self, path=None, token="default", is_new=False):
+        self._root = path
         self._repo = None
         self._config = None
         self._rootree = None
-        self._name = name
         self._locked = False
+        self._preferred_proj = None
 
+        array = token.split('@', 1)
+        if len(array) > 1:
+            self._preferred_proj = array[1]
+        self._name = array[0]
+    
         global BANKS
         if self.exists():
-            self._root = BANKS[name.lower()]
-        
+            if self.name_exist():
+                self._root = BANKS[self._name.lower()]
+            else:
+                for k, v in BANKS.items():
+                    if v == self._root:
+                        self._name = k
+                        break
 
     @property
     def prefix(self):
@@ -38,8 +48,18 @@ class Bank:
     def name(self):
         return self._name
 
+    @property
+    def preferred_proj(self):
+        return self._preferred_proj
+
     def exists(self):
+        return self.name_exist() or self.path_exist()
+
+    def name_exist(self):
         return self._name.lower() in BANKS.keys()
+    
+    def path_exist(self):
+        return self._root in BANKS.values()
 
     def list_projects(self):
         INVALID_REFS = ["refs/heads/master"]
@@ -214,6 +234,10 @@ class Bank:
         # a reference (lightweight branch) is tracking a whole test-suite
         # history, there are managed directly
         # TODO: compute the proper name for the current test-suite
+        if tag is None:
+            tag = self._preferred_proj
+            if tag is None:
+                tag = "unknown"
         refname = "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
 
         # check if the current reference already exit.
@@ -239,6 +263,13 @@ class Bank:
         # --> create the reference to track history
         if ref.name is None:
             self._repo.references.create(refname, coid)
+
+    def __repr__(self):
+        return {
+            'rootpath': self._root,
+            'name': self._name,
+            'locked': self._locked
+        }
 
 def init():
     """Called when program initializes. Detects defined banks in

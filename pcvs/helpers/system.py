@@ -7,6 +7,7 @@ from addict import Dict
 
 from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR, ROOTPATH
 from pcvs.helpers import log, package_manager, utils
+import pcvs
 
 
 ####################################
@@ -81,8 +82,16 @@ class Config(Dict):
     def isset(self, k):
         return k in self
     
-    def to_dict(self, prune=True):
-        return super().to_dict()
+    def to_dict(self):
+        # this dirty hack is due to a type(self) used into addict.py
+        # leading to misconvert derived classes from Dict()
+        # --> to_dict() checks if a sub-value is instance of type(self)
+        # In our case here, type(self) return Config(), addict not converting
+        # sub-Dict() into dict(). This double call to to_dict() seems
+        # to fix the issue. But an alternative to addict should be used
+        # (customly handled ?)
+        copy = Dict(super().to_dict())
+        return copy.to_dict()
 
     def from_dict(self, d):
         for k, v in d.items():
@@ -223,6 +232,7 @@ class MetaConfig(Dict):
             if k == '__internal':
                 continue
             # should ignore __internal
-            res[k] = v
+            res[k] = v.to_dict()
+        
         return res.to_dict()
 
