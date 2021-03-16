@@ -4,19 +4,20 @@ import pytest
 from addict import Dict
 from unittest.mock import patch
 
-@patch('pcvs.helpers.system.MetaConfig.root.compiler', return_value=Dict({
-            'commands': {
-                'cc': 'CC',
-                'cxx': 'CXX',
-                'fc': 'FC',
-                'f77': 'F77',
-                'f90': 'F90',
-                'f95': 'F95',
-                'f03': 'F03',
-                'f08': 'F08'
-            }
-        }))
-def test_lang_detection(mock_sys):
+@patch('pcvs.helpers.system.MetaConfig.root', Dict({
+            'compiler': {
+                'commands': {
+                    'cc': 'CC',
+                    'cxx': 'CXX',
+                    'fc': 'FC',
+                    'f77': 'F77',
+                    'f90': 'F90',
+                    'f95': 'F95',
+                    'f03': 'F03',
+                    'f08': 'F08'
+                }
+        }}))
+def test_lang_detection():
     assert(tested.detect_source_lang(["/path/to/nothing.valid"]) == 'cc')
     assert(tested.detect_source_lang(["/path/to/a.c"]) == 'cc')
     assert(tested.detect_source_lang(["/path/to/a.h"]) == 'cc')
@@ -36,14 +37,15 @@ def test_lang_detection(mock_sys):
                                       "/path/to/a.f08"]) == 'f08')
     
 
-@patch('pcvs.helpers.system.MetaConfig.root.compiler', return_value=Dict({
-            'variants': {
-                'openmp': {'args': '-fopenmp'},
-                'other_variant': {'args': '-fvariant'},
-                'all_errors': {'args': '-Werror'}
-            }
-        }))
-def test_build_variants(mock_sys):
+@patch('pcvs.helpers.system.MetaConfig.root', Dict({
+            'compiler': {
+                'variants': {
+                    'openmp': {'args': '-fopenmp'},
+                    'other_variant': {'args': '-fvariant'},
+                    'all_errors': {'args': '-Werror'}
+                }
+            }}))
+def test_build_variants():
     assert("-fopenmp" in tested.prepare_cmd_build_variants(['openmp']))
 
     s = tested.prepare_cmd_build_variants(['openmp', 'all_errors'])
