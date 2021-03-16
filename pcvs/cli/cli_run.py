@@ -217,16 +217,16 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     pvRun.terminate()
 
     bankPath = global_config.get('validation').target_bank
-    
-    bank = pvBank.Bank(token=bankPath)
-    pref_proj = bank.preferred_proj
-    if bank.exists():
-        log.print_item("Upload to the bank '{}{}'".format(
-                bank.name.upper(),
-                " (@{})".format(pref_proj) if pref_proj else ""
-            ))
-        bank.connect_repository()
-        bank.save_from_buildir(
-            None,
-            os.path.join(global_config.get('validation').output)
-        )
+    if bankPath:
+        bank = pvBank.Bank(path=bankPath)
+        pref_proj = bank.preferred_proj
+        if bank.exists():
+            log.print_item("Upload to the bank '{}{}'".format(
+                    bank.name.upper(),
+                    " (@{})".format(pref_proj) if pref_proj else ""
+                ))
+            bank.connect_repository()
+            bank.save_from_buildir(
+                None,
+                os.path.join(global_config.get('validation').output)
+            )
