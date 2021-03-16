@@ -140,14 +140,14 @@ class TestFile:
         This function dumps the Shell file, used as JCHRONOSS test command
         manager"""
         fn_sh = os.path.join(self._path_out, "list_of_tests.sh")
-        cobj = MetaConfig.root.get_internal('compiler_pm')
+        cobj = MetaConfig.root.get_internal('cc_pm')
         if TestFile.cc_pm_string == "" and cobj:
             TestFile.cc_pm_string = "\n".join([
                     e.get(load=True, install=False)
                     for e in cobj
                 ])
         
-        robj = MetaConfig.root.get_internal('runtime_pm')
+        robj = MetaConfig.root.get_internal('rt_pm')
         if TestFile.rt_pm_string == "" and robj:
             TestFile.rt_pm_string = "\n".join([
                     e.get(load=True, install=False)

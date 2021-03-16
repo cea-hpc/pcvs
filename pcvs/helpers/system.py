@@ -131,13 +131,13 @@ class MetaConfig(Dict):
     def bootstrap_compiler(self, node):
         subtree = self.bootstrap_generic('compiler', node)
         if 'package_manager' in subtree:
-            subtree.obj = package_manager.identify(subtree.package_manager)
+            self.set_internal('cc_pm', package_manager.identify(subtree.package_manager))
         return subtree
 
     def bootstrap_runtime(self, node):
         subtree = self.bootstrap_generic('runtime', node)
         if 'package_manager' in subtree:
-            subtree.obj = package_manager.identify(subtree.package_manager)
+            self.set_internal('rt_pm', package_manager.identify(subtree.package_manager))
         return subtree
     
     def bootstrap_group(self, node):
