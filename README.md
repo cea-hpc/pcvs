@@ -105,3 +105,25 @@ tox -l # available testenvs:
 	imports  #code proper imports
 	docs   # properly formatted RST documentation
 ```
+
+### Installation Troubleshooting
+
+#### Pygit2 issue(s)
+
+Cannot install pygit2 when running `pip install`. Error is of this kind:
+
+```
+-> error: git2.h: No such file or directory
+-> error: #error You need a compatible libgit2 version (1.1.x)
+```
+
+PCVS depends on pygit2 to deal with banks, pygit2 itself depending on libgit2
+(libs & dev). It is possible to manually install libgit2 (both libs &
+dev), but be aware that pygit2 >= 1.2.0 requires libgit2 >= 1.0.0.
+The latter may not be available on some systems, be sure to check out the proper
+version compatible with your pygit2 installation.
+
+Still, we recommend to rely on wheel packages to avoid installing extra third-party
+tools. `pip3` is the best solution. An important note: some `pip3` versions have
+issues when dealing with wheels, please ensure to update it before reporting any
+bugs. (`pip3 install --upgrade pip`)
