@@ -5,9 +5,9 @@ import os
 import click
 import pkg_resources
 
-from pcvs.backend import bank, config, profile
+from pcvs.backend import bank, config, profile, run
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
-                      cli_utilities)
+                      cli_utilities, cli_session)
 from pcvs.helpers import log, utils
 
 CONTEXT_SETTINGS = dict(
@@ -63,6 +63,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     config.init()
     profile.init()
     bank.init()
+    run.init()
 
 
 @cli.command(
@@ -102,6 +103,7 @@ cli.add_command(cli_config.config)
 cli.add_command(cli_profile.profile)
 cli.add_command(cli_run.run)
 cli.add_command(cli_bank.bank)
+cli.add_command(cli_session.session)
 cli.add_command(cli_utilities.exec)
 cli.add_command(cli_utilities.check)
 cli.add_command(cli_utilities.clean)

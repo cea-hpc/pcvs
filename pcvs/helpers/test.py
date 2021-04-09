@@ -206,11 +206,30 @@ class TestFile:
 
 
 class Test:
+    STATE_OTHER = -1
+    STATE_NOT_EXECUTED = 0
+    STATE_SUCCEED = 1
+    STATE_FAILED = 2
+    STATE_INVALID_SPEC = 3
+
+    _strstate = {
+        STATE_OTHER: 'OTHER',
+        STATE_NOT_EXECUTED: 'NOT_EXEC',
+        STATE_SUCCEED: 'SUCCESS',
+        STATE_FAILED: 'FAILURE',
+        STATE_INVALID_SPEC: 'INVALID'
+    }
+
     """A basic test representation, from one step to concretize the logic
     to the JCHRONOSS input datastruct."""
     def __init__(self, **kwargs):
         """register a new test"""
         self._array = kwargs
+        self._executed = False
+        self._rc = 0
+        self._time = 0.0
+        self._out = None
+        self._state = self.STATE_NOT_EXECUTED
     
     def override_cmd(self, cmd):
         self._array['command'] = cmd
@@ -218,6 +237,10 @@ class Test:
     @property
     def name(self):
         return self._array['name']
+
+    @property
+    def command(self):
+        return self._array['command']
         
     def get_dim(self, unit="n_node"):
         return self._array['nb_res']
@@ -226,7 +249,23 @@ class Test:
         self._rc = rc
         self._out = out
         self._time = time
-        self._success = (self._rc == 0)
+
+    def executed(self):
+        if self._state == self.STATE_NOT_EXECUTED:
+            self._state = self.STATE_OTHER
+
+        self._executed = True
+
+    def been_executed(self):
+        return self._executed
+    
+    @property
+    def state(self):
+        return self._state
+    
+    @property
+    def strstate(self):
+        return self._strstate[self._state]
 
     def to_json(self):
         return {
@@ -238,7 +277,7 @@ class Test:
             },
             "exec": self._array["command"],
             "result": {
-                "state": self._success,
+                "state": self._state if self._executed else STATE_NOT_EXECUTED,
                 "time": self._time,
                 "output": self._out,
             },

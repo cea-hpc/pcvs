@@ -57,7 +57,6 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
     base = os.path.basename(abspath)
     return ['a' for p in next(os.walk(d))[1] if p.startswith(base)]
 
-
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cli_profile.compl_list_token,
@@ -76,17 +75,8 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
               default=None, is_flag=True,
               help="Save stdout/stderr in a file in addition to terminal")
 @click.option("--detach", "detach",
-              default=True, is_flag=True, show_envvar=True,
-              help="Run the validation asynchronously (WIP)")
-@click.option("--status", "status",
               default=False, is_flag=True, show_envvar=True,
-              help="Display current run progression (WIP)")
-@click.option("-P", "--pause", "pause",
-              default=None, is_flag=True, show_envvar=True,
-              help="Pause the current run (WIP)")
-@click.option("-R", "--resume", "resume",
-              default=None, is_flag=True, show_envvar=True,
-              help="Resume a previously paused run (WIP)")
+              help="Run the validation asynchronously (WIP)")
 @click.option("-f/-F", "--override/--no-override", "override",
               default=False, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
@@ -104,9 +94,8 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, detach, status, resume, pause,
-        override, tee, anon, validation_file, simulated, bank, dup,
-        set_default, dirs) -> None:
+def run(ctx, profilename, output, detach, override, tee, anon, validation_file,
+        simulated, bank, dup, set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -114,6 +103,10 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     May also be provided as a list of directories as described by tests
     found in LIST_OF_DIRS.
     """
+    if set_default:
+        utils.open_in_editor(system.MetaConfig.validation_default_file)
+        exit(0)
+
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
@@ -122,26 +115,12 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         obj = pvBank.Bank(token=bank, path=None)
         if not obj.exists():
             log.err("'{}' bank does not exist".format(bank))
+        else:
+            bank = obj.prefix
     
 
-    # parse non-run situations
-    if pause and resume:
-        raise click.BadOptionUsage("--pause/--resume",
-                "Cannot pause and resume the run at the same time!")
-    elif pause:
-        log.nimpl("pause")
-        exit(0)
-    elif resume:
-        log.nimpl("resume")
-        exit(0)
-    elif status:
-        log.nimpl("status")
-        exit(0)
-    elif set_default:
-        utils.open_in_editor(system.MetaConfig.validation_default_file)
-        exit(0)
 
-    global_config = system.MetaConfig()
+    global_config = system.MetaConfig()        
 
     # then init the configuration
     val_cfg = global_config.bootstrap_validation_from_file(validation_file)
@@ -191,6 +170,12 @@ def run(ctx, profilename, output, detach, status, resume, pause,
 
     system.MetaConfig.root = global_config
 
+    the_session = pvRun.Session()
+    if detach:
+        the_session.detach()
+
+    #the_session.enable_tee()
+
     # from now, redirect stdout & stderr to the same logfile
     if global_config.get('validation').tee:
         log.init_tee(global_config.get('validation').output)
@@ -198,7 +183,7 @@ def run(ctx, profilename, output, detach, status, resume, pause,
     log.banner()
     log.print_header("Prepare Environment")
     # prepare PCVS and third-party tools
-    pvRun.prepare()
+    the_session.prepare()
 
     log.print_header("Process benchmarks")
     if global_config.get('validation').reused_build is not None:
@@ -206,18 +191,18 @@ def run(ctx, profilename, output, detach, status, resume, pause,
         log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
     else:
         start = time.time()
-        pvRun.process()
+        the_session.process()
         end = time.time()
         log.print_section(
                 "===> Processing done in {:<.3f} sec(s)".format(end-start))
     
     log.print_header("Validation Start")
     # real RUN !!
-    pvRun.run()
+    the_session.run()
 
     log.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
-    pvRun.terminate()
+    the_session.terminate()
 
     bankPath = global_config.get('validation').target_bank
     if bankPath:

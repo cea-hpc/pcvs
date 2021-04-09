@@ -139,7 +139,8 @@ def process_check_yaml_stream(data):
 
 def process_check_directory(dir):
     errors = dict()
-    setup_files, yaml_files = run.find_files_to_process(
+    session = run.Session()
+    setup_files, yaml_files = session.find_files_to_process(
         {os.path.basename(dir): dir})
 
     if setup_files:
