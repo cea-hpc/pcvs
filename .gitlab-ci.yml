@@ -20,18 +20,11 @@ stages:
 - misc
 - lint
 
-clean:
-    <<: *scope
-    stage: warmup
-    allow_failure: true
-    script:
-    - tox -e clean
-
 flake8:
     <<: *scope
     stage: lint
     script:
-    - tox -e lint
+    - tox -e py-lint
 yaml:
     <<: *scope
     stage: lint
@@ -42,19 +35,19 @@ cli:
     <<: *scope
     stage: tests
     script:
-    - tox -e tests cli
+    - tox -- cli
 
 backend:
     <<: *scope
     stage: tests
     script:
-    - tox -e tests backend
+    - tox -- backend
 
 helpers:
     <<: *scope
     stage: tests
     script:
-    - tox -e tests helpers
+    - tox -- helpers
 
       #converter:
       #    <<: *scope
@@ -63,16 +56,6 @@ helpers:
       #    script:
       #    - pip install -e .
       #    - pytest ./tests/pcvs/converter
-
-coverage:
-    <<: *scope
-    stage: misc
-    allow_failure: true
-    artifacts:
-        paths:
-        - .coverage
-    script:
-    - tox -e report
 
 documentation:
     <<: *scope
@@ -85,4 +68,4 @@ imports:
     stage: misc
     allow_failure: true
     script:
-    - tox -e imports
+    - tox -e order_imports
