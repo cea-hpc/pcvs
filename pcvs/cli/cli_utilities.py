@@ -7,7 +7,7 @@ from datetime import datetime
 import click
 from prettytable import PrettyTable
 
-from pcvs import BUILD_IDFILE
+from pcvs import NAME_BUILDFILE
 from pcvs.backend import utilities as pvUtils
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
@@ -106,7 +106,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
         log.print_section("Prepare the environment")
         # first, replace build dir with a temp one
         settings = MetaConfig()
-        cfg_val = settings.bootstrap_validation()
+        cfg_val = settings.bootstrap_validation({})
         cfg_val.set_ifdef('output', "/tmp/test")
         errors = {**errors, **pvUtils.process_check_directory(dir)}
 
@@ -159,7 +159,7 @@ def clean(ctx, force, fake, paths, interactive):
     for path in paths:
         for root, dirs, files in os.walk(path):
             # current root need to be cleaned
-            if BUILD_IDFILE in files:
+            if NAME_BUILDFILE in files:
                 log.print_section("Found build: {}".format(root))
                 for f in files:
                     if f.startswith('pcvsrun_') and f.endswith('.tar.gz'):

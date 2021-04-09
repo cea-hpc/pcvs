@@ -7,7 +7,7 @@ import jsonschema
 import yaml
 from addict import Dict
 
-from pcvs import ROOTPATH
+from pcvs import PATH_INSTDIR
 from pcvs.backend import config
 from pcvs.helpers import log, utils, system
 
@@ -120,7 +120,7 @@ class Profile:
     def load_template(self):
         self._exists = True
         self._file = os.path.join(
-            ROOTPATH,
+            PATH_INSTDIR,
             'templates/profile-format.yml')
         with open(self._file, 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))

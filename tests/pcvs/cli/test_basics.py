@@ -1,7 +1,7 @@
 import os
 
 import click
-from pcvs import BACKUP_NAMEDIR
+from pcvs import NAME_SRCDIR
 import pytest
 import logging
 import pcvs
@@ -55,7 +55,7 @@ def test_local_path(caplog):
     caplog.set_level(logging.DEBUG)
     with isolated_fs():
         res = click_call('-v', 'config', 'list')
-        assert("LOCAL: " + os.getcwd() + '/' + BACKUP_NAMEDIR in caplog.text)
+        assert("LOCAL: " + os.getcwd() + '/' + NAME_SRCDIR in caplog.text)
 
 
 def test_bad_command():

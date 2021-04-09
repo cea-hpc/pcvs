@@ -1,6 +1,10 @@
 import os
 
-BACKUP_NAMEDIR = ".pcvs"
-BUILD_NAMEDIR = ".pcvs-build"
-BUILD_IDFILE = ".pcvs-isbuilddir"
-ROOTPATH = os.path.join(os.path.dirname(__file__))
+NAME_BUILDIR = ".pcvs-build"
+NAME_BUILDFILE = ".pcvs-isbuilddir"
+NAME_SRCDIR = ".pcvs"
+
+PATH_INSTDIR = os.path.dirname(__file__)
+PATH_HOMEDIR = os.path.join(os.environ['HOME'], NAME_SRCDIR)
+PATH_SESSION = os.path.join(PATH_HOMEDIR, "session.yml")
+PATH_VALCFG = os.path.join(PATH_HOMEDIR, "validation.yml")

@@ -1,9 +1,9 @@
 from flask import Flask, abort, jsonify, render_template, request
 import os
-from pcvs import ROOTPATH
+from pcvs import PATH_INSTDIR
 
 def create_app(global_tree=None, test_config=None):
-    app = Flask(__name__, template_folder=os.path.join(ROOTPATH, "webview/templates"))
+    app = Flask(__name__, template_folder=os.path.join(PATH_INSTDIR, "webview/templates"))
 
     #app.config.from_object(...)
     @app.route('/about')

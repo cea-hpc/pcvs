@@ -7,7 +7,7 @@ import jsonschema
 import yaml
 from prettytable import PrettyTable
 
-from pcvs import BUILD_NAMEDIR
+from pcvs import NAME_BUILDIR
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, utils, system
 from pcvs.helpers.log import utf
@@ -15,7 +15,7 @@ from pcvs.helpers.log import utf
 
 def locate_scriptpaths(output=None):
     if output is None:
-        output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
+        output = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
     scripts = list()
     for root, _, files in os.walk(output):
         for f in files:
@@ -26,7 +26,7 @@ def locate_scriptpaths(output=None):
 
 def compute_scriptpath_from_testname(testname, output=None):
     if output is None:
-        output = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
+        output = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
     prefix = os.path.dirname(testname)
     return os.path.join(
         output,

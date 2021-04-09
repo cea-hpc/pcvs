@@ -5,9 +5,9 @@ import yaml
 import jsonschema
 from addict import Dict
 
-from pcvs import BACKUP_NAMEDIR, BUILD_NAMEDIR, ROOTPATH
-from pcvs.helpers import log, package_manager, utils
 import pcvs
+from pcvs import NAME_SRCDIR, NAME_BUILDIR, PATH_INSTDIR
+from pcvs.helpers import log, package_manager, utils
 
 
 ####################################
@@ -21,7 +21,7 @@ class ValidationScheme:
 
         if cls.avail_list is None:
             cls.avail_list = list()
-            for f in os.listdir(os.path.join(ROOTPATH, 'schemes/')):
+            for f in os.listdir(os.path.join(PATH_INSTDIR, 'schemes/')):
                 cls.avail_list.append(f.replace('-scheme.yml', ''))
         
         return cls.avail_list
@@ -30,7 +30,7 @@ class ValidationScheme:
         self._prefix = name
 
         with open(os.path.join(
-                            ROOTPATH,
+                            PATH_INSTDIR,
                             'schemes/{}-scheme.yml'.format(name)
                         ), 'r') as fh:
             self._scheme = yaml.load(fh, Loader=yaml.FullLoader)
@@ -105,7 +105,7 @@ class Config(Dict):
 
 class MetaConfig(Dict):
     root = None
-    validation_default_file = os.path.join(os.environ['HOME'], BACKUP_NAMEDIR, "validation.yml")
+    validation_default_file = pcvs.PATH_VALCFG
     
     def __init__(self, base={}, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,7 +164,7 @@ class MetaConfig(Dict):
         subtree.set_nosquash('verbose', 0)
         subtree.set_nosquash('color', True)
         subtree.set_nosquash('pf_name', 'default')
-        subtree.set_nosquash('output', os.path.join(os.getcwd(), BUILD_NAMEDIR))
+        subtree.set_nosquash('output', os.path.join(os.getcwd(), NAME_BUILDIR))
         subtree.set_nosquash('background', False)
         subtree.set_nosquash('override', False)
         subtree.set_nosquash('dirs', '.')

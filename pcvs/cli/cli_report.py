@@ -2,7 +2,7 @@ import os
 
 import click
 
-from pcvs import BUILD_IDFILE, BUILD_NAMEDIR
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR
 from pcvs.backend import report as pvReport
 from pcvs.helpers import log
 
@@ -15,9 +15,9 @@ from pcvs.helpers import log
 def report(ctx, mode, path):
     inputs = list()
     if path is None:
-        path = os.path.join(os.getcwd(), BUILD_NAMEDIR)
+        path = os.path.join(os.getcwd(), NAME_BUILDIR)
 
-    if not os.path.isfile(os.path.join(path, BUILD_IDFILE)):
+    if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
         log.err('{} is not a build directory. Abort.'.format(path))
 
     path = os.path.join(path, 'test_suite')

@@ -1,5 +1,5 @@
 from pcvs.backend import utilities as tested
-from pcvs import BUILD_NAMEDIR
+from pcvs import NAME_BUILDIR
 import pytest
 import os
 from unittest.mock import patch
@@ -33,5 +33,5 @@ def test_locate_scriptpaths(prefix):
 def test_compute_scriptpath(testname, prefix):
     result = tested.compute_scriptpath_from_testname(testname, prefix)
     if prefix is None:
-        prefix = os.path.join(os.getcwd(), BUILD_NAMEDIR, "test_suite")
+        prefix = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
     assert(result == os.path.join(prefix, os.path.dirname(testname), "list_of_tests.sh" ))

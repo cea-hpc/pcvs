@@ -7,7 +7,7 @@ import jsonschema
 import yaml
 from addict import Dict
 
-from pcvs import ROOTPATH
+from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, utils, system
 
 CONFIG_STORAGES = dict()
@@ -134,7 +134,7 @@ class ConfigurationBlock:
     def load_template(self):
         self._exists = True
         self._file = os.path.join(
-            ROOTPATH,
+            PATH_INSTDIR,
             'templates/{}-format.yml'.format(self._kind))
         with open(self._file, 'r') as fh:
             self.fill(yaml.load(fh, Loader=yaml.FullLoader))

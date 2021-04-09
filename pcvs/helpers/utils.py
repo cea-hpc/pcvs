@@ -9,7 +9,7 @@ import socket
 import yaml
 import pygit2
 
-from pcvs import BACKUP_NAMEDIR, ROOTPATH
+from pcvs import NAME_SRCDIR, PATH_INSTDIR
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 
@@ -17,9 +17,9 @@ from pcvs.helpers.system import MetaConfig
 ##    STORAGE SCOPE MANAGEMENT    ##
 ####################################
 STORAGES = {
-    'global': ROOTPATH,
-    'user': os.path.join(os.environ['HOME'], BACKUP_NAMEDIR),
-    'local': os.path.join(os.getcwd(), BACKUP_NAMEDIR)
+    'global': PATH_INSTDIR,
+    'user': os.path.join(os.environ['HOME'], NAME_SRCDIR),
+    'local': os.path.join(os.getcwd(), NAME_SRCDIR)
 }
 
 
@@ -84,11 +84,11 @@ def __determine_local_prefix(path, prefix):
 
 def set_local_path(path):
     assert (os.path.isdir(path))
-    found = __determine_local_prefix(path, BACKUP_NAMEDIR)
+    found = __determine_local_prefix(path, NAME_SRCDIR)
 
     # if local is the same as user path, discard
     if found in STORAGES.values():
-        found = os.path.join(path, BACKUP_NAMEDIR)
+        found = os.path.join(path, NAME_SRCDIR)
     STORAGES['local'] = found
 
 ####################################

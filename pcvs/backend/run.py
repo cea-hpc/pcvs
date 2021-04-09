@@ -11,7 +11,7 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvs import BACKUP_NAMEDIR, BUILD_IDFILE, BUILD_NAMEDIR, ROOTPATH
+from pcvs import NAME_SRCDIR, NAME_BUILDFILE, NAME_BUILDIR, PATH_SESSION
 from pcvs.helpers import criterion, log, test, utils
 from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import TEDescriptor, TestFile
@@ -71,7 +71,7 @@ def prepare():
                 log.print_item("Cleaning up {}".format(buildir), depth=2)
                 utils.create_or_clean_path(buildir)
             utils.create_or_clean_path(os.path.join(
-                valcfg.output, BUILD_IDFILE), is_dir=False)
+                valcfg.output, NAME_BUILDFILE), is_dir=False)
             utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
             utils.create_or_clean_path(os.path.join(
                 valcfg.output, 'conf.yml'), is_dir=False)
@@ -84,7 +84,7 @@ def prepare():
     os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
-    open(os.path.join(valcfg.output, BUILD_IDFILE), 'w').close()
+    open(os.path.join(valcfg.output, NAME_BUILDFILE), 'w').close()
 
     #log.print_section("Build third-party tools")
     #__build_tools()
@@ -120,7 +120,7 @@ def find_files_to_process(path_dict):
         for root, dirs, list_files in os.walk(path):
             last_dir = os.path.basename(root)
             # if the current dir is a 'special' one, discard
-            if last_dir in [BACKUP_NAMEDIR, BUILD_NAMEDIR, "build_scripts"]:
+            if last_dir in [NAME_SRCDIR, NAME_BUILDIR, "build_scripts"]:
                 log.debug("skip {}".format(root))
                 # set dirs to null, avoiding os.wal() to go further in that dir
                 dirs[:] = []

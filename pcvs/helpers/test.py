@@ -10,7 +10,7 @@ import jsonschema
 import yaml
 from addict import Dict
 
-from pcvs import ROOTPATH
+from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, test_transform, utils, system
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.package_manager import PManager
@@ -29,7 +29,7 @@ def __load_yaml_file_legacy(f):
     by relying on external converter (not perfect).
     """
     # Special case: old files required non-existing tags to be resolved
-    old_group_file = os.path.join(ROOTPATH, "templates/group-compat.yml")
+    old_group_file = os.path.join(PATH_INSTDIR, "templates/group-compat.yml")
 
     proc = subprocess.Popen(
         "pcvs_convert '{}' --stdout -k te -t '{}'".format(
