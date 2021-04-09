@@ -4,5 +4,6 @@ tox
 flake8
 coverage
 yamllint
+isort
 sphinx
 sphinx_rtd_theme

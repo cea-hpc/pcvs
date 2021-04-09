@@ -123,7 +123,8 @@ dev), but be aware that pygit2 >= 1.2.0 requires libgit2 >= 1.0.0.
 The latter may not be available on some systems, be sure to check out the proper
 version compatible with your pygit2 installation.
 
-Still, we recommend to rely on wheel packages to avoid installing extra third-party
+Still, we recommend to rely on wheel packages to avoid installing extra
+third-party 
 tools. `pip3` is the best solution. An important note: some `pip3` versions have
 issues when dealing with wheels, please ensure to update it before reporting any
 bugs. (`pip3 install --upgrade pip`)
