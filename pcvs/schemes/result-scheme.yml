@@ -7,7 +7,7 @@ properties:
       type: object
       properties:
         id:
-          type: object:
+          type: object
           properties:
             label: {"type": "string"}
             subtree: {"type": "string"}
@@ -27,7 +27,7 @@ properties:
           additionalProperties: false
           required: ["state", "time"]
         data:
-          type: object:
+          type: object
           properties:
             tags:
               type: array
