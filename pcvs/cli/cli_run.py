@@ -167,13 +167,14 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
 
     system.MetaConfig.root = global_config
 
-    the_session = pvSession.Session()
+    the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=os.path.join(
                                             global_config.validation.output,
                                             'out.log'
                                           ))
     if detach:
-        the_session.run_detached()
+        sid = the_session.run_detached(the_session)
+        log.print_item("Session successfully started, ID {}".format(sid))
     else:
-        the_session.run()
+        the_session.run(the_session)

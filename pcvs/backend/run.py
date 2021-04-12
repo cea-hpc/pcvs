@@ -17,6 +17,7 @@ from pcvs.helpers import criterion, log, test, utils
 from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import TEDescriptor, TestFile
 from pcvs.backend import bank as pvBank
+from pcvs.backend import session as pvSession
 from pcvs.orchestration import Orchestrator
 
 
@@ -36,7 +37,7 @@ def copy_file(src, dest):
     except SameFileError:
         pass
 
-def process_main_workflow():
+def process_main_workflow(the_session=None):
     global_config = MetaConfig.root
 
     log.banner()

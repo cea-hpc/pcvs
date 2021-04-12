@@ -84,6 +84,7 @@ def get_verbosity_str():
 def __set_encoding(e):
     global glyphs
     if e and 'utf-' in locale.getpreferredencoding().lower():
+        
         glyphs['copy'] = '\u00A9'
         glyphs['item'] = '\u27E2'
         glyphs['sec'] = '\u2756'
@@ -97,7 +98,7 @@ def __set_encoding(e):
         glyphs['empty_pg'] = click.style("\u25E6", bold=True, fg="bright_black")
         glyphs['sep_v'] = " \u237F "
         glyphs['sep_h'] = "\u23BC"
-        glyphs['spin'] = glyphs["time"]
+        glyphs['spin'] = glyphs['time']
     else:
         glyphs = {
             'copy': '(c)',
