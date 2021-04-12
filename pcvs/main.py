@@ -5,7 +5,7 @@ import os
 import click
 import pkg_resources
 
-from pcvs.backend import bank, config, profile, run
+from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
                       cli_utilities, cli_session)
 from pcvs.helpers import log, utils
@@ -63,7 +63,6 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     config.init()
     profile.init()
     bank.init()
-    run.init()
 
 
 @cli.command(

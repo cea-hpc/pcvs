@@ -30,7 +30,8 @@ glyphs = {
     'full_pg': '#',
     'empty_pg': '-',
     'sep_v': " | ",
-    'sep_h': "-"
+    'sep_h': "-",
+    "spin": ""
 }
 
 all_colors = [
@@ -80,13 +81,6 @@ def get_verbosity_str():
             return k
 
 
-def init_tee(path):
-    t = subprocess.Popen(["tee", os.path.join(path, 'out.log')],
-                         stdin=subprocess.PIPE)
-    os.dup2(t.stdin.fileno(), sys.stdout.fileno())
-    os.dup2(t.stdin.fileno(), sys.stderr.fileno())
-
-
 def __set_encoding(e):
     global glyphs
     if e and 'utf-' in locale.getpreferredencoding().lower():
@@ -103,6 +97,7 @@ def __set_encoding(e):
         glyphs['empty_pg'] = click.style("\u25E6", bold=True, fg="bright_black")
         glyphs['sep_v'] = " \u237F "
         glyphs['sep_h'] = "\u23BC"
+        glyphs['spin'] = glyphs["time"]
     else:
         glyphs = {
             'copy': '(c)',
@@ -117,7 +112,8 @@ def __set_encoding(e):
             'full_pg': '#',
             'empty_pg': '-',
             'sep_v': " | ",
-            'sep_h': "-"
+            'sep_h': "-",
+            'spin': click.style("[WIP]", fg='yellow', bold=True)
     }
 
 

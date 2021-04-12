@@ -2,7 +2,7 @@ from logging import Filter
 import click
 import re
 
-from pcvs.backend import run as pvRun
+from pcvs.backend import session as pvSession
 from pcvs.helpers import log
 
 
@@ -24,7 +24,7 @@ def session(ctx):
 @click.pass_context
 def session_list(ctx, regex, verbose):
     log.print_header("Session View")
-    sessions = pvRun.list_alive_sessions()
+    sessions = pvSession.list_alive_sessions()
     
     if not sessions:
         log.print_item("None")
@@ -35,8 +35,8 @@ def session_list(ctx, regex, verbose):
         if verbose:
             log.print_item("{}: need verbose mode".format(sk))
         else:
-            log.print_item("{: <6s}: {}".format(sk.upper(),
-                                            log.cl(sv, 'bright_black')))
+            log.print_item("ID {: >2s}: {}".format(str(sk),
+                                            log.cl(pvSession.Session.str_state(sv['state']), 'bright_black')))
 
 
 @session.command(name="attach", short_help="attach the shell to alive session")

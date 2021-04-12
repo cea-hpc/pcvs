@@ -8,6 +8,7 @@ import yaml
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
+from pcvs.backend import session as pvSession
 from pcvs.cli import cli_profile, cli_bank
 from pcvs.helpers import log, system, utils
 
@@ -71,9 +72,6 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-s", '--validation', "validation_file",
               default=None, show_envvar=True, type=str,
               help="Define which setting file to use (~/.pcvs/validation.cfg)")
-@click.option("-l/-L", "--tee/--no-tee", "tee", show_envvar=True,
-              default=None, is_flag=True,
-              help="Save stdout/stderr in a file in addition to terminal")
 @click.option("--detach", "detach",
               default=False, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously (WIP)")
@@ -94,7 +92,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, detach, override, tee, anon, validation_file,
+def run(ctx, profilename, output, detach, override, anon, validation_file,
         simulated, bank, dup, set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -136,7 +134,6 @@ def run(ctx, profilename, output, detach, override, tee, anon, validation_file,
     val_cfg.set_ifdef('simulated', simulated)
     val_cfg.set_ifdef('anonymize', anon)
     val_cfg.set_ifdef('exported_to', bank)
-    val_cfg.set_ifdef('tee', tee)
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('target_bank', bank)
     
@@ -170,51 +167,13 @@ def run(ctx, profilename, output, detach, override, tee, anon, validation_file,
 
     system.MetaConfig.root = global_config
 
-    the_session = pvRun.Session()
+    the_session = pvSession.Session()
+    the_session.register_callback(callback=pvRun.process_main_workflow,
+                                  io_file=os.path.join(
+                                            global_config.validation.output,
+                                            'out.log'
+                                          ))
     if detach:
-        the_session.detach()
-
-    #the_session.enable_tee()
-
-    # from now, redirect stdout & stderr to the same logfile
-    if global_config.get('validation').tee:
-        log.init_tee(global_config.get('validation').output)
-
-    log.banner()
-    log.print_header("Prepare Environment")
-    # prepare PCVS and third-party tools
-    the_session.prepare()
-
-    log.print_header("Process benchmarks")
-    if global_config.get('validation').reused_build is not None:
-        log.print_section("Reusing previously generated inputs")
-        log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
+        the_session.run_detached()
     else:
-        start = time.time()
-        the_session.process()
-        end = time.time()
-        log.print_section(
-                "===> Processing done in {:<.3f} sec(s)".format(end-start))
-    
-    log.print_header("Validation Start")
-    # real RUN !!
-    the_session.run()
-
-    log.print_header("Finalization")
-    # post-actions to build the archive, post-process the webview...
-    the_session.terminate()
-
-    bankPath = global_config.get('validation').target_bank
-    if bankPath:
-        bank = pvBank.Bank(path=bankPath)
-        pref_proj = bank.preferred_proj
-        if bank.exists():
-            log.print_item("Upload to the bank '{}{}'".format(
-                    bank.name.upper(),
-                    " (@{})".format(pref_proj) if pref_proj else ""
-                ))
-            bank.connect_repository()
-            bank.save_from_buildir(
-                None,
-                os.path.join(global_config.get('validation').output)
-            )
+        the_session.run()
