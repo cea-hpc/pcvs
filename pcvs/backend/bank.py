@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from addict import Dict
 import pygit2
 
-from pcvs.helpers import log, utils, criterion
+from pcvs.helpers import log, utils, criterion, git
 
 BANKS = dict()
 BANK_STORAGE = ""
@@ -29,7 +29,7 @@ class Bank:
         if len(array) > 1:
             self._preferred_proj = array[1]
         self._name = array[0]
-    
+        
         global BANKS
         if self.exists():
             if self.name_exist():
@@ -88,7 +88,7 @@ class Bank:
                     nb_parents += 1
                     cur = cur.parents[0]
 
-                s.append("  * {}: {} runs".format(v, nb_parents))
+                s.append("  * {}: {} run(s)".format(v, nb_parents))
 
         print("\n".join(s))
 
@@ -147,7 +147,6 @@ class Bank:
 
         data_hash = pygit2.hash(str(data))
         if data_hash in self._repo:
-            print("save new blob : hash {}".format(data_hash))
             return self._repo[data_hash].oid
         else:
             return self._repo.create_blob(str(data))
@@ -227,20 +226,13 @@ class Bank:
             time=int(self._config.validation.datetime.timestamp())
             )
         committer = pygit2.Signature(
-            name=utils.get_current_username(),
-            email=utils.get_current_usermail())
+            name=git.get_current_username(),
+            email=git.get_current_usermail())
         commit_msg = "Commit message is not used (yet)"
 
-        # a reference (lightweight branch) is tracking a whole test-suite
-        # history, there are managed directly
-        # TODO: compute the proper name for the current test-suite
-        if tag is None:
-            tag = self._preferred_proj
-            if tag is None:
-                tag = "unknown"
-        refname = "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
-
-        # check if the current reference already exit.
+        refname = self.__build_target_branch_name(tag)
+        
+        # check if the current reference already exist.
         # if so, retrieve the parent commit to be linked
         if refname in self._repo.references:
             parent_commit, ref = self._repo.resolve_refish(refname)
@@ -263,6 +255,33 @@ class Bank:
         # --> create the reference to track history
         if ref.name is None:
             self._repo.references.create(refname, coid)
+
+    def __build_target_branch_name(self, tag):
+        # a reference (lightweight branch) is tracking a whole test-suite
+        # history, there are managed directly
+        # TODO: compute the proper name for the current test-suite           
+        if tag is None:
+            tag = self._preferred_proj
+            
+            if tag is None:
+                tag = "unknown"
+        return "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
+    
+
+    def locate_key(self, key):
+        pass
+
+    def extract_data(self, key, start, end, format):
+        refname = self.__build_target_branch_name(None)
+        
+        class ProjectNameError(Exception): pass
+        if refname not in self._repo.references:
+            raise ProjectNameError()
+
+        head, _ = self._repo.resolve_refish(refname)
+        for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
+            print(commit.message, commit.author.date)
+
 
     def __repr__(self):
         return {

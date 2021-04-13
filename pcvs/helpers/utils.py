@@ -4,10 +4,7 @@ import subprocess
 from contextlib import contextmanager
 
 import jsonschema
-import getpass
-import socket
 import yaml
-import pygit2
 
 from pcvs import NAME_SRCDIR, PATH_INSTDIR
 from pcvs.helpers import log

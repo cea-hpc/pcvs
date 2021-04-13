@@ -112,11 +112,7 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)
         if not obj.exists():
-            log.err("'{}' bank does not exist".format(bank))
-        else:
-            bank = obj.prefix
-    
-
+            log.err("'{}' bank does not exist".format(obj.name))
 
     global_config = system.MetaConfig()        
 
@@ -133,7 +129,6 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     val_cfg.set_ifdef('dirs', dirs)
     val_cfg.set_ifdef('simulated', simulated)
     val_cfg.set_ifdef('anonymize', anon)
-    val_cfg.set_ifdef('exported_to', bank)
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('target_bank', bank)
     

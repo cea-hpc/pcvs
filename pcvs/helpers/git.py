@@ -1,4 +1,6 @@
 import pygit2
+import getpass
+import socket
 
 def request_git_attr(k):
     git_conf = pygit2.Config.get_global_config()

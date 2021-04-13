@@ -63,9 +63,9 @@ def process_main_workflow(the_session=None):
     # post-actions to build the archive, post-process the webview...
     terminate()
 
-    bankPath = global_config.get('validation').target_bank
-    if bankPath:
-        bank = pvBank.Bank(path=bankPath)
+    bank_token = global_config.get('validation').target_bank
+    if bank_token is not None:
+        bank = pvBank.Bank(token=bank_token)
         pref_proj = bank.preferred_proj
         if bank.exists():
             log.print_item("Upload to the bank '{}{}'".format(

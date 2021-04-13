@@ -171,7 +171,7 @@ class MetaConfig(Dict):
         subtree.set_nosquash('xmls', list())
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)
-        subtree.set_nosquash('exported_to', None)
+        subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
         subtree.set_nosquash('result', {"format": ['json']})
         subtree.set_nosquash('author', {
