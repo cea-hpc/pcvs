@@ -18,7 +18,7 @@ def compl_bank_projects(ctx, args, incomplete):
     pvBank.init()
     array = list()
     for bankname, bankpath in compl_list_banks(None, None, ''):
-        bank = pvBank.Bank(token=bankname, is_new=False)
+        bank = pvBank.Bank(token=bankname)
         bank.connect_repository()
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
@@ -50,7 +50,7 @@ def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
     log.print_header("Bank View")
 
-    b = pvBank.Bank(token=name, is_new=False)
+    b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
@@ -70,11 +70,11 @@ def bank_create(ctx, name, path):
     
     path = os.path.abspath(path)
 
-    b = pvBank.Bank(path, token=name, is_new=True)
+    b = pvBank.Bank(path, token=name)
     if b.exists():
         raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
-        b.connect_repository()  
+        b.connect_repository()
         b.save_to_global()
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
@@ -92,7 +92,7 @@ def bank_destroy(ctx, name, symlink):
     will be removed but existing data are preserved.
     """
     log.print_header("Bank View")
-    b = pvBank.Bank(token=name, is_new=False)
+    b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:

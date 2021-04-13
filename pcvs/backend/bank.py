@@ -1,6 +1,7 @@
 import os
 import tarfile
 import tempfile
+import glob
 import shutil
 from pygit2.repository import Repository
 
@@ -17,7 +18,7 @@ BANKS = dict()
 BANK_STORAGE = ""
 
 class Bank:
-    def __init__(self, path=None, token="default", is_new=False):
+    def __init__(self, path=None, token=""):
         self._root = path
         self._repo = None
         self._config = None
@@ -120,7 +121,7 @@ class Bank:
                 rep = pygit2.discover_repository(self._root)
                 if rep:
                     # need to lock, to ensure safety
-                    self._root = rep
+                    self._root = rep.rstrip("/")
                     self._lockfile = open(os.path.join(self._root, ".pcvs.lock"), 'w+')            
                     locked = False
                     while not locked:
@@ -193,17 +194,13 @@ class Bank:
 
         root_subdir = os.path.join(buildpath, "test_suite")
         #TODO: need a test walkthrough (not dirs)
-        for label, _ in self._config.validation.dirs.items():
-            for root, _, files in os.walk(os.path.join(root_subdir, label)):
-                for f in files:
-                    if not (f.startswith('output-') and f.endswith('.json')):
-                        continue
-                    with open(os.path.join(root, f), 'r') as fh:
-                        data = Dict(yaml.load(fh, Loader=yaml.Loader))
-                        #TODO: validate
-                    
-                    for elt in data['tests']:
-                        self.save_test_from_json(elt)
+        for result_file in glob.glob(os.path.join(buildpath, "pcvs_rawdat*.json")):
+            with open(result_file, 'r') as fh:
+                data = Dict(yaml.load(fh, Loader=yaml.Loader))
+                #TODO: validate
+            
+            for elt in data['tests']:
+                self.save_test_from_json(elt)
         self._rootree.write()
         self.finalize_snapshot(tag)
 
@@ -295,7 +292,7 @@ def init():
     $USER_STORAGE/banks.yml
     """
     global BANKS, BANK_STORAGE
-    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "saves/banks.yml")
+    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
             BANKS = yaml.load(f, Loader=yaml.Loader)
