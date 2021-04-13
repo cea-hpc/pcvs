@@ -115,10 +115,11 @@ def main_detached_session(sid, user_func, io_file, *args, **kwargs):
 
 
 class Session:
+    STATE_WAITING = -1
     STATE_IN_PROGRESS = 0
     STATE_COMPLETED = 1
     STATE_ERROR = 2
-
+    
     __state_str = None
 
     @property
@@ -128,6 +129,9 @@ class Session:
     @property
     def id(self):
         return self._sid
+    @property
+    def infos(self):
+        return self._session_infos
 
     @property
     def str_state(self):
@@ -137,7 +141,8 @@ class Session:
             self.__state_str = {
                 self.STATE_IN_PROGRESS: "IN_PROGRESS",
                 self.STATE_COMPLETED: "COMPLETED",
-                self.STATE_ERROR: "ERROR"
+                self.STATE_ERROR: "ERROR",
+                self.STATE_WAITING: "WAITING"
             }
         return self.__state_str[self._sid]
 
@@ -145,13 +150,13 @@ class Session:
         assert(kw in self._session_infos)
         return self._session_infos[kw]
 
-    def __init__(self, date=datetime.now(), path="."):
+    def __init__(self, date=None, path="."):
         self._func = None
         self._sid = -1
         self._session_infos = {
             "path": path,
             "io": None,
-            "state": self.STATE_IN_PROGRESS,
+            "state": self.STATE_WAITING,
             "started": date,
             "ended": None
         }
@@ -170,6 +175,8 @@ class Session:
 
     def run_detached(self, *args, **kwargs):
         if self._func is not None:
+            if self.property('started') == None:
+                self._session_infos['started'] = datetime.now()
             self._sid = store_session_to_file(self._session_infos)
             
             child = Process(target=main_detached_session,
@@ -182,6 +189,8 @@ class Session:
 
     def run(self, *args, **kwargs):
         if self._func is not None:
+            if self.property('started') == None:
+                self._session_infos['started'] = datetime.now()
             self._sid = store_session_to_file(self._session_infos)
 
             # save stdout/stder to out.log & keep it interactive
