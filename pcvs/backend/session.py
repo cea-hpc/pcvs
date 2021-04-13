@@ -177,6 +177,7 @@ class Session:
         if self._func is not None:
             if self.property('started') == None:
                 self._session_infos['started'] = datetime.now()
+            self._session_infos['state'] = self.STATE_IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
             
             child = Process(target=main_detached_session,
@@ -191,6 +192,7 @@ class Session:
         if self._func is not None:
             if self.property('started') == None:
                 self._session_infos['started'] = datetime.now()
+            self._session_infos['state'] = self.STATE_IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
             # save stdout/stder to out.log & keep it interactive
