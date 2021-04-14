@@ -9,13 +9,17 @@ from addict import Dict
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, utils, system
+from pcvs.helpers.exceptions import ConfigException, ValidationException
 
 CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
 
 
-def init():
+def init() -> None:
+    """init() module function, called when PCVS starts to load 
+    any existing configuration files
+    """
     global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_STORAGES = {k: os.path.join(v, "saves")
                        for k, v in utils.STORAGES.items()}
@@ -36,6 +40,7 @@ def init():
 
 
 def list_blocks(kind, scope=None):
+    """Getter to access the list of config names, filtered by kind & scope"""
     assert (kind in CONFIG_BLOCKS)
     assert (scope in CONFIG_STORAGES.keys() or scope is None)
     if scope is None:
@@ -45,20 +50,23 @@ def list_blocks(kind, scope=None):
 
 
 def check_valid_kind(s):
+    """Check if the kind given as parameter is a valid one.
+        :raises:
+            ConfigException.BadTokenError: the kind is not defined or not valid
+    """
     if s is None:
-        log.err("You must specify a 'kind' when referring to a conf. block",
-                "Allowed values: {}".format(", ".join(CONFIG_BLOCKS)),
-                "See --help for more information",
-                abort=1)
+        raise ConfigException.BadTokenError("no 'kind' specified")
 
     if s not in CONFIG_BLOCKS:
-        log.err("Invalid KIND '{}'".format(s),
-                "Allowed values: {}".format(", ".join(CONFIG_BLOCKS)),
-                "See --help for more information",
-                abort=1)
-
+        raise ConfigException.BadTokenError("invalid 'kind'")
 
 class ConfigurationBlock:
+    """Basic block holding a configuration node.
+        This is the object managing basic blocks from user perspective. This is
+        not related to MetaConfig() managing PCVS configuration itself (even if
+        some are included to it)
+    """
+
     def __init__(self, kind, name, scope=None):
         check_valid_kind(kind)
         utils.check_valid_scope(scope)
@@ -72,6 +80,9 @@ class ConfigurationBlock:
         self.retrieve_file()
 
     def retrieve_file(self):
+        """From the stored kind, scope, name, attempt to detect configuration
+        block on the file system (i.e. detected during module init())
+        """
         assert (self._kind in CONFIG_BLOCKS)
         scopes = utils.storage_order() if self._scope is None else [
             self._scope]
@@ -92,6 +103,7 @@ class ConfigurationBlock:
         self._exists = False
 
     def is_found(self):
+        """Is the current config block present on fs ?"""
         return self._exists
 
     @property
@@ -110,21 +122,29 @@ class ConfigurationBlock:
         self._details = Dict(raw)
 
     def dump(self):
+        """convert the configuration Block to a regulard dict.
+        This function first load the last version, to ensure being in sync.
+        """
         self.load_from_disk()
         return Dict(self._details).to_dict()
 
     def check(self, fail=True):
+        """validate a single configuration block.
+            :raises:
+                ValidationException.FormatError: config is not valid
+        """
         system.ValidationScheme(self._kind).validate(self._details)
 
     def load_from_disk(self):
+        """load the configuration file to populate the current object"""
         if not self._exists:
-            log.err("Invalid name {} for KIND '{}'".format(
-                self._name, self._kind))
+            raise ConfigException.BadTokenError(
+                "{} not defined as '{}' kind".format(self._name, self._kind))
 
         self.retrieve_file()
 
         if not os.path.isfile(self._file):
-            log.err("Internal error: file {} not found!".format(self._file))
+            raise ConfigException.NotFoundError()
 
         log.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
@@ -132,14 +152,16 @@ class ConfigurationBlock:
             self._details = Dict(yaml.safe_load(f))
 
     def load_template(self):
+        """load from the specific template, to create a new config block"""
         self._exists = True
         self._file = os.path.join(
             PATH_INSTDIR,
             'templates/{}-format.yml'.format(self._kind))
         with open(self._file, 'r') as fh:
-            self.fill(yaml.load(fh, Loader=yaml.FullLoader))
+            self.fill(yaml.safe_load(fh))
 
     def flush_to_disk(self):
+        """write the configuration block to disk"""
         self.check()
         self.retrieve_file()
 
@@ -156,6 +178,9 @@ class ConfigurationBlock:
             yaml.safe_dump(self._details.to_dict(), f)
 
     def clone(self, clone):
+        """copy the current object to create an identical one.
+            Mainly used to mirror two objects from different scopes
+        """
         assert (isinstance(clone, ConfigurationBlock))
         assert (clone._kind == self._kind)
         assert (not self.is_found())
@@ -168,6 +193,7 @@ class ConfigurationBlock:
         self._details = clone._details
 
     def delete(self):
+        """delete a configuration block from disk"""
         assert (self.is_found())
         assert (os.path.isfile(self._file))
 
@@ -176,6 +202,7 @@ class ConfigurationBlock:
         os.remove(self._file)
 
     def display(self):
+        """Configuration block pretty printer"""
         log.print_header("Configuration display")
         log.print_section("Scope: {}".format(self._scope.capitalize()))
         log.print_section("Path: {}".format(self._file))
@@ -184,6 +211,7 @@ class ConfigurationBlock:
             log.print_item("{}: {}".format(k, v))
 
     def open_editor(self, e=None):
+        """Open the current block for edition"""
         assert (self._file is not None)
 
         if not os.path.exists(self._file):
@@ -220,20 +248,17 @@ def check_valid_combination(dict_of_combinations=dict()):
 """
                 fplugin.write(content)
                 fplugin.flush()
-        try:
-            utils.open_in_editor(fname.name,
+        
+        utils.open_in_editor(fname.name,
                                  fplugin.name if fplugin else None,
                                  e=e)
-        except Exception:
-            log.warn("Issue with opening the conf. block. Stop!")
-            return
 
         # now, dump back temp file to the original saves
         try:
             fname.seek(0)
             self._details = Dict(yaml.load(fname, Loader=yaml.FullLoader))
         except yaml.YAMLError as e:
-            log.err("Failure when editing conf. block:", '{}'.format(e))
+            raise ConfigException.IOError("badly formatted file")
         except TypeError:
             self._details = dict()
 
@@ -253,10 +278,9 @@ def check_valid_combination(dict_of_combinations=dict()):
                                              delete=False) as rej_fh:
                 yaml.dump(stream, rej_fh)
 
-                log.err("Invalid format: {}".format(e.message),
-                        "Rejected file: {}".format(rej_fh.name),
-                        "See 'pcvs check' to validate external resource",
-                        "before the importation.")
+                raise ValidationException.FormatError(
+                    "Rejected file: {}".format(rej_fh.name)
+                )
 
         # delete temp files (replace by 'with...' ?)
         fname.close()

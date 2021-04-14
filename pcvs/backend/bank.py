@@ -13,6 +13,7 @@ from addict import Dict
 import pygit2
 
 from pcvs.helpers import log, utils, criterion, git
+from pcvs.helpers.exceptions import BankException
 
 BANKS = dict()
 BANK_STORAGE = ""
@@ -114,7 +115,7 @@ class Bank:
                         bare=True
                     )
                 except Exception:
-                    log.err("This path already contains a Bank!")
+                    raise BankException.AlreadyExistError()
                 #can't be moved before as self._root may not exist yet
                 self._lockfile = open(os.path.join(self._root, ".pcvs.lock"), 'w+')
             else:
@@ -133,7 +134,7 @@ class Bank:
 
                     self._repo = pygit2.Repository(rep)
                 else:
-                    log.err("Unable to find a valid bank in {}".format(self._root))
+                    raise BankException.NotFoundError()
             self._locked = True
 
     def save_to_global(self):
@@ -329,4 +330,4 @@ def flush_to_disk():
         with open(BANK_STORAGE, 'w+') as f:
             yaml.dump(BANKS, f)
     except IOError as e:
-        log.err("Failure while saving the banks.yml", '{}'.format(e))
+        raise BankException.IOError(e)
