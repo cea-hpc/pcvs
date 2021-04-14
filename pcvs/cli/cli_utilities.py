@@ -85,9 +85,9 @@ def check(ctx, dir, encoding, color, configs, profiles):
         
         t = PrettyTable()
         t.field_names = ["Alias", "Symbol", "Fallback"]
-        log.__set_encoding(False)
+        log.enable_unicode(False)
         fallback = copy.deepcopy(log.glyphs)
-        log.__set_encoding(True)
+        log.enable_unicode(True)
 
         for k in sorted(log.glyphs.keys()):
             t.add_row([k, log.glyphs[k], fallback[k]])

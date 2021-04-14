@@ -3,9 +3,56 @@ import os
 import textwrap
 import pprint
 import sys
+import functools
+
+def progbar(it, print_func=None, **kargs):
+    return click.progressbar(
+                it,empty_char=manager.utf('empty_pg'),
+                info_sep=manager.utf('sep_v'), fill_char=manager.utf('full_pg'),
+                show_percent=False, show_eta=False, show_pos=False,
+                item_show_func=print_func,
+                **kargs)
+
+manager = None
+def init(v, e, l):
+    global manager
+    manager = IOManager(verbose=v, enable_unicode=e, length=l)
+
+def print_section(*args, **kwargs):
+    return manager.print_section(*args, **kwargs)
+
+def banner(*args, **kwargs):
+    return manager.print_banner(*args, **kwargs)
+
+def print_header(*args, **kwargs):
+    return manager.print_header(*args, **kwargs)
+
+def print_item(*args, **kwargs):
+    return manager.print_item(*args, **kwargs)
+
+def err(*args, **kwargs):
+    manager.err(*args, **kwargs)
+
+def warn(*args, **kwargs):
+    manager.warn(*args, **kwargs)
+
+def info(*args, **kwargs):
+    manager.info(*args, **kwargs)
+
+def debug(*args, **kwargs):
+    manager.debug(*args, **kwargs)
+
+def utf(*args, **kwargs):
+    return manager.utf(*args, **kwargs)
+
+def get_verbosity_str(*args, **kwargs):
+    return manager.get_verbosity_str(*args, **kwargs)
+
+def get_verbosity(*args, **kwargs):
+    return manager.has_verb_level(*args, **kwargs)
 
 class IOManager:
-    glyphs_dict = {
+    __glyphs_dict = {
         "ascii": {
             'copy': '(c)',
             'item': '*',
@@ -37,14 +84,10 @@ class IOManager:
             'sep_h' : "\u23BC"
         }
     }
-    
-    vb_array = {
-        'normal': (0, logging.WARNING),
-        'info': (1, logging.INFO),
-        'debug': (2, logging.DEBUG)
-    }
 
-    all_colors = [
+    __verbosity = [(0, "normal"), (1, "info"), (2, "debug")]
+    
+    __color_list = [
         "black",
         "red",
         "green",
@@ -63,101 +106,90 @@ class IOManager:
         "bright_white",
     ]
 
-    def __init__(self, verbose, glyphs_enabled, length, logpath="", out=True):
-        self.linelength = 93
-        self.FORMAT = "%(levelname)s: %(message)s"
-        self.wrapper = None
-        self.out = out
-        self.verbosity = 0
-        self.write_logs = False
-        self.verbose = verbose
-        self.glyphs_enabled = glyphs_enabled
-        if glyphs_enabled:
-            self.glyphs = self.glyphs_dict["unicode"]
-        else:
-            self.glyphs = self.glyphs_dict["ascii"]
+    def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
+        self._linelength = 93
+        self._wrapper = None
+        self._tty = tty
+        self._logfile = None
+        self._verbose = verbose
+        self._unicode = enable_unicode
+        
+        self.enable_unicode(self._unicode)
 
         if length is not None:
-            self.linelength = length if length > 0 else click.get_terminal_size()[0]
-        if(logpath!=""):
-            self.write_logs = True
-            self.logpath = logpath
-            self.logfile = open(os.path.join(logpath, "out.log"), "w")
-        self.wrapper = textwrap.TextWrapper(width=self.linelength)
+            self._linelength = length if length > 0 else click.get_terminal_size()[0]
+        self._wrapper = textwrap.TextWrapper(width=self._linelength)
     
+        if logfile is not None:
+            assert(os.path.isfile(logfile))
+            self._logfile = open(logfile, "w")
+        
     def __del__(self):
-        if(self.write_logs):
-            self.logfile.close()
+        if self._logfile is not None:
+            self._logfile.close()
 
-    def __printlog(self, msg):
-        if(self.out):
+    def __print_rawline(self, msg):
+        if self._tty:
             click.echo(msg)
-        if(self.write_logs):
-            self.logfile.write(msg + "\n")
+        if self._logfile:
+            self._logfile.write(msg + '\n')
 
-    def get_verbosity(self, match):
-        assert(match in self.vb_array.keys())
-        return self.vb_array[match][0] <= self.verbosity
+    def has_verb_level(self, match):
+        req_idx = 0
+        for e in self.__verbosity:
+            if match.lower() == e[1].lower():
+                req_idx = e[0]
+                break
+        return req_idx <= self._verbose
 
     def get_verbosity_str(self):
-        for k, v in self.vb_array.items():
-            if v[0] == self.verbosity:
-                return k
+        for e in self.__verbosity:
+            if self._verbose == e[0]:
+                return e[1]
+        return  self.__verbosity[0][1]
 
     def print(self, *msg):
         for i in msg:
-            self.__printlog(i)
+            self.__print_rawline(i)
     
-    def pcvs_log_raising_exception(self, f):
-        def inner(*args, **kwargs):
-            try:
-                return f(*args, **kwargs)
-            except Exception as e:
-                self.log_exception(e)
+    def capture_exception(self, *e_type):
+        def inner_function(func):
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except e_type as e:
+                    self.print("EXCEPTION: {}".format(e))
+                        
+            return wrapper
+        return inner_function
 
-                raise e
-
-        return inner
-
-    def __set_encoding(self, e):
-        if(e == "utf-8" or e == "unicode"):
-            self.glyphs = self.glyphs_dict["unicode"]
-        elif(e == "ascii"):
-            self.glyphs = self.glyphs_dict["ascii"]
-
-    # def log_error(msg):
-    #     error(msg)
+    def enable_unicode(self, e=True):
+        self.glyphs = self.__glyphs_dict["unicode"] if e is True else self.__glyphs_dict["ascii"]
         
-    # def log_exception(e):
-    #     log("raised exception {}".format(e))
-
     def utf(self, k):
         assert(k in self.glyphs.keys())
         return self.glyphs[k]
 
     def print_header(self, s, out=True):
         hdr_char = self.utf('hdr')
-        str_len = self.linelength - (len(s) + 2 + 9)  # surrounding spaces  + color ID
-        begin = hdr_char * int(str_len / 2)
-        end = begin + (hdr_char * (str_len % 2 != 0))
-
-        fs = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
-        if len(fs) > self.linelength:
-            fs = click.style("{} {} {}".format(2*hdr_char, s.upper(), 2*hdr_char), fg="green")
-        self.wrapper.subsequent_indent = (2*hdr_char) + " "
-        fs = self.wrapper.fill(fs)
+        str_len = self._linelength - (len(s) + 2)  # surrounding spaces
+        begin = hdr_char * int(str_len / 2) # nb chars before the title (centering)
+        end = begin + (hdr_char * (str_len % 2 != 0)) #nb chars after the title (centering)
+        
+        # formatting & colouring
+        final_string = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
         if out:
-            self.__printlog(fs)
+            self.__print_rawline(final_string)
         else:
-            return fs
-        pass
+            return final_string
 
     def print_section(self, s, out=True):
         f = "{} {}".format(self.utf('sec'), s)
-        self.wrapper.subsequent_indent = "  "
-        s = self.wrapper.fill(click.style(f, fg='yellow'))
+        self._wrapper.subsequent_indent = "  "
+        s = self._wrapper.fill(click.style(f, fg='yellow'))
         if out:
-            self.__printlog(s)
+            self.__print_rawline(s)
         else:
             return s
 
@@ -166,50 +198,41 @@ class IOManager:
         bullet = indent + "{} ".format(self.utf('item')) if with_bullet is True else ""
         content = "{}".format(s)
 
-        self.wrapper.subsequent_indent = indent + "  "
-        s = self.wrapper.fill(click.style(bullet, fg="red") + click.style(content, fg="reset"))
+        self._wrapper.subsequent_indent = indent + "  "
+        s = self._wrapper.fill(click.style(bullet, fg="red") + click.style(content, fg="reset"))
         if out:
-            self.__printlog(s)
+            self.__print_rawline(s)
         else:
             return s
 
     def debug(self, *msg):
-        if(self.verbose >= 3):
+        if(self._verbose >= 3):
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__printlog("DEBUG: {}".format(click.style(line, fg="bright_black")))
-
+                    self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")))
 
     def info(self, *msg):
-        if(self.verbose >= 2):
+        if(self._verbose >= 2):
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__printlog("INFO: {}".format(click.style(line, fg="cyan")))
-
+                    self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")))
 
     def warn(self, *msg):
         for elt in msg:
             for line in elt.split('\n'):
-                self.__printlog("WARNING: {}".format(click.style(line, fg="yellow", bold=True)))
-
+                self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)))
 
     def err(self, *msg, abort=1):
-        self.__printlog("{}".format(click.style('-' * self.linelength, fg="red", bold=True)))
+        enclosing_line = click.style(self.utf('hdr') * self._linelength,
+                                     fg="red",
+                                     bold=True)
+        self.__print_rawline("{}".format(enclosing_line))
         for elt in msg:
             for line in elt.split('\n'):
-                self.__printlog("ERROR: {}".format(click.style(line, fg="red", bold=True)))
-        self.__printlog("{}".format(click.style('-' * self.linelength, fg="red", bold=True)))
+                self.__print_rawline("ERROR: {}".format(click.style(line, fg="red", bold=True)))
+        self.__print_rawline("{}".format(enclosing_line))
 
-
-    def progbar(self, it, print_func=None, **kargs):
-        return click.progressbar(it, empty_char=self.utf('empty_pg'),
-                                info_sep=self.utf('sep_v'), fill_char=self.utf('full_pg'),
-                                show_percent=False, show_eta=False, show_pos=False,
-                                item_show_func=print_func,
-                                **kargs)
-
-
-    def short_banner(self, string=False):
+    def print_short_banner(self, string=False):
         logo =[
             r"""             ____    ______  _    __  _____       """,
             r"""            / __ \  / ____/ | |  / / / ___/       """,
@@ -218,16 +241,16 @@ class IOManager:
             r"""         /_/      \____/    |___/  /____/         """,
             r"""                                                  """,
             r"""      Parallel Computing -- Validation Suite      """,
-            r"""             Copyright {} 2017 -- CEA             """.format(utf('copy')),
+            r"""             Copyright {} 2017 -- CEA             """.format(self.utf('copy')),
             r""""""
         ]
         s = []
-        if self.linelength < max(map(lambda x: len(x), logo)):
+        if self._linelength < max(map(lambda x: len(x), logo)):
             s = [
-                click.style("{}".format(utf("star")*14), fg="green"),
-                click.style("{} PCVS -- RT {}".format(utf("star"), utf('star')), fg="yellow"),
-                click.style("{} CEA {} 2017 {}".format(utf('star'), utf('copy'), utf('star')), fg="red"),
-                click.style("{}".format(utf("star")*14), fg="green")
+                click.style("{}".format(self.utf("star")*14), fg="green"),
+                click.style("{} PCVS -- RT {}".format(self.utf("star"), self.utf('star')), fg="yellow"),
+                click.style("{} CEA {} 2017 {}".format(self.utf('star'), self.utf('copy'), self.utf('star')), fg="red"),
+                click.style("{}".format(self.utf("star")*14), fg="green")
             ]
         else:
             s = [
@@ -239,20 +262,21 @@ class IOManager:
         if string is True:
             return "\n".join(s)
         else:
-            self.__printlog("\n".join(s))
+            self.__print_rawline("\n".join(s))
 
 
     def nimpl(self, *msg):
         self.err("This is not implemented (yet)!")  
 
     def print_n_stop(self, **kwargs):
+        # not replacing these prints (for debug only)
         for k, v in kwargs.items():
             click.secho("{}: ".format(k), fg="yellow", nl=False)
             click.secho(pprint.pformat(v), fg="blue")
         sys.exit(0)
 
 
-    def banner(self):
+    def print_banner(self):
         # ok,  this is ugly but the only way to make flake/pylint happy with
         # source file formatting AND keeping a nicely logo printed out witout
         # having to load a file.
@@ -275,7 +299,7 @@ class IOManager:
             r"""                                                        """
             r"""  /_/                      /____/   """,
             r"""                                       {} (PCVS) {}     """
-            r"""                           """.format(self.utf('star'), utf('star')),
+            r"""                           """.format(self.utf('star'), self.utf('star')),
             r"""          _    __      ___     __      __  _            """
             r"""    _____       _ __                """,
             r"""         | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____  """
@@ -301,13 +325,13 @@ class IOManager:
             r"""                                                        """
             r"""                                    """,
         ]
-        if self.linelength < max(map(lambda x: len(x), logo)):
-            self.short_banner()
+        if self._linelength < max(map(lambda x: len(x), logo)):
+            self.print_short_banner()
             return
         else:
-            click.secho("\n".join(logo[0:6]), fg="green")
-            click.secho("\n".join(logo[6:7]))
-            click.secho("\n".join(logo[7:9]), fg="green")
-            click.secho("\n".join(logo[9:11]), fg="yellow")
-            click.secho("\n".join(logo[11:12]), fg="red")
-            click.secho("\n".join(logo[12:]))
+            self.__print_rawline(click.style("\n".join(logo[0:6]), fg="green"))
+            self.__print_rawline(click.style("\n".join(logo[6:7])))
+            self.__print_rawline(click.style("\n".join(logo[7:9]), fg="green"))
+            self.__print_rawline(click.style("\n".join(logo[9:11]), fg="yellow"))
+            self.__print_rawline(click.style("\n".join(logo[11:12]), fg="red"))
+            self.__print_rawline(click.style("\n".join(logo[12:])))
