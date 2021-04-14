@@ -9,7 +9,7 @@ from addict import Dict
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
-from pcvs.helpers import log, utils, system, git
+from pcvs.helpers import git, log, system, utils
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()

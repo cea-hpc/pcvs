@@ -11,7 +11,7 @@ import yaml
 from addict import Dict
 
 from pcvs import PATH_INSTDIR
-from pcvs.helpers import log, test_transform, utils, system
+from pcvs.helpers import log, system, test_transform, utils
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.package_manager import PManager
 from pcvs.helpers.system import MetaConfig

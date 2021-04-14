@@ -8,7 +8,7 @@ import yaml
 from addict import Dict
 
 from pcvs import PATH_INSTDIR
-from pcvs.helpers import log, utils, system
+from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ConfigException, ValidationException
 
 CONFIG_STORAGES = dict()

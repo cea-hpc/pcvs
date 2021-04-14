@@ -5,14 +5,13 @@ from datetime import datetime
 import click
 import yaml
 
+from pcvs import PATH_SESSION
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
 from pcvs.backend import session as pvSession
-from pcvs.cli import cli_profile, cli_bank
+from pcvs.cli import cli_bank, cli_profile
 from pcvs.helpers import log, system, utils
-
-from pcvs import PATH_SESSION
 
 
 def iterate_dirs(ctx, param, value) -> dict:

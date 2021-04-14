@@ -1,10 +1,12 @@
 import os
-import pcvs
+from unittest.mock import Mock, patch
+
 import pytest
-import os
-from .conftest import click_call
+
+import pcvs
 from pcvs.cli import cli_config as tested
-from unittest.mock import patch, Mock
+
+from .conftest import click_call
 
 
 @pytest.fixture(params=pcvs.backend.config.CONFIG_BLOCKS)

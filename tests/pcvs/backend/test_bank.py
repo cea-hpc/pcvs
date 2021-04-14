@@ -1,13 +1,14 @@
-import pytest
+import json
 import os
 from datetime import datetime
-import yaml
-import json
-import pygit2
+from unittest.mock import Mock, patch
 
+import pygit2
+import pytest
+import yaml
 from addict import Dict
 from click.testing import CliRunner
-from unittest.mock import Mock, patch
+
 from pcvs.backend import bank as tested
 
 

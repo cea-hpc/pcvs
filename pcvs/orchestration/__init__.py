@@ -1,10 +1,12 @@
-from pcvs.helpers.test import Test
-from pcvs.helpers import log
-from pcvs.helpers.system import MetaConfig
-from pcvs.orchestration.publishers import Publisher
-from addict import Dict
 import subprocess
 import threading
+
+from addict import Dict
+
+from pcvs.helpers import log
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.test import Test
+from pcvs.orchestration.publishers import Publisher
 
 
 class SetBuilder:

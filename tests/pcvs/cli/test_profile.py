@@ -1,7 +1,10 @@
-from .conftest import click_call
-import pcvs
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
+
 import pytest
+
+import pcvs
+
+from .conftest import click_call
 
 
 def test_cmd():

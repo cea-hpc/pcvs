@@ -1,6 +1,7 @@
 
-import threading
 import subprocess
+import threading
+
 
 class Job:
     def __init__(self):

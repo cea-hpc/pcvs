@@ -1,7 +1,8 @@
-from click.testing import CliRunner
 import pytest
-from pcvs.main import cli
+from click.testing import CliRunner
+
 from pcvs.backend import config
+from pcvs.main import cli
 
 runner = CliRunner()
 

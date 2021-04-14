@@ -1,12 +1,15 @@
 import os
-import pcvs
-import yaml
-import pytest
-from click.testing import CliRunner
 from datetime import datetime
 from unittest import mock
 from unittest.mock import patch
+
+import pytest
+import yaml
+from click.testing import CliRunner
+
+import pcvs
 from pcvs.backend import session as tested
+
 
 def dummy_main_function(arg_a, arg_b):
     assert(arg_a == "argument_a")

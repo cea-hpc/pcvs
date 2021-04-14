@@ -1,5 +1,6 @@
 import pcvs
 
+
 class GenericException:
     class AlreadyExistError(Exception): pass
     class UnclassifiableError(Exception): pass

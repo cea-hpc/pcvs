@@ -1,18 +1,18 @@
+import fcntl
+import glob
 import os
+import shutil
 import tarfile
 import tempfile
-import glob
-import shutil
-from pygit2.repository import Repository
-
-import fcntl
-import yaml
 import time
 from datetime import datetime, timezone
-from addict import Dict
-import pygit2
 
-from pcvs.helpers import log, utils, criterion, git
+import pygit2
+import yaml
+from addict import Dict
+from pygit2.repository import Repository
+
+from pcvs.helpers import criterion, git, log, utils
 from pcvs.helpers.exceptions import BankException
 
 BANKS = dict()

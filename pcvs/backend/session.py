@@ -1,15 +1,15 @@
-from multiprocessing import Process
-import subprocess
-from datetime import datetime
-
-import os
-import sys
 import fcntl
-import yaml
+import os
+import subprocess
+import sys
 import time
+from datetime import datetime
+from multiprocessing import Process
 
-from pcvs.helpers import system, log
+import yaml
+
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
+from pcvs.helpers import log, system
 
 
 def unlock_session_file():

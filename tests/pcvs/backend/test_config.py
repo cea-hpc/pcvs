@@ -1,8 +1,10 @@
-from pcvs.backend.config import CONFIG_BLOCKS
-from pcvs.backend import config as tested
-from pcvs.helpers import utils
-import pytest
 from unittest.mock import patch
+
+import pytest
+
+from pcvs.backend import config as tested
+from pcvs.backend.config import CONFIG_BLOCKS
+from pcvs.helpers import utils
 
 
 @patch('glob.glob', return_value=[

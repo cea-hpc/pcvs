@@ -1,5 +1,7 @@
 import pytest
+
 from pcvs.helpers import utils as tested
+
 
 @pytest.mark.parametrize("token", ["test1", "test/test1"])
 def test_token_extraction_1(token):

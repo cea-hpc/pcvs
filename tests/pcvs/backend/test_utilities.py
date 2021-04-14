@@ -1,8 +1,11 @@
-from pcvs.backend import utilities as tested
-from pcvs import NAME_BUILDIR
-import pytest
 import os
 from unittest.mock import patch
+
+import pytest
+
+from pcvs import NAME_BUILDIR
+from pcvs.backend import utilities as tested
+
 
 @pytest.fixture(params=[None, "/root"])
 def prefix(request):

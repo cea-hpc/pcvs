@@ -1,9 +1,11 @@
-import click
+import functools
 import os
-import textwrap
 import pprint
 import sys
-import functools
+import textwrap
+
+import click
+
 
 def progbar(it, print_func=None, **kargs):
     return click.progressbar(

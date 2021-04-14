@@ -1,6 +1,9 @@
-from flask import Flask, abort, jsonify, render_template, request
 import os
+
+from flask import Flask, abort, jsonify, render_template, request
+
 from pcvs import PATH_INSTDIR
+
 
 def create_app(global_tree=None, test_config=None):
     app = Flask(__name__, template_folder=os.path.join(PATH_INSTDIR, "webview/templates"))

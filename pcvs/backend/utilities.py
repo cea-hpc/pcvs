@@ -2,16 +2,17 @@ import base64
 import os
 import subprocess
 import tempfile
-from addict import Dict
+
 import jsonschema
 import yaml
+from addict import Dict
 from prettytable import PrettyTable
 
 from pcvs import NAME_BUILDIR
 from pcvs.backend import config, profile, run
-from pcvs.helpers import log, utils, system
-from pcvs.helpers.log import utf
+from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers.log import utf
 
 
 def locate_scriptpaths(output=None):

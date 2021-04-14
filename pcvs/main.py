@@ -7,7 +7,7 @@ import pkg_resources
 
 from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
-                      cli_utilities, cli_session)
+                      cli_session, cli_utilities)
 from pcvs.helpers import log, utils
 
 CONTEXT_SETTINGS = dict(

@@ -2,22 +2,22 @@ import fileinput
 import glob
 import os
 import pprint
-import time
 import shutil
 import subprocess
 import tarfile
+import time
 from shutil import SameFileError
 from subprocess import CalledProcessError
 
 import yaml
 from addict import Dict
 
-from pcvs import NAME_SRCDIR, NAME_BUILDFILE, NAME_BUILDIR, PATH_SESSION
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_SESSION
+from pcvs.backend import bank as pvBank
+from pcvs.backend import session as pvSession
 from pcvs.helpers import criterion, log, test, utils
 from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import TEDescriptor, TestFile
-from pcvs.backend import bank as pvBank
-from pcvs.backend import session as pvSession
 from pcvs.orchestration import Orchestrator
 
 

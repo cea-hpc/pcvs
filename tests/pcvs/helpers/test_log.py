@@ -1,6 +1,9 @@
-from pcvs.helpers import log as tested
-import pytest
 import logging
+
+import pytest
+
+from pcvs.helpers import log as tested
+
 
 @pytest.mark.parametrize("level", [(0, "normal", logging.WARNING), 
                                    (1, "info", logging.INFO),

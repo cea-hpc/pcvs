@@ -1,6 +1,7 @@
-import os
 import json
+import os
 import pprint
+
 
 class Publisher:
     increment = 0

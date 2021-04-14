@@ -1,14 +1,18 @@
-from logging import error
-from addict import Dict
-import pytest
 import os
-import yaml
-from pcvs.helpers import package_manager, utils
-from pcvs.helpers import system as s
+from logging import error
 from unittest.mock import patch
-from pcvs.helpers import system
-from pcvs import PATH_INSTDIR
+
 import jsonschema
+import pytest
+import yaml
+from addict import Dict
+
+from pcvs import PATH_INSTDIR
+from pcvs.helpers import package_manager
+from pcvs.helpers import system
+from pcvs.helpers import system as s
+from pcvs.helpers import utils
+
 
 def test_bootstrap_compiler():
     obj = s.MetaConfig()

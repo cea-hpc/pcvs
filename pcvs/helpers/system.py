@@ -1,13 +1,13 @@
 import os
-from pcvs.helpers.exception import GenericException
 
-import yaml
 import jsonschema
+import yaml
 from addict import Dict
 
 import pcvs
-from pcvs import NAME_SRCDIR, NAME_BUILDIR, PATH_INSTDIR
-from pcvs.helpers import log, package_manager, git
+from pcvs import NAME_BUILDIR, NAME_SRCDIR, PATH_INSTDIR
+from pcvs.helpers import git, log, package_manager
+from pcvs.helpers.exception import GenericException
 from pcvs.helpers.exceptions import ValidationException
 
 

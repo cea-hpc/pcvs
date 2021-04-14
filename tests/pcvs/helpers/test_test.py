@@ -1,7 +1,9 @@
-from pcvs.helpers import test as tested
 import os
-import pytest
 from unittest.mock import patch
+
+import pytest
+
+from pcvs.helpers import test as tested
 
 
 def legacy_yaml_file():

@@ -1,8 +1,11 @@
-from pcvs.helpers import test_transform as tested
-import pcvs
+from unittest.mock import patch
+
 import pytest
 from addict import Dict
-from unittest.mock import patch
+
+import pcvs
+from pcvs.helpers import test_transform as tested
+
 
 @patch('pcvs.helpers.system.MetaConfig.root', Dict({
             'compiler': {

@@ -1,5 +1,6 @@
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
+
 from pcvs.converter.yaml_converter import main
 
 runner = CliRunner()
