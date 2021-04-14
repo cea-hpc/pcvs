@@ -124,7 +124,7 @@ def process_check_yaml_stream(data):
     token_load = token_yaml = "{}".format(utf('fail'))
     err_msg = None
     try:
-        stream = yaml.load(data, Loader=yaml.FullLoader)
+        stream = yaml.safe_load(data)
         token_load = "{}".format(utf('succ'))
 
         scheme.validate(stream)
@@ -222,7 +222,7 @@ class BuildSystem:
             return
 
         with open(out_file, 'w') as fh:
-            yaml.dump(self._stream.to_dict(), fh)
+            yaml.safe_dump(self._stream.to_dict(), fh)
 
 class AutotoolsBuildSystem(BuildSystem):
     def fill(self):

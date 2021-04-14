@@ -265,7 +265,7 @@ def profile_import(ctx, token, src_file):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
-        pf.fill(yaml.load(src_file.read(), Loader=yaml.Loader))
+        pf.fill(yaml.safe_load(src_file.read()))
         pf.flush_to_disk()
     else:
         log.err("Cannot import into an already created profile!")
@@ -281,7 +281,7 @@ def profile_export(ctx, token, dest_file):
 
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
-        dest_file.write(yaml.dump(pf.dump()))
+        dest_file.write(yaml.safe_dump(pf.dump()))
 
 @profile.command(name="split",
                  short_help="Recreate conf. blocks based on a profile")

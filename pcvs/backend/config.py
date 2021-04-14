@@ -230,9 +230,9 @@ class ConfigurationBlock:
                 prefix="{}-".format(self.full_name),
                 suffix=".py")
         with open(self._file, 'r') as f:
-            stream = yaml.load(f, Loader=yaml.FullLoader)
+            stream = yaml.safe_load(f)
             if stream:
-                yaml.dump(stream, fname)
+                yaml.safe_dump(stream, fname)
 
             if fplugin:
                 if stream and 'plugin' in stream:
@@ -256,7 +256,7 @@ def check_valid_combination(dict_of_combinations=dict()):
         # now, dump back temp file to the original saves
         try:
             fname.seek(0)
-            self._details = Dict(yaml.load(fname, Loader=yaml.FullLoader))
+            self._details = Dict(yaml.safe_load(fname))
         except yaml.YAMLError as e:
             raise ConfigException.IOError("badly formatted file")
         except TypeError:
@@ -276,7 +276,7 @@ def check_valid_combination(dict_of_combinations=dict()):
                                              suffix=".yml.rej",
                                              prefix=self.full_name,
                                              delete=False) as rej_fh:
-                yaml.dump(stream, rej_fh)
+                yaml.safe_dump(stream, rej_fh)
 
                 raise ValidationException.FormatError(
                     "Rejected file: {}".format(rej_fh.name)

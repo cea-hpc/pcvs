@@ -70,7 +70,7 @@ def load_yaml_file(f, source, build, prefix):
         with open(f, 'r') as fh:
             stream = fh.read()
             stream = replace_special_token(stream, source, build, prefix)
-            obj = yaml.load(stream, Loader=yaml.FullLoader)
+            obj = yaml.safe_load(stream)
     # badly formatted YAML
     except yaml.YAMLError:
         need_conversion = True
@@ -80,14 +80,14 @@ def load_yaml_file(f, source, build, prefix):
     # attempt to convert of the fly the YAML file
     if need_conversion:
         log.debug("\t--> Legacy syntax: {}".format(f))
-        obj = yaml.load(__load_yaml_file_legacy(f), Loader=yaml.FullLoader)
+        obj = yaml.safe_load(__load_yaml_file_legacy(f))
 
         # when 'debug' is activated, print the converted YAML file
         if log.get_verbosity('debug'):
             cv_file = os.path.join(os.path.split(f)[0], "converted-pcvs.yml")
             log.debug("\t--> Stored file to {}".format(cv_file))
             with open(cv_file, 'w') as fh:
-                yaml.dump(obj, fh)
+                yaml.safe_dump(obj, fh)
     return obj
 
 
@@ -202,7 +202,7 @@ class TestFile:
                 for c_k, c_v in MetaConfig.root.criterion.iterators.items():
                     self._debug[".system-values"][c_k] = c_v['values']
                 self._debug[".system-values"]['stats']['theoric'] = sys_cnt
-                yaml.dump(self._debug, fh, default_flow_style=None)
+                yaml.safe_dump(self._debug, fh, default_flow_style=None)
 
 
 class Test:

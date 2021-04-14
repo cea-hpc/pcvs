@@ -187,7 +187,7 @@ class Bank:
     
     def load_config_from_file(self, path):
         with open(os.path.join(path, "conf.yml"), 'r') as fh:
-            self._config = Dict(yaml.load(fh, Loader=yaml.Loader))
+            self._config = Dict(yaml.safe_load(fh))
         
     def save_from_buildir(self, tag, buildpath):
         self.load_config_from_file(buildpath)
@@ -197,7 +197,7 @@ class Bank:
         #TODO: need a test walkthrough (not dirs)
         for result_file in glob.glob(os.path.join(buildpath, "pcvs_rawdat*.json")):
             with open(result_file, 'r') as fh:
-                data = Dict(yaml.load(fh, Loader=yaml.Loader))
+                data = Dict(yaml.safe_load(fh))
                 #TODO: validate
             
             for elt in data['tests']:
@@ -296,7 +296,7 @@ def init():
     BANK_STORAGE = os.path.join(utils.STORAGES['user'], "banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
-            BANKS = yaml.load(f, Loader=yaml.Loader)
+            BANKS = yaml.safe_load(f)
     except FileNotFoundError:
         # nothing to do, file may not exist
         pass
@@ -328,6 +328,6 @@ def flush_to_disk():
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
         with open(BANK_STORAGE, 'w+') as f:
-            yaml.dump(BANKS, f)
+            yaml.safe_dump(BANKS, f)
     except IOError as e:
         raise BankException.IOError(e)

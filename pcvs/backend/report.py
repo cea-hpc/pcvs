@@ -27,7 +27,7 @@ def build_data_tree(path=os.getcwd(), files=None):
     cnt_tests = 0
 
     # with open(os.path.join(os.getcwd(), "result-scheme.yml"), "r") as fh:
-    #    val_str = yaml.load(fh, Loader=yaml.FullLoader)
+    #    val_str = yaml.safe_load(fh)
 
     for idx, f in enumerate(files):
         print("Dealing with n°{}".format(idx+1))

@@ -248,7 +248,7 @@ def config_import(ctx, token, in_file) -> None:
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found():
-        obj.fill(yaml.load(in_file.read(), Loader=yaml.Loader))
+        obj.fill(yaml.safe_load(in_file.read()))
         obj.flush_to_disk()
     else:
         raise click.BadArgumentUsage("Cannot import into an already created conf. block!")
@@ -270,6 +270,6 @@ def config_export(ctx, token, out_file):
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
-        out_file.write(yaml.dump(obj.dump()))
+        out_file.write(yaml.safe_dump(obj.dump()))
     else:
         log.err("Failed to export '{}': not found!".format(token))

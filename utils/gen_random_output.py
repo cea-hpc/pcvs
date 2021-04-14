@@ -18,7 +18,7 @@ file_count = random.randint(1, 100)
 print("building {} files...".format(file_count))
 
 with open(os.path.join(os.getcwd(), "pcvs-result-scheme.yaml"), 'r') as fh:
-    scheme = yaml.load(fh, Loader=yaml.FullLoader)
+    scheme = yaml.safe_load(fh)
 
 for f in range(1, file_count+1):
     filepath = os.path.join(prefix, "output-" + str(f) + "-list_of_tests.xml.json")

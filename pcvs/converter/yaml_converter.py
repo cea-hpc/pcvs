@@ -270,7 +270,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
         if template:
             log.print_item("Load template file: {}".format(template))
             stream = open(template, 'r').read() + stream
-        data_to_convert = yaml.load(stream, Loader=yaml.FullLoader)
+        data_to_convert = yaml.safe_load(stream*)
     except yaml.composer.ComposerError as e:
         log.err("Issue when parsing YAML: ", "{}".format(e))
 
@@ -322,7 +322,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
         f = open(out, "w")
 
     log.print_section("Converted data written into {}".format(f.name))
-    yaml.dump(final_data, f)
+    yaml.safe_dump(final_data, f)
 
     f.close()
 

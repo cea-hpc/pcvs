@@ -216,7 +216,7 @@ class MetaConfig(Dict):
         if os.path.isfile(filepath):
             try:
                 with open(filepath, 'r') as fh:
-                        node = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+                        node = Dict(yaml.safe_load(fh))
             except (IOError, yaml.YAMLError) as e:
                 raise GenericException.IOError(
                     "Error(s) found while loading (}".format(filepath))

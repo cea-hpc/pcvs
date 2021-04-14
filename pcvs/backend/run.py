@@ -329,7 +329,7 @@ def run():
 
     conf_file = os.path.join(MetaConfig.root.validation.output, "conf.yml")
     with open(conf_file, 'w') as conf_fh:
-        yaml.dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
+        yaml.safe_dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
 
     log.print_section("Run the Orchestrator")
     MetaConfig.root.get_internal('orchestrator').run()
@@ -425,7 +425,7 @@ def dup_another_build(build_dir, outdir):
 
     # First, load the whole config
     with open(os.path.join(build_dir, 'conf.yml'), 'r') as fh:
-        d = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+        d = Dict(yaml.safe_load(fh))
         global_config = MetaConfig(d)
 
     # first, clear fields overridden by current run

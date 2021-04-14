@@ -123,7 +123,7 @@ class Profile:
             PATH_INSTDIR,
             'templates/profile-format.yml')
         with open(self._file, 'r') as fh:
-            self.fill(yaml.load(fh, Loader=yaml.FullLoader))
+            self.fill(yaml.safe_load(fh))
 
     def check(self, fail=True):
         for kind in config.CONFIG_BLOCKS:
@@ -182,9 +182,9 @@ class Profile:
             suffix=".py"
         )
         with open(self._file, 'r') as f:
-            stream = yaml.load(f, Loader=yaml.FullLoader)
+            stream = yaml.safe_load(f)
             if stream:
-                yaml.dump(stream, fname)
+                yaml.safe_dump(stream, fname)
 
             if stream and 'plugin' in stream['runtime']:
                 content = base64.b64decode(
@@ -210,7 +210,7 @@ def check_valid_combination(dict_of_combinations=dict()):
         fplugin.seek(0)
 
         # now, dump back temp file to the original saves
-        stream = yaml.load(fname, Loader=yaml.FullLoader)
+        stream = yaml.safe_load(fname)
         if stream is None:
             stream = dict()
         stream_plugin = fplugin.read()
@@ -227,7 +227,7 @@ def check_valid_combination(dict_of_combinations=dict()):
                                              suffix=".yml.rej",
                                              prefix=self.full_name,
                                              delete=False) as rej_fh:
-                yaml.dump(stream, rej_fh)
+                yaml.safe_dump(stream, rej_fh)
 
                 log.err("Invalid format: {}".format(e.message),
                         "Rejected file: {}".format(rej_fh.name),
@@ -235,7 +235,7 @@ def check_valid_combination(dict_of_combinations=dict()):
                         "before the importation.")
 
         with open(self._file, 'w') as f:
-            yaml.dump(stream, f)
+            yaml.safe_dump(stream, f)
 
         # delete temp files (replace by 'with...' ?)
         fname.close()
