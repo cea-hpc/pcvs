@@ -11,6 +11,7 @@ from pcvs import NAME_BUILDIR
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, utils, system
 from pcvs.helpers.log import utf
+from pcvs.helpers.exceptions import ValidationException
 
 
 def locate_scriptpaths(output=None):
@@ -126,12 +127,12 @@ def process_check_yaml_stream(data):
         stream = yaml.load(data, Loader=yaml.FullLoader)
         token_load = "{}".format(utf('succ'))
 
-        scheme.validate(stream, fail_on_error=False)
+        scheme.validate(stream)
         token_yaml = "{}".format(utf('succ'))
 
     except yaml.YAMLError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
-    except jsonschema.exceptions.ValidationError as e:
+    except ValidationException.FormatError as e:
         err_msg = base64.b64encode(str(e.message).encode('utf-8'))
 
     return (err_msg, token_load, token_yaml)

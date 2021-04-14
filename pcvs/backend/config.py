@@ -114,7 +114,7 @@ class ConfigurationBlock:
         return Dict(self._details).to_dict()
 
     def check(self, fail=True):
-        system.ValidationScheme(self._kind).validate(self._details, fail)
+        system.ValidationScheme(self._kind).validate(self._details)
 
     def load_from_disk(self):
         if not self._exists:

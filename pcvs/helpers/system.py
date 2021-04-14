@@ -1,5 +1,5 @@
 import os
-import pprint
+from pcvs.helpers.exception import GenericException
 
 import yaml
 import jsonschema
@@ -8,17 +8,25 @@ from addict import Dict
 import pcvs
 from pcvs import NAME_SRCDIR, NAME_BUILDIR, PATH_INSTDIR
 from pcvs.helpers import log, package_manager, git
+from pcvs.helpers.exceptions import ValidationException
 
 
 ####################################
 ####   YAML VALIDATION OBJECT   ####
-####################################
+####################q################
 class ValidationScheme:
+    """Object manipulating schemes (yaml) to enforce data formats.
+    A validationScheme is instancied according to a 'model' (the format to
+    validate). This instance can be used multiple times to check multiple 
+    streams belonging to the same model.
+    """
     avail_list = None
 
     @classmethod
     def available_schemes(cls):
-
+        """return list of currently supported formats to be validated. The list
+        is extracted from INSTALL/schemes/<model>-scheme.yml
+        """
         if cls.avail_list is None:
             cls.avail_list = list()
             for f in os.listdir(os.path.join(PATH_INSTDIR, 'schemes/')):
@@ -27,62 +35,87 @@ class ValidationScheme:
         return cls.avail_list
 
     def __init__(self, name):
-        self._prefix = name
+        """Create a new ValidationScheme instancen based on a given model.
+            During initialisatio, the file scheme is loaded from disk.
+            :raises:
+            ValidationException.SchemeError: file is not found OR unable to load
+            the YAML scheme file.
+        """
+        self._name = name
 
-        with open(os.path.join(
+        try:
+            with open(os.path.join(
                             PATH_INSTDIR,
-                            'schemes/{}-scheme.yml'.format(name)
-                        ), 'r') as fh:
-            self._scheme = yaml.load(fh, Loader=yaml.FullLoader)
+                            'schemes/{}-scheme.yml'.format(name)), 'r') as fh:
+                self._scheme = yaml.safe_load(fh)
+        except (IOError, yaml.YAMLError):
+            raise ValidationException.SchemeError(
+                "Unable to load scheme {}".format(name))
 
-    def validate(self, content, fail_on_error=True, filepath=None):
+    def validate(self, content, filepath=None):
+        """Validate a given datastructure (dict) agasint the loaded scheme.
+            :raises:
+                ValidationException.FormatError: data are not valid
+                ValidationException.SchemeError: issue while applying scheme
+        """
         try:
             if filepath is None:
                 filepath = "'data stream'"
             
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
-            if fail_on_error:
-                log.err("Wrong format: {} ('{}'):".format(
-                                filepath,
-                                self._prefix),
-                        "{}".format(e.message))
-            else:
-                raise e
-        except Exception as e:
-            log.err(
-                "Something wrong happen validating {}".format(self._prefix),
+            raise ValidationException.FormatError(
+                "Wrong format: {} ('{}'):".format(filepath, self._name),
+                "{}".format(e.message))
+        except jsonschema.exceptions.SchemaError as e:    
+            raise ValidationException.SchemeError(
+                "Unable to use the scheme {}".format(self._name),
                 '{}'.format(e)
             )
 
 
 class Config(Dict):
+    """a 'Config' is a dict extension (an addict.Dict), used to manage all
+    configuration fields. While it can contain arbitrary data, the whole PCVS
+    configuration is composed of 5 distinct 'categories', each being a single
+    Config. These are then gathered in a `MetaConfig` object (see below)
+    """
     def __init__(self, d={}, *args, **kwargs):
+        """Init the object and propagate properly the init to Dict() object"""
         super().__init__(*args, **kwargs)
         for n in d:
             self.__setitem__(n, d[n])
     
-    def validate(self, kw, fail_on_error=True):
+    def validate(self, kw):
+        """Check if the Config instance matches the expected format as declared
+        in schemes/. As the 'category' is not carried by the object itself, it
+        is provided by the function argument.
+        """
         assert(kw in ValidationScheme.available_schemes())
         ValidationScheme(kw).validate(self)
 
     def __setitem__(self, param, value):
+        """extend it to handle dict initialization (needs Dict conversion)"""
         if isinstance(value, dict):
             value = Dict(value)
         super().__setitem__(param, value)
 
     def set_ifdef(self, k, v):
+        """shortcut function: init self[k] only if v is not None"""
         if v is not None:
             self[k] = v
 
     def set_nosquash(self, k, v):
+        """shortcut function: init self[k] only if v is not already set"""
         if not self.isset(k):
             self[k] = v
 
     def isset(self, k):
+        """check key existence in config dict"""
         return k in self
     
     def to_dict(self):
+        """Convert the Config() to regular dict."""
         # this dirty hack is due to a type(self) used into addict.py
         # leading to misconvert derived classes from Dict()
         # --> to_dict() checks if a sub-value is instance of type(self)
@@ -94,16 +127,33 @@ class Config(Dict):
         return copy.to_dict()
 
     def from_dict(self, d):
+        """Fill the current Config from a given dict"""
         for k, v in d.items():
             self[k] = v
     
     def from_file(self, filename):
-        with open(filename, 'r') as fh:
-            d = yaml.safe_load(fh)
-        self.from_dict(d)
+        """Fill the current config from a given file
+            :raises:
+                GenericException.IOError: file does not exist OR badly formatted
+        """
+        try:
+            with open(filename, 'r') as fh:
+                d = yaml.safe_load(fh)
+            self.from_dict(d)
+        except (IOError, yaml.YAMLError) as e:
+            raise GenericException.IOError("{} invalid or badly formatted".format(filename))
 
 
 class MetaConfig(Dict):
+    """Root configuration object. It is composed of Config(), categorizing
+    each configuration blocks. This MetaConfig() contains the whole profile
+    along with any validation and current run information.
+    This configuration is used as a dict extension.
+
+    To avoid carrying a global instancied object over the whole code, a
+    class-scoped attribute allows to browse the global configuration from
+    anywhere through `Metaconfig.root`"
+    """
     root = None
     validation_default_file = pcvs.PATH_VALCFG
     
@@ -112,38 +162,53 @@ class MetaConfig(Dict):
         if isinstance(base, dict):
             for k, v in base.items():
                 self[k] = v
+
+        # The 'internal' node is a special one. Put here anything not requiring
+        # to be published (like conf.yml, etc...). mainly one-time Python objects
         self['__internal'] = Config()
 
     def __setitem__(self, param, value):
+        """Extend the default Dict setter mthod to reach the base class one"""
         assert(isinstance(value, Config))
         super().__setitem__(param, value)
 
     def bootstrap_generic(self, subnode, node):
-        #self.setdefault(subnode, Config())
+        """"Initialize a Config() object and store it under name 'node'"""
+        
         if subnode not in self:
             self[subnode] = Config()
         
         for k, v in node.items():
             self[subnode][k] = v
+
         self[subnode].validate(subnode)
         return self[subnode]
 
     def bootstrap_compiler(self, node):
+        """"Specific initialize for compiler config block"""
         subtree = self.bootstrap_generic('compiler', node)
         if 'package_manager' in subtree:
             self.set_internal('cc_pm', package_manager.identify(subtree.package_manager))
         return subtree
 
     def bootstrap_runtime(self, node):
+        """"Specific initialize for runtime config block"""
         subtree = self.bootstrap_generic('runtime', node)
         if 'package_manager' in subtree:
             self.set_internal('rt_pm', package_manager.identify(subtree.package_manager))
         return subtree
     
     def bootstrap_group(self, node):
+        """"Specific initialize for group config block.
+        There is currently nothing to here but calling bootstrap_generic()"""
         return self.bootstrap_generic('group', node)
 
     def bootstrap_validation_from_file(self, filepath):
+        """"Specific initialize for validation config block. This function loads
+        a file containing the validation dict.
+            :raises:
+                GenericException.IOError: file is not found or badly formatted
+        """
         node = Dict()
         if filepath is None:
             filepath = self.validation_default_file
@@ -151,16 +216,18 @@ class MetaConfig(Dict):
         if os.path.isfile(filepath):
             try:
                 with open(filepath, 'r') as fh:
-                    node = Dict(yaml.load(fh, Loader=yaml.FullLoader))
-            except (IOError, yaml.YAMLError):
-                log.err("Error(s) found while loading (}".format(filepath))
+                        node = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+            except (IOError, yaml.YAMLError) as e:
+                raise GenericException.IOError(
+                    "Error(s) found while loading (}".format(filepath))
         
         return self.bootstrap_validation(node)
 
     def bootstrap_validation(self, node):
+        """"Specific initialize for validation config block"""
         subtree = self.bootstrap_generic('validation', node)
 
-        # #### now set default value ####
+        # Initialize default values when not set by user or default files
         subtree.set_nosquash('verbose', 0)
         subtree.set_nosquash('color', True)
         subtree.set_nosquash('pf_name', 'default')
@@ -194,6 +261,7 @@ class MetaConfig(Dict):
         return subtree
 
     def bootstrap_machine(self, node):
+        """"Specific initialize for machine config block"""
         subtree = self.bootstrap_generic('machine', node)
         subtree.set_nosquash('name', 'default')
         subtree.set_nosquash('nodes', 1)
@@ -216,18 +284,24 @@ class MetaConfig(Dict):
         return subtree
 
     def bootstrap_criterion(self, node):
+        """"Specific initialize for criterion config block"""
         return self.bootstrap_generic('criterion', node)
 
     def set_internal(self, k, v):
+        """manipulate the internal MetaConfig() node to store not-exportable data"""
         self['__internal'][k] = v
 
     def get_internal(self, k):
+        """manipulate the internal MetaConfig() node to load not-exportable data"""
         if k in self['__internal']:
             return self['__internal'][k]
         else:
             return None
 
     def dump_for_export(self):
+        """Export the whole configuration as a dict. Prune any __internal node
+        beforehand.
+        """
         res = Dict()
         for k, v in self.items():
             if k == '__internal':

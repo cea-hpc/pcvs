@@ -130,7 +130,7 @@ class Profile:
             if kind not in self._details:
                 raise jsonschema.exceptions.ValidationError(
                     "Missing '{}' in profile".format(kind))
-            system.ValidationScheme(kind).validate(self._details[kind], fail)
+            system.ValidationScheme(kind).validate(self._details[kind])
 
     def flush_to_disk(self):
         self._retrieve_file()
