@@ -7,7 +7,7 @@ from addict import Dict
 
 import pcvs
 from pcvs import NAME_SRCDIR, NAME_BUILDIR, PATH_INSTDIR
-from pcvs.helpers import log, package_manager, utils
+from pcvs.helpers import log, package_manager, git
 
 
 ####################################
@@ -171,12 +171,13 @@ class MetaConfig(Dict):
         subtree.set_nosquash('xmls', list())
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)
-        subtree.set_nosquash('exported_to', None)
+        subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
+        subtree.set_nosquash('buildcache', os.path.join(subtree.output, 'cache'))
         subtree.set_nosquash('result', {"format": ['json']})
         subtree.set_nosquash('author', {
-            "name": utils.get_current_username(),
-            "email": utils.get_current_usermail()})
+            "name": git.get_current_username(),
+            "email": git.get_current_usermail()})
 
         # Annoying here:
         # self.result should be allowed even without the 'set_ifnot' above

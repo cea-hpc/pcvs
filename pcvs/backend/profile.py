@@ -9,7 +9,7 @@ from addict import Dict
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
-from pcvs.helpers import log, utils, system
+from pcvs.helpers import log, utils, system, git
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -71,7 +71,7 @@ class Profile:
         self._exists = False
 
     def get_unique_id(self):
-        return utils.generate_data_hash(str(self._details))
+        return git.generate_data_hash(str(self._details))
 
     def fill(self, raw):
         # some checks

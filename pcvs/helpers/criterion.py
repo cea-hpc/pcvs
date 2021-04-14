@@ -331,7 +331,7 @@ def valid_combination(dic):
     val = MetaConfig.root.validation
     if first and rt.plugin:
         first = not first
-        rt.pluginfile =  os.path.join(val.output, "cache/rt-plugin.py")
+        rt.pluginfile =  os.path.join(val.buildcache, "rt-plugin.py")
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
         

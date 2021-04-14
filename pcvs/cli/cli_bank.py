@@ -18,7 +18,7 @@ def compl_bank_projects(ctx, args, incomplete):
     pvBank.init()
     array = list()
     for bankname, bankpath in compl_list_banks(None, None, ''):
-        bank = pvBank.Bank(token=bankname, is_new=False)
+        bank = pvBank.Bank(token=bankname)
         bank.connect_repository()
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
@@ -50,7 +50,7 @@ def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
     log.print_header("Bank View")
 
-    b = pvBank.Bank(token=name, is_new=False)
+    b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
@@ -70,11 +70,11 @@ def bank_create(ctx, name, path):
     
     path = os.path.abspath(path)
 
-    b = pvBank.Bank(path, name=name, is_new=True)
+    b = pvBank.Bank(path, token=name)
     if b.exists():
         raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
-        b.connect_repository()  
+        b.connect_repository()
         b.save_to_global()
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
@@ -92,7 +92,7 @@ def bank_destroy(ctx, name, symlink):
     will be removed but existing data are preserved.
     """
     log.print_header("Bank View")
-    b = pvBank.Bank(name=name, is_new=False)
+    b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
@@ -109,7 +109,7 @@ def bank_destroy(ctx, name, symlink):
 @click.pass_context
 def bank_save_run(ctx, name, path, project):
     
-    b = pvBank.Bank(name=name)
+    b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     b.connect_repository()
@@ -121,25 +121,27 @@ def bank_save_run(ctx, name, path, project):
     
 
 
-@bank.command(name="load", short_help="Load an object from datastore")
+@bank.command(name="load", short_help="Extract infos from the datastore")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
-@click.argument("attr", nargs=1, required=True)
-@click.option("-d", "--dest", "dest", default=None,
-              type=click.Path(file_okay=False),
-              help="Directory where extracting saved objects")
+@click.argument("key", nargs=1, required=True)
+@click.option("--since", "start", default=None,
+              help="Select a starting point from where data will be extracted")
+@click.option("--until", "end", default=None,
+              help="Select the last date (included) where data will be searched for")
+@click.option("-f", "--format", "format",
+              type=click.Choice(['json', 'list']), default='json',
+              help="Request a set of values from a given key")
 @click.pass_context
-def bank_load_content(ctx, name, attr, dest):
-    """Load  any object under ATTR label from the previously-registered bank
-    NAME"""
-    log.warn("BANK: WIP")
-
-@bank.command(name="delete", short_help="delete an object from datastore")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
-@click.argument("attr", nargs=1, required=True)
-@click.confirmation_option(
-    "-f", "--force", "force",
-    prompt="Are your sure to delete repository and its content ?",
-    help="Do not ask for confirmation before deletion")
-@click.pass_context
-def bank_delete_content(ctx, name, attr):
-    log.warn("BANK: WIP")
+def bank_load(ctx, name, key, format, start, end):
+    
+    b = pvBank.Bank(token=name)
+    log.err('Work in Progress')
+    class NotExist(Exception): pass    
+    try:
+        b.connect_repository()
+        b.extract_data(key, start, end, format)
+    except NotExist:
+        raise click.BadArgumentUsage("'{}' does not exist".format(name))
+    except KeyError:
+        raise click.BadArgumentUsage("The key \'{}\' is not valid within {} scope".format(key, name))
+    

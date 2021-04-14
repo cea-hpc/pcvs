@@ -1,6 +1,7 @@
 import os
 import tarfile
 import tempfile
+import glob
 import shutil
 from pygit2.repository import Repository
 
@@ -11,13 +12,13 @@ from datetime import datetime, timezone
 from addict import Dict
 import pygit2
 
-from pcvs.helpers import log, utils, criterion
+from pcvs.helpers import log, utils, criterion, git
 
 BANKS = dict()
 BANK_STORAGE = ""
 
 class Bank:
-    def __init__(self, path=None, token="default", is_new=False):
+    def __init__(self, path=None, token=""):
         self._root = path
         self._repo = None
         self._config = None
@@ -29,7 +30,7 @@ class Bank:
         if len(array) > 1:
             self._preferred_proj = array[1]
         self._name = array[0]
-    
+        
         global BANKS
         if self.exists():
             if self.name_exist():
@@ -88,7 +89,7 @@ class Bank:
                     nb_parents += 1
                     cur = cur.parents[0]
 
-                s.append("  * {}: {} runs".format(v, nb_parents))
+                s.append("  * {}: {} run(s)".format(v, nb_parents))
 
         print("\n".join(s))
 
@@ -120,7 +121,7 @@ class Bank:
                 rep = pygit2.discover_repository(self._root)
                 if rep:
                     # need to lock, to ensure safety
-                    self._root = rep
+                    self._root = rep.rstrip("/")
                     self._lockfile = open(os.path.join(self._root, ".pcvs.lock"), 'w+')            
                     locked = False
                     while not locked:
@@ -147,7 +148,6 @@ class Bank:
 
         data_hash = pygit2.hash(str(data))
         if data_hash in self._repo:
-            print("save new blob : hash {}".format(data_hash))
             return self._repo[data_hash].oid
         else:
             return self._repo.create_blob(str(data))
@@ -194,17 +194,13 @@ class Bank:
 
         root_subdir = os.path.join(buildpath, "test_suite")
         #TODO: need a test walkthrough (not dirs)
-        for label, _ in self._config.validation.dirs.items():
-            for root, _, files in os.walk(os.path.join(root_subdir, label)):
-                for f in files:
-                    if not (f.startswith('output-') and f.endswith('.json')):
-                        continue
-                    with open(os.path.join(root, f), 'r') as fh:
-                        data = Dict(yaml.load(fh, Loader=yaml.Loader))
-                        #TODO: validate
-                    
-                    for elt in data['tests']:
-                        self.save_test_from_json(elt)
+        for result_file in glob.glob(os.path.join(buildpath, "pcvs_rawdat*.json")):
+            with open(result_file, 'r') as fh:
+                data = Dict(yaml.load(fh, Loader=yaml.Loader))
+                #TODO: validate
+            
+            for elt in data['tests']:
+                self.save_test_from_json(elt)
         self._rootree.write()
         self.finalize_snapshot(tag)
 
@@ -227,20 +223,13 @@ class Bank:
             time=int(self._config.validation.datetime.timestamp())
             )
         committer = pygit2.Signature(
-            name=utils.get_current_username(),
-            email=utils.get_current_usermail())
+            name=git.get_current_username(),
+            email=git.get_current_usermail())
         commit_msg = "Commit message is not used (yet)"
 
-        # a reference (lightweight branch) is tracking a whole test-suite
-        # history, there are managed directly
-        # TODO: compute the proper name for the current test-suite
-        if tag is None:
-            tag = self._preferred_proj
-            if tag is None:
-                tag = "unknown"
-        refname = "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
-
-        # check if the current reference already exit.
+        refname = self.__build_target_branch_name(tag)
+        
+        # check if the current reference already exist.
         # if so, retrieve the parent commit to be linked
         if refname in self._repo.references:
             parent_commit, ref = self._repo.resolve_refish(refname)
@@ -264,6 +253,33 @@ class Bank:
         if ref.name is None:
             self._repo.references.create(refname, coid)
 
+    def __build_target_branch_name(self, tag):
+        # a reference (lightweight branch) is tracking a whole test-suite
+        # history, there are managed directly
+        # TODO: compute the proper name for the current test-suite           
+        if tag is None:
+            tag = self._preferred_proj
+            
+            if tag is None:
+                tag = "unknown"
+        return "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
+    
+
+    def locate_key(self, key):
+        pass
+
+    def extract_data(self, key, start, end, format):
+        refname = self.__build_target_branch_name(None)
+        
+        class ProjectNameError(Exception): pass
+        if refname not in self._repo.references:
+            raise ProjectNameError()
+
+        head, _ = self._repo.resolve_refish(refname)
+        for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
+            print(commit.message, commit.author.date)
+
+
     def __repr__(self):
         return {
             'rootpath': self._root,
@@ -276,7 +292,7 @@ def init():
     $USER_STORAGE/banks.yml
     """
     global BANKS, BANK_STORAGE
-    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "saves/banks.yml")
+    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
             BANKS = yaml.load(f, Loader=yaml.Loader)
