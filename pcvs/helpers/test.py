@@ -685,14 +685,20 @@ class TEDescriptor:
             elif self._build.sources.binary:
                 program = self._build.sources.binary
             
+            # attempt to determine test working directory
             if self._run.cwd:
                 chdir = self._run.cwd
+                # if set, 'program' build is prefix w/ cwd path
+                program = os.path.join(chdir, program)
+            else:
+                #else, prefix with @BUILDPATH@
+                program = os.path.join(self._buildir, program)
 
             command = "{runtime} {runtime_args} {args} {program} {params}".format(
                 runtime=MetaConfig.root.runtime.program,
                 runtime_args=MetaConfig.root.runtime.get('args', ''),
                 args=" ".join(args),
-                program=os.path.join(self._buildir, program),
+                program=program,
                 params=" ".join(params)
             )
 
