@@ -2,7 +2,7 @@ from .conftest import click_call, isolated_fs
 from unittest.mock import patch
 import pcvs
 import os
-
+from pcvs.backend import run as tested
 
 def test_no_userdirs():
     with isolated_fs():
