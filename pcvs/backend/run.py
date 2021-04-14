@@ -39,6 +39,7 @@ def copy_file(src, dest):
 
 def process_main_workflow(the_session=None):
     global_config = MetaConfig.root
+    valcfg = global_config.validation
 
     log.banner()
     log.print_header("Prepare Environment")
@@ -46,9 +47,9 @@ def process_main_workflow(the_session=None):
     prepare()
 
     log.print_header("Process benchmarks")
-    if global_config.get('validation').reused_build is not None:
+    if valcfg.reused_build is not None:
         log.print_section("Reusing previously generated inputs")
-        log.print_section("Duplicated from {}".format(os.path.abspath(dup)))
+        log.print_section("Duplicated from {}".format(os.path.abspath(valcfg.reused_build)))
     else:
         start = time.time()
         process()
@@ -63,7 +64,7 @@ def process_main_workflow(the_session=None):
     # post-actions to build the archive, post-process the webview...
     terminate()
 
-    bank_token = global_config.get('validation').target_bank
+    bank_token = valcfg.target_bank
     if bank_token is not None:
         bank = pvBank.Bank(token=bank_token)
         pref_proj = bank.preferred_proj
@@ -75,7 +76,7 @@ def process_main_workflow(the_session=None):
             bank.connect_repository()
             bank.save_from_buildir(
                 None,
-                os.path.join(global_config.get('validation').output)
+                os.path.join(valcfg.output)
             )
 
 

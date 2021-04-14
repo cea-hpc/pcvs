@@ -277,7 +277,7 @@ class Test:
             },
             "exec": self._array["command"],
             "result": {
-                "state": self._state if self._executed else STATE_NOT_EXECUTED,
+                "state": self._state if self._executed else self.STATE_NOT_EXECUTED,
                 "time": self._time,
                 "output": self._out,
             },
