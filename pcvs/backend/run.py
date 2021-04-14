@@ -140,6 +140,7 @@ def prepare():
                 valcfg.output, 'conf.env'), is_dir=False)
             utils.create_or_clean_path(os.path.join(
                 valcfg.output, 'save_for_export'))
+            utils.create_or_clean_path(valcfg.buildcache)
 
     log.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
@@ -427,9 +428,9 @@ def dup_another_build(build_dir, outdir):
         global_config = MetaConfig(d)
 
     # first, clear fields overridden by current run
-    global_config.get('validation').xmls = []
-    global_config.get('validation').output = outdir
-    global_config.get('validation').reused_build = build_dir
+    global_config.validation.output = outdir
+    global_config.validation.reused_build = build_dir
+    global_config.validation.buildcache = os.path.join(outdir, 'cache')
 
     # second, copy any xml/sh files to be reused
     for root, _, files, in os.walk(os.path.join(build_dir, "test_suite")):

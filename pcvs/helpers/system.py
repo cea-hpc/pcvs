@@ -173,6 +173,7 @@ class MetaConfig(Dict):
         subtree.set_nosquash('anonymize', False)
         subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
+        subtree.set_nosquash('buildcache', os.path.join(subtree.output, 'cache'))
         subtree.set_nosquash('result', {"format": ['json']})
         subtree.set_nosquash('author', {
             "name": git.get_current_username(),

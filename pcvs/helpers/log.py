@@ -218,7 +218,7 @@ def nimpl(*msg):
 
 
 def nreach(*msg):
-    cowsay.tux("""
+    err("""
     Uh oh, I reached this point but one ever told me I'll never go 
     that far! I'm afraid something really bad happened. Please send 
     help, I'm scared! Here are my coordinates: {}
