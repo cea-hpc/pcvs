@@ -1,3 +1,4 @@
+from logging import error
 from addict import Dict
 import pytest
 import os
@@ -5,7 +6,9 @@ import yaml
 from pcvs.helpers import package_manager, utils
 from pcvs.helpers import system as s
 from unittest.mock import patch
-
+from pcvs.helpers import system
+from pcvs import PATH_INSTDIR
+import jsonschema
 
 def test_bootstrap_compiler():
     obj = s.MetaConfig()
@@ -80,3 +83,96 @@ def test_bootstrap_runtime():
             res[type(p)] = 1
     assert(res[package_manager.SpackManager] == 1)
     assert(res[package_manager.ModuleManager] == 2)
+
+@pytest.fixture
+def kw_keys():
+    return [f.replace('-scheme.yml', '') for f in os.listdir(os.path.join(PATH_INSTDIR, 'schemes/'))]
+
+@pytest.fixture
+def init_config():
+    d = Dict({"": "value1", "key2": "value2"})
+    conf = system.Config(d)
+
+def test_validate(kw_keys):
+    vs = system.Config()
+    compiler = {
+        "commands": {
+            "cc": "example",
+            "cxx": "example",
+            "fc": "example",
+            "f77": "example",
+            "f90" : "example",
+        },
+        "variants": {
+            "openmp": {"args": "example"},
+            "tbb": {"args": "example"},
+            "cuda": {"args" : "example"},
+            "strict": {"args" : "example"}
+        },
+        "package_manager": {
+            "spack": ["example"],
+            "module": ["example"]
+        }
+    }    
+    runtime = {
+        "program": "example",
+        "args": "example",
+        "iterators": {
+            "iterator_name": {
+                "option": "example",
+                "numeric": True,
+                "type": "argument",
+                "position": "before",
+                "aliases": {
+                    "ib": "example",
+                    "tcp": "example",
+                    "shmem": "example",
+                    "ptl": "example"
+                }
+            }
+        },
+        "package_manager": {
+            "spack": ["example"],
+            "module": ["example"]
+        }
+    }
+    criterion = {
+        "iterators":{
+            "example":{
+                "values": [1,2],
+                "subtitle": "example"
+            }
+        }
+    }
+    criterion_wrong = {
+        "wrong-key":{
+            "example":{
+                "values": [1,2],
+                "subtitle": "example"
+            }
+        }
+    }
+    keywords = [
+        (compiler, "compiler"), 
+        (runtime, "runtime"), 
+        (criterion, "criterion")
+    ]
+    # for kw in ["compiler", "criterion", "group"]:
+    #     with open(os.path.join(PATH_INSTDIR, "templates/{}-format.yml".format(kw))) as blk:
+    #         to_validate = Dict(yaml.load(blk))
+    #         conf = system.Config(to_validate)
+    #         conf.validate(kw)
+    for kw in keywords:
+        to_validate = Dict(kw[0])
+        conf = system.Config(to_validate)
+        conf.validate(kw[1])
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        to_validate = Dict(criterion_wrong)
+        conf = system.Config(to_validate)
+        conf.validate(kw[1])
+    with pytest.raises(AssertionError):
+        vs.validate("wrong_value")
+
+
+def test_config(init_config):
+    pass
