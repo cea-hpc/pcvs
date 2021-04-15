@@ -7,6 +7,7 @@ import pytest
 import yaml
 from addict import Dict
 
+import pcvs
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import package_manager
 from pcvs.helpers import system
@@ -170,7 +171,7 @@ def test_validate(kw_keys):
         to_validate = Dict(kw[0])
         conf = system.Config(to_validate)
         conf.validate(kw[1])
-    with pytest.raises(jsonschema.exceptions.ValidationError):
+    with pytest.raises(pcvs.helpers.exceptions.ValidationException.FormatError):
         to_validate = Dict(criterion_wrong)
         conf = system.Config(to_validate)
         conf.validate(kw[1])

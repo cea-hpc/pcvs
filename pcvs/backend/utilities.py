@@ -258,13 +258,13 @@ def process_discover_directory(path):
     for root, dirs, files in os.walk(path):
         obj = None
         if 'configure' in files:
-            n = log.cl("Autotools", "yellow", bold=True)
+            n = log.style("Autotools", fg="yellow", bold=True)
             obj = AutotoolsBuildSystem(root, dirs, files)
         if 'CMakeLists.txt' in files:
-            n = log.cl("CMake", "cyan", bold=True)
+            n = log.style("CMake", fg="cyan", bold=True)
             obj = CMakeBuildSystem(root, dirs, files)
         if 'Makefile' in files:
-            n = log.cl("Make", "red", bold=True)
+            n = log.style("Make", fg="red", bold=True)
             obj = MakefileBuildSystem(root, dirs, files)
 
         if obj is not None:

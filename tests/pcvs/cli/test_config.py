@@ -26,59 +26,49 @@ def test_completion(mock_init):
 
 def test_cmd():
     res = click_call('config')
-    assert('Usage:' in res.output)
+    assert('Usage:' in res.stdout)
 
 
 @pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
-def test_list_all(config_scope, caplog):
-    return test_list(config_scope, 'all', caplog)
+def test_list_all(config_scope):
+    return test_list(config_scope, 'all')
 
 
 @pytest.mark.parametrize("config_kind", pcvs.backend.config.CONFIG_BLOCKS)
 @pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
-def test_list(config_scope, config_kind, caplog):
+def test_list(config_scope, config_kind):
 
     token = ".".join(filter(None, (config_scope, config_kind)))
 
     if config_scope and config_kind is None:
-        caplog.clear()
         res = click_call('config', 'list', token, success=False)
-        assert ("Invalid " in caplog.text)
+        assert ("Invalid " in res.stderr)
     else:
         res = click_call('config', 'list', token)
         assert (res.exit_code == 0)
 
     if config_scope and config_kind:
-        caplog.clear()
         res = click_call('config', 'list', token+".test")
-        assert ("no LABEL required for this command" in caplog.text)
+        assert ("WARNING: no LABEL required" in res.stderr)
 
+def test_list_wrong():
+    with pytest.raises(pcvs.helpers.exceptions.ConfigException.BadTokenError):
+        res = click_call('config', 'list', 'error')
+        #assert(res.exit_code != 0)
+        #assert ('Invalid KIND' in res.stderr)
 
-@pytest.mark.parametrize("config_kind", pcvs.backend.config.CONFIG_BLOCKS)
-@pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
-def test_list_scope(config_kind, config_scope):
-    for scope in pcvs.helpers.utils.storage_order():
-        _ = click_call('config', 'list', ".".join([scope, config_kind]))
+    with pytest.raises(pcvs.helpers.exceptions.ConfigException.BadTokenError):
+        res = click_call('config', 'list', 'failure.compiler')
+        #assert(res.exit_code != 0)
+        #assert ('Invalid SCOPE' in res.stderr)
 
-
-def test_list_wrong(caplog):
-    caplog.clear()
-    res = click_call('config', 'list', 'error')
-    assert(res.exit_code != 0)
-    assert ('Invalid KIND' in caplog.text)
-
-    caplog.clear()
-    res = click_call('config', 'list', 'failure.compiler')
-    assert(res.exit_code != 0)
-    assert ('Invalid SCOPE' in caplog.text)
-
-    caplog.clear()
-    res = click_call('config', 'list', 'failure.compiler.extra.field')
-    assert(res.exit_code != 0)
-    assert ('Invalid SCOPE' in caplog.text)
+    with pytest.raises(pcvs.helpers.exceptions.ConfigException.BadTokenError):
+        res = click_call('config', 'list', 'failure.compiler.extra.field')
+        #assert(res.exit_code != 0)
+        #assert ('Invalid SCOPE' in res.stderr)
 
 @patch('pcvs.backend.config.ConfigurationBlock', autospec=True)
-def test_show(mock_config, caplog):
+def test_show(mock_config):
     instance = mock_config.return_value
     instance.is_found.return_value = True
 
@@ -157,10 +147,10 @@ def test_destroy(mock_config):
     instance.delete.assert_not_called()
 
 
-def test_import(caplog):
+def test_import():
     pass
 
-def test_export(caplog):
+def test_export():
     pass
 
 

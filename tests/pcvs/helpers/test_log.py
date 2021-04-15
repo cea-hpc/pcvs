@@ -1,9 +1,11 @@
-from click.termui import progressbar
-import pytest
-import click
 import os
-from click.testing import CliRunner
 from unittest.mock import Mock, patch
+
+import click
+import pytest
+from click.termui import progressbar
+from click.testing import CliRunner
+
 from pcvs.helpers import log as tested
 from pcvs.helpers.exceptions import CommonException
 
@@ -91,38 +93,45 @@ def test_print_file():
                 obj2 = tested.IOManager(logfile="temp.log")
 
 
-def print_logcall(capsys):
+def test_print_logcall(capsys):
     with CliRunner().isolated_filesystem():
-        obj_normal = tested.IOManager(verbose=0, out=False, logfile="normal.log")
-        obj_info = tested.IOManager(verbose=1, out=False, logfile="debug.log")
-        obj_debug = tested.IOManager(verbose=2, out=False, logfile="info.log")
+        obj_normal = tested.IOManager(verbose=0, tty=False, logfile="normal.log")
+        obj_info = tested.IOManager(verbose=1, tty=False, logfile="info.log")
+        obj_debug = tested.IOManager(verbose=2, tty=False, logfile="debug.log")
         
         for man in [obj_normal, obj_info, obj_debug]: 
             man.err('test')
             man.warn('test')
             man.info('test')
             man.debug("test")
+            print(os.path.isfile('debug.log'))
+        man = None
+
+        # close log_files
+        del obj_normal
+        del obj_info
+        del obj_debug
         
         with open("normal.log", 'r') as fh:
             stream = fh.read()
-            assert('ERROR: test\n' in stream)
-            assert('WARN: test\n' in stream)
-            assert('INFO: test\n' not in stream)
-            assert('DEBUG: test\n' not in stream)
+            assert('ERROR: ' in stream)
+            assert('WARNING: ' in stream)
+            assert('INFO: ' not in stream)
+            assert('DEBUG: ' not in stream)
         
         with open("info.log", 'r') as fh:
             stream = fh.read()
-            assert('ERROR: test\n' in stream)
-            assert('WARN: test\n' in stream)
-            assert('INFO: test\n' in stream)
-            assert('DEBUG: test\n' not in stream)
+            assert('ERROR:' in stream)
+            assert('WARNING:' in stream)
+            assert('INFO:' in stream)
+            assert('DEBUG:' not in stream)
 
         with open("debug.log", 'r') as fh:
             stream = fh.read()
-            assert('ERROR: test\n' in stream)
-            assert('WARN: test\n' in stream)
-            assert('INFO: test\n' in stream)
-            assert('DEBUG: test\n' in stream)
+            assert('ERROR:' in stream)
+            assert('WARNING:' in stream)
+            assert('INFO:' in stream)
+            assert('DEBUG:' in stream)
     
 def test_banners(capsys):
     obj = tested.IOManager(length=100)

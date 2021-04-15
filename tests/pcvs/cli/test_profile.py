@@ -19,25 +19,25 @@ def test_cmd():
         'global': [('system-wide', "/path/to/system-wide.yml")]
         })
 @patch('pcvs.backend.profile.init', return_value=None)
-def test_list(mock_init, caplog):
+def test_list(mock_init):
     res = click_call('profile', 'list')
     assert(res.exit_code == 0)
-    assert('default' in res.output)
-    assert('user' in res.output)
-    assert('system-wide' in res.output)
+    assert('default' in res.stdout)
+    assert('user' in res.stdout)
+    assert('system-wide' in res.stdout)
 
     res = click_call('profile', 'list', 'local')
     assert(res.exit_code == 0)
-    assert('default' in res.output)
-    assert('user' not in res.output)
-    assert('system-wide' not in res.output)
+    assert('default' in res.stdout)
+    assert('user' not in res.stdout)
+    assert('system-wide' not in res.stdout)
 
     res = click_call('profile', 'list', 'global.system-wide')
     assert(res.exit_code == 0)
-    assert('default' not in res.output)
-    assert('user' not in res.output)
-    assert('system-wide' in res.output)
-    assert('no LABEL required' in caplog.text)
+    assert('default' not in res.stdout)
+    assert('user' not in res.stdout)
+    assert('system-wide' in res.stdout)
+    assert('no LABEL required' in res.stderr)
 
 
 @patch('pcvs.backend.profile.Profile')

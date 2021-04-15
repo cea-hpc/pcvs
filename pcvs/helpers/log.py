@@ -5,6 +5,7 @@ import sys
 import textwrap
 
 import click
+
 from pcvs.helpers.exceptions import CommonException
 
 
@@ -47,6 +48,9 @@ def debug(*args, **kwargs):
 
 def utf(*args, **kwargs):
     return manager.utf(*args, **kwargs)
+
+def style(*args, **kwargs):
+    return manager.style(*args, **kwargs)
 
 def get_verbosity_str(*args, **kwargs):
     return manager.get_verbosity_str(*args, **kwargs)
@@ -141,6 +145,7 @@ class IOManager:
             self._logfile = open(logfile, "w")
         
     def __del__(self):
+        
         if self._logfile is not None:
             self._logfile.close()
 
@@ -149,6 +154,7 @@ class IOManager:
             click.echo(msg, err=err)
         if self._logfile:
             self._logfile.write(msg + ('\n' if msg[-1] != "\n" else ""))
+            self._logfile.flush()
 
     def has_verb_level(self, match):
         req_idx = 0
@@ -187,6 +193,9 @@ class IOManager:
         assert(k in self.glyphs.keys())
         return self.glyphs[k]
 
+    def style(*args, **kwargs):
+        return click.style(*args, **kwargs)
+
     def print_header(self, s, out=True):
         hdr_char = self.utf('hdr')
         str_len = self._linelength - (len(s) + 2)  # surrounding spaces
@@ -222,13 +231,13 @@ class IOManager:
             return s
 
     def debug(self, *msg):
-        if(self._verbose >= 3):
+        if(self._verbose >= 2):
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")), err=True)
 
     def info(self, *msg):
-        if(self._verbose >= 2):
+        if(self._verbose >= 1):
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")),  err=True)
@@ -281,10 +290,10 @@ class IOManager:
             self.__print_rawline("\n".join(s))
 
 
-    def nimpl(self, *msg):
+    def nimpl(self, *msg):  # pragma: no cover
         self.err("This is not implemented (yet)!")  
 
-    def print_n_stop(self, **kwargs):
+    def print_n_stop(self, **kwargs):  #pragma: no cover
         # not replacing these prints (for debug only)
         for k, v in kwargs.items():
             click.secho("{}: ".format(k), fg="yellow", nl=False)

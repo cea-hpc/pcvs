@@ -124,7 +124,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
     else:
         log.print_section("{succ} {cg} {succ}".format(
             succ=log.utf('succ'),
-            cg=log.cl("Everything is OK!", 'green', bold=True))
+            cg=log.style("Everything is OK!", fg='green', bold=True))
         )
 """
 

@@ -53,7 +53,7 @@ def config_list_single_kind(kind, scope) -> None:
             if not names:
                 log.print_item("{: <6s}: {}".format(
                                 sc.upper(),
-                                log.cl('None', 'bright_black')))
+                                log.style('None', fg='bright_black')))
             else:
                 log.print_item("{: <6s}: {}".format(
                                 sc.upper(),

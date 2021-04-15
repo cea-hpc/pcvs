@@ -67,8 +67,8 @@ def profile_list(ctx, token):
                             for elt in [array for array in profiles[sc]]])
             if not names:
                 log.print_item("{: <6s}: {}".format(sc.upper(),
-                                                    log.cl('None',
-                                                             'bright_black')))
+                                                    log.style('None',
+                                                             fg='bright_black')))
             else:
                 log.print_item("{: <6s}: {}".format(sc.upper(),
                                                     ", ".join(names)))
