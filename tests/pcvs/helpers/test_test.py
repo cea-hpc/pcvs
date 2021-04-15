@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-
+from unittest.mock import patch
 from pcvs.helpers import test as tested
 
 
@@ -13,7 +13,7 @@ def legacy_yaml_file():
 def load_yaml_file():
     assert(False)
 
-
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_replace_tokens():
     build = "/path/to/build"
     prefix = "dir1/dir2"
@@ -42,9 +42,9 @@ def test_replace_tokens():
     assert(tested.replace_special_token(
                 'HOME is @HOME@',
                 src, build, prefix
-    ) == 'HOME is {}'.format(os.environ["HOME"]))
+    ) == 'HOME is {}'.format("/home/user"))
 
     assert(tested.replace_special_token(
                 'USER is @USER@',
                 src, build, prefix
-    ) == 'USER is {}'.format(os.environ['USER']))
+    ) == 'USER is {}'.format("superuser"))
