@@ -7,8 +7,7 @@ from addict import Dict
 import pcvs
 from pcvs import NAME_BUILDIR, NAME_SRCDIR, PATH_INSTDIR
 from pcvs.helpers import git, log, package_manager
-from pcvs.helpers.exception import GenericException
-from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers.exceptions import CommonException, ValidationException
 
 
 ####################################
@@ -134,14 +133,14 @@ class Config(Dict):
     def from_file(self, filename):
         """Fill the current config from a given file
             :raises:
-                GenericException.IOError: file does not exist OR badly formatted
+                CommonException.IOError: file does not exist OR badly formatted
         """
         try:
             with open(filename, 'r') as fh:
                 d = yaml.safe_load(fh)
             self.from_dict(d)
         except (IOError, yaml.YAMLError) as e:
-            raise GenericException.IOError("{} invalid or badly formatted".format(filename))
+            raise CommonException.IOError("{} invalid or badly formatted".format(filename))
 
 
 class MetaConfig(Dict):
@@ -207,7 +206,7 @@ class MetaConfig(Dict):
         """"Specific initialize for validation config block. This function loads
         a file containing the validation dict.
             :raises:
-                GenericException.IOError: file is not found or badly formatted
+                CommonException.IOError: file is not found or badly formatted
         """
         node = Dict()
         if filepath is None:
@@ -218,7 +217,7 @@ class MetaConfig(Dict):
                 with open(filepath, 'r') as fh:
                         node = Dict(yaml.safe_load(fh))
             except (IOError, yaml.YAMLError) as e:
-                raise GenericException.IOError(
+                raise CommonException.IOError(
                     "Error(s) found while loading (}".format(filepath))
         
         return self.bootstrap_validation(node)

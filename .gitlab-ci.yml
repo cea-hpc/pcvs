@@ -1,7 +1,7 @@
-image: "python:3.6"
+image: 'python:3.6'
 
 before_script:
-- pip3 install tox
+- pip3 install -rrequirements-dev.txt
 
 variables:
     GIT_CLEAN_FLAGS: -fddx -e .coverage
@@ -15,57 +15,67 @@ variables:
     - web
 
 stages:
-- warmup
-- tests
-- misc
-- lint
+- Installation
+- Pytest
+- I/O Formatting
+- Documentation
+- Static Analysis
 
-flake8:
-    <<: *scope
-    stage: lint
-    script:
-    - tox -e py-lint
 yaml:
     <<: *scope
-    stage: lint
+    stage: I/O Formatting
     script:
-    - tox -e yaml-lint
+    - tox -e lint-yaml
 
-cli:
+linters:
     <<: *scope
-    stage: tests
+    stage: Static Analysis
+    allow_failure: true
     script:
-    - tox -- cli
+    - tox -e lint-generic
 
-backend:
+build_doc:
     <<: *scope
-    stage: tests
-    script:
-    - tox -- backend
-
-helpers:
-    <<: *scope
-    stage: tests
-    script:
-    - tox -- helpers
-
-      #converter:
-      #    <<: *scope
-      #    coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
-      #    stage: tests
-      #    script:
-      #    - pip install -e .
-      #    - pytest ./tests/pcvs/converter
-
-documentation:
-    <<: *scope
-    stage: misc
+    stage: Documentation
     script:
     - tox -e docs
 
 imports:
     <<: *scope
-    stage: misc
-    allow_failure: true
+    stage: Static Analysis
     script:
-    - tox -e order_imports
+    - tox -e lint-import
+
+.pytest:
+    <<: *scope
+    stage: Pytest
+    script:
+    - pip3 install .
+    - coverage run --source=./pcvs -m pytest ./tests/pcvs
+    - coverage report
+
+setuptools:
+    <<: *scope
+    stage: Installation
+    script:
+    - python3 setup.py build
+    - python3 setup.py install
+    - pcvs
+
+pip:
+    <<: *scope
+    stage: Installation
+    script:
+    - pip3 install .
+    - pcvs
+
+Python3.6:
+    extends: .pytest
+    image: "python:3.6"
+Python3.7:
+    extends: .pytest
+    image: "python:3.7"
+Python3.8:
+    extends: .pytest
+    image: "python:3.8"
+
