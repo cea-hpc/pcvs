@@ -193,7 +193,7 @@ class IOManager:
         assert(k in self.glyphs.keys())
         return self.glyphs[k]
 
-    def style(*args, **kwargs):
+    def style(self, *args, **kwargs):
         return click.style(*args, **kwargs)
 
     def print_header(self, s, out=True):
@@ -311,44 +311,26 @@ class IOManager:
         #
         # the full header can be found under the /utils/ source dir.
         logo = [
-            r"""    ____                   ____     __   ______         """
-            r"""                   __  _            """,
-            r"""   / __ \____ __________ _/ / /__  / /  / ____/___  ____"""
-            r""" ___  ____  __  __/ /_(_)___  ____ _""",
-            r"""  / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ """
-            r"""`__ \/ __ \/ / / / __/ / __ \/ __ `/""",
-            r""" / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / """
-            r"""/ / / /_/ / /_/ / /_/ / / / / /_/ / """,
-            r"""/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/"""
-            r""" /_/ .___/\__,_/\__/_/_/ /_/\__, /  """,
-            r"""                                                        """
-            r"""  /_/                      /____/   """,
-            r"""                                       {} (PCVS) {}     """
-            r"""                           """.format(self.utf('star'), self.utf('star')),
-            r"""          _    __      ___     __      __  _            """
-            r"""    _____       _ __                """,
-            r"""         | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____  """
-            r"""   / ___/__  __(_) /____            """,
-            r"""         | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \ """
-            r"""   \__ \/ / / / / __/ _ \           """,
-            r"""         | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / / """
-            r"""  ___/ / /_/ / / /_/  __/           """,
-            r"""         |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/  """
-            r""" /____/\__,_/_/\__/\___/            """,
-            r"""                                                        """
-            r"""                                    """,
-            r"""   Copyright {} 2017 Commissariat à l'Énergie Atomique e"""
-            r"""t aux Énergies Alternatives (CEA)   """.format(self.utf('copy')),
-            r"""                                                        """
-            r"""                                    """,
-            r"""  This program comes with ABSOLUTELY NO WARRANTY;       """
-            r"""                                    """,
-            r"""  This is free software, and you are welcome to redistri"""
-            r"""bute it                             """,
-            r"""  under certain conditions; Please see COPYING for detai"""
-            r"""ls.                                 """,
-            r"""                                                        """
-            r"""                                    """,
+r"""    ____                   ____     __   ______                            __  _             """,
+r"""   / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _ """,
+r"""  / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/ """,
+r""" / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /  """,
+r"""/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /   """,
+r"""                                                          /_/                     /____/     """,
+r"""                                              {} (PCVS) {}""".format(self.utf('star'), self.utf('star')),
+r"""    _    __      ___     __      __  _                _____            __                    """,
+r"""   | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  _______/ /____  ____ ___      """,
+r"""   | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \     """,
+r"""   | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ /__  / /_/  __/ / / / / /     """,
+r"""   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      """,
+r"""                                                        /____/                               """,
+r"""                                                                                            """,
+r"""   Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA)   """.format(self.utf('copy')),
+r"""                                                                                            """,
+r"""  This program comes with ABSOLUTELY NO WARRANTY;                                           """,
+r"""  This is free software, and you are welcome to redistribute it                             """,
+r"""  under certain conditions; Please see COPYING for details.                                 """,
+r"""                                                                                            """,
         ]
         
         if self._linelength < max(map(lambda x: len(x), logo)):
@@ -358,7 +340,7 @@ class IOManager:
         else:
             self.__print_rawline(click.style("\n".join(logo[0:6]), fg="green"))
             self.__print_rawline(click.style("\n".join(logo[6:7])))
-            self.__print_rawline(click.style("\n".join(logo[7:9]), fg="green"))
-            self.__print_rawline(click.style("\n".join(logo[9:11]), fg="yellow"))
-            self.__print_rawline(click.style("\n".join(logo[11:12]), fg="red"))
-            self.__print_rawline(click.style("\n".join(logo[12:])))
+            self.__print_rawline(click.style("\n".join(logo[7:10]), fg="green"))
+            self.__print_rawline(click.style("\n".join(logo[10:11]), fg="yellow"))
+            self.__print_rawline(click.style("\n".join(logo[11:13]), fg="red"))
+            self.__print_rawline(click.style("\n".join(logo[13:])))
