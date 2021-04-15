@@ -5,18 +5,19 @@ import sys
 import textwrap
 
 import click
+from pcvs.helpers.exceptions import CommonException
 
 
 def progbar(it, print_func=None, **kargs):
     return click.progressbar(
-                it,empty_char=manager.utf('empty_pg'),
-                info_sep=manager.utf('sep_v'), fill_char=manager.utf('full_pg'),
+                it,empty_char=utf('empty_pg'),
+                info_sep=utf('sep_v'), fill_char=utf('full_pg'),
                 show_percent=False, show_eta=False, show_pos=False,
                 item_show_func=print_func,
                 **kargs)
 
 manager = None
-def init(v, e, l):
+def init(v=0, e=False, l=100):
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l)
 
@@ -54,7 +55,7 @@ def get_verbosity(*args, **kwargs):
     return manager.has_verb_level(*args, **kwargs)
 
 class IOManager:
-    __glyphs_dict = {
+    special_chars = {
         "ascii": {
             'copy': '(c)',
             'item': '*',
@@ -87,7 +88,7 @@ class IOManager:
         }
     }
 
-    __verbosity = [(0, "normal"), (1, "info"), (2, "debug")]
+    verb_levels = [(0, "normal"), (1, "info"), (2, "debug")]
     
     __color_list = [
         "black",
@@ -108,6 +109,18 @@ class IOManager:
         "bright_white",
     ]
 
+    @property
+    def verbose(self):
+        return self._verbose
+    
+    @property
+    def tty(self):
+        return self._tty
+    
+    @property
+    def log_filename(self):
+        return os.path.abspath(self._logfile.name) if self._logfile else None
+
     def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
         self._linelength = 93
         self._wrapper = None
@@ -123,32 +136,33 @@ class IOManager:
         self._wrapper = textwrap.TextWrapper(width=self._linelength)
     
         if logfile is not None:
-            assert(os.path.isfile(logfile))
+            if os.path.isfile(logfile):
+                raise CommonException.AlreadyExistError(logfile)
             self._logfile = open(logfile, "w")
         
     def __del__(self):
         if self._logfile is not None:
             self._logfile.close()
 
-    def __print_rawline(self, msg):
+    def __print_rawline(self, msg, err=False):
         if self._tty:
-            click.echo(msg)
+            click.echo(msg, err=err)
         if self._logfile:
-            self._logfile.write(msg + '\n')
+            self._logfile.write(msg + ('\n' if msg[-1] != "\n" else ""))
 
     def has_verb_level(self, match):
         req_idx = 0
-        for e in self.__verbosity:
+        for e in self.verb_levels:
             if match.lower() == e[1].lower():
                 req_idx = e[0]
                 break
         return req_idx <= self._verbose
 
     def get_verbosity_str(self):
-        for e in self.__verbosity:
+        for e in self.verb_levels:
             if self._verbose == e[0]:
                 return e[1]
-        return  self.__verbosity[0][1]
+        return  self.verb_levels[0][1]
 
     def print(self, *msg):
         for i in msg:
@@ -167,7 +181,7 @@ class IOManager:
         return inner_function
 
     def enable_unicode(self, e=True):
-        self.glyphs = self.__glyphs_dict["unicode"] if e is True else self.__glyphs_dict["ascii"]
+        self.glyphs = self.special_chars["unicode"] if e is True else self.special_chars["ascii"]
         
     def utf(self, k):
         assert(k in self.glyphs.keys())
@@ -188,7 +202,7 @@ class IOManager:
 
     def print_section(self, s, out=True):
         f = "{} {}".format(self.utf('sec'), s)
-        self._wrapper.subsequent_indent = "  "
+        self._wrapper.subsequent_indent = "  " 
         s = self._wrapper.fill(click.style(f, fg='yellow'))
         if out:
             self.__print_rawline(s)
@@ -211,28 +225,28 @@ class IOManager:
         if(self._verbose >= 3):
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")))
+                    self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")), err=True)
 
     def info(self, *msg):
         if(self._verbose >= 2):
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")))
+                    self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")),  err=True)
 
     def warn(self, *msg):
         for elt in msg:
             for line in elt.split('\n'):
-                self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)))
+                self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)),  err=True)
 
     def err(self, *msg, abort=1):
         enclosing_line = click.style(self.utf('hdr') * self._linelength,
                                      fg="red",
                                      bold=True)
-        self.__print_rawline("{}".format(enclosing_line))
+        self.__print_rawline("{}".format(enclosing_line),  err=True)
         for elt in msg:
             for line in elt.split('\n'):
-                self.__print_rawline("ERROR: {}".format(click.style(line, fg="red", bold=True)))
-        self.__print_rawline("{}".format(enclosing_line))
+                self.__print_rawline("ERROR: {}".format(click.style(line, fg="red", bold=True)),  err=True)
+        self.__print_rawline("{}".format(enclosing_line),  err=True)
 
     def print_short_banner(self, string=False):
         logo =[
@@ -242,7 +256,7 @@ class IOManager:
             r"""          / ____/ / /___    | |/ /  ___/ /        """,
             r"""         /_/      \____/    |___/  /____/         """,
             r"""                                                  """,
-            r"""      Parallel Computing -- Validation Suite      """,
+            r"""      Parallel Computing -- Validation System     """,
             r"""             Copyright {} 2017 -- CEA             """.format(self.utf('copy')),
             r""""""
         ]
@@ -250,7 +264,7 @@ class IOManager:
         if self._linelength < max(map(lambda x: len(x), logo)):
             s = [
                 click.style("{}".format(self.utf("star")*14), fg="green"),
-                click.style("{} PCVS -- RT {}".format(self.utf("star"), self.utf('star')), fg="yellow"),
+                click.style("{} -- PCVS -- {}".format(self.utf("star"), self.utf('star')), fg="yellow"),
                 click.style("{} CEA {} 2017 {}".format(self.utf('star'), self.utf('copy'), self.utf('star')), fg="red"),
                 click.style("{}".format(self.utf("star")*14), fg="green")
             ]
@@ -327,7 +341,9 @@ class IOManager:
             r"""                                                        """
             r"""                                    """,
         ]
+        
         if self._linelength < max(map(lambda x: len(x), logo)):
+            
             self.print_short_banner()
             return
         else:

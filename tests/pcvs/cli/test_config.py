@@ -9,15 +9,6 @@ from pcvs.cli import cli_config as tested
 from .conftest import click_call
 
 
-@pytest.fixture(params=pcvs.backend.config.CONFIG_BLOCKS)
-def config_kind(request):
-    return request.param
-
-@pytest.fixture(params=pcvs.helpers.utils.storage_order())
-def config_scope(request):
-    return request.param
-
-
 @patch('pcvs.backend.config.CONFIG_EXISTING', {k: {
         'local': [('default', "/path/to/default.yml")],
         'user': [('user-{}'.format(k), "/path/to/user_override.yml")],
@@ -38,9 +29,13 @@ def test_cmd():
     assert('Usage:' in res.output)
 
 
+@pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
 def test_list_all(config_scope, caplog):
     return test_list(config_scope, 'all', caplog)
 
+
+@pytest.mark.parametrize("config_kind", pcvs.backend.config.CONFIG_BLOCKS)
+@pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
 def test_list(config_scope, config_kind, caplog):
 
     token = ".".join(filter(None, (config_scope, config_kind)))
@@ -59,6 +54,8 @@ def test_list(config_scope, config_kind, caplog):
         assert ("no LABEL required for this command" in caplog.text)
 
 
+@pytest.mark.parametrize("config_kind", pcvs.backend.config.CONFIG_BLOCKS)
+@pytest.mark.parametrize('config_scope', pcvs.helpers.utils.storage_order())
 def test_list_scope(config_kind, config_scope):
     for scope in pcvs.helpers.utils.storage_order():
         _ = click_call('config', 'list', ".".join([scope, config_kind]))
