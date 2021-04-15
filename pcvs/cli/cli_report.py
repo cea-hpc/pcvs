@@ -18,7 +18,7 @@ def report(ctx, mode, path):
         path = os.path.join(os.getcwd(), NAME_BUILDIR)
 
     if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
-        log.err('{} is not a build directory. Abort.'.format(path))
+        click.BadArgumentUsage('{} is not a build directory.'.format(path))
 
     path = os.path.join(path, 'test_suite')
 

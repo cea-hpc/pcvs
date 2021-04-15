@@ -4,6 +4,7 @@ import click
 
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import log
+from pcvs.helpers.exceptions import BankException, CommonException
 
 
 def compl_list_banks(ctx, args, incomplete):
@@ -135,8 +136,7 @@ def bank_save_run(ctx, name, path, project):
 def bank_load(ctx, name, key, format, start, end):
     
     b = pvBank.Bank(token=name)
-    log.err('Work in Progress')
-    class NotExist(Exception): pass    
+    raise BankException.WIPError("bank load")
     try:
         b.connect_repository()
         b.extract_data(key, start, end, format)

@@ -111,7 +111,7 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)
         if not obj.exists():
-            log.err("'{}' bank does not exist".format(obj.name))
+            click.BadOptionUsage("--bank", "'{}' bank does not exist".format(obj.name))
 
     global_config = system.MetaConfig()        
 
@@ -147,8 +147,8 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
                                                            maxsplit=2)
         pf = pvProfile.Profile(label, scope)
         if not pf.is_found():
-            log.err("Please use a valid profile name:",
-                    "No '{}' found!".format(profilename))
+            raise click.BadOptionUsage(
+                "--profile", "Profile '{}' not found".format(profilename))
         pf.load_from_disk()
 
         val_cfg.set_ifdef('pf_name', pf.full_name)

@@ -5,6 +5,7 @@ from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config
 from pcvs.helpers import log, utils
+from pcvs.helpers.exceptions import ProfileException
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
@@ -166,7 +167,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
 
     pf = pvProfile.Profile(p_label, p_scope)
     if pf.is_found():
-        log.err("A profile named '{}' already exist!".format(
+        raise click.BadArgumentUsage("Profile named '{}' already exist!".format(
             pf.full_name))
 
     pf_blocks = {}
@@ -184,18 +185,13 @@ def profile_build(ctx, token, interactive, blocks, clone):
             for block in blocks:
                 (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
                 cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
-                if cur.is_found() and b_kind not in pf_blocks.keys():
-                    pf_blocks[b_kind] = cur
-                else:
-                    log.err("Issue with '{}'".format(block))
-                    if not cur.is_found():
-                        raise click.BadOptionUsage("-b", "Such configuration does not exist!")
-                    else:
-                        raise click.BadOptionUsage("-b", "\n".join([ 
-                            "'{}' kind is set twice".format(b_kind.upper()),
-                            "First is '{}'".format(pf_blocks[b_kind].full_name)
-                        ]))
-                    log.err("")
+                if not cur.is_found():
+                    raise click.BadOptionUsage(
+                        "--block", "'{}' config block does not exist".format(block))
+                elif b_kind in pf_blocks.keys():
+                    raise click.BadOptionUsage(
+                        "--block", "'{}' config block set twice".format(b_kind))
+                pf_blocks[b_kind] = cur
             pf.fill(pf_blocks)
         else:
             base = pvProfile.Profile('default', None)
@@ -224,11 +220,14 @@ def profile_build(ctx, token, interactive, blocks, clone):
 def profile_destroy(ctx, token):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
+    # tricky case, avoid users to use reserved word for scopes as
+    # profile label unless they explicitly specify a scope !
+    # 'local.global' is allowed, 'global' isn't
+    if scope is None and label in utils.storage_order():
+        raise click.BadArgumentUsage("token is ambiguous. Please specify")
+        
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
-        if pf.scope == 'global' and label == 'local':
-            log.err("err")
-        else:
             pf.delete()
     else:
         raise click.BadArgumentUsage("Profile '{}' not found! Please check the 'list' command".format(label),)
@@ -268,7 +267,7 @@ def profile_import(ctx, token, src_file):
         pf.fill(yaml.safe_load(src_file.read()))
         pf.flush_to_disk()
     else:
-        log.err("Cannot import into an already created profile!")
+        ProfileException.AlreadyExistError(token)
 
 @profile.command(name="export",
                  short_help="Export a profile to a file")

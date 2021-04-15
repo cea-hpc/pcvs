@@ -10,6 +10,7 @@ from addict import Dict
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
 from pcvs.helpers import git, log, system, utils
+from pcvs.helpers.exceptions import ProfileException, ValidationException
 
 PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
@@ -78,9 +79,8 @@ class Profile:
         assert (isinstance(raw, dict))
         check = [val for val in config.CONFIG_BLOCKS if val in raw.keys()]
         if len(check) != len(config.CONFIG_BLOCKS):
-            log.err(
-                "All {} configuration blocks are required to build "
-                "a valid profile!".format(len(config.CONFIG_BLOCKS)))
+            raise ProfileException.IncompleteError(
+                [v for v in config.CONFIG_BLOCKS not in check])
 
         # fill is called either from 'build' (dict of configurationBlock)
         # of from 'clone' (dict of raw file inputs)
@@ -107,11 +107,11 @@ class Profile:
 
     def load_from_disk(self):
         if not self._exists:
-            log.err("Invalid profile name {}".format(self._name))
+            raise ProfileException.NotFoundError(self._name)
         self._retrieve_file()
 
         if not os.path.isfile(self._file):
-            log.err("Internal Error: file {} not found!".format(self._file))
+            raise ProfileException.NotFoundError(self._file)
 
         log.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
@@ -229,10 +229,8 @@ def check_valid_combination(dict_of_combinations=dict()):
                                              delete=False) as rej_fh:
                 yaml.safe_dump(stream, rej_fh)
 
-                log.err("Invalid format: {}".format(e.message),
-                        "Rejected file: {}".format(rej_fh.name),
-                        "See 'pcvs check' to validate external resource",
-                        "before the importation.")
+                raise ValidationException.FormatError(
+                    e.message, "Rejected file: {}".format(rej_fh.name))
 
         with open(self._file, 'w') as f:
             yaml.safe_dump(stream, f)
@@ -253,7 +251,7 @@ def check_valid_combination(dict_of_combinations=dict()):
         for name in blocklist:
             c = config.ConfigurationBlock(name, prefix, scope)
             if c.is_found():
-                log.err("{} already exist!".format(c.full_name))
+                raise ProfileException.AlreadyExistError(c.full_name)
             else:
                 c.fill(self._details[name])
                 objs.append(c)

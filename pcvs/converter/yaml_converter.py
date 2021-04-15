@@ -10,6 +10,7 @@ import yaml
 
 import pcvs
 from pcvs.helpers import log
+from pcvs.helpers.exceptions import CommonException
 
 desc_dict = dict()
 
@@ -272,7 +273,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
             stream = open(template, 'r').read() + stream
         data_to_convert = yaml.safe_load(stream)
     except yaml.composer.ComposerError as e:
-        log.err("Issue when parsing YAML: ", "{}".format(e))
+        CommonException.IOError(e, template)
 
     # load the scheme
     if not scheme:

@@ -1,27 +1,34 @@
 import pcvs
 
 
-class GenericException:
-    class AlreadyExistError(Exception): pass
-    class UnclassifiableError(Exception): pass
-    class NotFoundError(Exception): pass
+# use this class as a template
+class GenericError(Exception): pass
+
+class CommonException:
+    class AlreadyExistError(GenericError): pass
+    class UnclassifiableError(GenericError): pass
+    class NotFoundError(GenericError): pass
+    class IOError(GenericError): pass
+    class BadTokenError(GenericError): pass
+    class WIPError(GenericError): pass
+
     
-class BankException(GenericException):
-    pass
+class BankException(CommonException): pass
 
-class ConfigException(GenericException):
-    class BadTokenError(Exception): pass
-
-class ProfileException(GenericException):
-    class BadTokenError(Exception): pass
-
-class ValidationException(GenericException):
-    class FormatError(Exception): pass
-    class SchemeError(Exception): pass
-
-class RunException:
-    class OverrideError(Exception): pass
-    class InvalidProgramError(Exception): pass
+class ConfigException(CommonException): pass
     
-class TestException:
-    pass
+class ProfileException(CommonException):
+    class BadTokenError(GenericError): pass
+    class IncompleteError(GenericError): pass
+
+class ValidationException(CommonException):
+    class FormatError(GenericError): pass
+    class SchemeError(GenericError): pass
+
+class RunException(CommonException):
+    class OverrideError(GenericError): pass
+    class ProgramError(GenericError): pass
+    class TestUnfoldError(GenericError): pass
+    
+class TestException(CommonException):
+    class TDFormatError(GenericError): pass

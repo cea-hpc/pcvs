@@ -272,4 +272,4 @@ def config_export(ctx, token, out_file):
     if obj.is_found():
         out_file.write(yaml.safe_dump(obj.dump()))
     else:
-        log.err("Failed to export '{}': not found!".format(token))
+        raise click.BadArgumentUsage("Config block not found: '{}'".format(token))

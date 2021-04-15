@@ -7,7 +7,7 @@ import jsonschema
 import yaml
 
 from pcvs import NAME_SRCDIR, PATH_INSTDIR
-from pcvs.helpers import log
+from pcvs.helpers.exceptions import CommonException, RunException
 from pcvs.helpers.system import MetaConfig
 
 ####################################
@@ -26,10 +26,7 @@ def storage_order():
 
 def check_valid_scope(s):
     if s not in storage_order() and s is not None:
-        log.err("Invalid SCOPE '{}'".format(s),
-                "Allowed values are: None, local, user & global",
-                "See --help for more information",
-                abort=1)
+        raise CommonException.BadTokenError(s)
 
 def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
     """Extract fields from tokens (a, b, c) from user's string
@@ -61,7 +58,7 @@ def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
         else:
             return (None, None, s)
     else:  # pragma: no cover
-        log.nreach()
+        pass
     return (None, None, None)  # pragma: no cover
 
 def __determine_local_prefix(path, prefix):
@@ -126,20 +123,17 @@ def assert_editor_valid(override=None):
         if shutil.which(editor, mode=os.X_OK) is None:
             raise Exception
     except:
-        log.err("'{}' is not a valid program.".format(editor),
-                "Please use --editor or set $EDITOR appropriately")
+        RunException.ProgramError(editor)
 
     return editor
 
 def open_in_editor(*paths, e=None):
     editor = assert_editor_valid(e)
     if shutil.which(editor) is None:
-        log.err("'{}' is not a valid editor.".format(editor),
-                "Please see the '-e' option!")
+        RunException.ProgramError(editor)
     cmd = [
         editor
     ] + list(filter(None, paths))
-    log.info("cmd: {}".format(" ".join(cmd)))
     subprocess.check_call(cmd)
 
 ####################################
@@ -153,7 +147,7 @@ def generate_local_variables(label, subprefix):
     cur_buildir = os.path.join(base_buildir, subprefix)
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
-def check_valid_program(p,  succ=log.print_item, fail=log.err):
+def check_valid_program(p, succ=None, fail=None):
     if not p:
         return
     try:
@@ -167,5 +161,6 @@ def check_valid_program(p,  succ=log.print_item, fail=log.err):
 
     if res is False and fail is not None:
         fail("{} not found or not a executable".format(p))
+        raise RunException.ProgramError(p)
 
     return res

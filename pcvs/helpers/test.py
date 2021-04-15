@@ -13,6 +13,7 @@ from addict import Dict
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, test_transform, utils
 from pcvs.helpers.criterion import Criterion, Serie
+from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.package_manager import PManager
 from pcvs.helpers.system import MetaConfig
 
@@ -74,9 +75,7 @@ def load_yaml_file(f, source, build, prefix):
     # badly formatted YAML
     except yaml.YAMLError:
         need_conversion = True
-    except Exception as e:
-        log.err("Failed to load YAML file {}:".format(f), "{}".format(e))
-
+    
     # attempt to convert of the fly the YAML file
     if need_conversion:
         log.debug("\t--> Legacy syntax: {}".format(f))
@@ -369,9 +368,7 @@ class TEDescriptor:
     def __init__(self, name, node, label, subprefix):
         """load a new TEDescriptor from a given YAML node"""
         if not isinstance(node, dict):
-            log.err(
-                "Unable to build a TestDescriptor "
-                "from the given node (got {})".format(type(node)))
+            raise TestException.TDFormatError(node)
         self._te_name = name
         self._skipped = name.startswith('.')
         self._te_label = node.get('label', self._te_name)

@@ -16,6 +16,7 @@ from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_SESSION
 from pcvs.backend import bank as pvBank
 from pcvs.backend import session as pvSession
 from pcvs.helpers import criterion, log, test, utils
+from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import TEDescriptor, TestFile
 from pcvs.orchestration import Orchestrator
@@ -126,8 +127,7 @@ def prepare():
     # if a previous build exists
     if os.path.isdir(buildir):
         if not valcfg.override:
-            log.err("Old run artifacts found in {}.".format(valcfg.output),
-                    "Please use '--override' to ignore.")
+            raise RunException.OverrideError(valcfg.output)
         else:
             if valcfg.reused_build is None:
                 log.print_item("Cleaning up {}".format(buildir), depth=2)
@@ -203,12 +203,8 @@ def process():
     errors += process_dyn_setup_scripts(setup_files)
     errors += process_static_yaml_files(yaml_files)
 
-    log.print_item("Checking for errors")
     if len(errors):
-        log.err("Issues while loading benchmarks:", abort=False)
-        for elt in errors:
-            log.err("  - {}:  {}".format(elt[0], elt[1]), abort=False)
-        log.err("")
+        raise RunException.TestUnfoldError(errors)
 
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
@@ -370,9 +366,9 @@ def save_for_export(f, dest=None):
         elif os.path.isdir(f):
             shutil.copytree(f, dest)
         else:
-            log.err("{}".format(f))
+            raise RunException.UnclassifiableError("{}".format(f))
     except FileNotFoundError as e:
-        log.warn("Unable to copy {}:".format(f), '{}'.format(e))
+        raise RunException.NotFoundError(e, f)
 
 
 def terminate():
@@ -416,7 +412,7 @@ def terminate():
             log.info('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(cmd)
         except CalledProcessError as e:
-            log.err("Fail to create an archive:", "{}".format(e))
+            raise RunException.ProgramError(e, cmd)
 
     return archive_name
 

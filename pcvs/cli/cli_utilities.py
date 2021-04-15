@@ -39,8 +39,7 @@ def exec(ctx, output, argument, gen_list, display):
     try:
         for f in script_path:
             if not os.path.isfile(f):
-                log.err("Unable to find Shell script related to '{}'".format(argument))
-                raise subprocess.CalledProcessError(cmd="Test-script", returncode=1)
+                raise click.BadArgumentUsage("Launch script for '{}' not found".format(argument))
             fds = subprocess.Popen(
                     ['sh', f, argument],
                     env=env,
@@ -49,8 +48,6 @@ def exec(ctx, output, argument, gen_list, display):
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
         rc = e.returncode
-    except Exception as e:
-        log.err(e)
     finally:
         sys.exit(rc)
 
