@@ -110,7 +110,7 @@ class Profile:
         if not os.path.isfile(self._file):
             raise ProfileException.NotFoundError(self._file)
 
-        log.info("load {} ({})".format(self._name, self._scope))
+        log.manager.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
 
@@ -143,23 +143,23 @@ class Profile:
 
     def clone(self, clone):
         self._retrieve_file()
-        log.info("Compute target prefix: {}".format(self._file))
+        log.manager.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details
 
     def delete(self):
-        log.info("delete {}".format(self._file))
+        log.manager.info("delete {}".format(self._file))
         os.remove(self._file)
         pass
 
     def display(self):
-        log.print_header("Profile View")
-        log.print_section("Scope: {}".format(self._scope.capitalize()))
-        log.print_section("Profile details:")
+        log.manager.print_header("Profile View")
+        log.manager.print_section("Scope: {}".format(self._scope.capitalize()))
+        log.manager.print_section("Profile details:")
         if self._details:
-            log.print_section("Details:")
+            log.manager.print_section("Details:")
             for k, v in self._details.items():
-                log.print_item("{}: {}".format(k, v))
+                log.manager.print_item("{}: {}".format(k, v))
 
     def edit(self, e=None):
         assert (self._file is not None)

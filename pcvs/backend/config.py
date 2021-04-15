@@ -144,7 +144,7 @@ class ConfigurationBlock:
         if not os.path.isfile(self._file):
             raise ConfigException.NotFoundError()
 
-        log.info("load {} from '{} ({})'".format(
+        log.imanager.info("load {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
@@ -163,7 +163,7 @@ class ConfigurationBlock:
         self.check()
         self.retrieve_file()
 
-        log.info("flush {} from '{} ({})'".format(
+        log.imanager.info("flush {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
 
         # just in case the block subprefix does not exist yet
@@ -187,7 +187,7 @@ class ConfigurationBlock:
         self.retrieve_file()
         assert(not os.path.isfile(self._file))
 
-        log.info("Compute target prefix: {}".format(self._file))
+        log.imanager.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details
 
     def delete(self):
@@ -195,18 +195,18 @@ class ConfigurationBlock:
         assert (self.is_found())
         assert (os.path.isfile(self._file))
 
-        log.info("remove {} from '{} ({})'".format(
+        log.imanager.info("remove {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         os.remove(self._file)
 
     def display(self):
         """Configuration block pretty printer"""
-        log.print_header("Configuration display")
-        log.print_section("Scope: {}".format(self._scope.capitalize()))
-        log.print_section("Path: {}".format(self._file))
-        log.print_section("Details:")
+        log.imanager.print_header("Configuration display")
+        log.imanager.print_section("Scope: {}".format(self._scope.capitalize()))
+        log.imanager.print_section("Path: {}".format(self._file))
+        log.imanager.print_section("Details:")
         for k, v in self._details.items():
-            log.print_item("{}: {}".format(k, v))
+            log.imanager.print_item("{}: {}".format(k, v))
 
     def edit(self, e=None):
         """Open the current block for edition"""
