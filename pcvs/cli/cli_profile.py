@@ -237,18 +237,23 @@ def profile_destroy(ctx, token):
                  short_help="Edit an existing profile")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
+@click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
+              help="Only edit the plugin code ('runtime')")
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
               default=None, type=str,
               help="Open file with EDITOR")
 @click.pass_context
-def profile_alter(ctx, token, editor):
+def profile_alter(ctx, token, editor, edit_plugin):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
         if pf.scope == 'global' and label == 'local':
             raise click.BadArgumentUsage('Wrongly formatted profile token')
         else:
-            pf.open_editor(editor)
+            if edit_plugin:
+                pf.edit_plugin(editor)
+            else:
+                pf.edit(editor)
     else:
         raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
                                "Please check the 'list' command")

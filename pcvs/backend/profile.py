@@ -3,6 +3,7 @@ import glob
 import os
 import tempfile
 
+import click
 import jsonschema
 import yaml
 from addict import Dict
@@ -160,82 +161,45 @@ class Profile:
             for k, v in self._details.items():
                 log.print_item("{}: {}".format(k, v))
 
-    def open_editor(self, e=None):
+    def edit(self, e=None):
         assert (self._file is not None)
 
         if not os.path.exists(self._file):
             return
+        
+        with open(self._file, 'r') as fh:
+            stream = fh.read()
 
-        e = utils.assert_editor_valid(e)
-        fname = tempfile.NamedTemporaryFile(
-            mode='w+',
-            prefix="{}".format(self.full_name),
-            suffix=".yml"
-        )
-        fplugin = tempfile.NamedTemporaryFile(
-            mode='w+',
-            prefix="{}".format(self.full_name),
-            suffix=".py"
-        )
-        with open(self._file, 'r') as f:
-            stream = yaml.safe_load(f)
-            if stream:
-                yaml.safe_dump(stream, fname)
+        edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
+        if edited_stream is not None:
+            edited_yaml = Dict(yaml.safe_load(edited_stream))
+            system.ValidationScheme('profile').validate(edited_yaml)
 
-            if stream and 'plugin' in stream['runtime']:
-                content = base64.b64decode(
-                    stream['runtime']['plugin']).decode('ascii')
-            else:
-                content = """import math
+            self.fill(edited_yaml)
+            self.flush_to_disk()
 
+    def edit_plugin(self, e=None):
+        if not os.path.exists(self._file):
+            return
+        
+        stream_yaml = dict()
+        with open(self._file, 'r') as fh:
+            stream_yaml = yaml.safe_load(fh)
+        
+        if 'plugin' in stream_yaml['runtime'].keys():
+            plugin_code = base64.b64decode(stream_yaml['runtime']['plugin']).decode('ascii')
+        else:
+            plugin_code = """import math
 def check_valid_combination(dict_of_combinations=dict()):
     # this dict maps keys (it name) with values (it value)
     # returns True if the combination should be used
-    return True
-"""
-            fplugin.write(content)
-            fplugin.flush()
-        try:
-            utils.open_in_editor(fname.name, fplugin.name, e=e)
-        except Exception:
-            log.warn("Issue with opening the conf. block. Stop!")
-            return
+    return True"""
 
-        # reset cursors
-        fname.seek(0)
-        fplugin.seek(0)
-
-        # now, dump back temp file to the original saves
-        stream = yaml.safe_load(fname)
-        if stream is None:
-            stream = dict()
-        stream_plugin = fplugin.read()
-        if len(stream_plugin) > 0:
-            stream['runtime']['plugin'] = base64.b64encode(
-                stream_plugin.encode('ascii'))
-
-        # just check the outcome is valid
-        self.fill(stream)
-        try:
-            self.check(fail=False)
-        except jsonschema.exceptions.ValidationError as e:
-            with tempfile.NamedTemporaryFile(mode="w+",
-                                             suffix=".yml.rej",
-                                             prefix=self.full_name,
-                                             delete=False) as rej_fh:
-                yaml.safe_dump(stream, rej_fh)
-
-                raise ValidationException.FormatError(
-                    e.message, "Rejected file: {}".format(rej_fh.name))
-
-        with open(self._file, 'w') as f:
-            yaml.safe_dump(stream, f)
-
-        # delete temp files (replace by 'with...' ?)
-        fname.close()
-        fplugin.close()
-
-        self.load_from_disk()
+        edited_code = click.edit(plugin_code, editor=e, extension=".py", require_save=True)
+        if edited_code is not None:
+            stream_yaml['runtime']['plugin'] = base64.b64encode(edited_code.encode('ascii'))
+            with open(self._file, 'w') as fh:
+                yaml.safe_dump(stream_yaml, fh)
 
     def split_into_configs(self, prefix, blocklist, scope=None):
         objs = list()

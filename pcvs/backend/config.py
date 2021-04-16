@@ -3,6 +3,7 @@ import glob
 import os
 import tempfile
 
+import click
 import jsonschema
 import yaml
 from addict import Dict
@@ -207,81 +208,48 @@ class ConfigurationBlock:
         for k, v in self._details.items():
             log.print_item("{}: {}".format(k, v))
 
-    def open_editor(self, e=None):
+    def edit(self, e=None):
         """Open the current block for edition"""
         assert (self._file is not None)
 
         if not os.path.exists(self._file):
             return
+        
+        with open(self._file, 'r') as fh:
+            stream = fh.read()
 
-        e = utils.assert_editor_valid(e)
+        edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
+        if edited_stream is not None:
+            edited_yaml = Dict(yaml.safe_load(edited_stream))
+            system.ValidationScheme(self._kind).validate(edited_yaml)
 
-        fname = tempfile.NamedTemporaryFile(
-            mode='w+',
-            prefix="{}-".format(self.full_name),
-            suffix=".yml")
-        fplugin = None
-        if self._kind == 'runtime':
-            fplugin = tempfile.NamedTemporaryFile(
-                mode='w+',
-                prefix="{}-".format(self.full_name),
-                suffix=".py")
-        with open(self._file, 'r') as f:
-            stream = yaml.safe_load(f)
-            if stream:
-                yaml.safe_dump(stream, fname)
+            self.fill(edited_yaml)
+            self.flush_to_disk()
 
-            if fplugin:
-                if stream and 'plugin' in stream:
-                    content = base64.b64decode(
-                        stream['plugin']).decode('ascii')
-                else:
-                    content = """import math
+    def edit_plugin(self, e=None):
+        if self._kind != "runtime":
+            return
 
+        if not os.path.exists(self._file):
+            return
+        
+        stream_yaml = dict()
+        with open(self._file, 'r') as fh:
+            stream_yaml = yaml.safe_load(fh)
+        
+        if 'plugin' in stream_yaml.keys():
+            plugin_code = base64.b64decode(stream_yaml['plugin']).decode('ascii')
+        else:
+            plugin_code = """import math
 def check_valid_combination(dict_of_combinations=dict()):
     # this dict maps keys (it name) with values (it value)
     # returns True if the combination should be used
-    return True
-"""
-                fplugin.write(content)
-                fplugin.flush()
+    return True"""
+
+        edited_code = click.edit(plugin_code, editor=e, extension=".py", require_save=True)
+        if edited_code is not None:
+            stream_yaml['plugin'] = base64.b64encode(edited_code.encode('ascii'))
+            with open(self._file, 'w') as fh:
+                yaml.safe_dump(stream_yaml, fh)
         
-        utils.open_in_editor(fname.name,
-                                 fplugin.name if fplugin else None,
-                                 e=e)
 
-        # now, dump back temp file to the original saves
-        try:
-            fname.seek(0)
-            self._details = Dict(yaml.safe_load(fname))
-        except yaml.YAMLError as e:
-            raise ConfigException.IOError("badly formatted file")
-        except TypeError:
-            self._details = dict()
-
-        if fplugin:
-            fplugin.seek(0)
-            stream_plugin = fplugin.read()
-            if len(stream_plugin) > 0:
-                self._details['plugin'] = base64.b64encode(
-                    stream_plugin.encode('ascii'))
-
-        try:
-            self.check(fail=False)
-        except jsonschema.exceptions.ValidationError as e:
-            with tempfile.NamedTemporaryFile(mode="w+",
-                                             suffix=".yml.rej",
-                                             prefix=self.full_name,
-                                             delete=False) as rej_fh:
-                yaml.safe_dump(stream, rej_fh)
-
-                raise ValidationException.FormatError(
-                    "Rejected file: {}".format(rej_fh.name)
-                )
-
-        # delete temp files (replace by 'with...' ?)
-        fname.close()
-        if fplugin:
-            fplugin.close()
-
-        self.flush_to_disk()

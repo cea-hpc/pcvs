@@ -177,7 +177,7 @@ def config_create(ctx, token, clone, interactive) -> None:
         copy.clone(base)
         copy.flush_to_disk()
         if interactive:
-            copy.open_editor()
+            copy.edit()
     else:
         raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
             copy.full_name))
@@ -210,11 +210,13 @@ def config_destroy(ctx, token) -> None:
 @config.command(name="edit", short_help="edit the config block")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
+@click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
+              help="runtime-only: edit plugin code instead of config file")
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
               default=None, type=str,
               help="Open file with EDITOR")
 @click.pass_context
-def config_edit(ctx, token, editor) -> None:
+def config_edit(ctx, token, editor, edit_plugin) -> None:
     """
     Open the file with $EDITOR for direct modifications. The configuration is
     then validated to ensure consistency.
@@ -226,7 +228,10 @@ def config_edit(ctx, token, editor) -> None:
 
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
-        block.open_editor(editor)
+        if edit_plugin:
+            block.edit_plugin(editor)
+        else:
+            block.edit(editor)
     else:
         raise click.BadArgumentUsage("Cannot open this configuration: does not exist!")
 
