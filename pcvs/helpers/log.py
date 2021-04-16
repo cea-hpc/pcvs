@@ -85,8 +85,8 @@ class IOManager:
             'succ' : click.style('\u2714', fg="green"),
             'git' : '\u237F',
             'time' : '\U0000231A',
-            'full_pg' : click.style("\u2022", bold=True, fg="cyan"),
-            'empty_pg' : click.style("\u25E6", bold=True, fg="bright_black"),
+            'full_pg' : click.style("\u25CF", bold=True, fg="cyan"),
+            'empty_pg' : click.style("\u25CB", bold=True, fg="bright_black"),
             'sep_v' : " \u237F ",
             'sep_h' : "\u23BC"
         }
