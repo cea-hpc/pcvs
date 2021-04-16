@@ -9,21 +9,6 @@ import click
 from pcvs.helpers.exceptions import CommonException
 
 
-manager = None
-def init(v=0, e=False, l=100):
-    global manager
-    manager = IOManager(verbose=v, enable_unicode=e, length=l)
-
-def progbar(it, print_func=None, man=None, **kargs):
-    if(man == None):
-        man = manager
-    return click.progressbar(
-            it,empty_char=man.utf('empty_pg'),
-            info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
-            show_percent=False, show_eta=False, show_pos=False,
-            item_show_func=print_func,
-            **kargs)
-
 class IOManager:
     special_chars = {
         "ascii": {
@@ -335,3 +320,21 @@ r"""                                                                            
             self.__print_rawline(click.style("\n".join(logo[10:11]), fg="yellow"))
             self.__print_rawline(click.style("\n".join(logo[11:13]), fg="red"))
             self.__print_rawline(click.style("\n".join(logo[13:])))
+
+
+manager = IOManager()
+
+
+def init(v=0, e=False, l=100):
+    global manager
+    manager = IOManager(verbose=v, enable_unicode=e, length=l)
+
+def progbar(it, print_func=None, man=None, **kargs):
+    if(man == None):
+        man = manager
+    return click.progressbar(
+            it,empty_char=man.utf('empty_pg'),
+            info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
+            show_percent=False, show_eta=False, show_pos=False,
+            item_show_func=print_func,
+            **kargs)

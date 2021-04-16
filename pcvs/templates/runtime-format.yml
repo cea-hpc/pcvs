@@ -45,5 +45,7 @@ iterators:
 # at the same time
 package_manager:
     # for Spack, the spec must refer to a single concretization
-    spack: "name@version+variants"
-    module: "group/flavor/version"
+    spack:
+    - "name@version+variants"
+    module:
+    - "group/flavor/version"

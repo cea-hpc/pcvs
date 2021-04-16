@@ -98,7 +98,8 @@ class ConfigurationBlock:
             self._scope = 'local'
         self._file = os.path.join(
             utils.STORAGES[self._scope], self._kind, self._name + ".yml")
-        self._exists = False
+        if not os.path.isfile(self._file):
+            self._exists = False
 
     def is_found(self):
         """Is the current config block present on fs ?"""
@@ -107,6 +108,10 @@ class ConfigurationBlock:
     @property
     def full_name(self):
         return ".".join([self._scope, self._kind, self._name])
+
+    @property
+    def ref_file(self):
+        return self._file
 
     @property
     def scope(self):
@@ -150,10 +155,8 @@ class ConfigurationBlock:
     def load_template(self):
         """load from the specific template, to create a new config block"""
         self._exists = True
-        self._file = os.path.join(
-            PATH_INSTDIR,
-            'templates/{}-format.yml'.format(self._kind))
-        with open(self._file, 'r') as fh:
+        with open(os.path.join(PATH_INSTDIR,
+                    'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
             self.fill(yaml.safe_load(fh))
 
     def flush_to_disk(self):
@@ -169,6 +172,8 @@ class ConfigurationBlock:
 
         with open(self._file, 'w') as f:
             yaml.safe_dump(self._details.to_dict(), f)
+        
+        self._exists = True
 
     def clone(self, clone):
         """copy the current object to create an identical one.
