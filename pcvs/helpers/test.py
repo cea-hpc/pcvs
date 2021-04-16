@@ -78,13 +78,13 @@ def load_yaml_file(f, source, build, prefix):
     
     # attempt to convert of the fly the YAML file
     if need_conversion:
-        log.debug("\t--> Legacy syntax: {}".format(f))
+        log.manager.debug("\t--> Legacy syntax: {}".format(f))
         obj = yaml.safe_load(__load_yaml_file_legacy(f))
 
         # when 'debug' is activated, print the converted YAML file
-        if log.get_verbosity('debug'):
+        if log.manager.has_verb_level('debug'):
             cv_file = os.path.join(os.path.split(f)[0], "converted-pcvs.yml")
-            log.debug("\t--> Stored file to {}".format(cv_file))
+            log.manager.debug("\t--> Stored file to {}".format(cv_file))
             with open(cv_file, 'w') as fh:
                 yaml.safe_dump(obj, fh)
     return obj
@@ -185,7 +185,7 @@ class TestFile:
 
     def generate_debug_info(self):
         """Dump debug info to the appropriate file for the input object"""
-        if len(self._debug) and log.get_verbosity('info'):
+        if len(self._debug) and log.manager.has_verb_level('info'):
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
                 # compute max number of combinations from system iterators
                 sys_cnt = functools.reduce(

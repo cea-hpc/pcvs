@@ -9,54 +9,20 @@ import click
 from pcvs.helpers.exceptions import CommonException
 
 
-def progbar(it, print_func=None, **kargs):
-    return click.progressbar(
-                it,empty_char=utf('empty_pg'),
-                info_sep=utf('sep_v'), fill_char=utf('full_pg'),
-                show_percent=False, show_eta=False, show_pos=False,
-                item_show_func=print_func,
-                **kargs)
-
 manager = None
 def init(v=0, e=False, l=100):
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l)
 
-def print_section(*args, **kwargs):
-    return manager.print_section(*args, **kwargs)
-
-def banner(*args, **kwargs):
-    return manager.print_banner(*args, **kwargs)
-
-def print_header(*args, **kwargs):
-    return manager.print_header(*args, **kwargs)
-
-def print_item(*args, **kwargs):
-    return manager.print_item(*args, **kwargs)
-
-def err(*args, **kwargs):
-    manager.err(*args, **kwargs)
-
-def warn(*args, **kwargs):
-    manager.warn(*args, **kwargs)
-
-def info(*args, **kwargs):
-    manager.info(*args, **kwargs)
-
-def debug(*args, **kwargs):
-    manager.debug(*args, **kwargs)
-
-def utf(*args, **kwargs):
-    return manager.utf(*args, **kwargs)
-
-def style(*args, **kwargs):
-    return manager.style(*args, **kwargs)
-
-def get_verbosity_str(*args, **kwargs):
-    return manager.get_verbosity_str(*args, **kwargs)
-
-def get_verbosity(*args, **kwargs):
-    return manager.has_verb_level(*args, **kwargs)
+def progbar(it, print_func=None, man=None, **kargs):
+    if(man == None):
+        man = manager
+    return click.progressbar(
+            it,empty_char=man.utf('empty_pg'),
+            info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
+            show_percent=False, show_eta=False, show_pos=False,
+            item_show_func=print_func,
+            **kargs)
 
 class IOManager:
     special_chars = {

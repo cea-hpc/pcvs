@@ -42,26 +42,26 @@ def process_main_workflow(the_session=None):
     global_config = MetaConfig.root
     valcfg = global_config.validation
 
-    log.banner()
-    log.print_header("Prepare Environment")
+    log.manager.print_banner()
+    log.manager.print_header("Prepare Environment")
     # prepare PCVS and third-party tools
     prepare()
 
-    log.print_header("Process benchmarks")
+    log.manager.print_header("Process benchmarks")
     if valcfg.reused_build is not None:
-        log.print_section("Reusing previously generated inputs")
-        log.print_section("Duplicated from {}".format(os.path.abspath(valcfg.reused_build)))
+        log.manager.print_section("Reusing previously generated inputs")
+        log.manager.print_section("Duplicated from {}".format(os.path.abspath(valcfg.reused_build)))
     else:
         start = time.time()
         process()
         end = time.time()
-        log.print_section(
+        log.manager.print_section(
                 "===> Processing done in {:<.3f} sec(s)".format(end-start))
     
-    log.print_header("Validation Start")
+    log.manager.print_header("Validation Start")
     run()
 
-    log.print_header("Finalization")
+    log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
 
@@ -70,7 +70,7 @@ def process_main_workflow(the_session=None):
         bank = pvBank.Bank(token=bank_token)
         pref_proj = bank.preferred_proj
         if bank.exists():
-            log.print_item("Upload to the bank '{}{}'".format(
+            log.manager.print_item("Upload to the bank '{}{}'".format(
                     bank.name.upper(),
                     " (@{})".format(pref_proj) if pref_proj else ""
                 ))
@@ -83,15 +83,15 @@ def process_main_workflow(the_session=None):
 
 def __print_summary():
     cfg = MetaConfig.root.validation
-    log.print_section("Summary:")
-    log.print_item("Loaded profile: '{}'".format(cfg.pf_name))
-    log.print_item("Built into: {}".format(cfg.output))
-    log.print_item("Verbosity: {}".format(
-        log.get_verbosity_str().capitalize()))
-    log.print_item("User directories:")
+    log.manager.print_section("Summary:")
+    log.manager.print_item("Loaded profile: '{}'".format(cfg.pf_name))
+    log.manager.print_item("Built into: {}".format(cfg.output))
+    log.manager.print_item("Verbosity: {}".format(
+        log.manager.get_verbosity_str().capitalize()))
+    log.manager.print_item("User directories:")
     width = max([len(i) for i in cfg.dirs])
     for k, v in cfg.dirs.items():
-        log.print_item("{:<{width}}: {:<{width}}".format(
+        log.manager.print_item("{:<{width}}: {:<{width}}".format(
             k.upper(),
             v,
             width=width),
@@ -117,12 +117,12 @@ def __check_defined_program_validity():
 
 
 def prepare():
-    log.print_section("Prepare environment")
-    log.print_item("Date: {}".format(
+    log.manager.print_section("Prepare environment")
+    log.manager.print_item("Date: {}".format(
         MetaConfig.root.validation.datetime.strftime("%c")))
     valcfg = MetaConfig.root.validation
 
-    log.print_item("Check whether build directory is valid")
+    log.manager.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
     # if a previous build exists
     if os.path.isdir(buildir):
@@ -130,7 +130,7 @@ def prepare():
             raise RunException.OverrideError(valcfg.output)
         else:
             if valcfg.reused_build is None:
-                log.print_item("Cleaning up {}".format(buildir), depth=2)
+                log.manager.print_item("Cleaning up {}".format(buildir), depth=2)
                 utils.create_or_clean_path(buildir)
             utils.create_or_clean_path(os.path.join(
                 valcfg.output, NAME_BUILDFILE), is_dir=False)
@@ -143,19 +143,19 @@ def prepare():
                 valcfg.output, 'save_for_export'))
             utils.create_or_clean_path(valcfg.buildcache)
 
-    log.print_item("Create subdirs for each provided directories")
+    log.manager.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, NAME_BUILDFILE), 'w').close()
 
-    #log.print_section("Build third-party tools")
+    #log.manager.print_section("Build third-party tools")
     #__build_tools()
 
-    log.print_section("Ensure user-defined programs exist")
+    log.manager.print_section("Ensure user-defined programs exist")
     __check_defined_program_validity()
 
-    log.print_section("Load and initialize validation criterions")
+    log.manager.print_section("Load and initialize validation criterions")
     criterion.initialize_from_system()
     # Pick on criterion used as 'resources' by JCHRONOSS
     # this is set by the run configuration
@@ -169,7 +169,7 @@ def find_files_to_process(path_dict):
     yaml_files = list()
 
     # discovery may take a while with some systems
-    log.print_item("PCVS-related file detection")
+    log.manager.print_item("PCVS-related file detection")
     # iterate over user directories
     for label, path in path_dict.items():
         # for each, walk through the tree
@@ -177,7 +177,7 @@ def find_files_to_process(path_dict):
             last_dir = os.path.basename(root)
             # if the current dir is a 'special' one, discard
             if last_dir in [NAME_SRCDIR, NAME_BUILDIR, "build_scripts"]:
-                log.debug("skip {}".format(root))
+                log.manager.debug("skip {}".format(root))
                 # set dirs to null, avoiding os.wal() to go further in that dir
                 dirs[:] = []
                 continue
@@ -192,12 +192,12 @@ def find_files_to_process(path_dict):
 
 
 def process():
-    log.print_section("Load from filesystem")
+    log.manager.print_section("Load from filesystem")
     setup_files, yaml_files = find_files_to_process(
         MetaConfig.root.validation.dirs)
 
-    log.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
-    log.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
+    log.manager.debug("Found setup files: {}".format(pprint.pformat(setup_files)))
+    log.manager.debug("Found static files: {}".format(pprint.pformat(yaml_files)))
 
     errors = []
     errors += process_dyn_setup_scripts(setup_files)
@@ -228,7 +228,7 @@ def build_env_from_configuration(current_node, parent_prefix="pcvs"):
 
 def process_dyn_setup_scripts(setup_files):
     err = []
-    log.print_item("Convert configuation to Shell variables")
+    log.manager.print_item("Convert configuation to Shell variables")
     env = os.environ.copy()
     env.update(build_env_from_configuration(MetaConfig.root))
 
@@ -237,10 +237,10 @@ def process_dyn_setup_scripts(setup_files):
         fh.write(str_dict_as_envvar(env))
         fh.close()
 
-    log.print_item("Manage dynamic files (scripts)")
+    log.manager.print_item("Manage dynamic files (scripts)")
     with log.progbar(setup_files, print_func=print_progbar_walker) as itbar:
         for label, subprefix, fname in itbar:
-            log.info("process {} ({})".format(subprefix, label))
+            log.manager.info("process {} ({})".format(subprefix, label))
             base_src, cur_src, base_build, cur_build = utils.generate_local_variables(
                 label, subprefix)
 
@@ -265,7 +265,7 @@ def process_dyn_setup_scripts(setup_files):
 
                 if fds.returncode != 0:
                     err.append((f, fderr.decode('utf-8')))
-                    log.info("{}: {}".format(f, fderr.decode('utf-8')))
+                    log.manager.info("{}: {}".format(f, fderr.decode('utf-8')))
                     continue
 
                 # flush the output to $BUILD/pcvs.yml
@@ -292,7 +292,7 @@ def process_dyn_setup_scripts(setup_files):
 
 def process_static_yaml_files(yaml_files):
     err = []
-    log.print_item("Process static test files")
+    log.manager.print_item("Process static test files")
     with log.progbar(yaml_files, print_func=print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
             _, cur_src, _, cur_build = utils.generate_local_variables(
@@ -310,24 +310,24 @@ def process_static_yaml_files(yaml_files):
             except (yaml.YAMLError, CalledProcessError) as e:
                 # log errors to be printed all at once
                 err.append((f, e.output))
-                log.info("{}: {}".format(f, e.output))
+                log.manager.info("{}: {}".format(f, e.output))
                 continue
             except Exception as e:
                 err.append((f, e))
-                log.info("Failed to read {}: ".format(f), "{}".format(e))
+                log.manager.info("Failed to read {}: ".format(f), "{}".format(e))
     return err
 
 
 def run():
     __print_summary()
-    log.print_item("Save Configurations into {}".format(
+    log.manager.print_item("Save Configurations into {}".format(
         MetaConfig.root.validation.output))
 
     conf_file = os.path.join(MetaConfig.root.validation.output, "conf.yml")
     with open(conf_file, 'w') as conf_fh:
         yaml.safe_dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
 
-    log.print_section("Run the Orchestrator")
+    log.manager.print_section("Run the Orchestrator")
     MetaConfig.root.get_internal('orchestrator').run()
 
 def anonymize_archive():
@@ -376,9 +376,9 @@ def terminate():
         MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
     outdir = MetaConfig.root.validation.output
     
-    log.print_section("Exporting results")
+    log.manager.print_section("Exporting results")
     
-    log.print_item("Prepare the archive")
+    log.manager.print_item("Prepare the archive")
     # copy file before anonymizing them
     for root, _, files in os.walk(os.path.join(outdir, "test_suite")):
         for file in files:
@@ -393,13 +393,13 @@ def terminate():
     #                os.path.join(outdir, 'webview'))
 
     if MetaConfig.root.validation.anonymize:
-        log.print_item("Anonymizing data")
+        log.manager.print_item("Anonymizing data")
         anonymize_archive()
 
-    log.print_item("Save user-defined artifacts")
-    #log.warn('TODO user-defined artifact')
+    log.manager.print_item("Save user-defined artifacts")
+    #log.manager.warn('TODO user-defined artifact')
 
-    log.print_item("Create the archive: {}".format(archive_name))
+    log.manager.print_item("Create the archive: {}".format(archive_name))
 
     with utils.cwd(outdir):
         cmd = [
@@ -409,7 +409,7 @@ def terminate():
             "save_for_export"
         ]
         try:
-            log.info('cmd: {}'.format(" ".join(cmd)))
+            log.manager.info('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             raise RunException.ProgramError(e, cmd)

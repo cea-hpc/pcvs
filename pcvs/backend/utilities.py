@@ -12,7 +12,6 @@ from pcvs import NAME_BUILDIR
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException
-from pcvs.helpers.log import utf
 
 
 def locate_scriptpaths(output=None):
@@ -46,14 +45,14 @@ def process_check_configs():
     for kind in config.CONFIG_BLOCKS:
         for scope in utils.storage_order():
             for blob in config.list_blocks(kind, scope):
-                token = log.utf('fail')
+                token = log.manager.utf('fail')
                 err_msg = ""
                 obj = config.ConfigurationBlock(kind, blob[0], scope)
                 obj.load_from_disk()
 
                 try:
                     obj.check(fail=False)
-                    token = log.utf('succ')
+                    token = log.manager.utf('succ')
                 except jsonschema.exceptions.ValidationError as e:
                     err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                     errors.setdefault(err_msg, 0)
@@ -73,12 +72,12 @@ def process_check_profiles():
 
     for scope in utils.storage_order():
         for blob in profile.list_profiles(scope):
-            token = log.utf('fail')
+            token = log.manager.utf('fail')
             obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
                 obj.check(fail=False)
-                token = log.utf('succ')
+                token = log.manager.utf('succ')
             except jsonschema.exceptions.ValidationError as e:
                 err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                 errors.setdefault(err_msg, 0)
@@ -110,7 +109,7 @@ def process_check_setup_file(filename, prefix):
                 err_msg = base64.b64encode(fds[1])
             else:
                 data = fds[0].decode('utf-8')
-                token = log.utf('succ')
+                token = log.manager.utf('succ')
     except subprocess.CalledProcessError as e:
         err_msg = base64.b64encode(str(e.stderr).encode('utf-8'))
 
@@ -147,9 +146,9 @@ def process_check_directory(dir):
 
     if setup_files:
         log.print_section(
-            'Analyzing scripts: (script{s}YAML{s}valid)'.format(s=log.utf('sep_v')))
+            'Analyzing scripts: (script{s}YAML{s}valid)'.format(s=log.manager.utf('sep_v')))
         for _, subprefix, f in setup_files:
-            token_script = token_load = token_yaml = log.utf('fail')
+            token_script = token_load = token_yaml = log.manager.utf('fail')
             err, token_script, data = process_check_setup_file(
                 os.path.join(dir, subprefix, f), subprefix)
             if err:
@@ -163,9 +162,9 @@ def process_check_directory(dir):
                     errors[err] += 1
             log.print_item(' {}{}{}{}{} {}'.format(
                 token_script,
-                log.utf('sep_v'),
+                log.manager.utf('sep_v'),
                 token_load,
-                log.utf('sep_v'),
+                log.manager.utf('sep_v'),
                 token_yaml,
                 os.path.join(dir, subprefix)
             ), with_bullet=False)
@@ -176,7 +175,7 @@ def process_check_directory(dir):
 
     if yaml_files:
         log.print_section(
-            "Analysis: pcvs.yml* (YAML{}Valid)".format(log.utf('sep_v')))
+            "Analysis: pcvs.yml* (YAML{}Valid)".format(log.manager.utf('sep_v')))
         for _, subprefix, f in yaml_files:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:
                 err, token_load, token_yaml = process_check_yaml_stream(
@@ -187,7 +186,7 @@ def process_check_directory(dir):
 
             log.print_item(' {}{}{} {}'.format(
                 token_load,
-                log.utf('sep_v'),
+                log.manager.utf('sep_v'),
                 token_yaml,
                 os.path.join(dir, subprefix)), with_bullet=False)
 

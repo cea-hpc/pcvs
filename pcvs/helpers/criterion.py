@@ -260,7 +260,7 @@ class Criterion:
             for i in range(start, end+1):
                 values.append(i**of)
         else:
-            log.warn("failure in Criterion sequence!")
+            log.manager.warn("failure in Criterion sequence!")
 
         return values
 
@@ -295,7 +295,7 @@ def initialize_from_system():
     runtime_iterators = MetaConfig.root.runtime.iterators
     criterion_iterators = MetaConfig.root.criterion.iterators
     it_to_remove = []
-    log.print_item("Prune undesired iterators from the run")
+    log.manager.print_item("Prune undesired iterators from the run")
 
     # if a criterion defined in criterion.yaml but
     # not declared as part of a runtime, the criterion
@@ -303,10 +303,10 @@ def initialize_from_system():
     # here is the purpose
     for it in criterion_iterators.keys():
         if it not in runtime_iterators:
-            log.warn("Undeclared criterion "
+            log.manager.warn("Undeclared criterion "
                      "as part of runtime: '{}' ".format(it))
         elif criterion_iterators[it]['values'] is None:
-            log.debug('No combination found for {},'
+            log.manager.debug('No combination found for {},'
                       ' removing from schedule'.format(it))
         else:
             continue
@@ -319,7 +319,7 @@ def initialize_from_system():
     # convert any sequence into valid range of integers for
     
     # numeric criterions
-    log.print_item("Expand possible iterator expressions")
+    log.manager.print_item("Expand possible iterator expressions")
     for criterion in MetaConfig.root.get_internal('crit_obj').values():
         criterion.expand_values()
 
