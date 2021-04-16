@@ -295,6 +295,7 @@ def process_static_yaml_files(yaml_files):
     log.print_item("Process static test files")
     with log.progbar(yaml_files, print_func=print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
+            print(label, subprefix, fname)
             _, cur_src, _, cur_build = utils.generate_local_variables(
                 label, subprefix)
             if not os.path.isdir(cur_build):
