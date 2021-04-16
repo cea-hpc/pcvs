@@ -89,14 +89,14 @@ def set_local_path(path):
 ####     PATH MANIPULATION      ####
 ####################################
 
-def create_or_clean_path(prefix, is_dir=True):
-    if is_dir:
-        if os.path.isdir(prefix):   
-            shutil.rmtree(prefix)
+def create_or_clean_path(prefix):
+    if os.path.isdir(prefix):
+        shutil.rmtree(prefix)
         os.mkdir(prefix)
+    elif os.path.isfile(prefix):
+        os.remove(prefix)
     else:
-        if os.path.isfile(prefix):
-            os.remove(prefix)
+        raise CommonException.IOError(prefix)
 
 @contextmanager
 def cwd(path):
@@ -110,44 +110,21 @@ def cwd(path):
         os.chdir(oldpwd)
 
 ####################################
-####  EDITOR OPENING MANAGMENT  ####
-####################################
-
-def assert_editor_valid(override=None):
-    editor = "Undefined"
-    try:
-        if override is None:
-            editor = os.environ['EDITOR']
-        else:
-            editor = override
-        if shutil.which(editor, mode=os.X_OK) is None:
-            raise Exception
-    except:
-        RunException.ProgramError(editor)
-
-    return editor
-
-def open_in_editor(*paths, e=None):
-    editor = assert_editor_valid(e)
-    if shutil.which(editor) is None:
-        RunException.ProgramError(editor)
-    cmd = [
-        editor
-    ] + list(filter(None, paths))
-    subprocess.check_call(cmd)
-
-####################################
 ####           MISC.            ####
 ####################################
 
 def generate_local_variables(label, subprefix):
+    if label not in MetaConfig.root.validation.dirs:
+        raise CommonException.NotFoundError(label)
+
     base_srcdir = MetaConfig.root.validation.dirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
     base_buildir = os.path.join(MetaConfig.root.validation.output, "test_suite", label)
-    cur_buildir = os.path.join(base_buildir, subprefix)
+    cur_buildir = os.path.join(base_buildir, subprefix)        
+
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
-def check_valid_program(p, succ=None, fail=None):
+def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
     if not p:
         return
     try:
@@ -159,8 +136,10 @@ def check_valid_program(p, succ=None, fail=None):
     if res is True and succ is not None:
         succ("'{}' found at '{}'".format(os.path.basename(p), filepath))
 
-    if res is False and fail is not None:
-        fail("{} not found or not a executable".format(p))
-        raise RunException.ProgramError(p)
+    if res is False:
+        if fail is not None:
+            fail("{} not found or not an executable".format(p))
+        if raise_if_fail:
+            raise RunException.ProgramError(p)
 
     return res
