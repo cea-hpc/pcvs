@@ -151,7 +151,7 @@ class Set(threading.Thread):
                                  stderr=subprocess.STDOUT,
                                  stdout=subprocess.PIPE)
             job.executed()
-            print("{}: {}".format(job.name, job.strstate))
+            log.manager.print("{}: {}".format(job.name, job.strstate))
         self._completed = True
 
 
