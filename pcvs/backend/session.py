@@ -1,5 +1,6 @@
 import fcntl
 import os
+import copy
 import subprocess
 import sys
 import time
@@ -122,13 +123,12 @@ def list_alive_sessions():
     return all_sessions
 
 
-def main_detached_session(sid, user_func, io_file, *args, **kwargs):
+def main_detached_session(sid, user_func, *args, **kwargs):
     """Main function processed when running in detached mode. This function
     is called by Session.run_detached() and is launched from cloned process
     (same global env, new main function). Arguments are:
         - sid: the session id
         - user_func: the Python fonction used as the new main()
-        - io_file: where to flush stdout/stderr
         - *args, **kwargs: user_func() arguments
     """
 
@@ -144,13 +144,6 @@ def main_detached_session(sid, user_func, io_file, *args, **kwargs):
 
     ret = 0
 
-    if io_file:
-        #TODO: re-init with new IOManager
-        # any logger calls from user_func will reach the original tty
-        file_fd = open(io_file, 'w')
-        sys.stdout = file_fd
-        sys.stderr = file_fd
-    
     try:
         # run the code in detached mode
         # beware: this function should only raises exception to stop.
@@ -166,10 +159,7 @@ def main_detached_session(sid, user_func, io_file, *args, **kwargs):
             'ended': datetime.now()
         })
         raise e
-    finally:
-        if io_file:
-            sys.stdout.close()
-    
+        
     return ret
 
 
@@ -259,11 +249,23 @@ class Session:
             
             # run the new process
             child = Process(target=main_detached_session,
-                            args=(self._sid, self._func, self._io_file, *args),
+                            args=(self._sid, self._func, *args),
                             kwargs=kwargs)
+            
+            # set the child IOManager before starting
+            # enable logfile but disable tty
+            # save the old manager to restore it after child starts
+            old = copy.copy(log.manager)
+            log.manager.set_logfile(enable=True, logfile=self._io_file)
+            log.manager.set_tty(enable=False)
             child.start()
             # complete the first child, to allow this process to terminate
             child.join()
+            
+            # do not close tty, to extra info to be printed but not logged
+            log.manager = old
+            log.manager.set_logfile(enable=False)
+            
             return self._sid
 
     def run(self, *args, **kwargs):
@@ -278,13 +280,8 @@ class Session:
             self._session_infos['state'] = self.STATE_IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
-            # save stdout/stder to out.log & keep it interactive
-            # to be replaced with new I/O interface
-            t = subprocess.Popen(["tee", self._io_file],
-                                    stdin=subprocess.PIPE)
-            os.dup2(t.stdin.fileno(), sys.stdout.fileno())
-            os.dup2(t.stdin.fileno(), sys.stderr.fileno())
-            
+            log.manager.set_logfile(enable=True, logfile=self._io_file)
+            log.manager.set_tty(enable=True)
             # run the code
             self._func(*args, **kwargs)
 
