@@ -73,29 +73,29 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
 @click.pass_context
 def cli_doc(ctx, category):
 
-    log.print_header("Documentation")
+    log.manager.print_header("Documentation")
 
-    log.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
+    log.manager.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
     for shell in ['zsh', 'bash']:
-        log.print_item(
+        log.manager.print_item(
             "{: >4s}: eval \"$(_PCVS_COMPLETE=source_{} pcvs)\"".
             format(shell.upper(), shell))
     pass
 
-    log.print_section("Create basic configuration blocks")
-    log.print_item("WIP")
+    log.manager.print_section("Create basic configuration blocks")
+    log.manager.print_item("WIP")
 
-    log.print_section("Create a profile")
-    log.print_item("WIP")
+    log.manager.print_section("Create a profile")
+    log.manager.print_item("WIP")
 
-    log.print_section("Make a compliant test-suite")
-    log.print_item("WIP")
+    log.manager.print_section("Make a compliant test-suite")
+    log.manager.print_item("WIP")
 
-    log.print_section("Run a  simple validation")
-    log.print_item("WIP")
+    log.manager.print_section("Run a  simple validation")
+    log.manager.print_item("WIP")
 
-    log.print_section("Browse results")
-    log.print_item("WIP")
+    log.manager.print_section("Browse results")
+    log.manager.print_item("WIP")
 
 
 cli.add_command(cli_config.config)

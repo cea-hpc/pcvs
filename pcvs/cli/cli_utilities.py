@@ -69,7 +69,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
     log.banner()
     errors = dict()
     if color:
-        log.print_header("Colouring")
+        log.manager.print_header("Colouring")
         t = PrettyTable()
         ctx.color = True
         t.field_names = ["Name", "Foreground", "Background"]
@@ -78,7 +78,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
         print(t)
 
     if encoding:
-        log.print_header("Encoding")
+        log.manager.print_header("Encoding")
         
         t = PrettyTable()
         t.field_names = ["Alias", "Symbol", "Fallback"]
@@ -91,16 +91,16 @@ def check(ctx, dir, encoding, color, configs, profiles):
         print(t)
     
     if configs:
-        log.print_header("Configurations")
+        log.manager.print_header("Configurations")
         errors = {**errors, **pvUtils.process_check_configs()}
 
     if profiles:
-        log.print_header("Profile(s)")
+        log.manager.print_header("Profile(s)")
         errors = {**errors, **pvUtils.process_check_profiles()}
 
     if dir:
-        log.print_header("Test directories")
-        log.print_section("Prepare the environment")
+        log.manager.print_header("Test directories")
+        log.manager.print_section("Prepare the environment")
         # first, replace build dir with a temp one
         settings = MetaConfig()
         cfg_val = settings.bootstrap_validation({})
@@ -109,7 +109,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
 
 """
     if errors:
-        log.print_section("Classification of errors:")
+        log.manager.print_section("Classification of errors:")
         table = PrettyTable()
         table.field_names = ["Count", "Type of error"]
         
@@ -122,9 +122,9 @@ def check(ctx, dir, encoding, color, configs, profiles):
         table.reversesort = True
         print(table)
     else:
-        log.print_section("{succ} {cg} {succ}".format(
-            succ=log.utf('succ'),
-            cg=log.style("Everything is OK!", fg='green', bold=True))
+        log.manager.print_section("{succ} {cg} {succ}".format(
+            succ=log.manager.utf('succ'),
+            cg=log.manager.style("Everything is OK!", fg='green', bold=True))
         )
 """
 
@@ -140,7 +140,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
 @click.pass_context
 def clean(ctx, force, fake, paths, interactive):
     if not fake and not force:
-        log.warn("IMPORTANT NOTICE:",
+        log.manager.warn("IMPORTANT NOTICE:",
                  "This command will delete files from previous run(s) and",
                  "no recovery will be possible after deletion.",
                  "Please use --force to indicate you acknowledge the risks",
@@ -152,12 +152,12 @@ def clean(ctx, force, fake, paths, interactive):
     if not paths:
         paths = [os.getcwd()]
 
-    log.print_header("DELETION")
+    log.manager.print_header("DELETION")
     for path in paths:
         for root, dirs, files in os.walk(path):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
-                log.print_section("Found build: {}".format(root))
+                log.manager.print_section("Found build: {}".format(root))
                 for f in files:
                     if f.startswith('pcvsrun_') and f.endswith('.tar.gz'):
                         arch_date = datetime.strptime(
@@ -166,7 +166,7 @@ def clean(ctx, force, fake, paths, interactive):
                         )
                         delta = datetime.now() - arch_date
                         if fake:
-                            log.print_item('Age: {} day{:<1}: {}'.format(
+                            log.manager.print_item('Age: {} day{:<1}: {}'.format(
                                 delta.days,
                                 "s" if delta.days > 1 else '',
                                 f))
@@ -175,7 +175,7 @@ def clean(ctx, force, fake, paths, interactive):
                             if not click.confirm('{}: ({} days ago) ?'.format(f, delta.days)):
                                 continue
                         os.remove(os.path.join(root, f))
-                        log.print_item('deleted {}'.format(f))
+                        log.manager.print_item('deleted {}'.format(f))
                 dirs[:] = []
 
 
@@ -191,5 +191,5 @@ def discover(ctx, paths):
     paths = [os.path.abspath(x) for x in paths]
     
     for p in paths:
-        log.print_section("{}".format(p))
+        log.manager.print_section("{}".format(p))
         pvUtils.process_discover_directory(p)

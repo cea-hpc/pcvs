@@ -169,6 +169,6 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
                                           ))
     if detach:
         sid = the_session.run_detached(the_session)
-        log.print_item("Session successfully started, ID {}".format(sid))
+        log.manager.print_item("Session successfully started, ID {}".format(sid))
     else:
         the_session.run(the_session)

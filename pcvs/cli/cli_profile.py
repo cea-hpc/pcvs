@@ -51,14 +51,14 @@ def profile_list(ctx, token):
                                                         maxsplit=2)
 
     if label:
-        log.warn("no LABEL required for this command")
+        log.manager.warn("no LABEL required for this command")
 
     utils.check_valid_scope(scope)
 
-    log.print_header("Profile View")
+    log.manager.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)
     if not profiles:
-        log.print_item("None")
+        log.manager.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
         for sc in utils.storage_order():
@@ -66,20 +66,20 @@ def profile_list(ctx, token):
             names = sorted([elt[0]
                             for elt in [array for array in profiles[sc]]])
             if not names:
-                log.print_item("{: <6s}: {}".format(sc.upper(),
-                                                    log.style('None',
+                log.manager.print_item("{: <6s}: {}".format(sc.upper(),
+                                                    log.manager.style('None',
                                                              fg='bright_black')))
             else:
-                log.print_item("{: <6s}: {}".format(sc.upper(),
+                log.manager.print_item("{: <6s}: {}".format(sc.upper(),
                                                     ", ".join(names)))
     else:
         names = sorted([x[0] for x in profiles])
-        log.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+        log.manager.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
 
     # in case verbosity is enabled, add scope paths
-    log.info("Scopes are ordered as follows:")
+    log.manager.info("Scopes are ordered as follows:")
     for i, scope in enumerate(utils.storage_order()):
-        log.info("{}. {}: {}".format(
+        log.manager.info("{}. {}: {}".format(
             i+1, scope.upper(), utils.STORAGES[scope]))
 
 
@@ -103,7 +103,7 @@ def profile_show(ctx, token):
 def profile_interactive_select():
     composition = {}
     for kind in pvConfig.CONFIG_BLOCKS:
-        log.print_section("Pick up a {}".format(kind.capitalize()))
+        log.manager.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
         for scope, avails in pvConfig.list_blocks(kind).items():
             for elt in avails:
@@ -115,7 +115,7 @@ def profile_interactive_select():
         except ValueError:
             default = None
         for i, cell in enumerate(choices):
-            log.print_item("{}: {}".format(i + 1, cell))
+            log.manager.print_item("{}: {}".format(i + 1, cell))
         while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
         (scope, _, label) = utils.extract_infos_from_token(
@@ -177,7 +177,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
         base = pvProfile.Profile(c_label, c_scope)
         pf.clone(base)
     elif interactive:
-        log.print_header("profile view (build)")
+        log.manager.print_header("profile view (build)")
         pf_blocks = profile_interactive_select()
         pf.fill(pf_blocks)
     else:
@@ -198,13 +198,13 @@ def profile_build(ctx, token, interactive, blocks, clone):
             base.load_template()
             pf.clone(base)
         
-    log.print_header("profile view")
+    log.manager.print_header("profile view")
     pf.flush_to_disk()
     # pf.display()
 
-    log.print_section("final profile (registered as {})".format(pf.scope))
+    log.manager.print_section("final profile (registered as {})".format(pf.scope))
     for k, v in pf_blocks.items():
-        log.print_item("{: >9s}: {}".format(
+        log.manager.print_item("{: >9s}: {}".format(
             k.upper(), ".".join([v.scope, v.short_name])))
 
 
@@ -318,7 +318,7 @@ def profile_decompose_profile(ctx, token, name, block_opt, scope):
         pf.load_from_disk()
 
 
-    log.print_section('"Create the subsequent configuration blocks:')
+    log.manager.print_section('"Create the subsequent configuration blocks:')
     for c in pf.split_into_configs(name, blocks, scope):
-        log.print_item(c.full_name)
+        log.manager.print_item(c.full_name)
         c.flush_to_disk()

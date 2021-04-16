@@ -35,7 +35,7 @@ def session(ctx, ack, list, ack_all):
     elif ack is not None:
         pvSession.remove_session_from_file(ack)
     else:  # listing is the defualt
-        log.print_header("Session View")
+        log.manager.print_header("Session View")
         for sk, sv in sessions.items():
             s = pvSession.Session()
             s.load_from(sk, sv)
@@ -51,4 +51,4 @@ def session(ctx, ack, list, ack_all):
             else:
                 extra_line = "Error"
 
-            log.print_item("ID {: >2s}: {}".format(str(s.id), extra_line))
+            log.manager.print_item("ID {: >2s}: {}".format(str(s.id), extra_line))

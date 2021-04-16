@@ -57,7 +57,7 @@ def process_check_configs():
                     err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                     errors.setdefault(err_msg, 0)
                     errors[err_msg] += 1
-                    log.debug(str(e))
+                    log.manager.debug(str(e))
 
                 t.add_row([token, obj.full_name])
     print(t)
@@ -82,7 +82,7 @@ def process_check_profiles():
                 err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                 errors.setdefault(err_msg, 0)
                 errors[err_msg] += 1
-                log.debug(str(e))
+                log.manager.debug(str(e))
 
             t.add_row([token, obj.full_name])
     print(t)
@@ -145,7 +145,7 @@ def process_check_directory(dir):
         {os.path.basename(dir): dir})
 
     if setup_files:
-        log.print_section(
+        log.manager.print_section(
             'Analyzing scripts: (script{s}YAML{s}valid)'.format(s=log.manager.utf('sep_v')))
         for _, subprefix, f in setup_files:
             token_script = token_load = token_yaml = log.manager.utf('fail')
@@ -160,7 +160,7 @@ def process_check_directory(dir):
                 if err:
                     errors.setdefault(err, 0)
                     errors[err] += 1
-            log.print_item(' {}{}{}{}{} {}'.format(
+            log.manager.print_item(' {}{}{}{}{} {}'.format(
                 token_script,
                 log.manager.utf('sep_v'),
                 token_load,
@@ -170,11 +170,11 @@ def process_check_directory(dir):
             ), with_bullet=False)
 
             if err:
-                log.info("FAILED: {}".format(
+                log.manager.info("FAILED: {}".format(
                     base64.b64decode(err).decode('utf-8')))
 
     if yaml_files:
-        log.print_section(
+        log.manager.print_section(
             "Analysis: pcvs.yml* (YAML{}Valid)".format(log.manager.utf('sep_v')))
         for _, subprefix, f in yaml_files:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:
@@ -184,14 +184,14 @@ def process_check_directory(dir):
                     errors.setdefault(err, 0)
                     errors[err] += 1
 
-            log.print_item(' {}{}{} {}'.format(
+            log.manager.print_item(' {}{}{} {}'.format(
                 token_load,
                 log.manager.utf('sep_v'),
                 token_yaml,
                 os.path.join(dir, subprefix)), with_bullet=False)
 
             if err:
-                log.info("FAILED: {}".format(
+                log.manager.info("FAILED: {}".format(
                     base64.b64decode(err).decode('utf-8')))
     return errors
 
@@ -218,7 +218,7 @@ class BuildSystem:
     def generate_file(self, filename="pcvs.yml"):
         out_file = os.path.join(self._root, filename)
         if os.path.isfile(out_file):
-            log.warn("template already exist ! Skip.")
+            log.manager.warn("template already exist ! Skip.")
             return
 
         with open(out_file, 'w') as fh:
@@ -257,17 +257,17 @@ def process_discover_directory(path):
     for root, dirs, files in os.walk(path):
         obj = None
         if 'configure' in files:
-            n = log.style("Autotools", fg="yellow", bold=True)
+            n = log.manager.style("Autotools", fg="yellow", bold=True)
             obj = AutotoolsBuildSystem(root, dirs, files)
         if 'CMakeLists.txt' in files:
-            n = log.style("CMake", fg="cyan", bold=True)
+            n = log.manager.style("CMake", fg="cyan", bold=True)
             obj = CMakeBuildSystem(root, dirs, files)
         if 'Makefile' in files:
-            n = log.style("Make", fg="red", bold=True)
+            n = log.manager.style("Make", fg="red", bold=True)
             obj = MakefileBuildSystem(root, dirs, files)
 
         if obj is not None:
             dirs[:] = []
-            log.print_item("{} [{}]".format(root, n))
+            log.manager.print_item("{} [{}]".format(root, n))
             obj.fill()
             obj.generate_file(filename="pcvs.yml")

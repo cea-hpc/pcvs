@@ -39,9 +39,9 @@ def bank(ctx):
 def bank_list(ctx):
     """
     List known repositories, stored under $HOME_STORAGE/banks.yml"""
-    log.print_header("Bank View")
+    log.manager.print_header("Bank View")
     for label, path in pvBank.list_banks().items():
-        log.print_item("{:<8}: {}".format(label.upper(), path))
+        log.manager.print_item("{:<8}: {}".format(label.upper(), path))
 
 
 @bank.command(name="show", short_help="Display data stored in a repo.")
@@ -49,7 +49,7 @@ def bank_list(ctx):
 @click.pass_context
 def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
-    log.print_header("Bank View")
+    log.manager.print_header("Bank View")
 
     b = pvBank.Bank(token=name)
     if not b.exists():
@@ -65,7 +65,7 @@ def bank_show(ctx, name):
 @click.pass_context
 def bank_create(ctx, name, path):
     """Create a new bank, named NAME, data will be stored under PATH."""
-    log.print_header("Bank View")
+    log.manager.print_header("Bank View")
     if path is None:
         path = os.getcwd()
     
@@ -92,14 +92,14 @@ def bank_destroy(ctx, name, symlink):
     repository deletion. 'data.yml' and bank entry in the configuratino file
     will be removed but existing data are preserved.
     """
-    log.print_header("Bank View")
+    log.manager.print_header("Bank View")
     b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         if not symlink:
-            log.warn("To delete a bank, just remove the directory {}".format(b.prefix))
-        log.print_item("Bank '{}' unlinked".format(name))
+            log.manager.warn("To delete a bank, just remove the directory {}".format(b.prefix))
+        log.manager.print_item("Bank '{}' unlinked".format(name))
         pvBank.rm_banklink(name)
         
 
