@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
+
 from pcvs.helpers import test as tested
 
 

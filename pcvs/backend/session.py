@@ -1,6 +1,6 @@
+import copy
 import fcntl
 import os
-import copy
 import subprocess
 import sys
 import time

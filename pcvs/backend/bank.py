@@ -12,6 +12,7 @@ import yaml
 from addict import Dict
 from pygit2.repository import Repository
 
+from pcvs import PATH_HOMEDIR
 from pcvs.helpers import criterion, git, log, utils
 from pcvs.helpers.exceptions import BankException
 
@@ -293,7 +294,7 @@ def init():
     $USER_STORAGE/banks.yml
     """
     global BANKS, BANK_STORAGE
-    BANK_STORAGE = os.path.join(utils.STORAGES['user'], "banks.yml")
+    BANK_STORAGE = os.path.join(PATH_HOMEDIR, "banks.yml")
     try:
         with open(BANK_STORAGE, 'r') as f:
             BANKS = yaml.safe_load(f)

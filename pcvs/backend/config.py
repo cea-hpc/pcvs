@@ -11,7 +11,6 @@ from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ConfigException, ValidationException
 
-CONFIG_STORAGES = dict()
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
 
@@ -20,9 +19,7 @@ def init() -> None:
     """init() module function, called when PCVS starts to load 
     any existing configuration files
     """
-    global CONFIG_STORAGES, CONFIG_BLOCKS, CONFIG_EXISTING
-    CONFIG_STORAGES = {k: os.path.join(v, "saves")
-                       for k, v in utils.STORAGES.items()}
+    global CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_EXISTING = {}
 
     # this first loop defines configuration order
@@ -32,7 +29,7 @@ def init() -> None:
         priority_paths.reverse()
         for token in priority_paths:  # reverse order (overriding)
             CONFIG_EXISTING[block][token] = []
-            for config_file in glob.glob(os.path.join(CONFIG_STORAGES[token],
+            for config_file in glob.glob(os.path.join(utils.STORAGES[token],
                                                       block,
                                                       "*.yml")):
                 CONFIG_EXISTING[block][token].append(
@@ -42,7 +39,7 @@ def init() -> None:
 def list_blocks(kind, scope=None):
     """Getter to access the list of config names, filtered by kind & scope"""
     assert (kind in CONFIG_BLOCKS)
-    assert (scope in CONFIG_STORAGES.keys() or scope is None)
+    assert (scope in utils.STORAGES.keys() or scope is None)
     if scope is None:
         return CONFIG_EXISTING[kind]
     else:
@@ -98,8 +95,8 @@ class ConfigurationBlock:
         # default file position when not found
         if self._scope is None:
             self._scope = 'local'
-        self._file = self._files = os.path.join(
-            CONFIG_STORAGES[self._scope], self._kind, self._name + ".yml")
+        self._file = os.path.join(
+            utils.STORAGES[self._scope], self._kind, self._name + ".yml")
         self._exists = False
 
     def is_found(self):

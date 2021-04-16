@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import jsonschema
 import yaml
 
-from pcvs import NAME_SRCDIR, PATH_INSTDIR
+from pcvs import NAME_SRCDIR, PATH_HOMEDIR, PATH_INSTDIR
 from pcvs.helpers.exceptions import CommonException, RunException
 from pcvs.helpers.system import MetaConfig
 
@@ -15,7 +15,7 @@ from pcvs.helpers.system import MetaConfig
 ####################################
 STORAGES = {
     'global': PATH_INSTDIR,
-    'user': os.path.join(os.environ['HOME'], NAME_SRCDIR),
+    'user': PATH_HOMEDIR,
     'local': os.path.join(os.getcwd(), NAME_SRCDIR)
 }
 

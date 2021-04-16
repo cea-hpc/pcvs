@@ -12,27 +12,23 @@ from pcvs.backend import config
 from pcvs.helpers import git, log, system, utils
 from pcvs.helpers.exceptions import ProfileException, ValidationException
 
-PROFILE_STORAGES = dict()
 PROFILE_EXISTING = dict()
 
-
 def init():
-    global PROFILE_EXISTING, PROFILE_STORAGES
-    PROFILE_STORAGES = {k: os.path.join(
-        v, "saves/profile") for k, v in utils.STORAGES.items()}
+    global PROFILE_EXISTING
     PROFILE_EXISTING = {}
     # this first loop defines configuration order
     priority_paths = utils.storage_order()
     priority_paths.reverse()
     for token in priority_paths:  # reverse order (overriding)
         PROFILE_EXISTING[token] = []
-        for pfile in glob.glob(os.path.join(PROFILE_STORAGES[token], "*.yml")):
+        for pfile in glob.glob(os.path.join(utils.STORAGES[token], 'profile', "*.yml")):
             PROFILE_EXISTING[token].append(
                 (os.path.basename(pfile)[:-4], pfile))
 
 
 def list_profiles(scope=None):
-    assert (scope in PROFILE_STORAGES.keys() or scope is None)
+    assert (scope in utils.STORAGES.keys() or scope is None)
     if scope is None:
         return PROFILE_EXISTING
     else:
@@ -68,7 +64,7 @@ class Profile:
         if self._scope is None:
             self._scope = 'local'
         self._file = os.path.join(
-            PROFILE_STORAGES[self._scope], self._name + ".yml")
+            utils.STORAGES[self._scope], 'profile', self._name + ".yml")
         self._exists = False
 
     def get_unique_id(self):
