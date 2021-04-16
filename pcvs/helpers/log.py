@@ -21,6 +21,9 @@ manager = None
 def init(v=0, e=False, l=100):
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l)
+    # this allow to fully wraps application I/Os
+    sys.stdout = manager
+    sys.stderr = manager
 
 def print_section(*args, **kwargs):
     return manager.print_section(*args, **kwargs)
@@ -120,20 +123,47 @@ class IOManager:
     @property
     def tty(self):
         return self._tty
+
+    def set_tty(self, enable):
+        self._tty = enable
+
+    def enable_tty(self):
+        self.set_tty(enable=True)
+
+    def disable_tty(self):
+        self.set_tty(enable=False)
     
     @property
     def log_filename(self):
         return os.path.abspath(self._logfile.name) if self._logfile else None
+
+    def set_logfile(self, enable, logfile=None):
+        self._logs = enable
+        if logfile is not None and os.path.abspath(logfile) != self.log_filename:
+            if self._logfile:
+                self._logfile.close()
+            self._logfile = open(os.path.abspath(logfile), 'w+')
+    
+    def enable_logfile(self):
+        self.set_logfile(enable=True)
+
+    def disable_logfile(self):
+        self.set_logfile(enable=False)
 
     def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
         self._linelength = 93
         self._wrapper = None
         self._tty = tty
         self._logfile = None
+        self._logs = False
         self._verbose = verbose
         self._unicode = enable_unicode
         
         self.enable_unicode(self._unicode)
+
+        if tty:
+            self._stdout = sys.stdout
+            self._stderr = sys.stderr
 
         if length is not None:
             self._linelength = length if length > 0 else click.get_terminal_size()[0]
@@ -142,17 +172,21 @@ class IOManager:
         if logfile is not None:
             if os.path.isfile(logfile):
                 raise CommonException.AlreadyExistError(logfile)
-            self._logfile = open(logfile, "w")
+            self._logs = True
+            self._logfile = open(os.path.abspath(logfile), "w")
         
     def __del__(self):
         
-        if self._logfile is not None:
+        if self._logs:
             self._logfile.close()
 
     def __print_rawline(self, msg, err=False):
         if self._tty:
-            click.echo(msg, err=err)
-        if self._logfile:
+            if err:
+                self._stderr.write(msg+'\n')
+            else:
+                self._stdout.write(msg+'\n')
+        if self._logs:
             self._logfile.write(msg + ('\n' if msg[-1] != "\n" else ""))
             self._logfile.flush()
 
@@ -173,6 +207,16 @@ class IOManager:
     def print(self, *msg):
         for i in msg:
             self.__print_rawline(i)
+
+    def write(self, txt):
+        self.__print_rawline(txt)
+
+    def flush(self):
+        if self._tty:
+            self._stderr.flush()
+            self._stdout.flush()
+        if self._logs:
+            self._logfile.flush()
     
     def capture_exception(self, *e_type):
         def inner_function(func):
