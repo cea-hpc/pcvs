@@ -17,22 +17,22 @@ variables:
 stages:
 - Installation
 - Pytest
-- I/O Formatting
 - Documentation
 - Static Analysis
 
-yaml:
-    <<: *scope
-    stage: I/O Formatting
-    script:
-    - tox -e lint-yaml
-
-linters:
+formatting:
     <<: *scope
     stage: Static Analysis
     allow_failure: true
     script:
     - tox -e lint-generic
+
+types:
+    <<: *scope
+    stage: Static Analysis
+    allow_failure: true
+    script:
+    - tox -e lint-type
 
 build_doc:
     <<: *scope
