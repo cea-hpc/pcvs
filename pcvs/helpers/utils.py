@@ -90,6 +90,8 @@ def set_local_path(path):
 ####################################
 
 def create_or_clean_path(prefix):
+    if not os.path.exists(prefix):
+        return
     if os.path.isdir(prefix):
         shutil.rmtree(prefix)
         os.mkdir(prefix)

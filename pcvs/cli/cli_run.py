@@ -131,6 +131,13 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('target_bank', bank)
     
+    print(val_cfg.output)
+    if os.path.exists(val_cfg.output) and not val_cfg.override:
+        raise click.BadOptionUsage("--output", "target build directory already exist")
+    elif not os.path.exists(val_cfg.output):
+        os.makedirs(val_cfg.output)
+        
+    
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if dup is not None:

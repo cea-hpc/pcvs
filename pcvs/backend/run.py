@@ -124,24 +124,19 @@ def prepare():
 
     log.manager.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
+    if not os.path.exists(buildir):
+        os.makedirs(buildir)
     # if a previous build exists
-    if os.path.isdir(buildir):
-        if not valcfg.override:
-            raise RunException.OverrideError(valcfg.output)
-        else:
-            if valcfg.reused_build is None:
-                log.manager.print_item("Cleaning up {}".format(buildir), depth=2)
-                utils.create_or_clean_path(buildir)
-            utils.create_or_clean_path(os.path.join(
-                valcfg.output, NAME_BUILDFILE), is_dir=False)
-            utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
-            utils.create_or_clean_path(os.path.join(
-                valcfg.output, 'conf.yml'), is_dir=False)
-            utils.create_or_clean_path(os.path.join(
-                valcfg.output, 'conf.env'), is_dir=False)
-            utils.create_or_clean_path(os.path.join(
-                valcfg.output, 'save_for_export'))
-            utils.create_or_clean_path(valcfg.buildcache)
+    if valcfg.reused_build is None:
+        log.manager.print_item("Cleaning up {}".format(buildir), depth=2)
+        utils.create_or_clean_path(buildir)
+    utils.create_or_clean_path(os.path.join(
+        valcfg.output, NAME_BUILDFILE))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
+    utils.create_or_clean_path(valcfg.buildcache)
 
     log.manager.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
