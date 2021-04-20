@@ -277,12 +277,14 @@ def process_dyn_setup_scripts(setup_files):
                 continue
 
             # Now create the file handler
-            TestFile(file_in=out_file,
+            obj = TestFile(file_in=out_file,
                 path_out=cur_build,
                 data=te_node,
                 label=label,
                 prefix=subprefix
-            ).process()
+            )
+            obj.process()
+            obj.flush_sh_file()
     return err
 
 def process_static_yaml_files(yaml_files):
@@ -297,11 +299,13 @@ def process_static_yaml_files(yaml_files):
             f = os.path.join(cur_src, fname)
 
             try:
-                TestFile(file_in=f,
+                obj = TestFile(file_in=f,
                     path_out=cur_build,
                     label=label,
                     prefix=subprefix
-                ).process()
+                )
+                obj.process()
+                obj.flush_sh_file()
             except (yaml.YAMLError, CalledProcessError) as e:
                 # log errors to be printed all at once
                 err.append((f, e.output))
