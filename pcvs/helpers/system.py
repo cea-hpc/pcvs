@@ -156,11 +156,8 @@ class MetaConfig(Dict):
     root = None
     validation_default_file = pcvs.PATH_VALCFG
     
-    def __init__(self, base={}, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if isinstance(base, dict):
-            for k, v in base.items():
-                self[k] = v
 
         # The 'internal' node is a special one. Put here anything not requiring
         # to be published (like conf.yml, etc...). mainly one-time Python objects
@@ -168,7 +165,6 @@ class MetaConfig(Dict):
 
     def __setitem__(self, param, value):
         """Extend the default Dict setter mthod to reach the base class one"""
-        assert(isinstance(value, Config))
         super().__setitem__(param, value)
 
     def bootstrap_generic(self, subnode, node):
