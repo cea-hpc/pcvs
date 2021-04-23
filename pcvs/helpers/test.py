@@ -114,7 +114,6 @@ class TestFile:
         
         if self._raw is None:
             self._raw = load_yaml_file(self._in, src, build, self._prefix)
-        
         # optionally validate user's input
         # this check should also be used while loading the file.
         # (old syntax files will only be converted if they are wrongly
@@ -134,7 +133,7 @@ class TestFile:
             # register debug informations relative to the loaded TEs
             self._debug[k] = td.get_debug()
     
-    def __del__(self):
+    def flush_sh_file(self):
         """Store the given input file into their destination.
         This function dumps the Shell file, used as JCHRONOSS test command
         manager"""
@@ -386,7 +385,6 @@ class TEDescriptor:
             tmp = Dict(MetaConfig.root.group[node['group']])
             tmp.update(Dict(node))
             node = tmp
-        
         # load from descriptions
         self._build = Dict(node.get('build', None))
         self._run = Dict(node.get('run', None))
