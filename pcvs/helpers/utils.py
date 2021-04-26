@@ -6,7 +6,7 @@ from contextlib import contextmanager
 import jsonschema
 import yaml
 
-from pcvs import NAME_SRCDIR, PATH_HOMEDIR, PATH_INSTDIR
+from pcvs import NAME_SRCDIR, PATH_HOMEDIR, PATH_INSTDIR, NAME_BUILDIR, NAME_BUILDFILE
 from pcvs.helpers.exceptions import CommonException, RunException
 from pcvs.helpers.system import MetaConfig
 
@@ -89,9 +89,16 @@ def set_local_path(path):
 ####     PATH MANIPULATION      ####
 ####################################
 
-def create_or_clean_path(prefix):
+def create_or_clean_path(prefix, dir=False):
     if not os.path.exists(prefix):
+        if dir:
+            os.mkdir(prefix)
+        else:
+            assert(os.path.isdir(os.path.dirname(prefix)))
+            open(prefix, 'w+').close()
         return
+    
+    # else, a previous path exists
     if os.path.isdir(prefix):
         shutil.rmtree(prefix)
         os.mkdir(prefix)
@@ -145,3 +152,14 @@ def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
             raise RunException.ProgramError(p)
 
     return res
+
+def find_buildir_from_prefix(path):
+        # three scenarios:
+        # - path = $PREFIX (being a buildir) -> use as build dir
+        # - path = $PREFIX (containing a buildir) - > join(.pcvs-build)
+        # - otherwise, raise a path error
+        if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)): 
+            path = os.path.join(path, NAME_BUILDIR)
+            if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
+                raise CommonException.NotFoundError("build-dir in {}".format(path))
+        return path
