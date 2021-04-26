@@ -104,8 +104,6 @@ def create_or_clean_path(prefix, dir=False):
         os.mkdir(prefix)
     elif os.path.isfile(prefix):
         os.remove(prefix)
-    else:
-        raise CommonException.IOError(prefix)
 
 @contextmanager
 def cwd(path):

@@ -379,19 +379,17 @@ def terminate():
     log.manager.print_section("Exporting results")
     
     log.manager.print_item("Prepare the archive")
+    #TODO: copy declared artifacts
     # copy file before anonymizing them
-    for root, _, files in os.walk(os.path.join(outdir, "test_suite")):
-        for file in files:
-            # TODO: save user-defined artifacts
-            if file.endswith(('.json', '.xml', '.yml')):
-                save_for_export(os.path.join(root, file))
+    #for root, _, files in os.walk(os.path.join(outdir, "test_suite")):
+    #    for file in files:
+    #        # TODO: save user-defined artifacts
+    #        if file.endswith(('.json', '.xml', '.yml')):
+    #            save_for_export(os.path.join(root, file))
 
+    save_for_export(os.path.join(outdir, NAME_BUILD_RESDIR))
     save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
-    # save_for_export(os.path.join(outdir, 'conf.env'))
-    #save_for_export(os.path.join(MetaConfig.root.validation.jchronoss.src,
-    #                             "tools/webview"),
-    #                os.path.join(outdir, 'webview'))
-
+    
     if MetaConfig.root.validation.anonymize:
         log.manager.print_item("Anonymizing data")
         anonymize_archive()
