@@ -12,7 +12,7 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_SESSION
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_BUILD_RESDIR, NAME_SRCDIR, NAME_BUILD_CONF_FN
 from pcvs.backend import bank as pvBank
 from pcvs.backend import session as pvSession
 from pcvs.helpers import criterion, log, test, utils
@@ -132,12 +132,13 @@ def prepare():
         utils.create_or_clean_path(buildir)
     utils.create_or_clean_path(os.path.join(
         valcfg.output, NAME_BUILDFILE))
-    utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'))
-    utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.yml'))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'webview'), dir=True)
+    utils.create_or_clean_path(os.path.join(valcfg.output, NAME_BUILD_CONF_FN))
     utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'))
-    utils.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'))
+    utils.create_or_clean_path(os.path.join(valcfg.output, 'save_for_export'), dir=True)
+    utils.create_or_clean_path(os.path.join(valcfg.output, NAME_BUILD_RESDIR), dir=True)
     utils.create_or_clean_path(valcfg.buildcache)
-
+    
     log.manager.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
@@ -322,7 +323,7 @@ def run():
     log.manager.print_item("Save Configurations into {}".format(
         MetaConfig.root.validation.output))
 
-    conf_file = os.path.join(MetaConfig.root.validation.output, "conf.yml")
+    conf_file = os.path.join(MetaConfig.root.validation.output, NAME_BUILD_CONF_FN)
     with open(conf_file, 'w') as conf_fh:
         yaml.safe_dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
 
@@ -385,7 +386,7 @@ def terminate():
             if file.endswith(('.json', '.xml', '.yml')):
                 save_for_export(os.path.join(root, file))
 
-    save_for_export(os.path.join(outdir, 'conf.yml'))
+    save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
     # save_for_export(os.path.join(outdir, 'conf.env'))
     #save_for_export(os.path.join(MetaConfig.root.validation.jchronoss.src,
     #                             "tools/webview"),
@@ -419,7 +420,7 @@ def dup_another_build(build_dir, outdir):
     global_config = None
 
     # First, load the whole config
-    with open(os.path.join(build_dir, 'conf.yml'), 'r') as fh:
+    with open(os.path.join(build_dir, NAME_BUILD_CONF_FN), 'r') as fh:
         d = Dict(yaml.safe_load(fh))
         global_config = MetaConfig(d)
 
