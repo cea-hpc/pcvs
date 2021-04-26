@@ -214,10 +214,10 @@ class Orchestrator:
                 #TODO: Publish results periodically
                 #1. on file system
                 #2. directly into the selected bank
-                self._publisher.finalize()
+                self._publisher.flush()
                 last_count = self._manager.executed_job
         
-        self._publisher.finalize()
+        self._publisher.flush()
 
     def pause_run(self):
         pass

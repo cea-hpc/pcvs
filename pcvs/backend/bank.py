@@ -12,7 +12,7 @@ import yaml
 from addict import Dict
 from pygit2.repository import Repository
 
-from pcvs import PATH_HOMEDIR
+from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_HOMEDIR
 from pcvs.helpers import criterion, git, log, utils
 from pcvs.helpers.exceptions import BankException
 
@@ -187,7 +187,7 @@ class Bank:
         self._config = Dict(yaml.safe_load(s))
     
     def load_config_from_file(self, path):
-        with open(os.path.join(path, "conf.yml"), 'r') as fh:
+        with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
             self._config = Dict(yaml.safe_load(fh))
         
     def save_from_buildir(self, tag, buildpath):
@@ -196,7 +196,7 @@ class Bank:
 
         root_subdir = os.path.join(buildpath, "test_suite")
         #TODO: need a test walkthrough (not dirs)
-        for result_file in glob.glob(os.path.join(buildpath, "pcvs_rawdat*.json")):
+        for result_file in os.listdir(os.path.join(buildpath, NAME_BUILD_RESDIR)):
             with open(result_file, 'r') as fh:
                 data = Dict(yaml.safe_load(fh))
                 #TODO: validate
@@ -211,6 +211,7 @@ class Bank:
 
         with tempfile.TemporaryDirectory() as tarpath:
             tarfile.open(os.path.join(archivepath)).extractall(tarpath)
+            os
             self.save_from_buildir(tag, os.path.join(tarpath, "save_for_export"))
 
     def finalize_snapshot(self, tag):
