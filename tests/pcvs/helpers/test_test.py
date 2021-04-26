@@ -15,6 +15,7 @@ log.init()
 def load_yaml_file():
     assert(False)
 
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_load_yaml_file():
     log.manager.print(NAME_BUILDIR)
     tested.load_yaml_file(os.path.join(PATH_INSTDIR, "schemes/criterion-scheme.yml"), 

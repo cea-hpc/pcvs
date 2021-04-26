@@ -42,8 +42,6 @@ def test_path_cleaner():
         assert(os.path.isdir("A/B"))
         assert(len(os.listdir("A/B")) == 0)
 
-        with pytest.raises(CommonException.IOError):
-            tested.create_or_clean_path("/dev/tty1")
 
 @pytest.mark.parametrize("wd_dir", ["/home", "/", "/tmp", "./dummy-dir"])
 def test_cwd_manager(wd_dir):
