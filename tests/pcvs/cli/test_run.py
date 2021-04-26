@@ -7,12 +7,30 @@ from pcvs.backend import run as tested
 from .conftest import click_call, isolated_fs
 
 
-def test_no_userdirs():
+@patch('pcvs.backend.session.Session', autospec=True)
+@patch('pcvs.backend.profile.Profile')
+@patch('pcvs.backend.bank')
+@patch('pcvs.helpers.system')
+def test_no_userdirs(mock_sys, mock_bank, mock_pf, mock_session):
     with isolated_fs():
-        _ = click_call('run')
+        res = click_call('run')
+        assert(res.exit_code == 0)
 
 
-@patch('pcvs.backend.run')
+@patch("pcvs.backend.session.lock_session_file", return_value={})
+@patch("pcvs.backend.session.unlock_session_file", return_value={})
+@patch("pcvs.backend.session.store_session_to_file", return_value={})
+@patch("pcvs.backend.session.update_session_from_file", return_value={})
+@patch("pcvs.backend.session.remove_session_from_file", return_value={})
+def test_big_integation(rs, us, ss, unlock, lock):
+    with isolated_fs():
+        res = click_call('profile', 'build', 'local.default')
+        assert(res.exit_code == 0)
+        res = click_call('run')       
+        assert(res.exit_code == 0)
+
+
+@patch('pcvs.backend.session')
 @patch('pcvs.backend.profile.Profile')
 @patch('pcvs.backend.bank')
 @patch('pcvs.helpers.system')

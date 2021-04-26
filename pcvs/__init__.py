@@ -14,6 +14,7 @@ PATH_SESSION = os.path.join(PATH_HOMEDIR, "session.yml")
 PATH_SESSION_LOCKFILE = os.path.join(PATH_HOMEDIR, "session.yml.lck")
 PATH_VALCFG = os.path.join(PATH_HOMEDIR, "validation.yml")
 
-if not os.path.exists(PATH_HOMEDIR):
-    os.makedirs(PATH_HOMEDIR)
+def create_home_dir():
+    if not os.path.exists(PATH_HOMEDIR):
+        os.makedirs(PATH_HOMEDIR)
 
