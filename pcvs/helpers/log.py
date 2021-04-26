@@ -126,7 +126,7 @@ class IOManager:
         if self._tty:
             click.echo(msg, err=err)
         if self._logs:
-            self._logfile.write(msg + ('\n' if msg[-1] != "\n" else ""))
+            self._logfile.write('{}{}'.format(msg, '\n' if msg[-1] != "\n" else ""))
             self._logfile.flush()
 
     def has_verb_level(self, match):
