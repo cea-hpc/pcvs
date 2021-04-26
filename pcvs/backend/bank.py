@@ -19,6 +19,7 @@ from pcvs.helpers.exceptions import BankException
 BANKS = dict()
 BANK_STORAGE = ""
 
+
 class Bank:
     def __init__(self, path=None, token=""):
         self._root = path
@@ -194,10 +195,10 @@ class Bank:
         self.load_config_from_file(buildpath)
         self._rootree = self._repo.TreeBuilder()
 
-        root_subdir = os.path.join(buildpath, "test_suite")
         #TODO: need a test walkthrough (not dirs)
-        for result_file in os.listdir(os.path.join(buildpath, NAME_BUILD_RESDIR)):
-            with open(result_file, 'r') as fh:
+        rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
+        for result_file in os.listdir(rawdata_dir):
+            with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
                 data = Dict(yaml.safe_load(fh))
                 #TODO: validate
             

@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from pcvs import NAME_BUILDIR, NAME_BUILD_RESDIR
 from unittest.mock import Mock, patch
 
 import pygit2
@@ -10,6 +11,7 @@ from addict import Dict
 from click.testing import CliRunner
 
 from pcvs.backend import bank as tested
+from pcvs.helpers import utils
 
 
 @pytest.fixture
@@ -22,9 +24,13 @@ def mock_repo_fs():
 @pytest.fixture
 def dummy_run():
     with CliRunner().isolated_filesystem():
-        path = os.path.join(os.getcwd(), ".pcvs-build")
-        os.makedirs(path)
-        with open(os.path.join(path, "pcvs_rawdat0000.json"), "w") as fh:
+        path = os.getcwd()
+        build_path = os.path.join(path, ".pcvs-build")
+        
+        os.makedirs(os.path.join(build_path, "rawdata"))
+        open(os.path.join(build_path, ".pcvs-isbuilddir"), 'w+').close()
+        
+        with open(os.path.join(build_path, "rawdata/pcvs_rawdat0000.json"), "w+") as fh:
             content = {
                 "tests": [{
                     "id": {
@@ -46,8 +52,8 @@ def dummy_run():
                 ]
             }
             json.dump(content, fh)
-
-        with open(os.path.join(path, "conf.yml"), 'w') as fh:
+        
+        with open(os.path.join(build_path, "conf.yml"), 'w') as fh:
             content = Dict()
             content.validation.dirs = {'LABEL_A': "DIR_A"}
             content.validation.author.name = "John Doe"
@@ -103,8 +109,9 @@ def test_save_run(mock_repo_fs, dummy_run, capsys):
     obj = tested.Bank(path=mock_repo_fs, token="dummy@original-tag")
     assert(not obj.exists())
     obj.connect_repository()
-    obj.save_from_buildir("override-tag", dummy_run)
-    obj.save_from_buildir(None, dummy_run)
+    prefix = utils.find_buildir_from_prefix(dummy_run)
+    obj.save_from_buildir("override-tag", prefix)
+    obj.save_from_buildir(None, prefix)
     
     repo = pygit2.Repository(mock_repo_fs)
 
