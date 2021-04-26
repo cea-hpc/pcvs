@@ -80,6 +80,7 @@ def isolated_yml_test():
     }
 }))
 @patch("pcvs.helpers.test.TEDescriptor")
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_TestFile(tedesc, isolated_yml_test):
     def dummydesc(obj):
         pass
@@ -136,6 +137,7 @@ def test_Test():
     },
     "criterion": {}
 }))
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_TEDescriptor(isolated_yml_test):
     tested.TEDescriptor.init_system_wide("n_node")
     node = {
