@@ -2,6 +2,7 @@ import copy
 import os
 import subprocess
 import sys
+import base64
 from datetime import datetime
 
 import click
@@ -47,9 +48,7 @@ def exec(ctx, output, argument, gen_list, display):
             fds.communicate()
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
-        rc = e.returncode
-    finally:
-        sys.exit(rc)
+        return e.returncode
 
 
 @click.command(name="check", short_help="Ensure future input will be conformant to standards")
@@ -66,14 +65,14 @@ def exec(ctx, output, argument, gen_list, display):
               help="Check correctness for all registered profiles")
 @click.pass_context
 def check(ctx, dir, encoding, color, configs, profiles):
-    log.banner()
+    log.manager.print_banner()
     errors = dict()
     if color:
         log.manager.print_header("Colouring")
         t = PrettyTable()
         ctx.color = True
         t.field_names = ["Name", "Foreground", "Background"]
-        for k in sorted(log.all_colors):
+        for k in sorted(log.manager.color_list):
             t.add_row([k, click.style("Test", fg=k), click.style("Test", bg=k)])
         print(t)
 
@@ -82,12 +81,11 @@ def check(ctx, dir, encoding, color, configs, profiles):
         
         t = PrettyTable()
         t.field_names = ["Alias", "Symbol", "Fallback"]
-        log.enable_unicode(False)
-        fallback = copy.deepcopy(log.glyphs)
-        log.enable_unicode(True)
-
-        for k in sorted(log.glyphs.keys()):
-            t.add_row([k, log.glyphs[k], fallback[k]])
+        man_default = log.IOManager(0, False, 100, None, None)
+        man_unicode = log.IOManager(0, True, 100, None, None)
+        
+        for k in sorted(man_default.avail_chars()):
+            t.add_row([k, man_unicode.utf(k), man_default.utf(k)])
         print(t)
     
     if configs:
@@ -105,9 +103,8 @@ def check(ctx, dir, encoding, color, configs, profiles):
         settings = MetaConfig()
         cfg_val = settings.bootstrap_validation({})
         cfg_val.set_ifdef('output', "/tmp/test")
-        errors = {**errors, **pvUtils.process_check_directory(dir)}
+        errors = {**errors, **pvUtils.process_check_directory(os.path.abspath(dir))}
 
-"""
     if errors:
         log.manager.print_section("Classification of errors:")
         table = PrettyTable()
@@ -126,7 +123,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
             succ=log.manager.utf('succ'),
             cg=log.manager.style("Everything is OK!", fg='green', bold=True))
         )
-"""
+        
 
 @click.command(name="clean", short_help="Remove artifacts generated from PCVS")
 @click.option("-f", "--force", "force", default=False, is_flag=True,

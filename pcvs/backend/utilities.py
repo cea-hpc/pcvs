@@ -16,7 +16,7 @@ from pcvs.helpers.exceptions import ValidationException
 
 def locate_scriptpaths(output=None):
     if output is None:
-        output = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
+        output = os.getcwd()
     scripts = list()
     for root, _, files in os.walk(output):
         for f in files:
@@ -27,10 +27,13 @@ def locate_scriptpaths(output=None):
 
 def compute_scriptpath_from_testname(testname, output=None):
     if output is None:
-        output = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
+        output = os.getcwd()
+    
+    buildir = utils.find_buildir_from_prefix(output)
     prefix = os.path.dirname(testname)
     return os.path.join(
-        output,
+        buildir,
+        'test_suite',
         prefix,
         "list_of_tests.sh"
     )
@@ -91,7 +94,7 @@ def process_check_profiles():
 
 def process_check_setup_file(filename, prefix):
     err_msg = None
-    token = utf('fail')
+    token = log.manager.utf('fail')
     data = None
     env = os.environ
     env.update(run.build_env_from_configuration({}))
@@ -121,27 +124,26 @@ scheme = system.ValidationScheme('te')
 
 def process_check_yaml_stream(data):
     global scheme
-    token_load = token_yaml = "{}".format(utf('fail'))
+    token_load = token_yaml = "{}".format(log.manager.utf('fail'))
     err_msg = None
     try:
         stream = yaml.safe_load(data)
-        token_load = "{}".format(utf('succ'))
+        token_load = "{}".format(log.manager.utf('succ'))
 
         scheme.validate(stream)
-        token_yaml = "{}".format(utf('succ'))
+        token_yaml = "{}".format(log.manager.utf('succ'))
 
     except yaml.YAMLError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
     except ValidationException.FormatError as e:
-        err_msg = base64.b64encode(str(e.message).encode('utf-8'))
+        err_msg = base64.b64encode(str(e).encode('utf-8'))
 
     return (err_msg, token_load, token_yaml)
 
 
 def process_check_directory(dir):
     errors = dict()
-    session = run.Session()
-    setup_files, yaml_files = session.find_files_to_process(
+    setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
 
     if setup_files:

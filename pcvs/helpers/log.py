@@ -45,7 +45,7 @@ class IOManager:
 
     verb_levels = [(0, "normal"), (1, "info"), (2, "debug")]
     
-    __color_list = [
+    color_list = [
         "black",
         "red",
         "green",
@@ -164,7 +164,10 @@ class IOManager:
 
     def enable_unicode(self, e=True):
         self.glyphs = self.special_chars["unicode"] if e is True else self.special_chars["ascii"]
-        
+    
+    def avail_chars(self):
+        return self.glyphs.keys()
+    
     def utf(self, k):
         assert(k in self.glyphs.keys())
         return self.glyphs[k]
