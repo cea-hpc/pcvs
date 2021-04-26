@@ -18,7 +18,7 @@ def iterate_dirs(ctx, param, value) -> dict:
     list_of_dirs = dict()
     if not value:  # if not specified
         testpath = os.getcwd()
-        label = os.path.basename(testpath)
+        return {os.path.basename(testpath): testpath}
     else:  # once specified
         err_msg = ""
         for d in value:

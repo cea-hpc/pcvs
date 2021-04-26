@@ -31,10 +31,3 @@ def test_locate_scriptpaths(prefix):
     assert(len(result) == 2)
     for f in ["/b", "/a/c"]:
         assert(os.path.join(f, "list_of_tests.sh") in result)
-
-
-def test_compute_scriptpath(testname, prefix):
-    result = tested.compute_scriptpath_from_testname(testname, prefix)
-    if prefix is None:
-        prefix = os.path.join(os.getcwd(), NAME_BUILDIR, "test_suite")
-    assert(result == os.path.join(prefix, os.path.dirname(testname), "list_of_tests.sh" ))
