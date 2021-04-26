@@ -1,8 +1,8 @@
+import base64
 import copy
 import os
 import subprocess
 import sys
-import base64
 from datetime import datetime
 
 import click

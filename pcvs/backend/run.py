@@ -12,7 +12,8 @@ from subprocess import CalledProcessError
 import yaml
 from addict import Dict
 
-from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_BUILD_RESDIR, NAME_SRCDIR, NAME_BUILD_CONF_FN
+from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
+                  NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import session as pvSession
 from pcvs.helpers import criterion, log, test, utils
