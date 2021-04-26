@@ -1,9 +1,10 @@
 import os
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR, NAME_BUILD_CONF_FN
 
 import click
 
 from pcvs.backend import bank as pvBank
-from pcvs.helpers import log
+from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import BankException, CommonException
 
 
@@ -112,11 +113,15 @@ def bank_save_run(ctx, name, path, project):
     
     b = pvBank.Bank(token=name)
     if not b.exists():
-        raise click.BadArgumentUsage("'{}' does not exist".format(name))
+       raise click.BadArgumentUsage("'{}' does not exist".format(name))
+   
+    path = os.path.abspath(path)
+    
     b.connect_repository()
     if os.path.isfile(path):
         b.save_from_archive(project, path)
     elif os.path.isdir(path):
+        path = utils.find_buildir_from_prefix(path)
         b.save_from_buildir(project, path)
 
     
