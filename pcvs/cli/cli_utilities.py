@@ -48,7 +48,10 @@ def exec(ctx, output, argument, gen_list, display):
             fds.communicate()
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
-        return e.returncode
+        rc = e.returncode
+    
+    # return code to console
+    sys.exit(rc)
 
 
 @click.command(name="check", short_help="Ensure future input will be conformant to standards")
