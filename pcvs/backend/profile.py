@@ -41,7 +41,7 @@ class Profile:
         utils.check_valid_scope(scope)
         self._name = name
         self._scope = scope
-        self._details = {}
+        self._details = Dict()
         self._exists = False
         self._file = None
 
@@ -83,7 +83,7 @@ class Profile:
         # of from 'clone' (dict of raw file inputs)
         for k, v in raw.items():
             if isinstance(v, config.ConfigurationBlock):
-                self._details[k] = v.dump()
+                self._details[k] = Dict(v.dump())
             else:
                 self._details[k] = v
 
@@ -139,7 +139,7 @@ class Profile:
             os.makedirs(prefix_file, exist_ok=True)
 
         with open(self._file, 'w') as f:
-            yaml.safe_dump(self._details, f)
+            yaml.safe_dump(self._details.to_dict(), f)
 
     def clone(self, clone):
         self._retrieve_file()
@@ -173,9 +173,8 @@ class Profile:
         edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             edited_yaml = Dict(yaml.safe_load(edited_stream))
-            system.ValidationScheme('profile').validate(edited_yaml)
-
             self.fill(edited_yaml)
+            self.check()
             self.flush_to_disk()
 
     def edit_plugin(self, e=None):
