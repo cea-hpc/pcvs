@@ -343,7 +343,7 @@ class Test:
             {env_code}
             output=`{cmd} 2>&1`
             ret=$?
-            echo "$output"
+            test -n "$output" && echo "$output"
             {finalize}
             ;;""".format(
                     cd_code=cd_code,
@@ -494,6 +494,11 @@ class TEDescriptor:
         elif self._run.program:
             binary = self._run.program
         self._build.sources.binary = binary
+        
+        for i in range(0, len(self._build.files)):
+            if not os.path.isabs(self._build.files[i]):
+                self._build.files[i] = os.path.join(self._srcdir, self._build.files[i])
+                
 
         command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
             cc=MetaConfig.root.compiler.commands.get(lang, 'echo'),
