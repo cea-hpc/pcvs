@@ -181,7 +181,7 @@ def find_files_to_process(path_dict):
             # otherwise, save the file
             for f in list_files:
                 # [1:] to remove extra '/'
-                subtree = os.path.relpath(path, root)
+                subtree = os.path.relpath(root, path)
                 if subtree == ".":
                     subtree = None
                 if 'pcvs.setup' == f:

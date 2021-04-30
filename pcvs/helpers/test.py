@@ -5,6 +5,7 @@ import os
 import pathlib
 import pprint
 import subprocess
+import base64
 
 import jsonschema
 import yaml
@@ -160,9 +161,10 @@ if test -n "$PCVS_SHOW"; then
     test "$PCVS_SHOW" = "all" -o "$PCVS_SHOW" = "loads" && echo '{pm_string}'
 else
     {pm_string}
+    :
 fi
 for arg in "$@"; do case $arg in
-""".format(pm_string="#Package-manager set by profile: \n"+"; ".join([
+""".format(pm_string="#Package-manager set by profile: \n"+"\n ".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
                     ]))) 
@@ -211,6 +213,8 @@ for arg in "$@"; do case $arg in
 class Test:
     
     Timeout_RC = 127
+    
+    NOSTART_STR = b"This test cannot be started."
     
     STATE_OTHER = -1
     STATE_NOT_EXECUTED = 0
@@ -268,6 +272,9 @@ class Test:
     def is_pickable(self):
         return not self.been_executed() and len([d for d in self.deps.values() if not d.been_executed()]) == 0
     
+    def has_failed_dep(self):
+        return len([d for d in self.deps.values() if d.state == Test.STATE_FAILED]) > 0
+    
     def first_valid_dep(self):
         for d in self.deps.values():
             if not d.been_executed():
@@ -282,16 +289,15 @@ class Test:
     def get_dim(self, unit="n_node"):
         return self._array['nb_res']
 
-    def save_final_result(self, rc=0, time=0.0, out=None):
+    def save_final_result(self, rc=0, time=0.0, out=b''):
         self.executed(self.STATE_SUCCEED if self._rc == rc else self.STATE_FAILED)
         self._rc = rc
-        self._out = out
+        self._out = base64.b64encode(out).decode('ascii')
         self._time = time
         
         for elt_k, elt_v in self._array['artifacts'].items():
             if os.path.isfile(elt_v):
                 with open(elt_v, 'rb') as fh:
-                    import base64
                     self._array['artifacts'][elt_k] = base64.b64encode(fh.read()).decode("ascii")
 
     def display(self):
@@ -306,6 +312,9 @@ class Test:
             icon = "fail"
     
         log.manager.print_job(label, self._time, self.name, colorname=colorname, icon=icon)
+        if self._out:
+            if (log.manager.has_verb_level("info") and self.state == Test.STATE_FAILED) or log.manager.has_verb_level("debug"):
+                log.manager.print(self._out)
 
     def executed(self, state=STATE_FAILED):
         self._state = state
@@ -351,7 +360,7 @@ class Test:
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation"""
         pm_code = "#Package-manager specs\n"
-        cd_code = "#Built command\n"
+        cd_code = "#Change directory\n"
         env_code = "#Built environment\n"
         final_code = ""
         self._array['wrapped_command'] = 'sh {} {}'.format(srcfile, self._array['name'])
@@ -394,9 +403,9 @@ class Test:
         return """
         "{name}")
             if test -n "$PCVS_SHOW"; then
-                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo "{env_code}"
-                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo "{pm_code}"
-            test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo "{cd_code}"
+                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo 'env_code'
+                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo 'pm_code'
+            test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo 'cmd'
                 exit 0
             fi
             {cd_code}
@@ -554,7 +563,6 @@ class TEDescriptor:
         collection of source files"""
         lang = test_transform.detect_source_lang(self._build.files)
         binary = self._te_name
-
         if self._build.sources.binary:
             binary = self._build.sources.binary
         elif self._run.program:
@@ -682,7 +690,7 @@ class TEDescriptor:
             return self.__build_from_cmake()
         elif 'make' in self._build:
             return self.__build_from_makefile()
-        elif 'sources' in self._build:
+        else:
             return self.__build_from_sources()
 
     def __construct_compil_tests(self):
@@ -707,7 +715,6 @@ class TEDescriptor:
 
         # count number of built tests
         self._effective_cnt += 1
-
         yield Test(
             te_name=self._te_name,
             label=self._te_label,

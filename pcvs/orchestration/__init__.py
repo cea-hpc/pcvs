@@ -103,9 +103,14 @@ class Manager:
                 job = self._dims[k].pop()
                 
                 if job:
-                    if job.been_executed():
+                    if job.been_executed() or job.has_failed_dep():
+                        if job.has_failed_dep():
+                            job.save_final_result(rc=-1, time=0.0, out=Test.NOSTART_STR)
+                            job.display()
+                        
                         self._count.executed += 1
                         self._publisher.add(job.to_json())
+                        # sad to break, should retry
                         break
                     elif not job.is_pickable():
                         self._dims[k].append(job)
@@ -204,11 +209,8 @@ class Set(threading.Thread):
                 rc = Test.Timeout_RC  #nah, to be changed
             except:
                 raise
-            job.save_final_result(time=final, rc=rc, out=stdout.decode('ascii'))
+            job.save_final_result(time=final, rc=rc, out=stdout)
             job.display()
-            if stdout:
-                if (log.manager.has_verb_level("info") and job.state == Test.STATE_FAILED) or log.manager.has_verb_level("debug"):
-                    log.manager.print(stdout)
 
         self._completed = True
 

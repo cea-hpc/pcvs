@@ -44,7 +44,13 @@ def detect_source_lang(array_of_files):
 
 
 def prepare_cmd_build_variants(variants=[], comb=None):
-    return " ".join(MetaConfig.root.compiler.variants[i].args for i in variants)
+    s = ""
+    variant_def = MetaConfig.root.compiler.variants
+    for i in variants:
+        if i in variant_def:
+            s = "{} {}".format(s, variant_def[i].arg)
+    
+    return s
 
 
 def handle_job_deps(deps_node, pkg_label, pkg_prefix):
