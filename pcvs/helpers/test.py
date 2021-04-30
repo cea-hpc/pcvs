@@ -155,17 +155,20 @@ class TestFile:
                 ])
 
         with open(fn_sh, 'w') as fh_sh:
-            fh_sh.write(
-                '#!/bin/sh\n' +
-                '{pm_string}\n'.format(pm_string="\n".join([
+            fh_sh.write("""#!/bin/sh
+if test -n "$PCVS_SHOW"; then
+    test "$PCVS_SHOW" = "all" -o "$PCVS_SHOW" = "loads" && echo '{pm_string}'
+else
+    {pm_string}
+fi
+for arg in "$@"; do case $arg in
+""".format(pm_string="#Package-manager set by profile: \n"+"; ".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
-                    ])) +
-                'for arg in "$@"; do\n' +
-                '   case $arg in\n')
+                    ]))) 
 
             for test in self._tests:
-                fh_sh.write(test.generate_script())
+                fh_sh.write(test.generate_script(fn_sh))
                 MetaConfig.root.get_internal('orchestrator').add_new_job(test)
 
             fh_sh.write(
@@ -290,13 +293,13 @@ class Test:
         }
     
 
-    def generate_script(self):
+    def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation"""
-        pm_code = ""
-        cd_code = ""
-        env_code = ""
+        pm_code = "#Package-manager specs\n"
+        cd_code = "#Built command\n"
+        env_code = "#Built environment\n"
         final_code = ""
-
+        self._array['wrapped_command'] = 'sh {} {}'.format(srcfile, self._array['name'])
         # if changing directory is required by the test
         if self._array['chdir'] is not None:
             cd_code += "cd '{}'\n".format(self._array['chdir'])
@@ -335,11 +338,12 @@ class Test:
         
         return """
         "{name}")
-            case "$PCVS_SHOW" in
-                env) echo "{env_code}"; exit 0;;
-                cmd) echo "{cmd}"; exit 0;;
-                loads) echo "{pm_esc}"; exit 0;;
-            esac
+            if test -n "$PCVS_SHOW"; then
+                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo "{env_code}"
+                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo "{pm_code}"
+            test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo "{cd_code}"
+                exit 0
+            fi
             {cd_code}
             {pm_code}
             {env_code}
@@ -391,12 +395,17 @@ class TEDescriptor:
         self._build = Dict(node.get('build', None))
         self._run = Dict(node.get('run', None))
         self._validation = Dict(node.get('validate', None))
-        self._artifacts = Dict(node.get('artifacts', None))
+        self._artifacts = Dict(node.get('artifact', None))
         self._template = node.get('group', None)
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
-        self._full_name = "/".join([self._te_pkg, self._te_name])
+        self._full_name = "/".join(filter(None, [self._te_label, self._te_subtree, self._te_name]))
         self._tags = node.get('tag', list())
+        
+        for elt_k, elt_v in self._artifacts.items():
+            if not os.path.isabs(elt_v):
+                self._artifacts[elt_k] = os.path.join(self._buildir, elt_v)
+
 
         # allow tags to be given as array OR a single string
         if not isinstance(self._tags, list):
