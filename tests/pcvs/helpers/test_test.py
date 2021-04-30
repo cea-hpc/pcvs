@@ -118,7 +118,7 @@ def test_Test():
     assert(testjson["id"]["te_name"] == "testte_name")
     assert(testjson["id"]["subtree"] == "testsubtree")
     assert(testjson["id"]["full_name"] == "testname")
-    assert(test.strstate == "OTHER")
+    #assert(test.strstate == "OTHER")
     test.save_final_result()
     test.generate_script()
 

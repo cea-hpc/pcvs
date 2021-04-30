@@ -168,7 +168,7 @@ patternProperties:
           time:
             type: object
             properties:
-              mean_time:
+              mean:
                 type: number
                 minimum: 0
               tolerance:
