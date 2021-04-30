@@ -1,12 +1,13 @@
 import subprocess
 import threading
-
+import time
 from addict import Dict
 
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 from pcvs.helpers.test import Test
 from pcvs.orchestration.publishers import Publisher
+from pcvs.helpers.exceptions import OrchestratorException
 
 
 class SetBuilder:
@@ -26,10 +27,13 @@ class SerialBuilder(SetBuilder):
 
 
 class Manager:
-    def __init__(self, max_size=0, builder=SerialBuilder()):
+    job_hashes = dict()
+    
+    def __init__(self, max_size=0, builder=SerialBuilder(), publisher=None):
         self._dims = dict()
         self._builder = builder
         self._max_size = max_size
+        self._publisher = publisher
         self._count = Dict({
             "total": 0,
             "executed": 0
@@ -38,10 +42,11 @@ class Manager:
     @property
     def executed_job(self):
         return self._count.executed
-
+    
     @property
     def total_job(self):
         return self._count.total
+
     def add_job(self, job):
         value = min(self._max_size, job.get_dim())
         
@@ -52,11 +57,35 @@ class Manager:
             self._dims.setdefault(value, list())
 
         self._dims[value].append(job)
+        self.job_hashes[hash(job.name)] = job
         self._count.total += 1
         
+    def resolve_deps(self):
+        for joblist in self._dims.values():
+            for job in joblist:
+                self.resolve_single_job_deps(job, list())
+    
+    def resolve_single_job_deps(self, job, chain):
+        
+        chain.append(job.name)
+        
+        for depname, depobj in job.deps.items():
+            if depobj is None:
+                hashed_dep = hash(depname)
+                if hashed_dep not in self.job_hashes:
+                    raise OrchestratorException.UndefDependencyError(depname)
+                
+                job_dep = self.job_hashes[hashed_dep]
+                
+                if job_dep.name in chain:
+                    raise OrchestratorException.CircularDependencyError(job_dep.name)    
+                
+                self.resolve_single_job_deps(job_dep, chain)
+                job.set_dep(depname, job_dep)
     
     def get_leftjob_count(self):
         return self._count.total - self._count.executed
+
 
     def create_subset(self, max_dim):
         # in this function should take place a scheduling policy
@@ -64,7 +93,7 @@ class Manager:
         # the set to re-run PCVS as the task command
         if max_dim <= 0:
             return None
-        
+                
         the_set = None
         for k in sorted(self._dims.keys(), reverse=True):
             if len(self._dims[k]) <= 0:
@@ -72,34 +101,46 @@ class Manager:
             else:
                 #assert(self._builder.job_grabber)
                 job = self._dims[k].pop()
-                if the_set is None:
-                    the_set = Set([job])
-                else:
+                
+                if job:
+                    if job.been_executed():
+                        self._count.executed += 1
+                        self._publisher.add(job.to_json())
+                        break
+                    elif not job.is_pickable():
+                        self._dims[k].append(job)
+                        
+                        # careful: it means jobs are picked up
+                        # but not popped from 
+                        while job and not job.is_pickable():
+                            job = job.first_valid_dep()
+                    
+                if job:
+                    job.picked()
+                    the_set = Set()
                     the_set.add(job)
+                    break
+                    
         return the_set
 
     def merge_subset(self, set):
         final = list()
         for job in set.content:
             if job.been_executed():
-                job.save_final_result()
                 self._count.executed += 1
-                final.append(job)
+                self._publisher.add(job.to_json())
             else:
                 self.add_job(job)
-
-        return final
 
 
 class Set(threading.Thread):
     global_increment = 0
-
-    def __init__(self, l=list()):
-        assert(isinstance(l, list))
-        self._id = self.global_increment
-        self.global_increment += 1
-        self._size = len(l)
-        self._jobs = l
+    
+    def __init__(self):
+        self._id = Set.global_increment
+        Set.global_increment += 1
+        self._size = 0
+        self._jobs = list()
         self._completed = False
         self._is_wrapped = False
         super().__init__()
@@ -111,13 +152,13 @@ class Set(threading.Thread):
     def add(self, l):
         if not isinstance(l, list):
             l = [l]
-
-        for job in l:
-            assert(isinstance(job, Test))
-            self._jobs.append(l)
+        self._jobs += l
 
     def __del__(self):
         pass
+    
+    def is_empty(self):
+        return len(self._jobs) == 0
 
     def been_completed(self):
         return self._completed
@@ -146,12 +187,29 @@ class Set(threading.Thread):
 
     def run(self):
         for job in self._jobs:
-            p = subprocess.Popen('{}'.format(job.command),
+            try:
+                p = subprocess.Popen('{}'.format(job.wrapped_command),
                                  shell=True,
                                  stderr=subprocess.STDOUT,
                                  stdout=subprocess.PIPE)
-            job.executed()
-            log.manager.print("{}: {}".format(job.name, job.strstate))
+                start = time.time()
+                stdout, _ = p.communicate(timeout=job.timeout)
+                final = time.time() - start
+                rc = p.returncode
+                
+            except subprocess.TimeoutExpired:
+                p.kill()
+                final = job.timeout
+                stdout, _ = p.communicate()
+                rc = Test.Timeout_RC  #nah, to be changed
+            except:
+                raise
+            job.save_final_result(time=final, rc=rc, out=stdout.decode('ascii'))
+            job.display()
+            if stdout:
+                if (log.manager.has_verb_level("info") and job.state == Test.STATE_FAILED) or log.manager.has_verb_level("debug"):
+                    log.manager.print(stdout)
+
         self._completed = True
 
 
@@ -162,10 +220,10 @@ class Orchestrator:
         self._pending_sets = dict()
         self._sched_on = config_tree.validation.scheduling.sched_on
         self._max_res = config_tree.machine.nodes
-        self._manager = Manager(self._max_res)
-        self._maxconcurrent = config_tree.machine.concurrent_run
         self._publisher = Publisher(config_tree.validation.output)
-
+        self._manager = Manager(self._max_res, publisher=self._publisher)
+        self._maxconcurrent = config_tree.machine.concurrent_run
+        
     def __del__(self):
         pass
 
@@ -174,6 +232,7 @@ class Orchestrator:
         self._manager.add_job(job)
 
     def start_run(self, restart=False):
+        self._manager.resolve_deps()
         nb_nodes = self._max_res
         last_count = 0
         #While some jobs are available to run
@@ -184,6 +243,7 @@ class Orchestrator:
                 # create a new set, if not possible, returns None
                 new_set = self._manager.create_subset(nb_nodes)
                 if new_set is not None:
+                
                     # schedule the set asynchronously
                     nb_nodes -= new_set.dim
                     self._pending_sets[new_set.id] = new_set
@@ -199,10 +259,7 @@ class Orchestrator:
             if set is not None:
                 nb_nodes += set.dim
                 del(self._pending_sets[set.id])
-                flushable_tests = self._manager.merge_subset(set)
-
-                for test in flushable_tests:
-                    self._publisher.add_test_entry(test.to_json())
+                self._manager.merge_subset(set)
             else:
                 pass
                 #TODO: create backup to allow start/stop

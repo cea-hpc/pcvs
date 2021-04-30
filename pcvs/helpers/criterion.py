@@ -72,6 +72,10 @@ class Combination:
             else:
                 args.append(value)
         return (envs, args, params)
+    
+    def translate_to_dict(self):
+        return self._combination
+        
 
 
 class Serie:

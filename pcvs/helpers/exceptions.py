@@ -32,3 +32,7 @@ class RunException(CommonException):
     
 class TestException(CommonException):
     class TDFormatError(GenericError): pass
+
+class OrchestratorException(CommonException):
+    class UndefDependencyError(GenericError): pass
+    class CircularDependencyError(GenericError): pass

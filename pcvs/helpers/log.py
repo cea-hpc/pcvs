@@ -17,8 +17,8 @@ class IOManager:
             'sec': '#',
             'hdr': '=',
             'star': '*',
-            'fail': click.style('X', fg='red', bold=True),
-            'succ': click.style('V', fg='green'),
+            'fail': "X",
+            'succ': "V",
             'git': '(git)',
             'time': '(time)',
             'full_pg': '#',
@@ -27,19 +27,19 @@ class IOManager:
             'sep_h': "-"
         },
         "unicode": {
-            'copy' : '\u00A9',
-            'item' : '\u27E2',
-            'sec' : '\u2756',
-            'hdr' : '\u23BC',
-            'star' : '\u2605',
-            'fail' : click.style('\u2716', fg="red", bold=True),
-            'succ' : click.style('\u2714', fg="green"),
-            'git' : '\u237F',
-            'time' : '\U0000231A',
-            'full_pg' : click.style("\u25CF", bold=True, fg="cyan"),
-            'empty_pg' : click.style("\u25CB", bold=True, fg="bright_black"),
-            'sep_v' : " \u237F ",
-            'sep_h' : "\u23BC"
+            'copy': '\u00A9',
+            'item': '\u27E2',
+            'sec': '\u2756',
+            'hdr': '\u23BC',
+            'star': '\u2605',
+            'fail': '\u2718',
+            'succ': '\u2714',
+            'git': '\u237F',
+            'time': '\U0000231A',
+            'full_pg': click.style("\u25CF", bold=True, fg="cyan"),
+            'empty_pg': click.style("\u25CB", bold=True, fg="bright_black"),
+            'sep_v': " \u237F ",
+            'sep_h': "\u23BC"
         }
     }
 
@@ -182,7 +182,7 @@ class IOManager:
         end = begin + (hdr_char * (str_len % 2 != 0)) #nb chars after the title (centering)
         
         # formatting & colouring
-        final_string = click.style("{} {} {}".format(begin, s.upper(), end), fg="green")
+        final_string = click.style("\n{} {} {}".format(begin, s.upper(), end), fg="green")
         if out:
             self.__print_rawline(final_string)
         else:
@@ -208,6 +208,18 @@ class IOManager:
             self.__print_rawline(s)
         else:
             return s
+    
+    def print_job(self, label, time, name, colorname="red", icon=None):
+        if icon is not None:
+            icon = self.utf(icon)
+        self.__print_rawline(click.style("   {} {:8.2f}s{}{}{}{}".format(
+                                            icon,
+                                            time,
+                                            self.utf("sep_v"),
+                                            label,
+                                            self.utf("sep_v"),
+                                            name),
+                             fg=colorname, bold=True))
 
     def debug(self, *msg):
         if(self._verbose >= 2):
@@ -328,15 +340,15 @@ r"""                                                                            
 manager = IOManager()
 
 
-def init(v=0, e=False, l=100):
+def init(v=0, e=False, l=100, quiet=False):
     global manager
-    manager = IOManager(verbose=v, enable_unicode=e, length=l)
+    manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
 
 def progbar(it, print_func=None, man=None, **kargs):
-    if(man == None):
+    if man is None:
         man = manager
     return click.progressbar(
-            it,empty_char=man.utf('empty_pg'),
+            it, empty_char=man.utf('empty_pg'),
             info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
             show_percent=False, show_eta=False, show_pos=False,
             item_show_func=print_func,

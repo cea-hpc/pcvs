@@ -19,7 +19,7 @@ class Publisher:
     def empty_entries(self):
         self._layout['tests'] = list()
 
-    def add_test_entry(self, json):
+    def add(self, json):
         self._layout['tests'].append(json)
         
     def flush(self):
@@ -27,10 +27,10 @@ class Publisher:
         if len(self._layout['tests']) <= 0:
             return
         
-        filename = os.path.join(self._destpath, self.fn_fmt.format(self.increment))
+        filename = os.path.join(self._destpath, self.fn_fmt.format(Publisher.increment))
         assert(not os.path.isfile(filename))
         
-        self.increment += 1
+        Publisher.increment += 1
         
         with open(filename, 'w+') as fh:
             json.dump(self._layout, fh)

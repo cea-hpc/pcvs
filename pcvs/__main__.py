@@ -109,3 +109,6 @@ cli.add_command(cli_utilities.clean)
 cli.add_command(cli_utilities.discover)
 #cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
+
+if __name__ == "__main__":
+    cli()
