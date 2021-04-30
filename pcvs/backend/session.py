@@ -283,8 +283,9 @@ class Session:
             log.manager.set_logfile(enable=True, logfile=self._io_file)
             log.manager.set_tty(enable=True)
             # run the code
-            self._func(*args, **kwargs)
-
-            # in that mode, no information is left to users once the session
-            # is complete.
-            remove_session_from_file(self._sid)
+            try:
+                self._func(*args, **kwargs)
+            finally:
+                # in that mode, no information is left to users once the session
+                # is complete.
+                remove_session_from_file(self._sid)
