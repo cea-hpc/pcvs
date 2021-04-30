@@ -47,13 +47,13 @@ def prepare_cmd_build_variants(variants=[], comb=None):
     return " ".join(MetaConfig.root.compiler.variants[i].args for i in variants)
 
 
-def handle_job_deps(deps_node, pkg_prefix):
+def handle_job_deps(deps_node, pkg_label, pkg_prefix):
     deps = list()
     if 'depends_on' in deps_node:
         for name, values in deps_node['depends_on'].items():
             if name == 'test':
                 for d in values:
-                    deps.append(d if '/' in d else "/".join([pkg_prefix, d]))
+                    deps.append(d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
             else:
                 deps += [d for d in package_manager.identify({name: values})]
     return deps

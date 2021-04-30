@@ -49,6 +49,8 @@ def __load_yaml_file_legacy(f):
 
 
 def replace_special_token(stream, src, build, prefix):
+    if prefix is None:
+        prefix = ""
     tokens = {
         '@BUILDPATH@': os.path.join(build, prefix),
         '@SRCPATH@': os.path.join(src, prefix),
@@ -370,8 +372,8 @@ class TEDescriptor:
             raise TestException.TDFormatError(node)
         self._te_name = name
         self._skipped = name.startswith('.')
-        self._te_label = node.get('label', self._te_name)
-        self._te_pkg = "/".join([label, subprefix]) if subprefix else label
+        self._te_label = label
+        self._te_subtree = subprefix
         
         _, self._srcdir, _, self._buildir = utils.generate_local_variables(
                 label,
@@ -630,12 +632,12 @@ class TEDescriptor:
             self._build.files = [self._build.files]
 
         # manage deps (tests, package_managers...)
-        deps = test_transform.handle_job_deps(self._build, self._te_pkg)
+        deps = test_transform.handle_job_deps(self._build, self._te_label, self._te_subtree)
 
         if 'cwd' in self._build:
             chdir = self._build.cwd
 
-        constraints = ["compilation"] + self._tags
+        tags = ["compilation"] + self._tags
         
         command = self.__build_command()
 
@@ -644,16 +646,19 @@ class TEDescriptor:
 
         yield Test(
             te_name=self._te_name,
-            subtree=self._te_pkg,
+            label=self._te_label,
+            subtree=self._te_subtree,
             name=self._full_name,
             command=command,
-            constraint=constraints,
+            tags=tags,
             dep=deps,
             nb_res=1,
-            time=self._validation.time.get("mean_time", None),
-            delta=self._validation.time.get("tolerance", None),
+            time=self._validation.time.get("mean", None),
+            delta=self._validation.time.get("tolerance", 0),
             rc=self._validation.get("expect_exit", 0),
+            artifacts=self._artifacts,
             resources=1,
+            comb_dict=None,
             valscript=None,
             env=None,
             matchers=None,
@@ -662,7 +667,7 @@ class TEDescriptor:
     
     def __construct_runtime_tests(self):
         """function steering tests to be run by the runtime command"""
-        te_deps = test_transform.handle_job_deps(self._run, self._te_pkg)
+        te_deps = test_transform.handle_job_deps(self._run, self._te_label, self._te_subtree)
         
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
@@ -706,20 +711,23 @@ class TEDescriptor:
 
             yield Test(
                 te_name=self._te_name,
-                subtree=self._te_pkg,
+                label=self._te_label,
+                subtree=self._te_subtree,
                 name="_".join([self._full_name, comb.translate_to_str()]),
                 command=command,
                 dep=deps,
-                constraint=self._tags,
+                tags=self._tags,
                 env=env,
                 nb_res=1,
-                time=self._validation.time.get("mean_time", None),
-                delta=self._validation.time.get("tolerance", None),
+                time=self._validation.time.get("mean", None),
+                delta=self._validation.time.get("tolerance", 0),
                 rc=self._validation.get("expect_exit", 0),
                 resources=comb.get(self._base_it, 1),
                 valscript=self._validation.script.get('path', None),
                 build=None,
+                comb_dict=comb.translate_to_dict(),
                 chdir=chdir,
+                artifacts=self._artifacts,
                 matchers=self._validation.get('match', None)
             )
 

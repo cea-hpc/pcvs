@@ -26,7 +26,7 @@ from pcvs.orchestration import Orchestrator
 def print_progbar_walker(elt):
     if elt is None:
         return None
-    return "["+elt[0]+"] " + elt[1]
+    return "["+elt[0]+"] " + (elt[1] if elt[1] else "")
 
 def str_dict_as_envvar(d):
     return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
@@ -181,10 +181,13 @@ def find_files_to_process(path_dict):
             # otherwise, save the file
             for f in list_files:
                 # [1:] to remove extra '/'
+                subtree = os.path.relpath(path, root)
+                if subtree == ".":
+                    subtree = None
                 if 'pcvs.setup' == f:
-                    setup_files.append((label, root.replace(path, '')[1:], f))
+                    setup_files.append((label, subtree, f))
                 elif 'pcvs.yml' == f or 'pcvs.yml.in' == f:
-                    yaml_files.append((label, root.replace(path, '')[1:], f))
+                    yaml_files.append((label, subtree, f))
     return (setup_files, yaml_files)
 
 
@@ -299,7 +302,7 @@ def process_static_yaml_files(yaml_files):
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
             f = os.path.join(cur_src, fname)
-
+            
             try:
                 obj = TestFile(file_in=f,
                     path_out=cur_build,

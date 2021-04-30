@@ -124,6 +124,9 @@ def cwd(path):
 def generate_local_variables(label, subprefix):
     if label not in MetaConfig.root.validation.dirs:
         raise CommonException.NotFoundError(label)
+    
+    if subprefix is None:
+        subprefix = ""
 
     base_srcdir = MetaConfig.root.validation.dirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
