@@ -2,14 +2,14 @@ import json
 import os
 
 from pcvs.webview import create_app
-
+from pcvs.helpers.test import Test
 
 def locate_json_files(path):
     array = list()
-    for root, _, files in os.walk(path):
-        for f in files:
-            if f.startswith("output-") and f.endswith(".xml.json"):
-                array.append(os.path.join(root, f))
+    print(path)
+    for f in os.listdir(path):
+        if f.startswith("pcvs_rawdat") and f.endswith(".json"):
+            array.append(os.path.join(path, f))
 
     return array
 
@@ -41,9 +41,10 @@ def build_data_tree(path=os.getcwd(), files=None):
             # TODO: read & store metadata
             for test in stream.get('tests', []):
                 cnt_tests += 1
-                test_label = test.get('label', 'NOLABEL')
-                test_tags = test.get('tags', [])
-                test_status = test['result'].get('status', 'error')
+                print(test)
+                test_label = test['id'].get('label', "NOLABEL")
+                test_tags = test['data'].get('tags', [])
+                test_status = str(test['result'].get('state', Test.STATE_OTHER))
 
                 statuses.setdefault(test_status, {
                     "tests": list(),
@@ -59,10 +60,9 @@ def build_data_tree(path=os.getcwd(), files=None):
                     "tests": list(),
                     "metadata": {
                         "count": {
-                            "error": 0,
-                            "success": 0,
-                            "failure": 0,
-                            "warn": 0,
+                            str(Test.STATE_OTHER): 0,
+                            str(Test.STATE_SUCCEED): 0,
+                            str(Test.STATE_FAILED): 0,
                             "total": 0
                         }
                     }
@@ -76,11 +76,10 @@ def build_data_tree(path=os.getcwd(), files=None):
                         "tests": list(),
                         "metadata": {
                             "count": {
-                                "error": 0,
-                                "success": 0,
-                                "failure": 0,
-                                "warn": 0,
-                                "total": 0
+                               str(Test.STATE_OTHER): 0,
+                            str(Test.STATE_SUCCEED): 0,
+                            str(Test.STATE_FAILED): 0,
+                            "total": 0
                             }
                         }
                     })

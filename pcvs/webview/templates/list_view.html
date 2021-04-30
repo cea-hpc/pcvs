@@ -20,9 +20,9 @@
 					'</div>'
 					} else {
 					return '<div class="progress" data-order="'+d.failure+'">' +
-					'<div class="progress-bar bg-danger" style="width: '+(100 * d.failure/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-warning" style="width: '+(100 * d.warn/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-success" style="width: '+(100 * d.success/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-danger" style="width: '+(100 * d[2]/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-warning" style="width: '+(100 * d[0]/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-success" style="width: '+(100 * d[1]/d.total)+'%"></div>' +
 					'</div>';
 					}
 					}

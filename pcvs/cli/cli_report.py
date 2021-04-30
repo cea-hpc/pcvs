@@ -20,7 +20,7 @@ def report(ctx, mode, path):
     if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
         click.BadArgumentUsage('{} is not a build directory.'.format(path))
 
-    path = os.path.join(path, 'test_suite')
+    path = os.path.join(path, 'rawdata')
 
     if mode == "web":
         pvReport.webview_run_server(path)

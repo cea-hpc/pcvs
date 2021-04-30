@@ -9,11 +9,11 @@ $(document).ready(function(){
 		order: [[1, 'asc']],
 		"createdRow": function(row, data, index)
 		{
-			if(data['result']['status'] == "success")
+			if(data['result']['state'] == "1")
 			{
 				$(row).addClass("text-success")
 			}
-			else if (data['result']['status'] == "warn")
+			else if (data['result']['state'] == "warn")
 			{
 				$(row).addClass("text-warning font-weight-bold")
 			}
@@ -34,25 +34,23 @@ $(document).ready(function(){
 				"className": 'detail-control text-center',
 				"render": function(d,t,s){return '<span class="oi oi-plus"></span>';}
 			},
-			{"responsivePriority": 2, "data": 'full_name'},
-			{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.status;}},
+			{"responsivePriority": 2, "data": 'id.full_name'},
+			{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.state;}},
 			{"responsivePriority": 3, "data": 'result', "render": function(d, t, s){return d.time.toFixed(2)+" s";}}
 		]
 		});
 	}).done(function(){	
 	function format_testline(data)
 	{
-		var raw_log = "This test does not carry the output!";
-		if('output' in data.result)
+		var raw_log = "";
+		if(data.result['output'])
 		{
-			raw_log = decodeURIComponent(escape(window.atob(data.result['output'])));
+			raw_log = "<pre>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</pre>";
 		}
 		return '<pre>'+
-			data['command']+
+			data['exec']+
 			'</pre>'+
-			'<pre>'+
-			raw_log+
-			'</pre>'
+			raw_log
 	}
 	$("#theTable tbody").on('click', 'td.detail-control',function(){
 		var line = $(this).closest('tr');
