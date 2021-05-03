@@ -1,5 +1,6 @@
-import setuptools
 import subprocess
+
+import setuptools
 
 current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE)
 

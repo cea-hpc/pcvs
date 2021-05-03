@@ -1,11 +1,14 @@
-import pytest
 import os
-from click.testing import CliRunner
-from unittest.mock import patch
-import addict
 from datetime import datetime
+from unittest.mock import patch
+
+import addict
+import pytest
+from click.testing import CliRunner
+
 import pcvs
 from pcvs.backend import run as tested
+
 
 @pytest.fixture
 def mock_config():

@@ -1,7 +1,6 @@
 import json
 import os
 from datetime import datetime
-from pcvs import NAME_BUILDIR, NAME_BUILD_RESDIR
 from unittest.mock import Mock, patch
 
 import pygit2
@@ -10,6 +9,7 @@ import yaml
 from addict import Dict
 from click.testing import CliRunner
 
+from pcvs import NAME_BUILD_RESDIR, NAME_BUILDIR
 from pcvs.backend import bank as tested
 from pcvs.helpers import utils
 

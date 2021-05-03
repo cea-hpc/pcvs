@@ -1,12 +1,4 @@
-import logging
-import os
-
-import click
-import pytest
-
 import pcvs
-from pcvs import NAME_SRCDIR
-from pcvs.helpers import log
 
 from .conftest import click_call, isolated_fs
 

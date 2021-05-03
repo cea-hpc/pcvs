@@ -1,19 +1,15 @@
 import fcntl
-import glob
 import os
-import shutil
 import tarfile
 import tempfile
 import time
-from datetime import datetime, timezone
 
 import pygit2
 import yaml
 from addict import Dict
-from pygit2.repository import Repository
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_HOMEDIR
-from pcvs.helpers import criterion, git, log, utils
+from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 
 BANKS = dict()

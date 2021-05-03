@@ -5,8 +5,8 @@ import yaml
 from addict import Dict
 
 import pcvs
-from pcvs import NAME_BUILDIR, NAME_SRCDIR, PATH_INSTDIR
-from pcvs.helpers import git, log, package_manager
+from pcvs import NAME_BUILDIR, PATH_INSTDIR
+from pcvs.helpers import git, pm
 from pcvs.helpers.exceptions import CommonException, ValidationException
 
 
@@ -183,14 +183,14 @@ class MetaConfig(Dict):
         """"Specific initialize for compiler config block"""
         subtree = self.bootstrap_generic('compiler', node)
         if 'package_manager' in subtree:
-            self.set_internal('cc_pm', package_manager.identify(subtree.package_manager))
+            self.set_internal('cc_pm', pm.identify(subtree.package_manager))
         return subtree
 
     def bootstrap_runtime(self, node):
         """"Specific initialize for runtime config block"""
         subtree = self.bootstrap_generic('runtime', node)
         if 'package_manager' in subtree:
-            self.set_internal('rt_pm', package_manager.identify(subtree.package_manager))
+            self.set_internal('rt_pm', pm.identify(subtree.package_manager))
         return subtree
     
     def bootstrap_group(self, node):

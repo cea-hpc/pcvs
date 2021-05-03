@@ -4,7 +4,6 @@ import click
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR
 from pcvs.backend import report as pvReport
-from pcvs.helpers import log
 
 
 @click.command('report', short_help="Manage PCVS result reporting interface")

@@ -4,8 +4,6 @@ import itertools
 import math
 import os
 
-from addict import Dict
-
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 

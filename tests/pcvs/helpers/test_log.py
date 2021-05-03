@@ -1,9 +1,7 @@
 import os
 from unittest.mock import Mock, patch
 
-import click
 import pytest
-from click.termui import progressbar
 from click.testing import CliRunner
 
 from pcvs.helpers import log as tested

@@ -1,7 +1,5 @@
-import pytest
 from click.testing import CliRunner
 
-from pcvs.backend import config
 from pcvs.main import cli
 
 runner = CliRunner(mix_stderr=False)

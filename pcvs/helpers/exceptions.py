@@ -1,6 +1,3 @@
-import pcvs
-
-
 # use this class as a template
 class GenericError(Exception): pass
 

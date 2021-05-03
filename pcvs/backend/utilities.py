@@ -8,7 +8,6 @@ import yaml
 from addict import Dict
 from prettytable import PrettyTable
 
-from pcvs import NAME_BUILDIR
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException

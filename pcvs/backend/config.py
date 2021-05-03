@@ -1,16 +1,14 @@
 import base64
 import glob
 import os
-import tempfile
 
 import click
-import jsonschema
 import yaml
 from addict import Dict
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
-from pcvs.helpers.exceptions import ConfigException, ValidationException
+from pcvs.helpers.exceptions import ConfigException
 
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()

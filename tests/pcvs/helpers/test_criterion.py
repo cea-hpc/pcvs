@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-from addict import Dict
 
 from pcvs.helpers import criterion as tested
 

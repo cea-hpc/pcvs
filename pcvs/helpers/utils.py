@@ -1,10 +1,6 @@
 import os
 import shutil
-import subprocess
 from contextlib import contextmanager
-
-import jsonschema
-import yaml
 
 from pcvs import (NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_HOMEDIR,
                   PATH_INSTDIR)

@@ -1,8 +1,9 @@
 import json
 import os
 
+from pcvs.testing.test import Test
 from pcvs.webview import create_app
-from pcvs.helpers.test import Test
+
 
 def locate_json_files(path):
     array = list()

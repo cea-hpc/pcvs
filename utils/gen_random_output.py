@@ -1,10 +1,11 @@
 
-import random
 import base64
-import os
 import json
-import yaml
+import os
+import random
+
 import jsonschema
+import yaml
 
 prefix = os.path.join(os.getcwd(), "outputs")
 labels = ["proj"+str(i) for i in range(0, 20+1)]

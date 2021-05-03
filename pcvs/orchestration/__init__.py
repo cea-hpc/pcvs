@@ -1,13 +1,13 @@
 import subprocess
 import threading
 import time
+
 from addict import Dict
 
-from pcvs.helpers import log
-from pcvs.helpers.system import MetaConfig
-from pcvs.helpers.test import Test
-from pcvs.orchestration.publishers import Publisher
 from pcvs.helpers.exceptions import OrchestratorException
+from pcvs.helpers.system import MetaConfig
+from pcvs.orchestration.publishers import Publisher
+from pcvs.testing.test import Test
 
 
 class SetBuilder:

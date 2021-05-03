@@ -1,10 +1,8 @@
 import fileinput
-import glob
 import os
 import pprint
 import shutil
 import subprocess
-import tarfile
 import time
 from shutil import SameFileError
 from subprocess import CalledProcessError
@@ -15,12 +13,12 @@ from addict import Dict
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
-from pcvs.backend import session as pvSession
-from pcvs.helpers import criterion, log, test, utils
+from pcvs.helpers import criterion, log, utils
 from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig
-from pcvs.helpers.test import TEDescriptor, TestFile
 from pcvs.orchestration import Orchestrator
+from pcvs.testing.tedesc import TEDescriptor
+from pcvs.testing.testfile import TestFile
 
 
 def print_progbar_walker(elt):

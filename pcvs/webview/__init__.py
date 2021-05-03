@@ -53,7 +53,6 @@ def create_app(global_tree=None, test_config=None):
                 "name": name,
                 "count": value['metadata']['count']
             })
-        print(out)
         return jsonify(out)
 
     @app.route("/<selection>/detail")

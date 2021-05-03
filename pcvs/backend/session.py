@@ -1,8 +1,6 @@
 import copy
 import fcntl
 import os
-import subprocess
-import sys
 import time
 from datetime import datetime
 from multiprocessing import Process
@@ -10,7 +8,7 @@ from multiprocessing import Process
 import yaml
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
-from pcvs.helpers import log, system
+from pcvs.helpers import log
 
 
 def unlock_session_file():

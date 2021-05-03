@@ -1,10 +1,12 @@
+import os
 from unittest.mock import patch
 
 import pytest
 from addict import Dict
 
 import pcvs
-from pcvs.helpers import test_transform as tested
+from pcvs.helpers import exceptions, pm, system
+from pcvs.testing import tedesc as tested
 
 
 @patch('pcvs.helpers.system.MetaConfig.root', Dict({
@@ -49,6 +51,7 @@ def test_lang_detection():
                 }
             }}))
 def test_build_variants():
+    print(system.MetaConfig.root.compiler.variants)
     assert("-fopenmp" in tested.prepare_cmd_build_variants(['openmp']))
 
     s = tested.prepare_cmd_build_variants(['openmp', 'all_errors'])
@@ -56,23 +59,23 @@ def test_build_variants():
     assert('-fvariant' not in s)
 
 
-@patch('pcvs.helpers.package_manager.identify')
+@patch('pcvs.helpers.pm.identify')
 def test_handle_job_deps(mock_id):
     #mock_pmlister.return_value = 
     assert(tested.handle_job_deps({'depends_on': {
         'test': ['a', 'b', 'c']
-    }}, "prefix") == ["prefix/a", "prefix/b", "prefix/c"])
+    }}, "label", "prefix") == ["label/prefix/a", "label/prefix/b", "label/prefix/c"])
 
     assert(tested.handle_job_deps({'depends_on': {
         'test': ['/a', '/b', '/c']
-    }}, "prefix") == ["/a", "/b", "/c"])
+    }}, "label", "prefix") == ["/a", "/b", "/c"])
 
     mock_id.return_value = ["spack..p1", "spack..p1c2", "spack..p1p3%c4"]
     assert(len(tested.handle_job_deps({'depends_on': {
         'pm': ['p1', 'p1@c2', 'p1 p3 %c4']
-    }}, "prefix")) == 3)
+    }}, "label", "prefix")) == 3)
 
-    assert(len(tested.handle_job_deps({}, "")) == 0)
+    assert(len(tested.handle_job_deps({}, "", "")) == 0)
 
 
 def test_xml_escape():
@@ -92,3 +95,52 @@ def test_xml_setif():
     assert(tested.xml_setif(elt, "b", "b_name") == "<b_name>b1</b_name>")
     assert(tested.xml_setif(elt, "c") == "<c>c1</c><c>c2</c><c>c3</c>")
     assert(tested.xml_setif(elt, "d") == "")
+
+
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
+@patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
+    "__internal": {
+        "cc_pm": "test_cc_pm"
+    },
+    "validation": {
+        "output": "test_output",
+        "dirs": {
+            "keytestdir": "valuetestdir"
+        }
+    },
+    "group": {
+        "GRPSERIAL": {}
+    },
+    "criterion": {}
+}))
+def test_TEDescriptor():
+    tested.TEDescriptor.init_system_wide("n_node")
+    node = {
+            "build":{
+                "cflags": "-DSYMB=MPI_2INT -DTYPE1='int' -DTYPE='int'",
+                "files": "'@SRCPATH@/constant.c'",
+                "sources": {
+                    "binary": "test_MPI_2INT"
+                }
+            },
+            "group": "GRPSERIAL",
+            "run": {
+                "program": "test_MPI_2INT"
+            },
+            "tag": [
+                "std_1",
+                "constant"
+            ]
+        }
+    tedesc = tested.TEDescriptor("foo", 
+        node,
+        "keytestdir", 
+        "bar")
+    # for i in tedesc.construct_tests():
+    #     print(i)
+    # raise Exception
+    with pytest.raises(exceptions.TestException.TDFormatError):
+        tested.TEDescriptor("foo", 
+            "StrInsteadOfDict",
+            "keytestdir", 
+            "bar")

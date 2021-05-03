@@ -1,11 +1,8 @@
 import os
-import time
 from datetime import datetime
 
 import click
-import yaml
 
-from pcvs import PATH_SESSION
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun

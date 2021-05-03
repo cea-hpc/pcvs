@@ -1,18 +1,14 @@
 import os
-from logging import error
 from unittest.mock import patch
 
-import jsonschema
 import pytest
-import yaml
 from addict import Dict
 
 import pcvs
 from pcvs import PATH_INSTDIR
-from pcvs.helpers import package_manager
+from pcvs.helpers import pm
 from pcvs.helpers import system
 from pcvs.helpers import system as s
-from pcvs.helpers import utils
 
 
 def test_bootstrap_compiler():
@@ -45,13 +41,13 @@ def test_bootstrap_compiler():
     assert(isinstance(package_array, list))
     assert(len(package_array) == 3)
     for p in package_array:
-        assert(isinstance(p, package_manager.PManager))
+        assert(isinstance(p, pm.PManager))
         if type(p) in res:
             res[type(p)] += 1
         else:
             res[type(p)] = 1
-    assert(res[package_manager.SpackManager] == 1)
-    assert(res[package_manager.ModuleManager] == 2)
+    assert(res[pm.SpackManager] == 1)
+    assert(res[pm.ModuleManager] == 2)
 
 def test_bootstrap_runtime():
     obj = s.MetaConfig()
@@ -81,13 +77,13 @@ def test_bootstrap_runtime():
     assert(isinstance(package_array, list))
     assert(len(package_array) == 3)
     for p in package_array:
-        assert(isinstance(p, package_manager.PManager))
+        assert(isinstance(p, pm.PManager))
         if type(p) in res:
             res[type(p)] += 1
         else:
             res[type(p)] = 1
-    assert(res[package_manager.SpackManager] == 1)
-    assert(res[package_manager.ModuleManager] == 2)
+    assert(res[pm.SpackManager] == 1)
+    assert(res[pm.ModuleManager] == 2)
 
 @pytest.fixture
 def kw_keys():

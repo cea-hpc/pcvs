@@ -1,6 +1,3 @@
-from pcvs.helpers import log
-
-
 def identify(pm_node):
     ret = list()
     if 'spack' in pm_node:

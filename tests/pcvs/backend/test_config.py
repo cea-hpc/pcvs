@@ -1,15 +1,16 @@
-from pcvs.helpers.exceptions import ConfigException
-from unittest.mock import patch
 import os
+from unittest.mock import patch
+
 import pytest
-from addict import Dict
 import yaml
+from addict import Dict
 from click.testing import CliRunner
 
 import pcvs
 from pcvs.backend import config as tested
 from pcvs.backend.config import CONFIG_BLOCKS
 from pcvs.helpers import utils
+from pcvs.helpers.exceptions import ConfigException
 
 
 @patch('glob.glob', return_value=[

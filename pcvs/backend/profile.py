@@ -1,7 +1,6 @@
 import base64
 import glob
 import os
-import tempfile
 
 import click
 import jsonschema
@@ -11,7 +10,7 @@ from addict import Dict
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
 from pcvs.helpers import git, log, system, utils
-from pcvs.helpers.exceptions import ProfileException, ValidationException
+from pcvs.helpers.exceptions import ProfileException
 
 PROFILE_EXISTING = dict()
 

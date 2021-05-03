@@ -1,8 +1,9 @@
-import pytest
 import os
+from unittest.mock import patch
+
+import pytest
 from addict import Dict
 from click.testing import CliRunner
-from unittest.mock import patch
 
 from pcvs.helpers import utils as tested
 from pcvs.helpers.exceptions import CommonException, RunException
