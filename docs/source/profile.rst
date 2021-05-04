@@ -94,21 +94,49 @@ Configuration basic blocks section).
 Example
 +++++++
 
-  GRPMPI:
-
-    run:
-
-      iterate:
-
-        n_omp:
-
-          **values**: null
+    GRPMPI:
+        run:
+            iterate:
+                n_omp:
+                    **values**: null
 
 machine node 
 ^^^^^^^^^^^^^^
 
+The machine node describes the constraints of the physical machine. It lists
+what processes can or can not use.
+
+    machine :
+        **nodes** : number of accessible nodes
+
+        **cores_per_node** : number of accessible cores per node
+
+        **concurrent_run** : maximum number of processes that can coexist
+
 runtime node 
 ^^^^^^^^^^^^^^
+
+The runtime node specifies entries that must be passed to the launch command. It
+contains subnodes such as ``args``, ```iterators``, etc. The ``iterator`` node
+contains arguments passed to the launching command. For example, if prterun
+takes the "-np" argument, which corresponds to the number of MPI threads, let's
+say ``n_mpi``, we will get the following runtime profile :
+
+    **args** : arguments for the launch command
+
+    iterators:
+        n_mpi:
+            **numeric** : true
+
+            **option** : "-np "
+
+            **type** : argument
+
+            aliases :
+                [dictionary of aliases for the option]
+                
+    plugins
+
 
 Building a new Profile 
 ---------------------- 
