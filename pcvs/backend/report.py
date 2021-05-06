@@ -1,13 +1,13 @@
 import json
 import os
+from pcvs.helpers.exceptions import ValidationException
 
 from pcvs.testing.test import Test
 from pcvs.webview import create_app
-
+from pcvs.helpers.system import ValidationScheme
 
 def locate_json_files(path):
     array = list()
-    print(path)
     for f in os.listdir(path):
         if f.startswith("pcvs_rawdat") and f.endswith(".json"):
             array.append(os.path.join(path, f))
@@ -26,6 +26,7 @@ def build_data_tree(path=os.getcwd(), files=None):
     tags = global_tree["tag"]
     statuses = global_tree["status"]
     cnt_tests = 0
+    scheme = ValidationScheme("test-result")
 
     # with open(os.path.join(os.getcwd(), "result-scheme.yml"), "r") as fh:
     #    val_str = yaml.safe_load(fh)
@@ -34,15 +35,18 @@ def build_data_tree(path=os.getcwd(), files=None):
         print("Dealing with n°{}".format(idx+1))
         with open(f, 'r') as fh:
             stream = json.load(fh)
-            # try:
-            #   jsonschema.validate(instance=stream, schema=val_str)
-            #   except jsonschema.exceptions.ValidationError as e:
-            #   print("skip {} (bad formatting): {}".format(f, e))
-            #   continue
             # TODO: read & store metadata
             for test in stream.get('tests', []):
+                try:
+                    pass
+                    # veeeeery slow
+                    #scheme.validate(test)
+                    
+                except ValidationException.FormatError:
+                    print("\t- skip {} (bad formatting)".format(f))
+                    continue
+            
                 cnt_tests += 1
-                print(test)
                 test_label = test['id'].get('label', "NOLABEL")
                 test_tags = test['data'].get('tags', [])
                 test_status = str(test['result'].get('state', Test.STATE_OTHER))
@@ -64,6 +68,7 @@ def build_data_tree(path=os.getcwd(), files=None):
                             str(Test.STATE_OTHER): 0,
                             str(Test.STATE_SUCCEED): 0,
                             str(Test.STATE_FAILED): 0,
+                            str(Test.STATE_INVALID_SPEC): 0,
                             "total": 0
                         }
                     }
@@ -80,6 +85,7 @@ def build_data_tree(path=os.getcwd(), files=None):
                                str(Test.STATE_OTHER): 0,
                             str(Test.STATE_SUCCEED): 0,
                             str(Test.STATE_FAILED): 0,
+                            str(Test.STATE_INVALID_SPEC): 0,
                             "total": 0
                             }
                         }
@@ -105,3 +111,4 @@ def webview_run_server(path):
     print("Build global tree ({} files)".format(len(json_files)))
     global_tree = build_data_tree(path, json_files)
     create_app(global_tree).run(host='0.0.0.0')
+

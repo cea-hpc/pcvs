@@ -2,9 +2,10 @@ import json
 import os
 
 from pcvs import NAME_BUILD_RESDIR
-
+from pcvs.helpers.system import ValidationScheme
 
 class Publisher:
+    scheme = None
     increment = 0
     fn_fmt = "pcvs_rawdat{:>04d}.json"
     
@@ -19,7 +20,14 @@ class Publisher:
     def empty_entries(self):
         self._layout['tests'] = list()
 
+    def validate(self, stream):
+        if not self.scheme:
+            self.scheme = ValidationScheme("test-result")
+        
+        self.scheme.validate(stream)
+    
     def add(self, json):
+        self.validate(json)
         self._layout['tests'].append(json)
         
     def flush(self):

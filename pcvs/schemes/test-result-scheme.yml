@@ -1,0 +1,44 @@
+---
+type: object
+properties:
+  id:
+    type: object
+    properties:
+      label: {"type": "string"}
+      subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
+      te_name: {"type": "string"}
+      full_name: {"type": "string"}
+    additionalProperties: false
+    required: ["label", "subtree", "te_name", "full_name"]
+  exec: {"type": "string"}
+  result:
+    type: object
+    properties:
+      rc: {"type": "integer"}
+      state: {"type": "integer"}
+      time: {"type": "number"}
+      output: {"OneOf": [{"type": "string"}, {"type": null}]}
+    additionalProperties: false
+    required: ['rc', 'state', 'time']
+  data:
+    type: object
+    properties:
+      tags:
+        OneOf:
+          type: array
+          items: {"type": "string"}
+      artifacts:
+        OneOf:
+          - type: null
+          - type: object
+            patternProperties:
+              "^.*$": {type: "string"}
+        
+      combination:
+        OneOf:
+          - type: null
+          - type: object
+            patternProperties:
+              "^.*$": {type: "string"}
+    additionalProperties: true
+additionalProperties: false

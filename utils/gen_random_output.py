@@ -7,7 +7,10 @@ import random
 import jsonschema
 import yaml
 
-prefix = os.path.join(os.getcwd(), "outputs")
+file_count = 90
+test_count = 1000000
+test_per_file = int(test_count/file_count)
+prefix = os.path.join(os.getcwd(), "rawdata")
 labels = ["proj"+str(i) for i in range(0, 20+1)]
 tagset1 = ["MPI", "OpenMP", "reproducers", "Threads"]
 tagset2 = ["fast", "slow", "large", "small"]
@@ -15,14 +18,10 @@ random.seed()
 if not os.path.isdir(prefix):
     os.makedirs(prefix)
 
-file_count = random.randint(1, 100)
 print("building {} files...".format(file_count))
 
-with open(os.path.join(os.getcwd(), "pcvs-result-scheme.yaml"), 'r') as fh:
-    scheme = yaml.safe_load(fh)
-
-for f in range(1, file_count+1):
-    filepath = os.path.join(prefix, "output-" + str(f) + "-list_of_tests.xml.json")
+for f in range(0, file_count):
+    filepath = os.path.join(prefix, "pcvs_rawdat{:04}.json".format(f))
     warn_threshold = random.randint(30,90+1)
     err_threshold = random.randint(50,100+1)
 
@@ -31,11 +30,9 @@ for f in range(1, file_count+1):
     if os.path.isfile(filepath):
         continue
     
-    test_count = random.randint(1, 5000)
     json_node = {"tests" : []}
 
-    
-    for t in range(1, test_count+1):
+    for t in range(1, test_per_file+1):
         label = labels[random.randrange(0, len(labels))]
         tags = [tagset1[random.randrange(0, len(tagset1))]]
         tags += [tagset2[random.randrange(0, len(tagset2))]]
@@ -46,28 +43,35 @@ for f in range(1, file_count+1):
     
         status = random.randint(0, 100)
         if status < warn_threshold:
-            status = "success"
-        elif warn_threshold < status  and status < err_threshold:
-            status = "warn"
+            status = 1
+        elif warn_threshold < status and status < err_threshold:
+            status = 3
         else:
-            status = "failure"
+            status = 2
         
         time = random.randrange(0, 5000) / 1000
         output = base64.b64encode(("Test Sample {}".format(t)).encode('ascii')).decode('ascii')
         
         json_node['tests'].append({
-            "command": "pcvs exec 'test_name'",
-            "label": label,
-            "subtree": " ",
-            "name" : "test_{}".format(t),
-            "full_name": label + " " + "test_{}".format(t),
+            "id": {
+                "label": label,
+                "subtree": "sub",
+                "te_name" : "test_{}".format(t),
+                "full_name": "{}/{}/test_{}".format(label, "sub", t),
+            },
+            "exec": "sh list_of_tests.sh '{}'".format("{}/{}/test_{}".format(label, "sub", t)),
             "result": {
+                "rc": random.randint(0, 1),
                 "output": output,
-                "status": status,
+                "state": status,
                 "time": time
             },
-            "tags": tags
-
+            "data": {
+                "tags": tags,
+                "combination": {
+                    "n_mpi": f
+                }
+            }
         })
     
     with open(filepath, 'w') as fh:

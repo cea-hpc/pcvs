@@ -110,7 +110,7 @@ class Test:
         log.manager.print_job(label, self._time, self.name, colorname=colorname, icon=icon)
         if self._out:
             if (log.manager.has_verb_level("info") and self.state == Test.STATE_FAILED) or log.manager.has_verb_level("debug"):
-                log.manager.print(self._out)
+                log.manager.print(base64.b64decode(self._out))
 
     def executed(self, state=STATE_FAILED):
         self._state = state
@@ -148,7 +148,7 @@ class Test:
                 "tags": self._array['tags'],
                 "metrics": "TBD",
                 "artifacts": self._array['artifacts'],
-                "comb": self._array['comb_dict']
+                "combination": self._array['comb_dict']
             }
         }
     
