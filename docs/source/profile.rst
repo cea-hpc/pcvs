@@ -10,142 +10,90 @@ yaml files that can be imported/exported via the command line interface.
 
 This configuration is separated in 5 nodes :
 
-* compiler * criterion * group * machine * runtimes
+* compiler 
+* criterion 
+* group 
+* machine 
+* runtimes
 
-each node is separated in subnodes :
+each node is separated in subnodes and can be defined separately in multiple
+ways. As files, profiles are written with the yml syntax. 
 
-compiler node 
-^^^^^^^^^^^^^
-
-The compiler node describes the building sequence of tests, from the compiler
-command to options, arguments, tags, libraries, etc.
-
-This node contains the following subnodes :
-
-    commands :
-
-        **cc** : compilation command for C code
-
-        **cxx** : compilation command for C++ code
-
-        **f77** : compilation command for Fortran77 code
-
-        **f90** : compilation command for Fortran90 code
-
-        **fc** : compilation command for generic Fortran code
-
-    variants :
-
-        cuda :
-
-            **args** : additionnal arguments for code compiled with CUDA
-
-        openmp :
-
-            **args** : additionnal arguments for code compiled with openmp
-            features
-
-        strict :
-
-            **args** : arguments for extra verifications
-
-        tbb :
-
-            **args** : arguments for use of tbb library
-
-criterion node 
-^^^^^^^^^^^^^^
-
-the criterion node contains a collection of iterators that describe the tests.
-PCVS can iterate over the following parameters :
-
-* n_core * n_mpi * n_node * n_omp * n_proc
-
-    iterators :
-
-        n_[iterator] :
-
-            **subtitle** : string used to indicate the number of [iterator] in
-            the test description
-
-            **values** : values that [iterator] allowed to take
-
-Example
-+++++++
-
-iterators:
-    n_core:
-        **subtitle**: C
-
-        **values**:
-        
-        - 1
-        
-        - 2
-
-
-group node 
-^^^^^^^^^^
-
-The group node contains group definitions that describe tests. A group
-description can contain any node present in the Configuration basic blocks (CF
-Configuration basic blocks section).
-
-Example
-+++++++
-
-    GRPMPI:
-        run:
-            iterate:
-                n_omp:
-                    **values**: null
-
-machine node 
-^^^^^^^^^^^^^^
-
-The machine node describes the constraints of the physical machine. It lists
-what processes can or can not use.
-
-    machine :
-        **nodes** : number of accessible nodes
-
-        **cores_per_node** : number of accessible cores per node
-
-        **concurrent_run** : maximum number of processes that can coexist
-
-runtime node 
-^^^^^^^^^^^^^^
-
-The runtime node specifies entries that must be passed to the launch command. It
-contains subnodes such as ``args``, ```iterators``, etc. The ``iterator`` node
-contains arguments passed to the launching command. For example, if prterun
-takes the "-np" argument, which corresponds to the number of MPI threads, let's
-say ``n_mpi``, we will get the following runtime profile :
-
-    **args** : arguments for the launch command
-
-    iterators:
-        n_mpi:
-            **numeric** : true
-
-            **option** : "-np "
-
-            **type** : argument
-
-            aliases :
-                [dictionary of aliases for the option]
-                
-    plugins
+Scope
+-----
 
 
 Building a new Profile 
 ---------------------- 
 
-TBW 
+To create a blank
+profile, one can use the command :
+
+.. code-block:: bash
+
+    pcvs profile build example_profile
+
+To export this profile in a file format, use the command :
+
+.. code-block:: bash
+
+    pcvs profile export example_profile example_profile.yml
+
+This profile is fully customizable with any text editor, to import the profile
+back into PCVS use the command :
+
+.. code-block:: bash
+
+    pcvs profile import example_profile example_profile.yml
+
+Without arguments, the ``pcvs profile build`` command builds blocks as default,
+but a profile can be built with custom configuration blocks. 
+
+Building a profile with existing configuration blocks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Buiding a profile based on configuration blocks can be done in two ways :
+
+* in the CLI
+* with the interactive mode
+
+In the CLI
+++++++++++
+
+.. code-block:: bash
+
+    pcvs profile build example_profile -b [scope].[block-name].[block-type]
+
+This command has to include either 0 or 5 ``-b`` blocks (default or complete
+configuration). 
+
+With the interactive mode
++++++++++++++++++++++++++
+
+.. code-block:: bash
+    pcvs profile build -if
+
+For the configuration blocks setting please refer to the Configuration
+blocks section.
 
 Managing Profiles 
 ----------------- 
+
+Besides being built, exported or imported, profiles can be altered or destroyed
+with the corresponding commands.
+
+Use pcvs profile list to see every available profiles.
+
+``pcvs profile alter [profile]`` launches a text editor in order to manually
+change the profile. PCVS scans editors to give a choice to users.
+
+``pcvs profile destroy [profile]`` deletes a profile 
+
 TBW
 
 Using Profiles 
---------------
+
+Profiles are used at runtime, they are specified with the ``-p`` option.
+
+.. code-block:: bash
+    pcvs run -p example_profile
