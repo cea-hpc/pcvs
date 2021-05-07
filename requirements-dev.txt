@@ -3,7 +3,6 @@ pytest
 tox
 flake8
 coverage
-yamllint
 isort
 mypy
 sphinx

@@ -1,0 +1,24 @@
+---
+type: object
+properties:
+  fail_on_error: {type: boolean}
+  verbose: {type: integer}
+  scheduling:
+    type: object
+    properties:
+      model: {type: integer}
+      sched_on: {type: string}
+    additionalProperties: false
+  result:
+    type: object
+    properties:
+      log: {type: integer}
+      logsz: {type: integer}
+      format:
+        type: array
+        items:
+          type: string
+          enum: ['junit', 'json', 'yaml']
+    additionalProperties: false
+additionalProperties: false
+        

@@ -7,6 +7,7 @@
     },
     "exec": "sh /.../list_of_tests.sh &apos;tmp/test_main&apos;", 
     "result": {
+        "rc": 0,
         "output": "RmFrZSBleGVjdXRpb24=",
         "state": 0,
         "time": 10.34
