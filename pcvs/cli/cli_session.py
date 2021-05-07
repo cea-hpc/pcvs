@@ -37,6 +37,9 @@ def session(ctx, ack, list, ack_all):
     elif ack is not None:
         if ack not in sessions.keys():
             raise click.BadOptionUsage('--ack', "No such Session id (see pcvs session)")
+        elif sessions[ack]['state'] not in [pvSession.Session.STATE_ERROR, pvSession.Session.STATE_COMPLETED]:
+            raise click.BadOptionUsage('--ack', "This session is not completed yet")
+        
         pvSession.remove_session_from_file(ack)
         lockfile = os.path.join(sessions[ack]['path'], NAME_BUILDIR_LOCKFILE)
         utils.unlock_file(lockfile)

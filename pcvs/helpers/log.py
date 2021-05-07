@@ -157,7 +157,8 @@ class IOManager:
                 try:
                     return func(*args, **kwargs)
                 except e_type as e:
-                    self.print("EXCEPTION: {}".format(e))
+                    raise e
+                    self.err("{}: {}".format(type(e).__name__, e))
                         
             return wrapper
         return inner_function
