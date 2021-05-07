@@ -9,13 +9,13 @@ job_manager:
   mintime: 1000
   maxtime: 1500
   allocate:
-    program: "salloc"
-    args: "-p sandy"
-    wrapper: "/path/to/alloc_wrapper"
+    program: "echo"
+    args: ""
+    wrapper: ""
   run:
-    program: "srun"
-    args: "-p sandy"
-    wrapper: "/path/to/run_wrapper"
+    program: "echo"
+    args: ""
+    wrapper: ""
     #  batch:
     # comand: "srun"
     # args: "-p sandy"
@@ -34,6 +34,6 @@ partitions:
     cores_per_node: 32
     job_manager:
       allocate:
-        program: 'mycmd'
-        args: "-k "
-        wrapper: "/another/alloc/wrapper"
+        program: 'echo'
+        args: ""
+        wrapper: ""

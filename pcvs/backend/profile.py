@@ -73,11 +73,7 @@ class Profile:
     def fill(self, raw):
         # some checks
         assert (isinstance(raw, dict))
-        check = [val for val in config.CONFIG_BLOCKS if val in raw.keys()]
-        if len(check) != len(config.CONFIG_BLOCKS):
-            raise ProfileException.IncompleteError(
-                [v for v in config.CONFIG_BLOCKS not in check])
-
+        
         # fill is called either from 'build' (dict of configurationBlock)
         # of from 'clone' (dict of raw file inputs)
         for k, v in raw.items():
@@ -115,11 +111,11 @@ class Profile:
 
     def load_template(self):
         self._exists = True
-        self._file = os.path.join(
-            PATH_INSTDIR,
-            'templates/profile-format.yml')
-        with open(self._file, 'r') as fh:
-            self.fill(yaml.safe_load(fh))
+        self._file = None
+        for kind in config.CONFIG_BLOCKS:
+            filepath = os.path.join(PATH_INSTDIR, "templates", "{}-format.yml".format(kind))
+            with open(filepath, "r") as fh:
+                self.fill({kind: yaml.safe_load(fh)})
 
     def check(self, fail=True):
         for kind in config.CONFIG_BLOCKS:
