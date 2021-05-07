@@ -2,7 +2,24 @@
 type: object
 properties:
   fail_on_error: {type: boolean}
-  verbose: {type: integer}
+  default_profile: {type: string}
+  output: {type: string}
+  background: {type: boolean}
+  override: {type: boolean}
+  dirs:
+    type: object
+    patternProperties:
+      "^.*$": {type: string}
+  runlog: {type: string}
+  simulated: {type: boolean}
+  anonymize: {type: boolean}
+  target_bank: {type: string}
+  reused_build: {type: string}
+  author:
+    type: object
+    properties:
+      name: {type: string} 
+      email: {type: string}
   scheduling:
     type: object
     properties:

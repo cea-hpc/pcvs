@@ -216,6 +216,14 @@ class MetaConfig(Dict):
                 raise CommonException.IOError(
                     "Error(s) found while loading (}".format(filepath))
         
+        # some post-actions
+        for field in ["output", "reused_build", "runlog"]:
+            if field in node:
+                node[field] = os.path.abspath(node[field])
+                
+        if node.dirs:
+            node.dirs = {k: os.path.abspath(v) for k, v in node.dirs.items()}
+            
         return self.bootstrap_validation(node)
 
     def bootstrap_validation(self, node):
@@ -229,7 +237,7 @@ class MetaConfig(Dict):
         subtree.set_nosquash('output', os.path.join(os.getcwd(), NAME_BUILDIR))
         subtree.set_nosquash('background', False)
         subtree.set_nosquash('override', False)
-        subtree.set_nosquash('dirs', '.')
+        subtree.set_nosquash('dirs', None)
         subtree.set_nosquash('runlog', os.path.join(subtree.output, 'out.log'))
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)
@@ -242,9 +250,9 @@ class MetaConfig(Dict):
             "email": git.get_current_usermail()})
 
         # Annoying here:
-        # self.result should be allowed even without the 'set_ifnot' above
+        # self.result should be allowed even without the 'set_nosquash' above
         # but because of inheritance, it does not result as a Dict()
-        # As the 'set_ifnot' is required, it is solving the issue
+        # As the 'set_nosquash' is required, it is solving the issue
         # but this corner-case should be remembered as it WILL happen again :(
         if 'format' not in subtree.result:
             subtree.result.format = ['json']

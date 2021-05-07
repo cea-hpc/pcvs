@@ -16,8 +16,7 @@ from pcvs.helpers import log, system, utils
 def iterate_dirs(ctx, param, value) -> dict:
     list_of_dirs = dict()
     if not value:  # if not specified
-        testpath = os.getcwd()
-        return {os.path.basename(testpath): testpath}
+        return None
     else:  # once specified
         err_msg = ""
         for d in value:
@@ -64,17 +63,14 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
               help="F directory where PCVS is allowed to store data")
-@click.option("-e", "--edit", "set_default",
-              default=None, is_flag=True,
-              help="Edit default settings to run a validation")
 @click.option("-s", '--settings', "settings_file",
               default=None, show_envvar=True, type=str,
               help="Define which setting file to use (~/.pcvs/validation.cfg)")
 @click.option("--detach", "detach",
-              default=False, is_flag=True, show_envvar=True,
+              default=None, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously (WIP)")
 @click.option("-f/-F", "--override/--no-override", "override",
-              default=False, is_flag=True, show_envvar=True,
+              default=None, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
 @click.option("-d", "--dry-run", "simulated",
               default=None, is_flag=True,
@@ -90,19 +86,16 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
+@log.manager.capture_exception(Exception)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
-        simulated, bank, dup, set_default, dirs) -> None:
+        simulated, bank, dup, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
     By default the current directory is scanned to find test-suites to run.
     May also be provided as a list of directories as described by tests
-    found in LIST_OF_DIRS.
+    found in DIRS.
     """
-    if set_default:
-        utils.open_in_editor(system.MetaConfig.validation_default_file)
-        exit(0)
-
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
@@ -119,12 +112,19 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('output', output)
     val_cfg.set_ifdef('background', detach)
     val_cfg.set_ifdef('override', override)
-    val_cfg.set_ifdef('dirs', dirs)
     val_cfg.set_ifdef('simulated', simulated)
     val_cfg.set_ifdef('anonymize', anon)
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
+    
+    # if dirs not set by config file nor CLI
+    if not dirs and not val_cfg.dirs:
+        testpath = os.getcwd()
+        dirs = {os.path.basename(testpath): testpath}
+    
+    # not overriding if dirs is None
+    val_cfg.set_ifdef("dirs", dirs)
     
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)

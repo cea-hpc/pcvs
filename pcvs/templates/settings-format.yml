@@ -1,16 +1,26 @@
 ---
-# global validation settings
-# to keep CLI simple
+# global validation settings to keep CLI simple
 # this file is not a basic configuration block
 # and should be put into the ~/.pcvs/validation.yml
 # to be automatically loaded
 
 # does pcvs return a non-zero exit code if at least a test failed
 fail_on_error: true
-# Use 'tee' to keep the output into a file
-tee: true
-# enable verbose (can be true, false, 0, 1, 2, 3)
-verbose: 0
+runlog: "path/to/runlog/file.log"
+output: "build/directory"
+# True = detached sessions
+background: false 
+override: false
+dirs:
+    current_directory: '.'
+simulated: false
+anonymize: false
+target_bank: 'bankTag@bankProject'
+reused_build: "another/build/directory/to/clone/from"
+author:
+    name: "Who-run-the-test-suite"
+    email: "johndoe@example.com"
+
 # how to schedule jobs (JCHRONoSS-specific)
 scheduling:
     # type of scheduling:
