@@ -24,6 +24,7 @@ class ValidationException(CommonException):
 
 class RunException(CommonException):
     class OverrideError(GenericError): pass
+    class InProgressError(GenericError): pass
     class ProgramError(GenericError): pass
     class TestUnfoldError(GenericError): pass
     
@@ -33,3 +34,7 @@ class TestException(CommonException):
 class OrchestratorException(CommonException):
     class UndefDependencyError(GenericError): pass
     class CircularDependencyError(GenericError): pass
+    
+class LockException(CommonException):
+    class BadOwnerError(GenericError): pass
+    class TimeoutError(GenericError): pass

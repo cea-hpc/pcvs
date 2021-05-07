@@ -8,29 +8,21 @@ from multiprocessing import Process
 import yaml
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
-from pcvs.helpers import log
+from pcvs.helpers import log, utils
 
 
 def unlock_session_file():
     """ Release the lock after manipulating the session.yml file.
         The call won't failed if the lockfile is not taken before unlocking.
     """
-    with open(PATH_SESSION_LOCKFILE, "w+") as fh:
-        fcntl.flock(fh, fcntl.LOCK_UN)
-
-def lock_session_file():
+    utils.unlock_file(PATH_SESSION_LOCKFILE)
+    
+def lock_session_file(timeout=None):
     """Acquire the lockfil before manipulating the session.yml file.
         This ensure safety between multiple PCVS instances.
         Be sure to call `unlock_session_file()` once completed
     """
-    locked = False
-    with open(PATH_SESSION_LOCKFILE, "w+") as fh:
-        while not locked:
-            try:
-                fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                locked = True
-            except BlockingIOError:  # failed to lock
-                time.sleep(1)
+    utils.lock_file(PATH_SESSION_LOCKFILE, timeout=timeout)
 
 
 def store_session_to_file(c):
@@ -88,6 +80,8 @@ def update_session_from_file(sid, update):
         with open(PATH_SESSION, 'w') as fh:
             yaml.safe_dump(all_sessions, fh)
 
+    unlock_session_file()
+
     
 def remove_session_from_file(sid):
     """clear a session from logs. Argument is the session id"""
@@ -109,7 +103,7 @@ def remove_session_from_file(sid):
 
 def list_alive_sessions():
     """load and return the complete dict from session.yml file"""
-    lock_session_file()
+    lock_session_file(timeout=15)
 
     try:
         with open(PATH_SESSION, 'r') as fh:

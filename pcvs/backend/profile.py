@@ -10,7 +10,7 @@ from addict import Dict
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
 from pcvs.helpers import git, log, system, utils
-from pcvs.helpers.exceptions import ProfileException
+from pcvs.helpers.exceptions import ProfileException, ValidationException
 
 PROFILE_EXISTING = dict()
 
@@ -124,7 +124,7 @@ class Profile:
     def check(self, fail=True):
         for kind in config.CONFIG_BLOCKS:
             if kind not in self._details:
-                raise jsonschema.exceptions.ValidationError(
+                raise ValidationException.FormatError(
                     "Missing '{}' in profile".format(kind))
             system.ValidationScheme(kind).validate(self._details[kind])
 

@@ -1,11 +1,14 @@
 import os
 import shutil
+import fcntl
+import time
 from contextlib import contextmanager
 
 from pcvs import (NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_HOMEDIR,
                   PATH_INSTDIR)
-from pcvs.helpers.exceptions import CommonException, RunException
+from pcvs.helpers.exceptions import CommonException, RunException, LockException
 from pcvs.helpers.system import MetaConfig
+from pcvs.helpers import log
 
 ####################################
 ##    STORAGE SCOPE MANAGEMENT    ##
@@ -161,3 +164,40 @@ def find_buildir_from_prefix(path):
             if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
                 raise CommonException.NotFoundError("build-dir in {}".format(path))
         return path
+
+def unlock_file(f):
+    if os.path.exists(f) and os.path.isfile(f):
+        with open(f, "w+") as fh:
+            os.remove(f)
+            log.manager.debug("Unlock {}".format(f))
+
+
+def lock_file(f, reentrant=False, timeout=None):
+    
+    log.manager.debug("Attempt locking {}".format(f))
+    locked = trylock_file(f, reentrant)
+    count = 0
+    while not locked:
+        time.sleep(1)
+        count += 1
+        if timeout and count > timeout:
+            raise LockException.TimeoutError(f)
+        locked = trylock_file(f, reentrant)
+    return locked
+
+
+def trylock_file(f, reentrant=False):
+    if not os.path.exists(f):
+        with open(f, 'w') as fh:
+            fh.write("{}".format(os.getpid()))
+        log.manager.debug("Lock {}".format(f))
+        return True
+    else:
+        with open(f, 'r') as fh:
+            pid = int(fh.read().strip())
+        
+        if pid == os.getpid() and reentrant:
+            log.manager.debug("Lock {}".format(f))
+            return True
+        
+        return False

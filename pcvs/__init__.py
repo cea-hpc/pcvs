@@ -4,6 +4,7 @@ import click
 
 NAME_BUILDIR = ".pcvs-build"
 NAME_BUILDFILE = ".pcvs-isbuilddir"
+NAME_BUILDIR_LOCKFILE = ".pcvs-wip"
 NAME_SRCDIR = ".pcvs"
 NAME_BUILD_CONF_FN = "conf.yml"
 NAME_BUILD_RESDIR = "rawdata"

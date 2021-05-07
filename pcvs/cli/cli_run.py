@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+from pcvs.helpers.exceptions import RunException
+from pcvs import NAME_BUILDIR_LOCKFILE
 
 import click
 
@@ -175,3 +177,4 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
         log.manager.print_item("Session successfully started, ID {}".format(sid))
     else:
         the_session.run(the_session)
+        utils.unlock_file(lockfile)

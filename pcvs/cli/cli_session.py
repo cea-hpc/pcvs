@@ -1,9 +1,11 @@
 from datetime import datetime
+import os
+from pcvs import NAME_BUILDIR_LOCKFILE
 
 import click
 
 from pcvs.backend import session as pvSession
-from pcvs.helpers import log
+from pcvs.helpers import log, utils
 
 
 def compl_session_token(ctx, args, incomplete) -> list:
@@ -30,8 +32,14 @@ def session(ctx, ack, list, ack_all):
         for session_id in sessions.keys():
             if sessions[session_id]['state'] != pvSession.Session.STATE_IN_PROGRESS:
                 pvSession.remove_session_from_file(session_id)
+                lockfile = os.path.join(sessions[session_id]['path'], NAME_BUILDIR_LOCKFILE)
+                utils.unlock_file(lockfile)
     elif ack is not None:
+        if ack not in sessions.keys():
+            raise click.BadOptionUsage('--ack', "No such Session id (see pcvs session)")
         pvSession.remove_session_from_file(ack)
+        lockfile = os.path.join(sessions[ack]['path'], NAME_BUILDIR_LOCKFILE)
+        utils.unlock_file(lockfile)
     else:  # listing is the defualt
         log.manager.print_header("Session View")
         for sk, sv in sessions.items():
