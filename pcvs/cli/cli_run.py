@@ -67,7 +67,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-e", "--edit", "set_default",
               default=None, is_flag=True,
               help="Edit default settings to run a validation")
-@click.option("-s", '--validation', "validation_file",
+@click.option("-s", '--settings', "settings_file",
               default=None, show_envvar=True, type=str,
               help="Define which setting file to use (~/.pcvs/validation.cfg)")
 @click.option("--detach", "detach",
@@ -90,7 +90,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-def run(ctx, profilename, output, detach, override, anon, validation_file,
+def run(ctx, profilename, output, detach, override, anon, settings_file,
         simulated, bank, dup, set_default, dirs) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -107,15 +107,10 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     if output is not None:
         output = os.path.abspath(output)
 
-    if bank is not None:
-        obj = pvBank.Bank(token=bank, path=None)
-        if not obj.exists():
-            click.BadOptionUsage("--bank", "'{}' bank does not exist".format(obj.name))
-
     global_config = system.MetaConfig()        
 
     # then init the configuration
-    val_cfg = global_config.bootstrap_validation_from_file(validation_file)
+    val_cfg = global_config.bootstrap_validation_from_file(settings_file)
 
     # save 'run' parameters into global configuration
     val_cfg.set_ifdef('datetime', datetime.now())
@@ -128,32 +123,47 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
     val_cfg.set_ifdef('simulated', simulated)
     val_cfg.set_ifdef('anonymize', anon)
     val_cfg.set_ifdef('reused_build', dup)
+    val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
     
-    if os.path.exists(val_cfg.output) and not val_cfg.override:
-        raise click.BadOptionUsage("--output", "target build directory already exist")
+    if bank is not None:
+        obj = pvBank.Bank(token=bank, path=None)
+        if not obj.exists():
+            click.BadOptionUsage("--bank", "'{}' bank does not exist".format(obj.name))
+
+    # BEFORE the build dir still does not exist !
+    lockfile = os.path.join(val_cfg.output, NAME_BUILDIR_LOCKFILE)
+    if os.path.exists(val_cfg.output):
+        if not val_cfg.override:
+            raise click.BadOptionUsage("--output", "target build directory already exist")
+        if not utils.trylock_file(lockfile):
+            raise RunException.InProgressError(val_cfg.output)
+            
+        
     elif not os.path.exists(val_cfg.output):
         os.makedirs(val_cfg.output)
-        
+    
+    # DO NOT move the logger init before the build dir exist (above)
+    log.manager.set_logfile(val_cfg.runlog is not None, val_cfg.runlog)    
     
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
-    if dup is not None:
+    if val_cfg.reused_build is not None:
         try:
-            global_config = pvRun.dup_another_build(dup, val_cfg.output)
+            global_config = pvRun.dup_another_build(val_cfg.reused_build, val_cfg.output)
             #TODO: Currently nothing can be overriden from cloned build except:
             # - 'output'
         except FileNotFoundError:
             raise click.BadOptionUsage(
-                "--duplicate", "{} is not a valid build directory!".format(dup))
+                "--duplicate", "{} is not a valid build directory!".format(val_cfg.reused_build))
     else:
         # otherwise create own settings command block
-        (scope, _, label) = utils.extract_infos_from_token(profilename,
+        (scope, _, label) = utils.extract_infos_from_token(val_cfg.default_profile,
                                                            maxsplit=2)
         pf = pvProfile.Profile(label, scope)
         if not pf.is_found():
             raise click.BadOptionUsage(
-                "--profile", "Profile '{}' not found".format(profilename))
+                "--profile", "Profile '{}' not found".format(val_cfg.default_profile))
         pf.load_from_disk()
 
         val_cfg.set_ifdef('pf_name', pf.full_name)
@@ -168,11 +178,8 @@ def run(ctx, profilename, output, detach, override, anon, validation_file,
 
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
-                                  io_file=os.path.join(
-                                            global_config.validation.output,
-                                            'out.log'
-                                          ))
-    if detach:
+                                  io_file=val_cfg.runlog)
+    if val_cfg.background:
         sid = the_session.run_detached(the_session)
         log.manager.print_item("Session successfully started, ID {}".format(sid))
     else:

@@ -41,6 +41,8 @@ def process_main_workflow(the_session=None):
     global_config = MetaConfig.root
     valcfg = global_config.validation
 
+    log.manager.set_logfile(valcfg.runlog is not None, valcfg.runlog)
+
     log.manager.print_banner()
     log.manager.print_header("Prepare Environment")
     # prepare PCVS and third-party tools
@@ -441,9 +443,6 @@ def dup_another_build(build_dir, outdir):
                                     )
 
                 copy_file(src, dest)
-
-                if f == "list_of_tests.xml":
-                    global_config.get('validation').xmls.append(dest)
 
     # other files
     for f in ('conf.env'):
