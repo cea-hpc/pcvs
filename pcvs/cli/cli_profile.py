@@ -5,7 +5,7 @@ from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config
 from pcvs.helpers import log, utils
-from pcvs.helpers.exceptions import ProfileException
+from pcvs.helpers.exceptions import ProfileException, ValidationException
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
@@ -243,6 +243,7 @@ def profile_destroy(ctx, token):
               default=None, type=str,
               help="Open file with EDITOR")
 @click.pass_context
+@log.manager.capture_exception(ValidationException.FormatError)
 def profile_alter(ctx, token, editor, edit_plugin):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)

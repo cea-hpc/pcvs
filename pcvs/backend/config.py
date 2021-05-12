@@ -1,6 +1,7 @@
 import base64
 import glob
 import os
+import random
 
 import click
 import yaml
@@ -218,11 +219,17 @@ class ConfigurationBlock:
 
         edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
-            edited_yaml = Dict(yaml.safe_load(edited_stream))
-            system.ValidationScheme(self._kind).validate(edited_yaml)
-
-            self.fill(edited_yaml)
-            self.flush_to_disk()
+            try:
+                edited_yaml = Dict(yaml.safe_load(edited_stream))
+                system.ValidationScheme(self._kind).validate(edited_yaml)
+                self.fill(edited_yaml)
+                self.flush_to_disk()
+            except Exception as e:
+                fname = "./rej{}-{}.yml".format(random.randint(0, 1000), self.full_name)
+                with open(fname, "w") as fh:
+                    fh.write(edited_stream)
+                raise e
+                raise e
 
     def edit_plugin(self, e=None):
         if self._kind != "runtime":

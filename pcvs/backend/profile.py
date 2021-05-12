@@ -1,6 +1,7 @@
 import base64
 import glob
 import os
+import random
 
 import click
 import jsonschema
@@ -167,9 +168,15 @@ class Profile:
 
         edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
-            edited_yaml = Dict(yaml.safe_load(edited_stream))
-            self.fill(edited_yaml)
-            self.check()
+            try:
+                edited_yaml = Dict(yaml.safe_load(edited_stream))
+                self.fill(edited_yaml)
+                self.check()
+            except Exception as e:
+                fname = "./rej{}-{}.yml".format(random.randint(0, 1000), self.full_name)
+                with open(fname, "w") as fh:
+                    fh.write(edited_stream)
+                raise e
             self.flush_to_disk()
 
     def edit_plugin(self, e=None):
