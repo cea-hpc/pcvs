@@ -85,7 +85,63 @@ following nodes :
 .. code-block:: yaml
 
     run:
+        cwd: path to build directory
+        depends_on: 
+            test: [list of tests on which it depends]
+            spack: [list of spack dependencies used by this test]
+            module: [list of installed modules this test needs]
         program: name of the binary file
+
+The run node owns the ``iterate`` subnode which can contain custom iterators
+desribed in the ``criterion`` node in the selected profile. Moreover, the
+run.iterate node can define custom iterators without defining them in
+``criterion`` by writing them in the run.iterate.program node.
+
+.. code-block:: yaml
+
+    run:
         iterate: 
             iterator_described_in_profile.runtime.criterion:
                 values: [list of values for the corresponding iterator]
+            program:
+                custom_iterator: 
+                    numeric: true/false
+                    type: "argument" or "environment"
+                    values: [list of values taken by the iterator]
+                    subtitle: string chosen to identify this iterator
+
+Validate
+--------
+
+The validate node describes the expected test behaviour, including exit, time
+and matching output.
+
+TODO
+
+Group
+-----
+
+Groups are described in profiles. They can contain ``build``, ``run``, ``tag``,
+``validate``, and ``artifact`` subnodes. Once a group is defined in the used
+profile it can be called in the validation setup file.
+
+.. code-block:: yaml
+
+    group: name of the group defined in the profile
+
+Tag
+---
+
+TODO
+
+Artifact
+--------
+
+The artifact node contains anything the output should have in addition to the
+results of tests.
+
+.. code-block:: yaml
+
+    artifact:
+        obj1: "path/to/obj1"
+        obj2: "path/to/obj2"
