@@ -22,6 +22,12 @@ ways. As files, profiles are written with the yml syntax.
 Scope
 -----
 
+Profiles can have different scopes depending on which user should have access or
+which project should be affected by it. The 3 scopes are the following :
+
+* Local : The profile is only seeable from a specific folder
+* User : The profile is seeable from everywhere in an userspace.
+* Global : The profile is accessible to everyone and from everywhere.
 
 Building a new Profile 
 ---------------------- 
@@ -71,7 +77,8 @@ With the interactive mode
 +++++++++++++++++++++++++
 
 .. code-block:: bash
-    pcvs profile build -if
+
+    pcvs profile build -i
 
 For the configuration blocks setting please refer to the Configuration
 blocks section.
@@ -96,4 +103,5 @@ Using Profiles
 Profiles are used at runtime, they are specified with the ``-p`` option.
 
 .. code-block:: bash
+
     pcvs run -p example_profile
