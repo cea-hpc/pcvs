@@ -1,5 +1,6 @@
 import base64
 import os
+import shlex
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
@@ -155,14 +156,17 @@ class Test:
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation"""
-        pm_code = "#Package-manager specs\n"
-        cd_code = "#Change directory\n"
-        env_code = "#Built environment\n"
-        final_code = ""
+        pm_code = ""
+        cd_code = ""
+        env_code = ""
+        cmd_code = ""
+        post_code = ""
+        
         self._array['wrapped_command'] = 'sh {} {}'.format(srcfile, self._array['name'])
+        
         # if changing directory is required by the test
         if self._array['chdir'] is not None:
-            cd_code += "cd '{}'\n".format(self._array['chdir'])
+            cd_code += "cd '{}'\n".format(shlex.quote(self._array['chdir']))
 
         # manage package-manager deps
         if self._array['dep'] is not None:
@@ -175,7 +179,7 @@ class Test:
         # manage environment variables defined in TE
         if self._array['env'] is not None:
             for e in self._array['env']:
-                env_code += "{}; export {}\n".format(e, e.split('=')[0])
+                env_code += "{}; export {}\n".format(shlex.quote(e), shlex.quote(e.split('=')[0]))
 
         # if test should be validated through a matching regex
         if self._array['matchers'] is not None:
@@ -183,40 +187,45 @@ class Test:
                 expr = v['expr']
                 required = (v.get('expect', True) is True)
                 # if match is required set 'ret' to 1 when grep fails
-                final_code += "{echo} | {grep} '{expr}' {fail} ret=1\n".format(
+                post_code += "{echo} | {grep} '{expr}' {fail} ret=1\n".format(
                     echo='echo "$output"',
                     grep='grep -qP',
-                    expr=expr,
+                    expr=shlex.quote(expr),
                     fail='||' if required else "&&")
         
         # if a custom script is provided (in addition or not to matchers)
         if self._array['valscript'] is not None:
-            final_code += "{echo} | {script}; ret=$?".format(
+            post_code += "{echo} | {script}; ret=$?".format(
                 echo='echo "$output"',
-                script=self._array['valscript']
+                script=shlex.quote(self._array['valscript'])
             )
+        
+        cmd_code = self._array['command']
+        print(cmd_code)
         
         return """
         "{name}")
             if test -n "$PCVS_SHOW"; then
-                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo 'env_code'
-                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo 'pm_code'
-            test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo 'cmd'
+                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo '{p_env}'
+                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo '{p_pm}'
+                test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo {p_cmd}
                 exit 0
             fi
             {cd_code}
             {pm_code}
             {env_code}
-            output=`{cmd} 2>&1`
+            output=$({cmd_code} 2>&1)
             ret=$?
             test -n "$output" && echo "$output"
-            {finalize}
+            {post_code}
             ;;""".format(
+                    p_cmd="{}".format(shlex.quote(cmd_code)),
+                    p_env="{}".format(env_code),
+                    p_pm="{}".format(pm_code),
                     cd_code=cd_code,
                     pm_code=pm_code,
-                    pm_esc=pm_code.replace(r'$', r'\$').replace(r'`', r'\`'),
                     env_code=env_code,
-                        name=self._array['name'],
-                    cmd=self._array['command'],
-                    finalize=final_code
+                    cmd_code=cmd_code,
+                    post_code=post_code,
+                    name=self._array['name']
                 )

@@ -158,7 +158,7 @@ else
     :
 fi
 for arg in "$@"; do case $arg in
-""".format(pm_string="#Package-manager set by profile: \n"+"\n ".join([
+""".format(pm_string="#Package-manager set by profile: \n"+"\n".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
                     ]))) 

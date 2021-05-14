@@ -29,7 +29,9 @@ def exec(ctx, output, argument, gen_list, display):
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
-    env.update({'PCVS_SHOW': str(display)})
+
+    if display:
+        env.update({'PCVS_SHOW': str(display)})
     
     if gen_list:
         script_path = pvUtils.locate_scriptpaths(output)
