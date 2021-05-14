@@ -369,6 +369,8 @@ class TEDescriptor:
 
         if 'cwd' in self._build:
             chdir = self._build.cwd
+            if not os.path.isabs(chdir):
+                chdir = os.path.abspath(os.path.join(self._buildir, chdir))
 
         tags = ["compilation"] + self._tags
         
@@ -423,13 +425,11 @@ class TEDescriptor:
                 program = self._build.sources.binary
             
             # attempt to determine test working directory
-            if self._run.cwd:
-                chdir = self._run.cwd
-                # if set, 'program' build is prefix w/ cwd path
-                program = os.path.join(chdir, program)
-            else:
-                #else, prefix with @BUILDPATH@
-                program = os.path.join(self._buildir, program)
+            chdir = self._run.cwd if self._run.cwd else self._buildir
+            if not os.path.isabs(chdir):
+                chdir = os.path.abspath(os.path.join(self._buildir, chdir))
+
+            program = os.path.abspath(os.path.join(chdir, program))
 
             command = "{runtime} {runtime_args} {args} {program} {params}".format(
                 runtime=MetaConfig.root.runtime.program,
