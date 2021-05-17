@@ -16,8 +16,10 @@ CONFIG_EXISTING = dict()
 
 
 def init() -> None:
-    """init() module function, called when PCVS starts to load 
-    any existing configuration files
+    """Load configuration tree available on disk.
+
+    This function is called when PCVS starts to load 3-scope configuration
+    trees.
     """
     global CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_EXISTING = {}
@@ -37,7 +39,15 @@ def init() -> None:
 
 
 def list_blocks(kind, scope=None):
-    """Getter to access the list of config names, filtered by kind & scope"""
+    """Get available configuration blocks, as present on disk.
+
+    :param kind: configBlock kind (see ``CONFIG_BLOCKS`` for possible values)
+    :type kind: str, one of ``CONFIG_BLOCKS`` values
+    :param scope: where the configblocks is located, defaults to None
+    :type scope: 'user', 'global' or 'local', optional
+    :return: list blocks with specified kind, restricted by scope (if any)
+    :rtype: dict of config blocks
+    """
     assert (kind in CONFIG_BLOCKS)
     assert (scope in utils.STORAGES.keys() or scope is None)
     if scope is None:
@@ -47,9 +57,14 @@ def list_blocks(kind, scope=None):
 
 
 def check_valid_kind(s):
-    """Check if the kind given as parameter is a valid one.
-        :raises:
-            ConfigException.BadTokenError: the kind is not defined or not valid
+    """Assert the parameter is a valid kind.
+
+    Kind are defined by ``CONFIG_BLOCKS`` module attribute.
+
+    :param s: the kind to validate
+    :type s: str
+    :raises BadTokenError: Kind is None
+    :raises BadTokenError: Kind is not in allowed values.
     """
     if s is None:
         raise ConfigException.BadTokenError("no 'kind' specified")
@@ -57,14 +72,48 @@ def check_valid_kind(s):
     if s not in CONFIG_BLOCKS:
         raise ConfigException.BadTokenError("invalid 'kind'")
 
+
 class ConfigurationBlock:
-    """Basic block holding a configuration node.
-        This is the object managing basic blocks from user perspective. This is
-        not related to MetaConfig() managing PCVS configuration itself (even if
-        some are included to it)
+    """Handle the basic configuration block, smallest part of a profile.
+
+        From a user persperctive, a basic block is a dict, gathering in a Python
+        object informations relative to the configuration of a single component.
+        In PCVS, there is 5 types of componenents:
+            * Compiler-oriented (defining compiler commands)
+            * Runtime-oriented (setting runtime & parametrization)
+            * Machine-oriented (Defining resources used for execution)
+            * Group-oriented (used a templates to globally describe tests)
+            * Criterion-oriented (range of parameters used to run a test-suite)
+
+        This class helps to manage any of these config blocks above. The
+        distinction between them is carried over by an instance attribute
+        ``_kind``.
+
+        .. note::
+            This object can easily be confused with :class:`system.Config`.
+            While ConfigurationBlocks are from a user perspective,
+            system.Config handles the internal configuration tree, on which runs
+            rely. Nonetheless, both could be merged into a single representation
+            in later versions.
+
+        :param str _kind: which component this object describes
+        :param str _name: block name 
+        :param dict details: block content
+        :param str _scope: block scope, may be None
+        :param str _file: absolute path for the block on disk
+        :param bool _exists: True if the block exist on disk
     """
 
     def __init__(self, kind, name, scope=None):
+        """Constructer method
+
+        :param kind: which component to initialize this basicblock with
+        :type kind: str, one of ``CONFIG_BLOCKS`` values
+        :param name: block name
+        :type name: str
+        :param scope: block scope, defaults to 'local'
+        :type scope: str, optional
+        """
         check_valid_kind(kind)
         utils.check_valid_scope(scope)
         self._kind = kind
@@ -76,8 +125,10 @@ class ConfigurationBlock:
 
         self.retrieve_file()
 
-    def retrieve_file(self):
-        """From the stored kind, scope, name, attempt to detect configuration
+    def retrieve_file(self) -> None:
+        """Associate the actual filepath to the config block.
+
+        From the stored kind, scope, name, attempt to detect configuration
         block on the file system (i.e. detected during module init())
         """
         assert (self._kind in CONFIG_BLOCKS)
@@ -100,45 +151,81 @@ class ConfigurationBlock:
         if not os.path.isfile(self._file):
             self._exists = False
 
-    def is_found(self):
-        """Is the current config block present on fs ?"""
+    def is_found(self) -> bool:
+        """Check if the current config block is present on fs.
+
+        :return: True if it exists
+        :rtype: bool
+        """
         return self._exists
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
+        """Return complete block label (scope + kind + name)
+
+        :return: the fully-qualified name.
+        :rtype: str
+        """
         return ".".join([self._scope, self._kind, self._name])
 
     @property
-    def ref_file(self):
+    def ref_file(self) -> str:
+        """Return filepath associated with current config block.
+
+        :return: the filepath, may be None
+        :rtype: str
+        """
         return self._file
 
     @property
-    def scope(self):
+    def scope(self) -> str:
+        """Return block scope.
+
+        :return: the scope, resolved if needed.
+        :rtype: str
+        """
         return self._scope
 
     @property
-    def short_name(self):
+    def short_name(self) -> str:
+        """Return the block label only.
+
+        :return: the short name (may conflict with other config block)
+        :rtype: str
+        """
         return self._name
 
-    def fill(self, raw):
+    def fill(self, raw) -> None:
+        """Populate the block content with parameters.
+
+        :param raw: the data to fill.
+        :type raw: dict
+        """
         self._details = Dict(raw)
 
-    def dump(self):
-        """convert the configuration Block to a regulard dict.
+    def dump(self) -> dict:
+        """Convert the configuration Block to a regular dict.
+
         This function first load the last version, to ensure being in sync.
+
+        :return: a regular dict() representing the config blocK
+        :rtype: dict
         """
         self.load_from_disk()
         return Dict(self._details).to_dict()
 
-    def check(self, fail=True):
-        """validate a single configuration block.
-            :raises:
-                ValidationException.FormatError: config is not valid
-        """
+    def check(self) -> None:
+        """Validate a single configuration block according to its scheme."""
         system.ValidationScheme(self._kind).validate(self._details)
 
-    def load_from_disk(self):
-        """load the configuration file to populate the current object"""
+    def load_from_disk(self) -> None:
+        """load the configuration file to populate the current object.
+        
+        :raises BadTokenError: the scope/kind/name tuple does not refer to a
+            valid file.
+        :raises NotFoundError: The target file does not exist
+        """
+        
         if not self._exists:
             raise ConfigException.BadTokenError(
                 "{} not defined as '{}' kind".format(self._name, self._kind))
@@ -151,14 +238,14 @@ class ConfigurationBlock:
         with open(self._file) as f:
             self._details = Dict(yaml.safe_load(f))
 
-    def load_template(self):
+    def load_template(self) -> None:
         """load from the specific template, to create a new config block"""
         self._exists = True
         with open(os.path.join(PATH_INSTDIR,
-                    'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
+                               'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
             self.fill(yaml.safe_load(fh))
 
-    def flush_to_disk(self):
+    def flush_to_disk(self) -> None:
         """write the configuration block to disk"""
         self.check()
         self.retrieve_file()
@@ -171,12 +258,16 @@ class ConfigurationBlock:
 
         with open(self._file, 'w') as f:
             yaml.safe_dump(self._details.to_dict(), f)
-        
+
         self._exists = True
 
-    def clone(self, clone):
-        """copy the current object to create an identical one.
-            Mainly used to mirror two objects from different scopes
+    def clone(self, clone: 'ConfigurationBlock') -> None:
+        """Copy the current object to create an identical one.
+        
+        Mainly used to mirror two objects from different scopes.
+        
+        :param clone: the object to mirror
+        :type clone: :class:`ConfigurationBlock`
         """
         assert (isinstance(clone, ConfigurationBlock))
         assert (clone._kind == self._kind)
@@ -189,8 +280,8 @@ class ConfigurationBlock:
         log.manager.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details
 
-    def delete(self):
-        """delete a configuration block from disk"""
+    def delete(self) -> None:
+        """Delete a configuration block from disk"""
         assert (self.is_found())
         assert (os.path.isfile(self._file))
 
@@ -198,7 +289,7 @@ class ConfigurationBlock:
             self._name, self._kind, self._scope))
         os.remove(self._file)
 
-    def display(self):
+    def display(self) -> None:
         """Configuration block pretty printer"""
         log.manager.print_header("Configuration display")
         log.manager.print_section("Scope: {}".format(self._scope.capitalize()))
@@ -207,17 +298,23 @@ class ConfigurationBlock:
         for k, v in self._details.items():
             log.manager.print_item("{}: {}".format(k, v))
 
-    def edit(self, e=None):
-        """Open the current block for edition"""
+    def edit(self, e=None) -> None:
+        """Open the current block for edition.
+        
+        :raises Exception: Something occured on the edited version.
+        :param e: the EDITOR to use instead of default.
+        :type e: str
+        """
         assert (self._file is not None)
 
         if not os.path.exists(self._file):
             return
-        
+
         with open(self._file, 'r') as fh:
             stream = fh.read()
 
-        edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
+        edited_stream = click.edit(
+            stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
                 edited_yaml = Dict(yaml.safe_load(edited_stream))
@@ -225,25 +322,35 @@ class ConfigurationBlock:
                 self.fill(edited_yaml)
                 self.flush_to_disk()
             except Exception as e:
-                fname = "./rej{}-{}.yml".format(random.randint(0, 1000), self.full_name)
+                fname = "./rej{}-{}.yml".format(
+                    random.randint(0, 1000), self.full_name)
                 with open(fname, "w") as fh:
                     fh.write(edited_stream)
                 raise e
-                raise e
 
-    def edit_plugin(self, e=None):
+    def edit_plugin(self, e=None) -> None:
+        """Special case to handle 'plugin' key for 'runtime' blocks.
+        
+        This allows to edit a de-serialized version of the 'plugin' field. By
+        default, data are stored as a base64 string. In order to let user edit
+        the code, the string need to be decoded first.
+        
+        :param e: the editor to use instead of defaults
+        :type e: str
+        """
         if self._kind != "runtime":
             return
 
         if not os.path.exists(self._file):
             return
-        
+
         stream_yaml = dict()
         with open(self._file, 'r') as fh:
             stream_yaml = yaml.safe_load(fh)
-        
+
         if 'plugin' in stream_yaml.keys():
-            plugin_code = base64.b64decode(stream_yaml['plugin']).decode('ascii')
+            plugin_code = base64.b64decode(
+                stream_yaml['plugin']).decode('ascii')
         else:
             plugin_code = """import math
 def check_valid_combination(dict_of_combinations=dict()):
@@ -251,10 +358,10 @@ def check_valid_combination(dict_of_combinations=dict()):
     # returns True if the combination should be used
     return True"""
 
-        edited_code = click.edit(plugin_code, editor=e, extension=".py", require_save=True)
+        edited_code = click.edit(
+            plugin_code, editor=e, extension=".py", require_save=True)
         if edited_code is not None:
-            stream_yaml['plugin'] = base64.b64encode(edited_code.encode('ascii'))
+            stream_yaml['plugin'] = base64.b64encode(
+                edited_code.encode('ascii'))
             with open(self._file, 'w') as fh:
                 yaml.safe_dump(stream_yaml, fh)
-        
-

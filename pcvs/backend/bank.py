@@ -53,8 +53,6 @@ class Bank:
         The token is under the form ``A@B`` where ``A`` depicts its name and
         ``B`` represents the "default" project" where data will be manipulated.
 
-        :
-
         :param path: location of the bank repo (on disk), defaults to None
         :type path: str, optional
         :param token: name & default project to manipulate, defaults to ""
