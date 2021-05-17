@@ -1,5 +1,5 @@
-pcvs package
-============
+Package Documentation
+=====================
 
 Subpackages
 -----------
