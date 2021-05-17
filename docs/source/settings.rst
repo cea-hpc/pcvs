@@ -116,7 +116,22 @@ Validate
 The validate node describes the expected test behaviour, including exit, time
 and matching output.
 
-TODO
+
+.. code-block:: yaml
+
+    validate:
+        expect_exit: expected exit code (integer)
+        time:
+            mean: expected time to compute the test (seconds / float) tolerance:
+            standard deviation for expected time (seconds / float)
+            kill_after: maximum time after which process has to be killed
+            (seconds / float)
+        match:
+            label:
+                expr:
+                expect:
+        script:
+            path: Path to a validating script
 
 Group
 -----
@@ -132,7 +147,14 @@ profile it can be called in the validation setup file.
 Tag
 ---
 
-TODO
+Tags get in the results and tests can be sorted tag-wise. A test can have
+multiple tags and tags do not have to be defined upstream.
+
+.. code-block:: yaml
+
+    tag: 
+        - tag1
+        - tag2
 
 Artifact
 --------
