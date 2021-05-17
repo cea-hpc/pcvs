@@ -10,6 +10,21 @@ from pcvs.helpers.exceptions import CommonException
 
 
 class IOManager:
+    """
+    Manager for Input/Output streams.
+
+    Contains methods for logging and printing in PCVS. IOManager handles
+    multiple outputs (file + standard output), logging levels (warning, error,
+    info, etc) and pretty banners. Colors are handled by click and color tags
+    are written in files (use less -r).
+
+    :param special_chars: dictionary for fancy bullet characters
+    :type special_chars: dict
+    :param verb_levels: verbosity level (normal, info, debug)
+    :type verb_levels: list
+    :param color_list: list of colors used by PCVS
+    :type color_list: list
+    """
     special_chars = {
         "ascii": {
             'copy': '(c)',
@@ -66,37 +81,90 @@ class IOManager:
 
     @property
     def verbose(self):
+        """getter for verbosity level
+
+        :return: verbosity level (0, 1, 2)
+        :rtype: int
+        """
         return self._verbose
-    
+
     @property
     def tty(self):
+        """getter for tty information
+
+        :return: False if tty not used, 1 if tty used
+        :rtype: bool
+        """
         return self._tty
 
     def set_tty(self, enable):
+        """[summary]
+
+        :param enable: [description]
+        :type enable: [type]
+        """
         self._tty = enable
 
     def enable_tty(self):
+        """enables tty
+        """
         self.set_tty(enable=True)
 
     def disable_tty(self):
+        """disables tty
+        """
         self.set_tty(enable=False)
     
     @property
     def log_filename(self):
+        """getter for logfile path
+
+        :return: logfile path
+        :rtype: str
+        """
         return os.path.abspath(self._logfile.name) if self._logfile else None
 
     def set_logfile(self, enable, logfile=None):
+        """setter for logfile path
+
+        :param enable: true if logging with files is enabled
+        :type enable: bool
+        :param logfile: logfile name, defaults to None
+        :type logfile: str, optional
+        """
         self._logs = enable
         if logfile is not None and os.path.abspath(logfile) != self.log_filename:
             self._logfile = open(os.path.abspath(logfile), 'w+')
     
     def enable_logfile(self):
+        """enables logging on file
+        """
         self.set_logfile(enable=True)
 
     def disable_logfile(self):
+        """disables logging on file
+        """
         self.set_logfile(enable=False)
 
     def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
+        """constructor for IOManager object
+
+        :param verbose: verbosity level (0 : low, 1: info, 2: debug), defaults
+            to 0
+        :type verbose: int, optional
+        :param enable_unicode: True if unicode alphabet usage is authorised,
+            defaults to True
+        :type enable_unicode: bool, optional
+        :param length: length of terminal (character number), defaults to 80
+        :type length: int, optional
+        :param logfile: logfile name, file logging disabled if logfile=None,
+            defaults to None
+        :type logfile: str, optional
+        :param tty: True if logs must be in stdout, defaults to True
+        :type tty: bool, optional
+        :raises CommonException.AlreadyExistError: only one IOManager can
+            exist in a session
+        """
         self._linelength = 93
         self._wrapper = None
         self._tty = tty
@@ -118,11 +186,20 @@ class IOManager:
             self._logfile = open(os.path.abspath(logfile), "w")
         
     def __del__(self):
+        """desctuctor for IOManager (closes streams)
+        """
         
         if self._logs:
             self._logfile.close()
 
     def __print_rawline(self, msg, err=False):
+        """print a line as text
+
+        :param msg: message to be printed
+        :type msg: str
+        :param err: True if the message is an error message, defaults to False
+        :type err: bool, optional
+        """
         if self._tty:
             click.echo(msg, err=err)
         if self._logs:
@@ -130,6 +207,14 @@ class IOManager:
             self._logfile.flush()
 
     def has_verb_level(self, match):
+        """ returns true if the verbosity level is activated.
+
+        :param match: verbosity level to check
+        :type match: str or int
+        :return: True if "match" verbosity level is supposed to be printed by
+            the IOManager
+        :rtype: bool
+        """
         req_idx = 0
         for e in self.verb_levels:
             if match.lower() == e[1].lower():
@@ -138,19 +223,35 @@ class IOManager:
         return req_idx <= self._verbose
 
     def get_verbosity_str(self):
+        """[summary]
+
+        :return: [description]
+        :rtype: [type]
+        """
         for e in self.verb_levels:
             if self._verbose == e[0]:
                 return e[1]
         return  self.verb_levels[0][1]
 
     def print(self, *msg):
+        """prints a raw line. Takes multiple arguments.
+        """
         for i in msg:
             self.__print_rawline(i)
 
     def write(self, txt):
+        """print a string.
+
+        :param txt: message to be printed
+        :type txt: str
+        """
         self.__print_rawline(txt)
 
     def capture_exception(self, *e_type):
+        """wraps functions to capture unhandled exceptions for high-level
+            function not to crash.
+            :param \*e_type: errors to be catched
+        """
         def inner_function(func):
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
@@ -164,19 +265,51 @@ class IOManager:
         return inner_function
 
     def enable_unicode(self, e=True):
+        """enables/disables unicode alphabet usage
+
+        :param e: True to enable unicode usage, defaults to True
+        :type e: bool, optional
+        """
         self.glyphs = self.special_chars["unicode"] if e is True else self.special_chars["ascii"]
     
     def avail_chars(self):
+        """lists allowed bullet characters
+
+        :return: a list of characters
+        :rtype: list
+        """
         return self.glyphs.keys()
     
     def utf(self, k):
+        """returns the corresponding character to a bullet character
+
+        :param k: character used as bullet character
+        :type k: char
+        :return: fancy bullet character
+        :rtype: char
+        """
         assert(k in self.glyphs.keys())
         return self.glyphs[k]
 
     def style(self, *args, **kwargs):
+        """returns a string style using click
+
+        :return: a string style
+        :rtype: click.style
+        """
         return click.style(*args, **kwargs)
 
     def print_header(self, s, out=True):
+        """prints a header
+
+        :param s: header content
+        :type s: str
+        :param out: True if the header has to be logged, False if it has to be
+            returned, defaults to True
+        :type out: bool, optional
+        :return: header string if out=False, Nothing otherwise
+        :rtype: str
+        """
         hdr_char = self.utf('hdr')
         str_len = self._linelength - (len(s) + 2)  # surrounding spaces
         begin = hdr_char * int(str_len / 2) # nb chars before the title (centering)
@@ -190,6 +323,16 @@ class IOManager:
             return final_string
 
     def print_section(self, s, out=True):
+        """prints a section
+
+        :param s: content of the section
+        :type s: str
+        :param out: True if the section has to be logged, False if it has to be
+            returned, defaults to True
+        :type out: bool, optional
+        :return: section string if out=False, Nothing otherwise
+        :rtype: str
+        """
         f = "{} {}".format(self.utf('sec'), s)
         self._wrapper.subsequent_indent = "  " 
         s = self._wrapper.fill(click.style(f, fg='yellow'))
@@ -199,6 +342,20 @@ class IOManager:
             return s
 
     def print_item(self, s, depth=1, out=True, with_bullet=True):
+        """prints an item
+
+        :param s: item content
+        :type s: str
+        :param depth: number of tabulations used for indentation, defaults to 1
+        :type depth: int, optional
+        :param out: True if the item has to be logged, False if it has to be
+            returned, defaults to True
+        :type out: bool, optional
+        :param with_bullet: True if the item should have a bullet, defaults to True
+        :type with_bullet: bool, optional
+        :return: item string if out=False, Nothing otherwise
+        :rtype: str
+        """
         indent = ("   " * depth)
         bullet = indent + "{} ".format(self.utf('item')) if with_bullet is True else ""
         content = "{}".format(s)
@@ -211,6 +368,19 @@ class IOManager:
             return s
     
     def print_job(self, label, time, name, colorname="red", icon=None):
+        """prints a job description
+
+        :param label: job label
+        :type label: str
+        :param time: time elapsed since the job launch
+        :type time: float
+        :param name: name of the job
+        :type name: str
+        :param colorname: color of the job log, defaults to "red"
+        :type colorname: str, optional
+        :param icon: bullet, defaults to None
+        :type icon: str, optional
+        """
         if icon is not None:
             icon = self.utf(icon)
         self.__print_rawline(click.style("   {} {:8.2f}s{}{}{}{}".format(
@@ -223,23 +393,31 @@ class IOManager:
                              fg=colorname, bold=True))
 
     def debug(self, *msg):
+        """prints a debug message
+        """
         if(self._verbose >= 2):
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")), err=True)
 
     def info(self, *msg):
+        """prints an info message
+        """
         if(self._verbose >= 1):
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")),  err=True)
 
     def warn(self, *msg):
+        """prints a warning message
+        """
         for elt in msg:
             for line in elt.split('\n'):
                 self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)),  err=True)
 
-    def err(self, *msg, abort=1):
+    def err(self, *msg):
+        """prints an error message
+        """
         enclosing_line = click.style(self.utf('hdr') * self._linelength,
                                      fg="red",
                                      bold=True)
@@ -250,6 +428,11 @@ class IOManager:
         self.__print_rawline("{}".format(enclosing_line),  err=True)
 
     def print_short_banner(self, string=False):
+        """prints a little banner
+
+        :param string: True if the banner has to be returned, False if it has to be logged
+        :type string: bool
+        """
         logo =[
             r"""             ____    ______  _    __  _____       """,
             r"""            / __ \  / ____/ | |  / / / ___/       """,
@@ -283,9 +466,13 @@ class IOManager:
 
 
     def nimpl(self, *msg):  # pragma: no cover
+        """prints the "not implemented" error
+        """
         self.err("This is not implemented (yet)!")  
 
     def print_n_stop(self, **kwargs):  #pragma: no cover
+        """prints a message, then exits the program
+        """
         # not replacing these prints (for debug only)
         for k, v in kwargs.items():
             click.secho("{}: ".format(k), fg="yellow", nl=False)
@@ -294,6 +481,8 @@ class IOManager:
 
 
     def print_banner(self):
+        """prints a large banner
+        """
         # ok,  this is ugly but the only way to make flake/pylint happy with
         # source file formatting AND keeping a nicely logo printed out witout
         # having to load a file.
@@ -342,10 +531,34 @@ manager = IOManager()
 
 
 def init(v=0, e=False, l=100, quiet=False):
+    """initializes a global manager for everyone to use
+
+    :param v: verbosity level, defaults to 0
+    :type v: int, optional
+    :param e: True to enable unicode alphabet, False to use ascii, defaults to
+        False
+    :type e: bool, optional
+    :param l: length of the terminal, defaults to 100
+    :type l: int, optional
+    :param quiet: False to write to stdout, defaults to False
+    :type quiet: bool, optional
+    """
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
 
 def progbar(it, print_func=None, man=None, **kargs):
+    """prints a progress bar using click
+
+    :param it: iterable on which the progress bar has to iterate
+    :type it: iterable
+    :param print_func: method used to show the item next to the progress bar,
+        defaults to None
+    :type print_func: function, optional
+    :param man: manager used to describe the bullets, defaults to None
+    :type man: log.IOManager, optional
+    :return: a click progress bar (iterable)
+    :rtype: click.ProgressBar
+    """
     if man is None:
         man = manager
     return click.progressbar(
