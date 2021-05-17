@@ -4,7 +4,7 @@ import socket
 import pygit2
 
 
-def request_git_attr(k):
+def request_git_attr(k) -> str:
 
     try:
         #TODO: not only look for user config
@@ -16,10 +16,12 @@ def request_git_attr(k):
         pass
     return None
 
-def generate_data_hash(data):
+
+def generate_data_hash(data) -> str:
     return str(pygit2.hash(data))
 
-def get_current_username():
+
+def get_current_username() -> str:
     u = request_git_attr('user.name')
     if u is None:
         return getpass.getuser()
