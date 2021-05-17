@@ -8,7 +8,7 @@ import pygit2
 import yaml
 from addict import Dict
 
-from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_HOMEDIR
+from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 
@@ -16,14 +16,55 @@ BANKS = dict()
 
 
 class Bank:
+    """Representation of a PCVS result datastore.
+    
+    Stored as a Git repo, a bank hold multiple results to be scanned and used to
+    analyse benchmarks result over time. A single bank can manipulate namespaces
+    (referred as 'projects'). The namespace is provided by suffixing ``@proj``
+    to the original name.
+    
+    :param root: the root bank directory
+    :type root: str
+    :param repo: the Pygit2 handle
+    :type repo:  :class:`Pygit2.Repository`
+    :param config: when set, configuration file of the just-submitted archive
+    :type config: :class:`addict.Dict`
+    :param rootree: When set, root handler to the next commit to insert
+    :type rootree: :class:`Pygit2.Object`
+    :param locked: Serialize Bank manipulation among multiple processes
+    :type locked: bool
+    :param preferred_proj: extracted default-proj from initial token
+    :type preferred_proj: str
+    """
     def __init__(self, path=None, token=""):
-        self._root = path
+        """Build a Bank.
+        
+        The path may be omitted if the bank is already known (=stored in
+        ``PATH_BANK`` file). If not, the path is mandatory in order to be saved.
+        
+        .. warning::
+            A bank name should be resolved either by its presence in
+            ``PATH_BANK`` file **or** with a valid provided path. Otherwise, an
+            error may be raised.
+        
+        The token is under the form ``A@B`` where ``A`` depicts its name and
+        ``B`` represents the "default" project" where data will be manipulated.
+        
+        :
+
+        :param path: location of the bank repo (on disk), defaults to None
+        :type path: str, optional
+        :param token: name & default project to manipulate, defaults to ""
+        :type token: str, optional
+        """
+        self._root = os.path.abspath(path)
         self._repo = None
         self._config = None
         self._rootree = None
         self._locked = False
         self._preferred_proj = None
 
+        #split name & default-proj from token
         array = token.split('@', 1)
         if len(array) > 1:
             self._preferred_proj = array[1]
@@ -41,36 +82,89 @@ class Bank:
 
     @property
     def prefix(self):
+        """Get path to bank directory.
+
+        :return: absolute path to directory
+        :rtype: str
+        """
         return self._root
     
     @property
     def name(self):
+        """Get bank name.
+
+        :return: the exact label (without default-project suffix)
+        :rtype: str
+        """
         return self._name
 
     @property
     def preferred_proj(self):
+        """Get default-project tag
+
+        :return: the exact project (without bank label prefix)
+        :rtype: str
+        """
         return self._preferred_proj
 
     def exists(self):
+        """Check if the bank is stored in ``PATH_BANK`` file.
+        
+        Verification is made either on name **or** path.
+
+        :return: True if both the bank exist and globally registered
+        :rtype: bool
+        """
         return self.name_exist() or self.path_exist()
 
     def name_exist(self):
+        """Check if the bank name is registered into ``PATH_BANK`` file.
+        
+        :return: True if the name (lowered) is in the keys()
+        :rtype: bool
+        """
         return self._name.lower() in BANKS.keys()
     
     def path_exist(self):
+        """check if the bank path is registered into ``PATH_BANK`` file.
+        
+        :return: True if the path is known.
+        :rtype: bool
+        """
         return self._root in BANKS.values()
 
     def list_projects(self):
+        """Given the bank, list projects with at least one run.
+        
+        In a bank, each branch is a project, just list available branches.
+        `master` branch is not a valid project.
+        
+        :return: A list of available projects
+        :rtype: list of str
+        """
         INVALID_REFS = ["refs/heads/master"]
         # a ref is under the form: 'refs/<bla>/NAME/<hash>
         return [elt.split('/')[2] for elt in self._repo.references if elt not in INVALID_REFS]
     
     def __str__(self):
+        """stringification of a bank. 
+        
+        Represented as a dict
+
+        :return: a combination of name & path
+        :rtype: dict
+        """
         return str({self._name : self._root})
 
     def show(self):
+        """print the bank on stdout.
+        
+        .. note::
+            This function does not use :class:`log.IOManager`
+        """
         projects = dict()
         s = ["Projects contained in bank '{}':".format(self._root)]
+        # browse references
         for b in self._repo.references:
             if b == 'refs/heads/master':
                 continue
@@ -78,6 +172,7 @@ class Bank:
             projects.setdefault(name, list())
             projects[name].append(b.split("/")[3])
 
+        # for each project, list 'run variants', each having a different hash
         for pk, pv in projects.items():
             s.append("- {:<8}: {} distinct testsuite(s)".format(pk, len(pv)))
             for v in pv:
@@ -92,14 +187,30 @@ class Bank:
         print("\n".join(s))
 
     def __del__(self):
+        """Closes the bank.
+        """
         self.disconnect_repository()
     
     def disconnect_repository(self):
+        """Free the bank repo, to be reused by other instance.
+        """
         if self._locked:
             self._locked = False
             fcntl.flock(self._lockfile, fcntl.LOCK_UN)
 
     def connect_repository(self):
+        """Connect to the bank repo, making it exclusive to the current process.
+        
+        Two scenarios:
+            * the path is empty -> create a new bank
+            * the path is not empty -> detect a bank repo.
+            
+        In any cases, lock the directory to prevent multiple accesses.
+
+        :raises AlreadyExistError: A bank is already built
+        :raises NotFoundError: the given path does not contain a
+            Git directory.
+        """
         if self._repo is None:
             if not os.path.isfile(os.path.join(self._root, 'HEAD')):
                 try:
@@ -135,12 +246,24 @@ class Bank:
             self._locked = True
 
     def save_to_global(self):
+        """Store the current bank into ``PATH_BANK`` file.
+        """
         global BANKS
         if self._name in BANKS:
             self._name = os.path.basename(self._root).lower()
         add_banklink(self._name, self._root)
             
     def create_test_blob(self, data):
+        """Create a small hashed object, to be stored into a bank.
+        
+        :param data: any type of data to be stored. In PCVS context, it is
+            mainly json-formatted strings.
+        :param data: str
+        
+        :return: the pygit2-hashed representation id
+        :rtype: :class:`pygit2.Object`
+        """
+        
         assert(isinstance(self._repo, pygit2.Repository))
         #assert(isinstance(data, str))
 
@@ -151,46 +274,100 @@ class Bank:
             return self._repo.create_blob(str(data))
 
     def insert(self, treebuild, path, obj):
+        """Associate an object to a given tag (=path).
+        
+        The result is stored into the parent subtree (treebuild). The path is an
+        array of subrefixes, identifying the subtree where the object will
+        be stored under the bank. This function associates the path & the object
+        together, write the result in the parent and returns its Oid. 
+        
+        This function is called recursively to build the whole tree. The stop
+        condition is when the function reaches the file (=basename), which
+        create the real blob object.
+
+        :param treebuild: the parent Oid where this association will be stored
+        :type treebuild: :class:`Pygit2.TreeBuilder`
+        :param path: the subpath where to store the object
+        :type path: list of str
+        :param obj: the actual data to store
+        :type obj: any, mainly str
+        :return: the actual parent id
+        :rtype: :class:`Pygit2.Oid`
+        """
         repo = self._repo
-        if len(path) == 1:  # base case
+        
+        # the basename is reached -> generate the blob and return the parend oid
+        if len(path) == 1:
             blob_obj = self.create_test_blob(obj)
             treebuild.insert(path[0], blob_obj, pygit2.GIT_FILEMODE_BLOB)
             return treebuild.write()
 
+        # otherwise, determine where the current subdir is going
         subtree_name = path[0]
         tree = repo.get(treebuild.write())
         
         try:
+            # check if the subdir already exist in this bank subtree
             entry = tree[subtree_name]
             assert(entry.filemode == pygit2.GIT_FILEMODE_TREE)
             subtree = repo.get(entry.hex)
+            # YES it is found -> reuse this subtree
             sub_treebuild = repo.TreeBuilder(subtree)
         except KeyError:
+            # NOPE: first time adding a resource to this subtree
+            # create a new one
             sub_treebuild = repo.TreeBuilder()
         
+        # recursive call, as we didn't reach the subtree bottom
         subtree_oid = self.insert(sub_treebuild, path[1:], obj)
+        # Pygit2 insert, to build the actual intemediate node
         treebuild.insert(subtree_name, subtree_oid, pygit2.GIT_FILEMODE_TREE)
         return treebuild.write()
 
     def save_test_from_json(self, jtest):
-        #TODO: validate
+        """Store data to a bank directly from JSON representation.
+        
+        This is mainly used when a bank is directly connected to a run instance,
+        not intermediate file is required.
+
+        :param jtest: the JSON-formatted test result
+        :type jtest: str
+        :return: the blob object id
+        :rtype: :class:`Pygit2.Oid`
+        """
         assert('validation' in self._config)
         test_track = jtest['id']['full_name'].split("/")
         oid = self.insert(self._rootree, test_track, jtest.to_dict())
         return oid
 
     def load_config_from_str(self, s):
+        """Load the configuration data associated with the archive to process.
+
+        :param s: the configuration data
+        :type s: str
+        """
         self._config = Dict(yaml.safe_load(s))
     
     def load_config_from_file(self, path):
+        """Load the configuration file associated with the archive to process.
+
+        :param path: the configuration file path
+        :type path: str
+        """
         with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
             self._config = Dict(yaml.safe_load(fh))
         
     def save_from_buildir(self, tag, buildpath):
+        """Extract results from the given build directory & store into the bank.
+
+        :param tag: overridable default project (if different)
+        :type tag: str
+        :param buildpath: the directory where PCVS stored results
+        :type buildpath: str
+        """
         self.load_config_from_file(buildpath)
         self._rootree = self._repo.TreeBuilder()
 
-        #TODO: need a test walkthrough (not dirs)
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
         for result_file in os.listdir(rawdata_dir):
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
@@ -203,6 +380,16 @@ class Bank:
         self.finalize_snapshot(tag)
 
     def save_from_archive(self, tag, archivepath):
+        """Extract results from the archive, if used to export results.
+        
+        This is basically the same as :func:`BanK.save_from_buildir` except
+        the archive is extracted first.
+
+        :param tag: overridable default project (if different)
+        :type tag: str
+        :param archivepath: archive path
+        :type archivepath: str
+        """
         assert(os.path.isfile(archivepath))
 
         with tempfile.TemporaryDirectory() as tarpath:
@@ -211,6 +398,14 @@ class Bank:
             self.save_from_buildir(tag, os.path.join(tarpath, "save_for_export"))
 
     def finalize_snapshot(self, tag):
+        """Finalize result submission into the bank.
+        
+        After walking through build directory, finalize the Git tree to insert a
+        commit on top of the created tree.
+
+        :param tag: overridable default project (if different)
+        :type tag: str
+        """
         # Setup commit metadata:
         # 1. The author is the one who ran the test-suite
         # 2. The committer is submitting the archive to the bank
@@ -253,6 +448,17 @@ class Bank:
             self._repo.references.create(refname, coid)
 
     def __build_target_branch_name(self, tag):
+        """Compute the target branch to store data.
+        
+        This is used to build the exact Git branch name based on:
+            * default-proj
+            * unique profile hash, used to run the validation
+
+        :param tag: overridable default-proj (if different)
+        :type tag: str
+        :return: fully-qualified target branch name
+        :rtype: str
+        """
         # a reference (lightweight branch) is tracking a whole test-suite
         # history, there are managed directly
         # TODO: compute the proper name for the current test-suite           
@@ -263,11 +469,22 @@ class Bank:
                 tag = "unknown"
         return "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
     
-
-    def locate_key(self, key):
-        pass
-
     def extract_data(self, key, start, end, format):
+        """Extract information from the bank given specifications.
+        
+        .. note::
+            This function is still WIP.
+
+        :param key: the requested key
+        :type key: str
+        :param start: start time
+        :type start: date
+        :param end: end time
+        :type end: date
+        :param format: Not relevant yet
+        :type format: Not relevant yet
+        :raises ProjectNameError: Targeted project does not exist
+        """
         refname = self.__build_target_branch_name(None)
         
         class ProjectNameError(Exception): pass
@@ -278,8 +495,12 @@ class Bank:
         for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
             print(commit.message, commit.author.date)
 
-
     def __repr__(self):
+        """Bank representation.
+        
+        :return: a dict-based representation
+        :rtype: dict
+        """
         return {
             'rootpath': self._root,
             'name': self._name,
@@ -287,10 +508,11 @@ class Bank:
         }
 
 def init():
-    """Called when program initializes. Detects defined banks in
-    $USER_STORAGE/banks.yml
+    """Bank interface detection.
+    
+    Called when program initializes. Detects defined banks in ``PATH_BANK``
     """
-    global BANKS, PATH_BANK
+    global BANKS
     try:
         with open(PATH_BANK, 'r') as f:
             BANKS = yaml.safe_load(f)
@@ -302,15 +524,31 @@ def init():
 
 
 def list_banks():
-    """Accessor to bank dict (outside of this module)"""
+    """Accessor to bank dict (outside of this module).
+    
+    :return: dict of available banks.
+    :rtype: dict
+    """
     return BANKS
 
 def add_banklink(name, path):
+    """store a new bank to the global system.
+    
+    :param name: bank label
+    :type name: str
+    :param path: path to bank directory
+    :type path: str
+    """
     global BANKS
     BANKS[name] = path
     flush_to_disk()
 
 def rm_banklink(name):
+    """remove a bank from the global management system.
+
+    :param name: bank name
+    :type name: str
+    """
     global BANKS
     if name in BANKS:
         BANKS.pop(name)
@@ -318,7 +556,10 @@ def rm_banklink(name):
     
 
 def flush_to_disk():
-    """Save in-memory bank management to disk. This only implies 'banks.yml'"""
+    """Update the ``PATH_BANK`` file with in-memory object.
+
+    :raises IOError: Unable to properly manipulate the tree layout
+    """
     global BANKS, PATH_BANK
     try:
         prefix_file = os.path.dirname(PATH_BANK)
