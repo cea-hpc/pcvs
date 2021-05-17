@@ -47,6 +47,13 @@ build_doc:
     script:
     - tox -e docs
 
+test_doc:
+    <<: *scope
+    allow_failure: true
+    stage: Documentation
+    script:
+    - tox -e lint-docs
+
 imports:
     <<: *scope
     stage: Static Analysis
