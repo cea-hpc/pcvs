@@ -63,7 +63,7 @@ original tests (PCVS can go together with other test frameworks).
    glossary
    faq
    overview
-   pcvs
+   api/pcvs
    
 
 
