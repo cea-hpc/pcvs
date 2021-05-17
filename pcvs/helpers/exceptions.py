@@ -86,7 +86,7 @@ class TestException(CommonException):
 class OrchestratorException(CommonException):
     """Execution-specific errors."""
     class UndefDependencyError(GenericError):
-q        """Declared job dep cannot be fully qualified, not defined."""
+        """Declared job dep cannot be fully qualified, not defined."""
         pass
     
     class CircularDependencyError(GenericError):

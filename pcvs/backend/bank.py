@@ -57,7 +57,7 @@ class Bank:
         :param token: name & default project to manipulate, defaults to ""
         :type token: str, optional
         """
-        self._root = os.path.abspath(path)
+        self._root = path
         self._repo = None
         self._config = None
         self._rootree = None
