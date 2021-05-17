@@ -48,6 +48,7 @@ class Combination:
         on the representation of each criterion in the test semantic. It builds
         tokens to provide to properly build the test command. It can
         either be:
+        
         1. an environment variable to export before the test to run (gathering
            system-scope and program-scope elements)
         2. a runtime argument

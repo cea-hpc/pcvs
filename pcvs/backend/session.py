@@ -118,10 +118,14 @@ def list_alive_sessions():
 def main_detached_session(sid, user_func, *args, **kwargs):
     """Main function processed when running in detached mode. This function
     is called by Session.run_detached() and is launched from cloned process
-    (same global env, new main function). Arguments are:
-        - sid: the session id
-        - user_func: the Python fonction used as the new main()
-        - *args, **kwargs: user_func() arguments
+    (same global env, new main function).
+
+    :param sid: the session id
+    :param user_func: the Python function used as the new main()
+    :param \*args: user_func() arguments
+    :type \*args: tuple
+    :param \*\*kwargs: user_func() arguments
+    :type \*\*kwargs: dict
     """
 
     # When calling a subprocess, the parent is attached to its child

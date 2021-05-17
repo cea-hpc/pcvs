@@ -53,9 +53,9 @@ class ValidationScheme:
 
     def validate(self, content, filepath=None):
         """Validate a given datastructure (dict) agasint the loaded scheme.
-            :raises:
-                ValidationException.FormatError: data are not valid
-                ValidationException.SchemeError: issue while applying scheme
+
+            :raises ValidationException.FormatError: data are not valid
+            :raises ValidationException.SchemeError: issue while applying scheme
         """
         try:
             if filepath is None:
@@ -132,8 +132,8 @@ class Config(Dict):
     
     def from_file(self, filename):
         """Fill the current config from a given file
-            :raises:
-                CommonException.IOError: file does not exist OR badly formatted
+        
+            :raises CommonException.IOError: file does not exist OR badly formatted
         """
         try:
             with open(filename, 'r') as fh:
@@ -199,10 +199,11 @@ class MetaConfig(Dict):
         return self.bootstrap_generic('group', node)
 
     def bootstrap_validation_from_file(self, filepath):
-        """"Specific initialize for validation config block. This function loads
-        a file containing the validation dict.
-            :raises:
-                CommonException.IOError: file is not found or badly formatted
+        """Specific initialize for validation config block. This function loads
+            a file containing the validation dict.
+
+            :raises CommonException.IOError: file is not found or badly 
+                formatted
         """
         node = Dict()
         if filepath is None:

@@ -78,7 +78,7 @@ class ConfigurationBlock:
 
         From a user persperctive, a basic block is a dict, gathering in a Python
         object informations relative to the configuration of a single component.
-        In PCVS, there is 5 types of componenents:
+        In PCVS, there is 5 types of components:
             * Compiler-oriented (defining compiler commands)
             * Runtime-oriented (setting runtime & parametrization)
             * Machine-oriented (Defining resources used for execution)
