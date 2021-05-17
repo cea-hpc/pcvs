@@ -13,7 +13,6 @@ from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 
 BANKS = dict()
-BANK_STORAGE = ""
 
 
 class Bank:
@@ -291,10 +290,9 @@ def init():
     """Called when program initializes. Detects defined banks in
     $USER_STORAGE/banks.yml
     """
-    global BANKS, BANK_STORAGE
-    BANK_STORAGE = os.path.join(PATH_HOMEDIR, "banks.yml")
+    global BANKS, PATH_BANK
     try:
-        with open(BANK_STORAGE, 'r') as f:
+        with open(PATH_BANK, 'r') as f:
             BANKS = yaml.safe_load(f)
     except FileNotFoundError:
         # nothing to do, file may not exist
@@ -321,12 +319,12 @@ def rm_banklink(name):
 
 def flush_to_disk():
     """Save in-memory bank management to disk. This only implies 'banks.yml'"""
-    global BANKS, BANK_STORAGE
+    global BANKS, PATH_BANK
     try:
-        prefix_file = os.path.dirname(BANK_STORAGE)
+        prefix_file = os.path.dirname(PATH_BANK)
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
-        with open(BANK_STORAGE, 'w+') as f:
+        with open(PATH_BANK, 'w+') as f:
             yaml.safe_dump(BANKS, f)
     except IOError as e:
         raise BankException.IOError(e)
