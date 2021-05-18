@@ -1,8 +1,11 @@
 import subprocess
-
+import os
 import setuptools
 
-current_version = subprocess.run("./utils/get_version", stdout=subprocess.PIPE)
+loc = {}
+with open(os.path.join("pcvs/version.py")) as fh:
+    exec(fh.read(), None, loc)
+version = loc['__version__']
 
 with open("README.md", 'r') as f:
     desc = f.read()
@@ -13,7 +16,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="pcvs",
-    version=current_version.stdout.decode("utf-8"),
+    version=version,
     license="CeCILL-C",
     author="Julien Adam",
     author_email="adamj@paratools.com",
