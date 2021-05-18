@@ -44,7 +44,7 @@ def test_config_init(kind, scope):
     assert(obj.full_name == "{}.{}.{}".format(scope, kind, "test-name"))
     assert(obj.short_name == "test-name")
     assert(not obj.is_found())
-    obj.check(fail=True)
+    obj.check()
 
 def test_config_bad_kind():
     with pytest.raises(ConfigException.BadTokenError):
