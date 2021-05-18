@@ -57,7 +57,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
-              shell_complete=cli_profile.compl_list_token,
+              autocompletion=cli_profile.compl_list_token,
               type=str, show_envvar=True,
               help="Existing and valid profile supporting this run")
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
@@ -78,7 +78,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,
               help="Purge the results from sensitive data (HOME, USER...)")
-@click.option("-b", "--bank", "bank", default=None, shell_complete=cli_bank.compl_bank_projects,
+@click.option("-b", "--bank", "bank", default=None, autocompletion=cli_bank.compl_bank_projects,
               help="Which bank will store the run in addition to the archive")
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
