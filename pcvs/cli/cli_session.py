@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from pcvs import NAME_BUILDIR_LOCKFILE
 
@@ -48,16 +48,18 @@ def session(ctx, ack, list, ack_all):
         for sk, sv in sessions.items():
             s = pvSession.Session()
             s.load_from(sk, sv)
+            status = "Error"
+            duration = timedelta()
 
             if s.state == pvSession.Session.STATE_IN_PROGRESS:
-                extra_line = "In Progress (for {})".format(
-                    str(datetime.now() - s.property('started'))
-                )
+                duration = datetime.now() - s.property('started')
+                status = "In Progress -- {:4.2f}%".format(s.property('progress'))
             elif s.state == pvSession.Session.STATE_COMPLETED:
-                extra_line = "Completed (lasted {})".format(
-                    str(s.property('ended') - s.property('started'))
-                )
-            else:
-                extra_line = "Error"
-
-            log.manager.print_item("ID {: >2s}: {}".format(str(s.id), extra_line))
+                duration = s.property('ended') - s.property('started')
+                status = "Completed"    
+            
+            log.manager.print_item("SID {: >2s}: {} ({})".format(
+                str(s.id),
+                status.upper(),
+                str(timedelta(days=duration.days, seconds=duration.seconds))
+            ))

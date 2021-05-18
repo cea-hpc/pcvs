@@ -199,6 +199,7 @@ class Session:
         self._session_infos = {
             "path": path,
             "io": None,
+            "progress": 0,
             "state": self.STATE_WAITING,
             "started": date,
             "ended": None

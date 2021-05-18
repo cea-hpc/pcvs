@@ -10,13 +10,17 @@ class Publisher:
     fn_fmt = "pcvs_rawdat{:>04d}.json"
     
     def __init__(self, prefix="."):
-        
+        super().__init__()
         self._layout = {
             "tests": []
         }
         self._destpath = os.path.join(prefix, NAME_BUILD_RESDIR)
         assert(os.path.isdir(self._destpath))
 
+    @property
+    def format(self):
+        return "json"
+    
     def empty_entries(self):
         self._layout['tests'] = list()
 
@@ -43,3 +47,6 @@ class Publisher:
         with open(filename, 'w+') as fh:
             json.dump(self._layout, fh)
             self.empty_entries()
+            
+class JUnitPublisher(Publisher):
+    pass

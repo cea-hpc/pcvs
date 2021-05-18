@@ -18,7 +18,7 @@ from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration import Orchestrator
 from pcvs.testing.tedesc import TEDescriptor
-from pcvs.testing.testfile import TestFile
+from pcvs.testing.testfile import TestFile, load_yaml_file
 
 
 def print_progbar_walker(elt):
@@ -60,7 +60,7 @@ def process_main_workflow(the_session=None):
                 "===> Processing done in {:<.3f} sec(s)".format(end-start))
     
     log.manager.print_header("Validation Start")
-    run()
+    run(the_session)
 
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
@@ -272,7 +272,7 @@ def process_dyn_setup_scripts(setup_files):
                 out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
                     fh.write(fdout.decode('utf-8'))
-                te_node = test.load_yaml_file(
+                te_node = load_yaml_file(
                     out_file, base_src, base_build, subprefix)
             except CalledProcessError:
                 pass
@@ -322,7 +322,7 @@ def process_static_yaml_files(yaml_files):
     return err
 
 
-def run():
+def run(the_session):
     __print_summary()
     log.manager.print_item("Save Configurations into {}".format(
         MetaConfig.root.validation.output))
@@ -332,7 +332,7 @@ def run():
         yaml.safe_dump(MetaConfig.root.dump_for_export(), conf_fh, default_flow_style=None)
 
     log.manager.print_section("Run the Orchestrator")
-    MetaConfig.root.get_internal('orchestrator').run()
+    MetaConfig.root.get_internal('orchestrator').run(the_session)
 
 def anonymize_archive():
     config = MetaConfig.root.validation

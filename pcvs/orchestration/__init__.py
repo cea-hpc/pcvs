@@ -4,11 +4,12 @@ import time
 
 from addict import Dict
 
+from pcvs.helpers import log
 from pcvs.helpers.exceptions import OrchestratorException
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.publishers import Publisher
 from pcvs.testing.test import Test
-
+from pcvs.backend import session
 
 class SetBuilder:
     def __init__(self, wrap=False):
@@ -39,13 +40,6 @@ class Manager:
             "executed": 0
         })
     
-    @property
-    def executed_job(self):
-        return self._count.executed
-    
-    @property
-    def total_job(self):
-        return self._count.total
 
     def add_job(self, job):
         value = min(self._max_size, job.get_dim())
@@ -59,6 +53,12 @@ class Manager:
         self._dims[value].append(job)
         self.job_hashes[hash(job.name)] = job
         self._count.total += 1
+        
+    def get_count(self, tag=None):
+        if tag is None:
+            tag = 'total'
+        assert(tag in self._count.keys())
+        return self._count[tag]
         
     def resolve_deps(self):
         for joblist in self._dims.values():
@@ -100,7 +100,7 @@ class Manager:
                 continue
             else:
                 #assert(self._builder.job_grabber)
-                job = self._dims[k].pop()
+                job: Test = self._dims[k].pop()
                 
                 if job:
                     if job.been_executed() or job.has_failed_dep():
@@ -158,6 +158,7 @@ class Set(threading.Thread):
         if not isinstance(l, list):
             l = [l]
         self._jobs += l
+        self._size = len(self._jobs)
 
     def __del__(self):
         pass
@@ -181,6 +182,7 @@ class Set(threading.Thread):
         if self._size <= 0:
             return 0
         elif self._size == 1:
+            
             return self._jobs[0].get_dim()
         else:
             return max(self._jobs, key=lambda x: x.get_dim())
@@ -220,23 +222,29 @@ class Orchestrator:
         config_tree = MetaConfig.root
         self._conf = config_tree
         self._pending_sets = dict()
-        self._sched_on = config_tree.validation.scheduling.sched_on
         self._max_res = config_tree.machine.nodes
         self._publisher = Publisher(config_tree.validation.output)
         self._manager = Manager(self._max_res, publisher=self._publisher)
         self._maxconcurrent = config_tree.machine.concurrent_run
         
+        
     def __del__(self):
         pass
 
+    def print_infos(self):
+        log.manager.print_item("Total base: {} test(s)".format(self._manager.get_count('total')))
+        log.manager.print_item("Concurrent launches: {} job(s)".format(self._maxconcurrent))
+        log.manager.print_item("Number of resources: {}".format(self._max_res))
+        
     #This func should only be a passthrough to the job manager
     def add_new_job(self, job):
         self._manager.add_job(job)
 
-    def start_run(self, restart=False):
+    def start_run(self, the_session=None, restart=False):
         self._manager.resolve_deps()
+        self.print_infos()
         nb_nodes = self._max_res
-        last_count = 0
+        last_progress = 0
         #While some jobs are available to run
         while self._manager.get_leftjob_count() > 0 or len(self._pending_sets) > 0:
             # dummy init value
@@ -257,7 +265,6 @@ class Orchestrator:
                 if s.been_completed():
                     set = s
                     break
-
             if set is not None:
                 nb_nodes += set.dim
                 del(self._pending_sets[set.id])
@@ -266,22 +273,27 @@ class Orchestrator:
                 pass
                 #TODO: create backup to allow start/stop
             
-            # Complex condition to trigger a dump of results
+            current_progress = self._manager.get_count('executed') / self._manager.get_count('total')
+                
+            # Condition to trigger a dump of results
             # info result file at a periodic step of 5% of
             # the global workload
-            if ((self._manager.executed_job - last_count) / self._manager.total_job) > 0.05:
+            if (current_progress - last_progress) > 0.05:
                 #TODO: Publish results periodically
                 #1. on file system
                 #2. directly into the selected bank
                 self._publisher.flush()
-                last_count = self._manager.executed_job
+                last_progress = current_progress
+                if the_session is not None:
+                    session.update_session_from_file(the_session.id, {'progress': current_progress * 100})
+                
         
         self._publisher.flush()
 
     def pause_run(self):
         pass
 
-    def run(self):
+    def run(self, session):
         #pre-actions done only once
-        self.start_run(restart=False)
+        self.start_run(session, restart=False)
         pass
