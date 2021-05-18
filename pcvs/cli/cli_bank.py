@@ -46,7 +46,7 @@ def bank_list(ctx):
 
 
 @bank.command(name="show", short_help="Display data stored in a repo.")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.pass_context
 def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
@@ -61,7 +61,7 @@ def bank_show(ctx, name):
 
 
 @bank.command(name="create", short_help="Register a new bank")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.argument("path", nargs=1, type=click.Path(exists=False, file_okay=False), required=True)
 @click.pass_context
 def bank_create(ctx, name, path):
@@ -80,7 +80,7 @@ def bank_create(ctx, name, path):
         b.save_to_global()
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.option("-s", "--symlink", is_flag=True,
               help="Only delete the HOME symbolic link (keep data intact)")
 @click.confirmation_option(
@@ -105,7 +105,7 @@ def bank_destroy(ctx, name, symlink):
         
 
 @bank.command(name="save", short_help="Save a new run to the datastore")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.argument("path", nargs=1, required=True, type=click.Path(exists=True))
 @click.argument("project", nargs=1, required=False, type=str, default=None)
 @click.pass_context
@@ -128,7 +128,7 @@ def bank_save_run(ctx, name, path, project):
 
 
 @bank.command(name="load", short_help="Extract infos from the datastore")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.argument("key", nargs=1, required=True)
 @click.option("--since", "start", default=None,
               help="Select a starting point from where data will be extracted")

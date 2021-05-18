@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-
+import shutil
 import click
 import pkg_resources
 
@@ -55,7 +55,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     ctx.color = color
 
     if width is None:
-        width = click.get_terminal_size()[0]
+        width = shutil.get_terminal_size()[0]
     log.init(verbose, encoding, width)
     utils.set_local_path(ctx.obj['exec'])
 

@@ -65,7 +65,7 @@ def config_list_single_kind(kind, scope) -> None:
 
 @config.command(name="list", short_help="List available configuration blocks")
 @click.argument("token", nargs=1, required=False,
-                type=click.STRING, autocompletion=compl_list_token)
+                type=click.STRING, shell_complete=compl_list_token)
 @click.pass_context
 def config_list(ctx, token) -> None:
     """List available configurations on the system. The list can be
@@ -110,7 +110,7 @@ def config_list(ctx, token) -> None:
 @config.command(name="show",
                 short_help="Show detailed view of the selected configuration")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.pass_context
 def config_show(ctx, token) -> None:
     """Prints a detailed description of this configuration block, labeled NAME
@@ -134,7 +134,7 @@ def config_show(ctx, token) -> None:
 
 @config.command(name="create", short_help="Create/Clone a configuration block")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-f", "--from", "clone",
               default=None, type=str, show_envvar=True,
               help="Valid name to copy (may use scope, e.g. global.label)")
@@ -185,7 +185,7 @@ def config_create(ctx, token, clone, interactive) -> None:
 
 @config.command(name="destroy", short_help="Remove a config block")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.confirmation_option(
     "-f", "--force",
     prompt="Are you sure you want to delete this config ?",
@@ -209,7 +209,7 @@ def config_destroy(ctx, token) -> None:
 
 @config.command(name="edit", short_help="edit the config block")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
               help="runtime-only: edit plugin code instead of config file")
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
@@ -238,7 +238,7 @@ def config_edit(ctx, token, editor, edit_plugin) -> None:
 
 @config.command(name="import", short_help="Import config from a file")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.argument("in_file", type=click.File('r'))
 @click.pass_context
 def config_import(ctx, token, in_file) -> None:
@@ -261,7 +261,7 @@ def config_import(ctx, token, in_file) -> None:
 
 @config.command(name="export", short_help="Export config into a file")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.argument("out_file", type=click.File('w'))
 @click.pass_context
 def config_export(ctx, token, out_file):
