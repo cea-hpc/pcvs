@@ -59,11 +59,14 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     log.init(verbose, encoding, width)
     utils.set_local_path(ctx.obj['exec'])
 
+    utils.create_home_dir()
+
     # detections
     config.init()
     profile.init()
     bank.init()
-
+    
+    
 
 @cli.command(
     "help",

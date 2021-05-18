@@ -50,7 +50,6 @@ def prepare_cmd_build_variants(variants=[], comb=None):
     variant_def = MetaConfig.root.compiler.variants
     for i in variants:
         
-        print(variants, variant_def)
         if i in variant_def.keys():
             s = "{} {}".format(s, variant_def[i].args)
     return s

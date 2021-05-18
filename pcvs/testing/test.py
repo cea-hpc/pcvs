@@ -201,7 +201,6 @@ class Test:
             )
         
         cmd_code = self._array['command']
-        print(cmd_code)
         
         return """
         "{name}")

@@ -20,6 +20,11 @@ STORAGES = {
 }
 
 
+def create_home_dir():
+    if not os.path.exists(PATH_HOMEDIR):
+        os.makedirs(PATH_HOMEDIR)
+
+
 def storage_order():
     return ['local', 'user', 'global']
 
