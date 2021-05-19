@@ -199,7 +199,6 @@ def config_destroy(ctx, token) -> None:
     through the `pcvs config --help` command.
     """
     (scope, kind, label) = utils.extract_infos_from_token(token)
-    log.manager.warn('loo')
     c = pvConfig.ConfigurationBlock(kind, label, scope)
     if c.is_found():
         c.delete()

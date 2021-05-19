@@ -3,6 +3,7 @@ import os
 import pprint
 import sys
 import textwrap
+import traceback
 
 import click
 
@@ -258,8 +259,9 @@ class IOManager:
                 try:
                     return func(*args, **kwargs)
                 except e_type as e:
-                    raise e
-                    self.err("{}: {}".format(type(e).__name__, e))
+                    #raise e
+                    manager.err("{}: {}".format(type(e).__name__, e))
+                    manager.info(traceback.format_exception(*sys.exc_info()))
                         
             return wrapper
         return inner_function
@@ -392,32 +394,40 @@ class IOManager:
                                             name),
                              fg=colorname, bold=True))
 
-    def debug(self, *msg):
+    def debug(self, msg):
         """prints a debug message
         """
         if(self._verbose >= 2):
+            if type(msg) != list:
+                msg = [msg]
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")), err=True)
 
-    def info(self, *msg):
+    def info(self, msg):
         """prints an info message
         """
         if(self._verbose >= 1):
+            if type(msg) != list:
+                msg = [msg]
             for elt in msg:
                 for line in elt.split('\n'):
                     self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")),  err=True)
 
-    def warn(self, *msg):
+    def warn(self, msg):
         """prints a warning message
         """
+        if type(msg) != list:
+            msg = [msg]
         for elt in msg:
             for line in elt.split('\n'):
                 self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)),  err=True)
 
-    def err(self, *msg):
+    def err(self, msg):
         """prints an error message
         """
+        if type(msg) != list:
+            msg = [msg]
         enclosing_line = click.style(self.utf('hdr') * self._linelength,
                                      fg="red",
                                      bold=True)

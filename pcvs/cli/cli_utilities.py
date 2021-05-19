@@ -142,13 +142,13 @@ def check(ctx, dir, encoding, color, configs, profiles):
 @click.pass_context
 def clean(ctx, force, fake, paths, interactive):
     if not fake and not force:
-        log.manager.warn("IMPORTANT NOTICE:",
+        log.manager.warn(["IMPORTANT NOTICE:",
                  "This command will delete files from previous run(s) and",
                  "no recovery will be possible after deletion.",
                  "Please use --force to indicate you acknowledge the risks",
                  "and will face consequences in case of improper use.",
                  "",
-                 "To list files to be deleted instead, you may use --dry-run."
+                 "To list files to be deleted instead, you may use --dry-run."]
         )
         sys.exit(0)
     if not paths:

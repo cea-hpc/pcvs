@@ -260,9 +260,10 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     log.manager.print_header("YAML Conversion")
 
     if template is None and kind == "te":
-        log.manager.warn("If the TE file contains YAML aliases, the conversion may",
-                 "fail. Use the '--template' option to provide the YAML file",
-                 "containing these aliases")
+        log.manager.warn(
+            ["If the TE file contains YAML aliases, the conversion may",
+             "fail. Use the '--template' option to provide the YAML file",
+             "containing these aliases"])
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
     try:
