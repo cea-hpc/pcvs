@@ -1,4 +1,6 @@
 -r requirements.txt
+darglint
+pydocstyle
 pytest
 tox
 flake8
