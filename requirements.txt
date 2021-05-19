@@ -1,5 +1,5 @@
 PyYAML>=5.1
-Click>=7.0
+Click<8.1
 jsonschema
 addict
 PrettyTable
