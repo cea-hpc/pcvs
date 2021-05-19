@@ -9,6 +9,7 @@ Subpackages
 
    pcvs.backend
    pcvs.cli
+   pcvs.testing
    pcvs.converter
    pcvs.helpers
    pcvs.orchestration
@@ -17,13 +18,11 @@ Subpackages
 Submodules
 ----------
 
-pcvs.main module
-----------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: pcvs.main
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   pcvs.main
+   pcvs.version
 
 Module contents
 ---------------

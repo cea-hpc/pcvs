@@ -4,13 +4,10 @@ pcvs.converter package
 Submodules
 ----------
 
-pcvs.converter.yaml\_converter module
--------------------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: pcvs.converter.yaml_converter
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   pcvs.converter.yaml_converter
 
 Module contents
 ---------------

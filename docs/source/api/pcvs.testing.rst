@@ -1,5 +1,5 @@
-pcvs.orchestration package
-==========================
+pcvs.testing package
+====================
 
 Submodules
 ----------
@@ -7,12 +7,14 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   pcvs.orchestration.publishers
+   pcvs.testing.tedesc
+   pcvs.testing.test
+   pcvs.testing.testfile
 
 Module contents
 ---------------
 
-.. automodule:: pcvs.orchestration
+.. automodule:: pcvs.testing
    :members:
    :undoc-members:
    :show-inheritance:
