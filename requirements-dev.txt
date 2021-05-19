@@ -1,6 +1,7 @@
 -r requirements.txt
 darglint
 pydocstyle
+docstr-coverage
 autopep8
 pytest
 tox
