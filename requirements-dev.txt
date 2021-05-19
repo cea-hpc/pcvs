@@ -1,6 +1,7 @@
 -r requirements.txt
 darglint
 pydocstyle
+autopep8
 pytest
 tox
 flake8
