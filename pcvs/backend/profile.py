@@ -16,6 +16,7 @@ from pcvs.helpers.exceptions import (ConfigException, ProfileException,
 
 PROFILE_EXISTING = dict()
 
+
 def init():
     """Initialization callback, loading available profiles on disk.
     """
@@ -54,14 +55,14 @@ class Profile:
     blocks), one of each kind (compiler, runtime, machine, criterion & group)
     and gathers all required information to start a validation process. A
     profile object is the basic representation to be manipulated by the user.
-    
+
     .. note::
         A profile object can be confused with
         :class:`pcvs.helpers.system.MetaConfig`. While both are carrying the
         whole user configuration, a Profile object is used to build/manipulate
         it, while a Metaconfig is the actual internal representation of a
         complete run config.
-    
+
     :param _name: profile name, should be unique for a given scope
     :type _name: str
     :param _scope: profile scope, allowed values in `storage_order()`, defaults
@@ -72,6 +73,7 @@ class Profile:
     :param _file: profile file absolute path
     :type _file: str
     """
+
     def __init__(self, name, scope=None):
         utils.check_valid_scope(scope)
         self._name = name
@@ -84,11 +86,11 @@ class Profile:
 
     def _retrieve_file(self):
         """From current representation, determine the profile file path.
-        
+
         This function relies on known profiles & path concatenation.
         """
         self._file = None
-        
+
         # determine proper scope is not given
         if self._scope is None:
             allowed_scopes = utils.storage_order()
@@ -108,7 +110,7 @@ class Profile:
         # AND no pre-existing profile were found. assume scope as 'local'
         if self._scope is None:
             self._scope = 'local'
-        
+
         # this code is executed ONLY when a new profile is created
         # otherwise the for loop above would have trigger a profile
         # in that case, _file is computed through path concatenation
@@ -119,7 +121,7 @@ class Profile:
 
     def get_unique_id(self):
         """Compute unique hash string identifying a profile.
-        
+
         This is required to make distinction between multiple profiles, based on
         its content (banks relies on such unicity).
 
@@ -136,7 +138,7 @@ class Profile:
         """
         # some checks
         assert (isinstance(raw, dict))
-        
+
         # fill is called either from 'build' (dict of configurationBlock)
         # of from 'clone' (dict of raw file inputs)
         for k, v in raw.items():
@@ -147,7 +149,7 @@ class Profile:
 
     def dump(self):
         """Return the full profile content as a single regular dict.
-        
+
         This function loads the profile on disk first.
 
         :return: a regular dict for this profile
@@ -188,7 +190,7 @@ class Profile:
         :raises NotFoundError: profile does not exist
         :raises NotFoundError: profile path is not valid
         """
-        
+
         if not self._exists:
             raise ProfileException.NotFoundError(self._name)
         self._retrieve_file()
@@ -202,13 +204,14 @@ class Profile:
 
     def load_template(self):
         """Populate the profile from templates of 5 basic config. blocks.
-        
+
         Filepath still need to be determined via `retrieve_file()` call.
         """
         self._exists = True
         self._file = None
         for kind in config.CONFIG_BLOCKS:
-            filepath = os.path.join(PATH_INSTDIR, "templates", "{}-format.yml".format(kind))
+            filepath = os.path.join(
+                PATH_INSTDIR, "templates", "{}-format.yml".format(kind))
             with open(filepath, "r") as fh:
                 self.fill({kind: yaml.safe_load(fh)})
 
@@ -227,7 +230,7 @@ class Profile:
 
     def flush_to_disk(self):
         """Write down profile to disk.
-        
+
         Also, ensure the filepath is valid and profile content is compliant with
         schemes.
         """
@@ -255,7 +258,7 @@ class Profile:
 
     def delete(self):
         """Remove the current profile from disk.
-        
+
         It does not destroy the Python object, though.
         """
         log.manager.info("delete {}".format(self._file))
@@ -274,34 +277,36 @@ class Profile:
 
     def edit(self, e=None):
         """Open the editor to manipulate profile content.
-        
+
         :param e: an editor program to use instead of defaults
         :type e: str
-        
+
         :raises Exception: Something happened while editing the file
-        
+
         .. warning::
             If the edition failed (validation failed) a rejected file is created
             in the current directory containing the rejected profile. Once
             manually edited, it may be submitted again through `pcvs profile
             import`.
-        """    
+        """
         assert (self._file is not None)
 
         if not os.path.exists(self._file):
             return
-        
+
         with open(self._file, 'r') as fh:
             stream = fh.read()
 
-        edited_stream = click.edit(stream, editor=e, extension=".yml", require_save=True)
+        edited_stream = click.edit(
+            stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
                 edited_yaml = Dict(yaml.safe_load(edited_stream))
                 self.fill(edited_yaml)
                 self.check()
             except Exception as e:
-                fname = "./rej{}-{}.yml".format(random.randint(0, 1000), self.full_name)
+                fname = "./rej{}-{}.yml".format(
+                    random.randint(0, 1000), self.full_name)
                 with open(fname, "w") as fh:
                     fh.write(edited_stream)
                 raise e
@@ -309,12 +314,12 @@ class Profile:
 
     def edit_plugin(self, e=None):
         """Edit the 'runtime.plugin' section of the current profile.
-        
+
         :param e: an editor program to use instead of defaults
         :type e: str
-        
+
         :raises Exception: Something happened while editing the file.
-        
+
         .. warning::
             If the edition failed (validation failed) a rejected file is created
             in the current directory containing the rejected profile. Once
@@ -323,11 +328,12 @@ class Profile:
         """
         if not os.path.exists(self._file):
             return
-        
+
         self.load_from_disk()
-        
+
         if 'plugin' in self._details['runtime'].keys():
-            plugin_code = base64.b64decode(self._details['runtime']['plugin']).decode('ascii')
+            plugin_code = base64.b64decode(
+                self._details['runtime']['plugin']).decode('ascii')
         else:
             plugin_code = """import math
 def check_valid_combination(dict_of_combinations=dict()):
@@ -335,19 +341,22 @@ def check_valid_combination(dict_of_combinations=dict()):
     # returns True if the combination should be used
     return True"""
         try:
-            edited_code = click.edit(plugin_code, editor=e, extension=".py", require_save=True)
+            edited_code = click.edit(
+                plugin_code, editor=e, extension=".py", require_save=True)
             if edited_code is not None:
-                self._details['runtime']['plugin'] = base64.b64encode(edited_code.encode('ascii'))
+                self._details['runtime']['plugin'] = base64.b64encode(
+                    edited_code.encode('ascii'))
                 self.flush_to_disk()
         except Exception as e:
-            fname = "./rej{}-{}-plugin.yml".format(random.randint(0, 1000), self.full_name)
+            fname = "./rej{}-{}-plugin.yml".format(
+                random.randint(0, 1000), self.full_name)
             with open(fname, "w") as fh:
                 fh.write(edited_code)
             raise e
 
     def split_into_configs(self, prefix, blocklist, scope=None):
         """Convert the given profile into a list of basic blocks.
-        
+
         This is the reverse operation of creating a profile (not the 'opposite').
 
         :param prefix: common prefix name used to name basic blocks.
@@ -357,7 +366,7 @@ def check_valid_combination(dict_of_combinations=dict()):
         :type blocklist: list
         :param scope: config block scope, defaults to None
         :type scope: str, optional
-        
+
         :raises AlreadyExistError: the created configuration
             block name already exist
         :return: list of created :class:`ConfigurationBlock`

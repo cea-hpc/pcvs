@@ -30,7 +30,7 @@ def build_data_tree(path=os.getcwd(), files=None):
         * tests are gathered by labels
         * tests are gathered by tags
         * tests are gathered by status
-    
+
     :param path: where build dir is located, defaults to os.getcwd()
     :type path: str, optional
     :param files: list of result files, defaults to None
@@ -62,16 +62,17 @@ def build_data_tree(path=os.getcwd(), files=None):
                 try:
                     pass
                     # veeeeery slow
-                    #scheme.validate(test)
-                    
+                    # scheme.validate(test)
+
                 except ValidationException.FormatError:
                     print("\t- skip {} (bad formatting)".format(f))
                     continue
-            
+
                 cnt_tests += 1
                 test_label = test['id'].get('label', "NOLABEL")
                 test_tags = test['data'].get('tags', [])
-                test_status = str(test['result'].get('state', Test.STATE_OTHER))
+                test_status = str(test['result'].get(
+                    'state', Test.STATE_OTHER))
 
                 statuses.setdefault(test_status, {
                     "tests": list(),
@@ -104,11 +105,11 @@ def build_data_tree(path=os.getcwd(), files=None):
                         "tests": list(),
                         "metadata": {
                             "count": {
-                               str(Test.STATE_OTHER): 0,
-                            str(Test.STATE_SUCCEED): 0,
-                            str(Test.STATE_FAILED): 0,
-                            str(Test.STATE_INVALID_SPEC): 0,
-                            "total": 0
+                                str(Test.STATE_OTHER): 0,
+                                str(Test.STATE_SUCCEED): 0,
+                                str(Test.STATE_FAILED): 0,
+                                str(Test.STATE_INVALID_SPEC): 0,
+                                "total": 0
                             }
                         }
                     })
@@ -129,15 +130,15 @@ def build_data_tree(path=os.getcwd(), files=None):
 
 def webview_run_server(path):
     """Init the report interface.
-    
+
     Start the Flask application after processing result files.
 
     :param path: where result files are stored (under 'rawdata' dir)
     :type path: str
     """
     print("Load YAML files")
-    json_files = [os.path.join(path, f) for f in os.listdir(path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
+    json_files = [os.path.join(path, f) for f in os.listdir(
+        path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
     print("Build global tree ({} files)".format(len(json_files)))
     global_tree = build_data_tree(path, json_files)
     create_app(global_tree).run(host='0.0.0.0')
-

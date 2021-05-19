@@ -220,12 +220,12 @@ class ConfigurationBlock:
 
     def load_from_disk(self) -> None:
         """load the configuration file to populate the current object.
-        
+
         :raises BadTokenError: the scope/kind/name tuple does not refer to a
             valid file.
         :raises NotFoundError: The target file does not exist
         """
-        
+
         if not self._exists:
             raise ConfigException.BadTokenError(
                 "{} not defined as '{}' kind".format(self._name, self._kind))
@@ -263,9 +263,9 @@ class ConfigurationBlock:
 
     def clone(self, clone: 'ConfigurationBlock') -> None:
         """Copy the current object to create an identical one.
-        
+
         Mainly used to mirror two objects from different scopes.
-        
+
         :param clone: the object to mirror
         :type clone: :class:`ConfigurationBlock`
         """
@@ -300,7 +300,7 @@ class ConfigurationBlock:
 
     def edit(self, e=None) -> None:
         """Open the current block for edition.
-        
+
         :raises Exception: Something occured on the edited version.
         :param e: the EDITOR to use instead of default.
         :type e: str
@@ -330,11 +330,11 @@ class ConfigurationBlock:
 
     def edit_plugin(self, e=None) -> None:
         """Special case to handle 'plugin' key for 'runtime' blocks.
-        
+
         This allows to edit a de-serialized version of the 'plugin' field. By
         default, data are stored as a base64 string. In order to let user edit
         the code, the string need to be decoded first.
-        
+
         :param e: the editor to use instead of defaults
         :type e: str
         """
