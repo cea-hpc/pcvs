@@ -1,6 +1,7 @@
 import os
 import shutil
-import fcntl
+
+from shutil import SameFileError
 import time
 from contextlib import contextmanager
 
@@ -157,6 +158,21 @@ def cwd(path):
         yield
     finally:
         os.chdir(oldpwd)
+
+
+def copy_file(src, dest):
+    """Copy a source file into a destination directory.
+
+    :param src: source file to copy.
+    :type src: str
+    :param dest: destination directory, may not exist yet.
+    :type dest: str
+    """
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    try:
+        shutil.copy(src, dest)
+    except SameFileError:
+        pass
 
 ####################################
 ####           MISC.            ####
