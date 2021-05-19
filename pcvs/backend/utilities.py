@@ -53,7 +53,7 @@ def process_check_configs():
                 obj.load_from_disk()
 
                 try:
-                    obj.check(fail=False)
+                    obj.check()
                     token = log.manager.utf('succ')
                 except jsonschema.exceptions.ValidationError as e:
                     err_msg = base64.b64encode(str(e.message).encode('utf-8'))
@@ -78,7 +78,7 @@ def process_check_profiles():
             obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
-                obj.check(fail=False)
+                obj.check()
                 token = log.manager.utf('succ')
             except jsonschema.exceptions.ValidationError as e:
                 err_msg = base64.b64encode(str(e.message).encode('utf-8'))
