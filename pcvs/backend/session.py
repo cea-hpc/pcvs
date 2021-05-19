@@ -41,32 +41,34 @@ def store_session_to_file(c):
     :rtype: int
     """
     all_sessions = None
-    sid = 0
+    sid = -1
 
     lock_session_file()
-    # to operate, PCVS needs to full-read and then full-write the whole file
-    if os.path.isfile(PATH_SESSION):
-        with open(PATH_SESSION, 'r') as fh:
-            all_sessions = yaml.safe_load(fh)
+    try:
+        # to operate, PCVS needs to full-read and then full-write the whole file
+        if os.path.isfile(PATH_SESSION):
+            with open(PATH_SESSION, 'r') as fh:
+                all_sessions = yaml.safe_load(fh)
 
-    # compute the session id, incrementally done from the highest session id
-    # currently running and registered.
-    # Please not a session is not flushed away from logs until the user
-    # explicitly does it
-    if all_sessions is not None:
-        sid = max(all_sessions.keys()) + 1
-    else:
-        # yaml.safe_load returns None if empty
-        all_sessions = dict()
+        # compute the session id, incrementally done from the highest session id
+        # currently running and registered.
+        # Please not a session is not flushed away from logs until the user
+        # explicitly does it
+        if all_sessions is not None:
+            sid = max(all_sessions.keys()) + 1
+        else:
+            # yaml.safe_load returns None if empty
+            sid = 0
+            all_sessions = dict()
 
-    assert(sid not in all_sessions.keys())
-    all_sessions[sid] = c
+        assert(sid not in all_sessions.keys())
+        all_sessions[sid] = c
 
-    # dump the file back
-    with open(PATH_SESSION, 'w') as fh:
-        yaml.safe_dump(all_sessions, fh)
-
-    unlock_session_file()
+        # dump the file back
+        with open(PATH_SESSION, 'w') as fh:
+            yaml.safe_dump(all_sessions, fh)
+    finally:
+        unlock_session_file()
     return sid
 
 
@@ -82,19 +84,20 @@ def update_session_from_file(sid, update):
     """
 
     lock_session_file()
-    all_sessions = None
-    if os.path.isfile(PATH_SESSION):
-        with open(PATH_SESSION, 'r') as fh:
-            all_sessions = yaml.safe_load(fh)
+    try:
+        all_sessions = None
+        if os.path.isfile(PATH_SESSION):
+            with open(PATH_SESSION, 'r') as fh:
+                all_sessions = yaml.safe_load(fh)
 
-    if all_sessions is not None and sid in all_sessions:
-        for k, v in update.items():
-            all_sessions[sid][k] = v
-        # only if editing is done, flush the file back
-        with open(PATH_SESSION, 'w') as fh:
-            yaml.safe_dump(all_sessions, fh)
-
-    unlock_session_file()
+        if all_sessions is not None and sid in all_sessions:
+            for k, v in update.items():
+                all_sessions[sid][k] = v
+            # only if editing is done, flush the file back
+            with open(PATH_SESSION, 'w') as fh:
+                yaml.safe_dump(all_sessions, fh)
+    finally:
+        unlock_session_file()
 
 
 def remove_session_from_file(sid):
@@ -104,19 +107,20 @@ def remove_session_from_file(sid):
     :type sid: int
     """
     lock_session_file()
-    all_sessions = None
-    if os.path.isfile(PATH_SESSION):
-        with open(PATH_SESSION, 'r') as fh:
-            all_sessions = yaml.safe_load(fh)
+    try:
+        all_sessions = None
+        if os.path.isfile(PATH_SESSION):
+            with open(PATH_SESSION, 'r') as fh:
+                all_sessions = yaml.safe_load(fh)
 
-    if all_sessions is not None and sid in all_sessions:
-        del all_sessions[sid]
-        with open(PATH_SESSION, 'w') as fh:
-            if len(all_sessions) > 0:
-                yaml.safe_dump(all_sessions, fh)
-            # else, truncate the file to zero -> open(w) with no data
-
-    unlock_session_file()
+        if all_sessions is not None and sid in all_sessions:
+            del all_sessions[sid]
+            with open(PATH_SESSION, 'w') as fh:
+                if len(all_sessions) > 0:
+                    yaml.safe_dump(all_sessions, fh)
+                # else, truncate the file to zero -> open(w) with no data
+    finally:
+        unlock_session_file()
 
 
 def list_alive_sessions():
@@ -132,8 +136,8 @@ def list_alive_sessions():
             all_sessions = yaml.safe_load(fh)
     except FileNotFoundError as e:
         all_sessions = {}
-
-    unlock_session_file()
+    finally:
+        unlock_session_file()
     return all_sessions
 
 
