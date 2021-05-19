@@ -14,6 +14,11 @@ from pcvs.helpers.exceptions import ValidationException
 
 
 def locate_scriptpaths(output=None):
+    """Path lookup to find all 'list_of_tests' script within a given prefix.
+
+    :param output: prefix to walk through, defaults to current directory
+    :type output: str, optional
+    """
     if output is None:
         output = os.getcwd()
     scripts = list()
@@ -25,9 +30,18 @@ def locate_scriptpaths(output=None):
 
 
 def compute_scriptpath_from_testname(testname, output=None):
+    """Locate the proper 'list_of_tests.sh' according to a fully-qualified test
+    name.
+
+    :param testname: test name belonging to the script
+    :type testname: str
+    :param output: prefix to walk through, defaults to current directory
+    :type output: str, optional
+
+    """
     if output is None:
         output = os.getcwd()
-    
+
     buildir = utils.find_buildir_from_prefix(output)
     prefix = os.path.dirname(testname)
     return os.path.join(
@@ -39,6 +53,8 @@ def compute_scriptpath_from_testname(testname, output=None):
 
 
 def process_check_configs():
+    """Analyse available configurations to ensure their correctness relatively
+    to their respective schemes."""
     errors = dict()
     t = PrettyTable()
     t.field_names = ["Valid", "ID"]
@@ -67,6 +83,8 @@ def process_check_configs():
 
 
 def process_check_profiles():
+    """Analyse availables profiles and check their correctness relatively to the
+    base scheme."""
     t = PrettyTable()
     errors = dict()
     t.field_names = ["Valid", "ID"]
@@ -92,6 +110,15 @@ def process_check_profiles():
 
 
 def process_check_setup_file(filename, prefix):
+    """Check if a given pcvs.setup could be parsed if used in a regular process.
+
+    :param filename: the pcvs.setup filepath
+    :type filename: str
+    :param prefix: the subtree the setup is extract from (used as argument)
+    :type prefix: str
+    :return: a tuple (err msg, icon to print, parsed data)
+    :rtype: tuple
+    """
     err_msg = None
     token = log.manager.utf('fail')
     data = None
@@ -122,6 +149,11 @@ scheme = system.ValidationScheme('te')
 
 
 def process_check_yaml_stream(data):
+    """Analyze a pcvs.yml stream and check its correctness relatively to
+    standard. 
+    :param data: the stream to process
+    :type data: str
+    """
     global scheme
     token_load = token_yaml = "{}".format(log.manager.utf('fail'))
     err_msg = None
@@ -141,6 +173,11 @@ def process_check_yaml_stream(data):
 
 
 def process_check_directory(dir):
+    """Analyze a directory to ensure defined test files are valid.
+
+    :param dir: the directory to process.
+    :type dir: str
+    """
     errors = dict()
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
@@ -203,7 +240,7 @@ class BuildSystem:
         self._dirs = dirs
         self._files = files
         self._stream = Dict()
-        
+
     def __append_listdir(self):
         self._dirs = list()
         self._files = list()
@@ -225,18 +262,22 @@ class BuildSystem:
         with open(out_file, 'w') as fh:
             yaml.safe_dump(self._stream.to_dict(), fh)
 
+
 class AutotoolsBuildSystem(BuildSystem):
     def fill(self):
         name = os.path.basename(self._root)
-        self._stream[name].build.autotools.autogen = ('autogen.sh' in self._files)
+        self._stream[name].build.autotools.autogen = (
+            'autogen.sh' in self._files)
         self._stream[name].build.files = os.path.join(self._root, 'configure')
         self._stream[name].build.autotools.params = ""
+
 
 class CMakeBuildSystem(BuildSystem):
     def fill(self):
         name = os.path.basename(self._root)
         self._stream[name].build.cmake.vars = "CMAKE_BUILD_TYPE=Debug"
-        self._stream[name].build.files = os.path.join(self._root, 'CMakeLists.txt')
+        self._stream[name].build.files = os.path.join(
+            self._root, 'CMakeLists.txt')
 
 
 class MakefileBuildSystem(BuildSystem):
@@ -251,7 +292,7 @@ def process_autotools_suite(root, dirs, files):
     name = os.path.basename(root)
     stream[name].build.files = os.path.join(root, "configure")
     stream[name].build.autogen = ('autogen.sh' in files)
-    
+
 
 def process_discover_directory(path):
 
