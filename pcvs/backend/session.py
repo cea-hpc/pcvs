@@ -12,22 +12,32 @@ from pcvs.helpers import log, utils
 
 
 def unlock_session_file():
-    """ Release the lock after manipulating the session.yml file.
-        The call won't failed if the lockfile is not taken before unlocking.
+    """Release the lock after manipulating the session.yml file.
+    
+    The call won't fail if the lockfile is not taken before unlocking.
     """
     utils.unlock_file(PATH_SESSION_LOCKFILE)
     
 def lock_session_file(timeout=None):
     """Acquire the lockfil before manipulating the session.yml file.
-        This ensure safety between multiple PCVS instances.
-        Be sure to call `unlock_session_file()` once completed
+    
+    This ensure safety between multiple PCVS instances. Be sure to call
+    `unlock_session_file()` once completed
+    
+    :param timeout: return from blocking once timeout is expired (raising
+        TimeoutError)
+    :type timeout: int
     """
     utils.lock_file(PATH_SESSION_LOCKFILE, timeout=timeout)
 
 
 def store_session_to_file(c):
     """Save a new session into the session file (in HOME dir).
-        The argument is the content to save for this session (dict)
+    
+    :param c: session infos to store
+    :type c: dict
+    :return: the sid associated to new create session id.
+    :rtype: int
     """
     all_sessions = None
     sid = 0
@@ -60,10 +70,14 @@ def store_session_to_file(c):
 
 
 def update_session_from_file(sid, update):
-    """ Update data from a running session from the global file
-        The argument are:
-        - sid: the session id
-        - update: the keys to update. If already existing, content is replaced
+    """Update data from a running session from the global file.
+
+    This only add/replace keys present in argument dict. Other keys remain.
+    
+    :param sid: the session id
+    :type sid: int
+    :param update: the keys to update. If already existing, content is replaced
+    :type: dict
     """
 
     lock_session_file()
@@ -84,7 +98,11 @@ def update_session_from_file(sid, update):
 
     
 def remove_session_from_file(sid):
-    """clear a session from logs. Argument is the session id"""
+    """clear a session from logs.
+    
+    :param sid: the session id to remove.
+    :type sid: int
+    """
     lock_session_file()
     all_sessions = None
     if os.path.isfile(PATH_SESSION):
@@ -102,7 +120,11 @@ def remove_session_from_file(sid):
 
 
 def list_alive_sessions():
-    """load and return the complete dict from session.yml file"""
+    """Load and return the complete dict from session.yml file
+    
+    :return: the session dict
+    :rtype: dict
+    """
     lock_session_file(timeout=15)
 
     try:
@@ -116,16 +138,17 @@ def list_alive_sessions():
 
 
 def main_detached_session(sid, user_func, *args, **kwargs):
-    """Main function processed when running in detached mode. This function
-    is called by Session.run_detached() and is launched from cloned process
-    (same global env, new main function).
+    """Main function processed when running in detached mode.
+    
+    This function is called by Session.run_detached() and is launched from
+    cloned process (same global env, new main function).
 
     :param sid: the session id
     :param user_func: the Python function used as the new main()
-    :param \*args: user_func() arguments
-    :type \*args: tuple
-    :param \*\*kwargs: user_func() arguments
-    :type \*\*kwargs: dict
+    :param args: user_func() arguments
+    :type args: tuple
+    :param kwargs: user_func() arguments
+    :type kwargs: dict
     """
 
     # When calling a subprocess, the parent is attached to its child
@@ -160,9 +183,18 @@ def main_detached_session(sid, user_func, *args, **kwargs):
 
 
 class Session:
-    """Object representing a running validation (detached or not). Despite the
-    fact it is designed for manage concurrent runs,  it takes a callback and
-    can be derived for other needs.
+    """Object representing a running validation (detached or not).
+    
+    Despite the fact it is designed for manage concurrent runs,  it takes a
+    callback and can be derived for other needs.
+    
+    :param _func: user function to be called once the session starts 
+    :type _func: Callable
+    :param _sid: session id, automatically generated
+    :type _sid: int
+    :param _session_infos: session infos dict
+    :type _session_infos: dict
+    
     """
     STATE_WAITING = -1
     STATE_IN_PROGRESS = 0
@@ -178,25 +210,47 @@ class Session:
 
     @property
     def state(self):
+        """Getter to session status.
+        :return: session status
+        :rtype: int
+        """
         return self._session_infos['state']
 
     @property
     def id(self):
+        """Getter to session id.
+        :return: session id
+        :rtype: int
+        """
         return self._sid
+    
     @property
     def infos(self):
+        """Getter to session infos.
+        :return: session infos
+        :rtype: dict
+        """
         return self._session_infos
 
     @property
     def str_state(self):
+        """Getter to str-based session status.
+        :return: session status
+        :rtype: str
+        """
         return self.__state_str[self._sid]
 
     def property(self, kw):
-        """Access specific data from the session stored info session.yml"""
+        """Access specific data from the session stored info session.yml.
+        
+        :param kw: the information to retrieve. kw must be a valid key
+        :type kw: str
+        """
         assert(kw in self._session_infos)
         return self._session_infos[kw]
 
     def __init__(self, date=None, path="."):
+        """constructor method"""
         self._func = None
         self._sid = -1
         # this dict is then flushed to the session.yml
@@ -210,29 +264,47 @@ class Session:
         }
     
     def load_from(self, sid, data):
-        """Function used to update the current object with session infos
-        read from global file
+        """Update the current object with session infos read from global file.
+        
+        :param sid: session id read from file
+        :type sid: int
+        :param data: session infos read from file
+        :type data: dict
         """
         self._sid = sid
         self._session_infos = data
 
     def register_callback(self, callback, io_file=None):
-        """Register the callback used as main function once the sessio
-            is started
+        """Register the callback used as main function once the session is
+        started.
+        
+        :param callback: function to invoke
+        :type callback: Callable
+        :param io_file: Where I/O will be redirected once session is started
+        :type io_file: str, optional
         """
         self._func = callback
         self.register_io_file(io_file)
 
     def register_io_file(self, pathfile=None):
-        """Register the I/O file when stdout/stderr will be flushed once
-            the session is started.
+        """Register the I/O file when stdout/stderr will be flushed once the
+        session is started.
+        
+        :param pathfile: the path to redirect I/Os, may be None
+        :type pathfile: str, optional
         """
         self._session_infos['io'] = pathfile
         self._io_file = pathfile
 
     def run_detached(self, *args, **kwargs):
-        """Run the session is detached mode. Arguments are for user function
-        only"""
+        """Run the session is detached mode.
+        
+        Arguments are for user function only.
+        :param args: user function positional arguments
+        :type args: tuple
+        :param kwargs user function keyword-based arguments.
+        :type kwargs: tuple
+        """
         if self._func is not None:
             # some sessions can have their starting time set directly when
             # initializing the object.
@@ -266,9 +338,15 @@ class Session:
             return self._sid
 
     def run(self, *args, **kwargs):
-        """Run the session normally, without detaching the focus. Arguments are
-            user function ones. This function is also in charge of redirecting
-            I/O properly (stdout, file, logs)
+        """Run the session normally, without detaching the focus.
+        
+        Arguments are user function ones. This function is also in charge of
+        redirecting I/O properly (stdout, file, logs)
+        
+        :param args: user function positional arguments
+        :type args: tuple
+        :param kwargs user function keyword-based arguments.
+        :type kwargs: tuple
         """
         if self._func is not None:
             # same as above, shifted starting time or not
