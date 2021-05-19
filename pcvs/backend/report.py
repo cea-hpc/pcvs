@@ -1,12 +1,20 @@
 import json
 import os
-from pcvs.helpers.exceptions import ValidationException
 
+from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers.system import ValidationScheme
 from pcvs.testing.test import Test
 from pcvs.webview import create_app
-from pcvs.helpers.system import ValidationScheme
+
 
 def locate_json_files(path):
+    """Locate where json files are stored under the given prefix.
+
+    :param path: [description]
+    :type path: [type]
+    :return: [description]
+    :rtype: [type]
+    """
     array = list()
     for f in os.listdir(path):
         if f.startswith("pcvs_rawdat") and f.endswith(".json"):
@@ -16,6 +24,20 @@ def locate_json_files(path):
 
 
 def build_data_tree(path=os.getcwd(), files=None):
+    """Build the whole static data tree, browsed by Flask upon request.
+
+    The tree is duplicated into three sections:
+        * tests are gathered by labels
+        * tests are gathered by tags
+        * tests are gathered by status
+    
+    :param path: where build dir is located, defaults to os.getcwd()
+    :type path: str, optional
+    :param files: list of result files, defaults to None
+    :type files: list, optional
+    :return: the global tree
+    :rtype: dict
+    """
     global_tree = {
         "metadata": {},
         "label": {},
@@ -106,8 +128,15 @@ def build_data_tree(path=os.getcwd(), files=None):
 
 
 def webview_run_server(path):
+    """Init the report interface.
+    
+    Start the Flask application after processing result files.
+
+    :param path: where result files are stored (under 'rawdata' dir)
+    :type path: str
+    """
     print("Load YAML files")
-    json_files = locate_json_files(path)
+    json_files = [os.path.join(path, f) for f in os.listdir(path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
     print("Build global tree ({} files)".format(len(json_files)))
     global_tree = build_data_tree(path, json_files)
     create_app(global_tree).run(host='0.0.0.0')
