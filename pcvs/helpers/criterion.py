@@ -128,7 +128,7 @@ class Criterion:
         self._numeric = description.get('numeric', numeric) is True
         self._prefix = description.get('option', '')
         self._after = description.get('position', 'after') == 'after'
-        self._alias = description.get('alias', {})
+        self._alias = description.get('aliases', {})
         self._is_env = description.get('type', 'argument') == 'environment'
         # this should be only set by per-TE criterion definition
         self._local = local
