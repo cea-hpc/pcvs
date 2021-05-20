@@ -15,7 +15,7 @@ func()
 	ret=1
 }
 
-func darglint --docstring-style sphinx --verbosity 2 --strictness full "$@"
+func darglint --verbosity 2 "$@"
 
 func pydocstyle "$@"
 

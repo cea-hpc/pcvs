@@ -78,25 +78,6 @@ def test_handle_job_deps(mock_id):
     assert(len(tested.handle_job_deps({}, "", "")) == 0)
 
 
-def test_xml_escape():
-    assert(tested.xml_escape('"hello, world!"') == "&quot;hello, world!&quot;")
-    assert(tested.xml_escape("'hello, world!'") == "&apos;hello, world!&apos;")
-    assert(tested.xml_escape("hello & world!") == "hello &amp; world!")
-    assert(tested.xml_escape('<hello, world!>') == "&lt;hello, world!&gt;")
-
-
-def test_xml_setif():
-    elt = {
-        "a": "a1",
-        "b": "b1",
-        "c": ["c1", "c2", "c3"]
-    }
-    assert(tested.xml_setif(elt, "a") == "<a>a1</a>")
-    assert(tested.xml_setif(elt, "b", "b_name") == "<b_name>b1</b_name>")
-    assert(tested.xml_setif(elt, "c") == "<c>c1</c><c>c2</c><c>c3</c>")
-    assert(tested.xml_setif(elt, "d") == "")
-
-
 @patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
     "__internal": {
