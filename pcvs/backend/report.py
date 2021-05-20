@@ -71,8 +71,8 @@ def build_data_tree(path=os.getcwd(), files=None):
                 cnt_tests += 1
                 test_label = test['id'].get('label', "NOLABEL")
                 test_tags = test['data'].get('tags', [])
-                test_status = str(test['result'].get(
-                    'state', Test.STATE_OTHER))
+                state = test['result'].get('state', Test.State.ERR_OTHER)
+                test_status = str(Test.State(state))
 
                 statuses.setdefault(test_status, {
                     "tests": list(),
@@ -88,10 +88,12 @@ def build_data_tree(path=os.getcwd(), files=None):
                     "tests": list(),
                     "metadata": {
                         "count": {
-                            str(Test.STATE_OTHER): 0,
-                            str(Test.STATE_SUCCEED): 0,
-                            str(Test.STATE_FAILED): 0,
-                            str(Test.STATE_INVALID_SPEC): 0,
+                            str(Test.State.WAITING): 0,
+                            str(Test.State.IN_PROGRESS): 0,
+                            str(Test.State.SUCCEED): 0,
+                            str(Test.State.FAILED): 0,
+                            str(Test.State.ERR_DEP): 0,
+                            str(Test.State.ERR_OTHER): 0,
                             "total": 0
                         }
                     }
@@ -105,10 +107,12 @@ def build_data_tree(path=os.getcwd(), files=None):
                         "tests": list(),
                         "metadata": {
                             "count": {
-                                str(Test.STATE_OTHER): 0,
-                                str(Test.STATE_SUCCEED): 0,
-                                str(Test.STATE_FAILED): 0,
-                                str(Test.STATE_INVALID_SPEC): 0,
+                                str(Test.State.WAITING): 0,
+                                str(Test.State.IN_PROGRESS): 0,
+                                str(Test.State.SUCCEED): 0,
+                                str(Test.State.FAILED): 0,
+                                str(Test.State.ERR_DEP): 0,
+                                str(Test.State.ERR_OTHER): 0,
                                 "total": 0
                             }
                         }

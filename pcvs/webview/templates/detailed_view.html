@@ -9,11 +9,19 @@ $(document).ready(function(){
 		order: [[1, 'asc']],
 		"createdRow": function(row, data, index)
 		{
-			if(data['result']['state'] == "1")
+			if(data['result']['state'] == "0")
+			{
+				$(row).addClass("text-secondary")
+			}
+			else if(data['result']['state'] == "1")
+			{
+				$(row).addClass("text-primary")
+			}
+			else if(data['result']['state'] == "2")
 			{
 				$(row).addClass("text-success")
 			}
-			else if (data['result']['state'] == "warn")
+			else if (data['result']['state'] == "4")
 			{
 				$(row).addClass("text-warning font-weight-bold")
 			}
