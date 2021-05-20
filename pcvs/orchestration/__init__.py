@@ -51,8 +51,12 @@ class Manager:
             self._dims.setdefault(value, list())
 
         self._dims[value].append(job)
-        self.job_hashes[hash(job.name)] = job
-        self._count.total += 1
+        
+        hashed = hash(job.name)
+        # if test is not know yet, add + increment
+        if hashed not in self.job_hashes:
+            self.job_hashes[hash(job.name)] = job
+            self._count.total += 1
         
     def get_count(self, tag=None):
         if tag is None:
@@ -104,14 +108,21 @@ class Manager:
                 
                 if job:
                     if job.been_executed() or job.has_failed_dep():
+                        # jobs can be picked up outside of this pop() call
+                        # if tagged executed, they have been fully handled
+                        # and should just be removed from scheduling
+                        #
+                        # Another case: test can't be picked up because
+                        # job deps have failed.
+                        # in that case, no job management occured.
+                        # do it now.
                         if job.has_failed_dep():
                             job.save_final_result(rc=-1, time=0.0,
-                                                  out=Test.NOSTART_STR,
-                                                  state=Test.State.ERR_DEP)
+                                                out=Test.NOSTART_STR,
+                                                state=Test.State.ERR_DEP)
                             job.display()
-                        
-                        self._count.executed += 1
-                        self._publisher.add(job.to_json())
+                            self._count.executed += 1
+                            self._publisher.add(job.to_json())
                         # sad to break, should retry
                         break
                     elif not job.is_pickable():
@@ -137,6 +148,7 @@ class Manager:
                 self._count.executed += 1
                 self._publisher.add(job.to_json())
             else:
+                self._dims[value].append(job)
                 self.add_job(job)
 
 
@@ -299,6 +311,7 @@ class Orchestrator:
                 
         
         self._publisher.flush()
+        assert(self._manager.get_count('executed') == self._manager.get_count('total'))
 
     def pause_run(self):
         pass

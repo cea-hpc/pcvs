@@ -343,7 +343,6 @@ class Session:
             # same as above, shifted starting time or not
             if self.property('started') == None:
                 self._session_infos['started'] = datetime.now()
-            print(self._session_infos)
             
             self._session_infos['state'] = self.State.IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
