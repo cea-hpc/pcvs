@@ -28,6 +28,22 @@ class Test:
     NOSTART_STR = b"This test cannot be started."
     
     class State(IntEnum):
+        """Provide Status management, specifically for tests/jobs.
+        
+        Defined as an enum, it represents different states a job can take during
+        its lifetime. As tests are then serialized into a JSON file, there is
+        no need for construction/representation (as done for Session states).
+        
+        :var int WAITING: Job is currently waiting to be scheduled
+        :var int IN_PROGRESS: A running Set() handle the job, and is scheduled
+            for run.
+        :var int SUCCEED: Job successfully run and passes all checks (rc,
+            matchers...)
+        :var int FAILED: Job didn't suceed, at least one condition failed.
+        :var int ERR_DEP: Special cases to manage jobs descheduled because at
+            least one of its dependencies have failed to complete.
+        :var int ERR_OTHER: Any other uncaught situation.
+        """
         WAITING = 0
         IN_PROGRESS = 1
         SUCCEED = 2
@@ -36,16 +52,24 @@ class Test:
         ERR_OTHER = 5
 
         def __str__(self):
+            """Stringify to return the label.
+            
+            :return: the enum name
+            :rtype: str
+            """
             return self.name
         
         def __repr__(self):
+            """Enum represenation a tuple (name, value).
+            
+            :return a tuple mapping the enum.
+            :rtype: tuple
+            """
             return (self.name, self.value)
 
 
-    """A basic test representation, from one step to concretize the logic
-    to the JCHRONOSS input datastruct."""
     def __init__(self, **kwargs):
-        """register a new test"""
+        """constructor method"""
         self._array = kwargs
         self._rc = 0
         self._time = 0.0
@@ -56,51 +80,135 @@ class Test:
             deparray = self._array['dep']
             self._array['dep'] = {k: None for k in deparray}
     
-    def override_cmd(self, cmd):
-        self._array['command'] = cmd
-    
     @property
     def name(self):
+        """Getter for fully-qualified job name.
+        
+        :return: test name.
+        :rtype: str
+        """
         return self._array['name']
 
     @property
     def command(self):
+        """Getter for the full command.
+        
+        This is a real command, executed in a shell, coming from user's
+        specificaition. It should not be confused with `wrapped_command`.
+
+        :return: unescaped command line
+        :rtype: str
+        """
         return self._array['command']
     
     @property
     def wrapped_command(self):
+        """Getter for the list_of_test.sh invocation leading to run the job.
+        
+        This command is under the form: `sh /path/list_of_tests.sh <test-name>`
+
+        :return: wrapper command line
+        :rtype: str
+        """
         return self._array['wrapped_command']
 
     @property
     def deps(self):
+        """"Getter to the dependency list for this job.
+        
+        The dependency struct is an array, where for each name (=key), the
+        associated Job is stored (value)
+        :return the dict, potentially not resolved yet
+        :rtype: dict
+        """
         return self._array["dep"]
 
     def set_dep(self, name, obj):
+        """Resolve the dep object for a given dep name.
+        
+        :param name: the dep name to resolve, should be a valid dep.
+        :type name: str
+        :param obj: the dep object, should be a Test()
+        :type obj: :class:`Test`
+        """
         assert(name in self._array['dep'])
         self._array['dep'][name] = obj
         
     def is_pickable(self):
+        """Check if the test can be scheduled.
+        
+        It ensures it hasn't been executed yet (or currently running) and all
+        its deps are resolved and successfully run.
+        
+        :return: True if the job can be scheduled
+        :rtype: bool
+        """
         return not self.been_executed() and len([d for d in self.deps.values() if not d.been_executed()]) == 0
     
     def has_failed_dep(self):
+        """Check if at least one dep is blocking this job from ever be
+        scheduled.
+        
+        :return: True if at least one dep is shown a `Test.State.FAILED` state.
+        :rtype: bool
+        """
         return len([d for d in self.deps.values() if d.state == Test.State.FAILED]) > 0
     
     def first_valid_dep(self):
+        """Retrive the first ready-for-schedule dep.
+        
+        This is mainly used to ease the scheduling process by following the job
+        dependency graph.
+        
+        :return: a Test object if possible, None otherwise
+        :rtype: :class:`Test` or NoneType
+        """
         for d in self.deps.values():
-            if not d.been_executed():
+            if d.is_pickable():
                 return d
+        return None
     
     @property
     def timeout(self):
+        """Getter for Test timeout in seconds.
+        
+        It cumulates timeout + tolerance, this value being passed to the
+        subprocess.timeout.
+        
+        :return: an integer if a timeout is defined, None otherwise
+        :rtype: int or NoneType
+        """
         if self._array['time'] is None:
             return None
         return self._array['time'] + self._array['delta']
         
     def get_dim(self, unit="n_node"):
+        """Return the orch-dimension value for this test.
+        
+        The dimension can be defined by the user and let the orchestrator knows
+        what resource are, and how to 'count' them'. This accessor allow the
+        orchestrator to exract the information, based on the key name.
+        
+        :param unit: the resource label, such label should exist within the test
+        :type unit: str
+        
+        :return: The number of resource this Test is requesting.
+        :rtype: int
+        """
         return self._array['nb_res']
 
     def save_final_result(self, rc=0, time=0.0, out=b'', state=None):
-        
+        """Build the final Test result node.
+
+        :param rc: return code, defaults to 0
+        :type rc: int, optional
+        :param time: elapsed time, defaults to 0.0
+        :type time: float, optional
+        :param out: standard out/err, defaults to b''
+        :type out: bytes, optional
+        :param state: Job final status (if override needed), defaults to FAILED
+        :type state: :class:`Test.State`, optional
+        """
         if state is None:
             state = Test.State.SUCCEED if self._rc == rc else Test.State.FAILED
         self.executed(state)
@@ -114,6 +222,7 @@ class Test:
                     self._array['artifacts'][elt_k] = base64.b64encode(fh.read()).decode("ascii")
 
     def display(self):
+        """Print the Test into stdout (through the manager)."""
         colorname = "yellow"
         icon = ""
         label = str(self._state)
@@ -127,26 +236,46 @@ class Test:
             colorname = "yellow"
             icon = "fail"
     
-
         log.manager.print_job(label, self._time, self.name, colorname=colorname, icon=icon)
         if self._out:
             if (log.manager.has_verb_level("info") and self.state == Test.State.FAILED) or log.manager.has_verb_level("debug"):
                 log.manager.print(base64.b64decode(self._out))
 
     def executed(self, state=None):
+        """Set current Test as executed.
+        
+        :param state: give a special state to the test, defaults to FAILED
+        :param state: :class:`Test.State`, optional
+        """
         self._state = state if type(state) == Test.State else Test.State.FAILED
 
     def been_executed(self):
+        """Cehck if job has been executed (not waiting or in progress).
+        
+        :return: False if job is waiting for scheduling or in progress.
+        :rtype: bool
+        """
         return self._state not in [Test.State.WAITING, Test.State.IN_PROGRESS]
     
-    def picked(self):
-        self._state == Test.State.IN_PROGRESS
+    def pick(self):
+        """Flag the job as picked up for scheduling."""
+        self._state = Test.State.IN_PROGRESS
             
     @property
     def state(self):
+        """Getter for current job state.
+        
+        :return: the job current status.
+        :rtype: :class:`Test.State`
+        """
         return self._state
     
     def to_json(self):
+        """Serialize the whole Test as a JSON object.
+        
+        :return: a JSON object mapping the test
+        :rtype: str
+        """
         return {
             "id" : {
                 "te_name": self._array["te_name"],
@@ -171,7 +300,16 @@ class Test:
     
 
     def generate_script(self, srcfile):
-        """Serialize test logic to its Shell representation"""
+        """Serialize test logic to its Shell representation.
+        
+        This script provides the shell sequence to put in a shell script
+        switch-case, in order to reach that test from script arguments.
+        
+        :param srcfile: script filepath, to store the actual wrapped command.
+        :type srcfile: str
+        :return: the shell-compliant instruction set to build the test
+        :rtype: str
+        """
         pm_code = ""
         cd_code = ""
         env_code = ""

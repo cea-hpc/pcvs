@@ -134,7 +134,7 @@ class Manager:
                             job = job.first_valid_dep()
                     
                 if job:
-                    job.picked()
+                    job.pick()
                     the_set = Set()
                     the_set.add(job)
                     break

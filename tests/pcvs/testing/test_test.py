@@ -36,8 +36,6 @@ def test_Test():
         valscript = "testvalscript",)
     assert(test.name == "testname")
     assert(test.command == "testcommand")
-    test.override_cmd("testnewcommand")
-    assert(test.command == "testnewcommand")
     assert(test.get_dim() == "testdim")
     assert(not test.been_executed())
     assert(test.state == tested.Test.State.WAITING)
