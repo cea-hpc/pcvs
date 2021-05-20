@@ -1,10 +1,8 @@
 import copy
-import fcntl
 import os
-import time
 from datetime import datetime
 from multiprocessing import Process
-
+from enum import IntEnum
 import yaml
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
@@ -48,7 +46,7 @@ def store_session_to_file(c):
         # to operate, PCVS needs to full-read and then full-write the whole file
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.safe_load(fh)
+                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
 
         # compute the session id, incrementally done from the highest session id
         # currently running and registered.
@@ -57,7 +55,7 @@ def store_session_to_file(c):
         if all_sessions is not None:
             sid = max(all_sessions.keys()) + 1
         else:
-            # yaml.safe_load returns None if empty
+            # yaml.load returns None if empty
             sid = 0
             all_sessions = dict()
 
@@ -66,7 +64,7 @@ def store_session_to_file(c):
 
         # dump the file back
         with open(PATH_SESSION, 'w') as fh:
-            yaml.safe_dump(all_sessions, fh)
+            yaml.dump(all_sessions, fh)
     finally:
         unlock_session_file()
     return sid
@@ -88,14 +86,14 @@ def update_session_from_file(sid, update):
         all_sessions = None
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.safe_load(fh)
+                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
 
         if all_sessions is not None and sid in all_sessions:
             for k, v in update.items():
                 all_sessions[sid][k] = v
             # only if editing is done, flush the file back
             with open(PATH_SESSION, 'w') as fh:
-                yaml.safe_dump(all_sessions, fh)
+                yaml.dump(all_sessions, fh)
     finally:
         unlock_session_file()
 
@@ -111,13 +109,13 @@ def remove_session_from_file(sid):
         all_sessions = None
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.safe_load(fh)
+                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
 
         if all_sessions is not None and sid in all_sessions:
             del all_sessions[sid]
             with open(PATH_SESSION, 'w') as fh:
                 if len(all_sessions) > 0:
-                    yaml.safe_dump(all_sessions, fh)
+                    yaml.dump(all_sessions, fh)
                 # else, truncate the file to zero -> open(w) with no data
     finally:
         unlock_session_file()
@@ -133,7 +131,7 @@ def list_alive_sessions():
 
     try:
         with open(PATH_SESSION, 'r') as fh:
-            all_sessions = yaml.safe_load(fh)
+            all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
     except FileNotFoundError as e:
         all_sessions = {}
     finally:
@@ -173,12 +171,12 @@ def main_detached_session(sid, user_func, *args, **kwargs):
         # a sys.exit() will bypass the rest here.
         ret = user_func(*args, **kwargs)
         update_session_from_file(sid, {
-            'state': Session.STATE_COMPLETED,
+            'state': Session.State.COMPLETED,
             'ended': datetime.now()
         })
     except Exception as e:
         update_session_from_file(sid, {
-            'state': Session.STATE_ERROR,
+            'state': Session.State.ERROR,
             'ended': datetime.now()
         })
         raise e
@@ -200,18 +198,15 @@ class Session:
     :type _session_infos: dict
 
     """
-    STATE_WAITING = -1
-    STATE_IN_PROGRESS = 0
-    STATE_COMPLETED = 1
-    STATE_ERROR = 2
-
-    __state_str = {
-        STATE_IN_PROGRESS: "IN_PROGRESS",
-        STATE_COMPLETED: "COMPLETED",
-        STATE_ERROR: "ERROR",
-        STATE_WAITING: "WAITING"
-    }
-
+    class State(IntEnum):
+        WAITING = 0
+        IN_PROGRESS = 1
+        COMPLETED = 2
+        ERROR = 3
+        
+        def __str__(self):
+            return self.name  
+    
     @property
     def state(self):
         """Getter to session status.
@@ -236,14 +231,6 @@ class Session:
         """
         return self._session_infos
 
-    @property
-    def str_state(self):
-        """Getter to str-based session status.
-        :return: session status
-        :rtype: str
-        """
-        return self.__state_str[self._sid]
-
     def property(self, kw):
         """Access specific data from the session stored info session.yml.
 
@@ -262,7 +249,7 @@ class Session:
             "path": path,
             "io": None,
             "progress": 0,
-            "state": self.STATE_WAITING,
+            "state": Session.State.WAITING,
             "started": date,
             "ended": None
         }
@@ -317,7 +304,7 @@ class Session:
                 self._session_infos['started'] = datetime.now()
 
             # flag it as running & make the info public
-            self._session_infos['state'] = self.STATE_IN_PROGRESS
+            self._session_infos['state'] = self.State.IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
             # run the new process
@@ -356,7 +343,9 @@ class Session:
             # same as above, shifted starting time or not
             if self.property('started') == None:
                 self._session_infos['started'] = datetime.now()
-            self._session_infos['state'] = self.STATE_IN_PROGRESS
+            print(self._session_infos)
+            
+            self._session_infos['state'] = self.State.IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
             log.manager.set_logfile(enable=True, logfile=self._io_file)
@@ -368,3 +357,19 @@ class Session:
                 # in that mode, no information is left to users once the session
                 # is complete.
                 remove_session_from_file(self._sid)
+
+
+def enum_representer(dumper, data):
+    return dumper.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
+
+
+def enum_constructor(loader, node):
+    s = loader.construct_scalar(node)
+    name, value = s.split('||')
+    obj = Session.State(int(value))
+    assert(obj.name == name)
+    
+    return obj
+
+yaml.add_constructor(u'!Session.State', enum_constructor)
+yaml.add_representer(Session.State, enum_representer)

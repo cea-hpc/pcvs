@@ -12,7 +12,7 @@ def compl_session_token(ctx, args, incomplete) -> list:
     sessions = pvSession.list_alive_sessions()
     if sessions is None:
         return []
-    return [(k, pvSession.Session.str_state(v['state'])) for k, v in sessions.items() if incomplete in str(k)]
+    return [(k, str(pvSession.Session.State(v['state']))) for k, v in sessions.items() if incomplete in str(k)]
 
 
 @click.command(name="session", short_help="Manage multiple validations")
@@ -30,14 +30,14 @@ def session(ctx, ack, list, ack_all):
 
     if ack_all is True:
         for session_id in sessions.keys():
-            if sessions[session_id]['state'] != pvSession.Session.STATE_IN_PROGRESS:
+            if sessions[session_id]['state'] != pvSession.Session.State.IN_PROGRESS:
                 pvSession.remove_session_from_file(session_id)
                 lockfile = os.path.join(sessions[session_id]['path'], NAME_BUILDIR_LOCKFILE)
                 utils.unlock_file(lockfile)
     elif ack is not None:
         if ack not in sessions.keys():
             raise click.BadOptionUsage('--ack', "No such Session id (see pcvs session)")
-        elif sessions[ack]['state'] not in [pvSession.Session.STATE_ERROR, pvSession.Session.STATE_COMPLETED]:
+        elif sessions[ack]['state'] not in [pvSession.Session.State.ERROR, pvSession.Session.State.COMPLETED]:
             raise click.BadOptionUsage('--ack', "This session is not completed yet")
         
         pvSession.remove_session_from_file(ack)
@@ -51,10 +51,10 @@ def session(ctx, ack, list, ack_all):
             status = "Error"
             duration = timedelta()
 
-            if s.state == pvSession.Session.STATE_IN_PROGRESS:
+            if s.state == pvSession.Session.State.IN_PROGRESS:
                 duration = datetime.now() - s.property('started')
                 status = "In Progress -- {:4.2f}%".format(s.property('progress'))
-            elif s.state == pvSession.Session.STATE_COMPLETED:
+            elif s.state == pvSession.Session.State.COMPLETED:
                 duration = s.property('ended') - s.property('started')
                 status = "Completed"    
             

@@ -25,7 +25,7 @@ def mock_home_config():
 def test_session_init():
     date = datetime.now()
     obj = tested.Session(date)
-    assert(obj.str_state == "WAITING")
+    assert(str(obj.state) == "WAITING")
     assert(obj.property('started') == date)
 
 
@@ -36,7 +36,7 @@ def test_session_file():
             mock_pcvs.PATH_SESSION = os.path.join(os.getcwd(), '.pcvs/session.yml')
             print(pcvs.PATH_HOMEDIR)
             test_dict = {
-                    'state': tested.Session.STATE_COMPLETED,
+                    'state': tested.Session.State.COMPLETED,
                     'started': datetime.now()
             }
             
