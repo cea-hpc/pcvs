@@ -3,6 +3,7 @@ import threading
 import time
 
 from addict import Dict
+from typing import List
 
 from pcvs.helpers import log
 from pcvs.helpers.exceptions import OrchestratorException
@@ -40,7 +41,6 @@ class Manager:
             "executed": 0
         })
     
-
     def add_job(self, job):
         value = min(self._max_size, job.get_dim())
         
@@ -105,7 +105,9 @@ class Manager:
                 if job:
                     if job.been_executed() or job.has_failed_dep():
                         if job.has_failed_dep():
-                            job.save_final_result(rc=-1, time=0.0, out=Test.NOSTART_STR)
+                            job.save_final_result(rc=-1, time=0.0,
+                                                  out=Test.NOSTART_STR,
+                                                  state=Test.State.ERR_DEP)
                             job.display()
                         
                         self._count.executed += 1
@@ -145,7 +147,7 @@ class Set(threading.Thread):
         self._id = Set.global_increment
         Set.global_increment += 1
         self._size = 0
-        self._jobs = list()
+        self._jobs: List[Test] = list()
         self._completed = False
         self._is_wrapped = False
         super().__init__()
@@ -202,6 +204,14 @@ class Set(threading.Thread):
                 start = time.time()
                 stdout, _ = p.communicate(timeout=job.timeout)
                 final = time.time() - start
+                
+                # Note: The return code here is coming from the script,
+                # not the test itself. It is transitively transmitted once the
+                # test complete, except if test used matchers to validate.
+                # in that case, a non-zero exit code indicates at least one
+                # matcher failed.
+                # The the engine, no other checks than return code evaluation
+                # is necessary to assess test status.
                 rc = p.returncode
                 
             except subprocess.TimeoutExpired:

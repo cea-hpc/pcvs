@@ -1,6 +1,7 @@
 import base64
 import os
 import shlex
+from enum import IntEnum
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
@@ -8,26 +9,38 @@ from pcvs.helpers.pm import PManager
 
 
 class Test:
+    """Smallest component of a validation process.
     
+    A test is basically a shell command to run. Depending on its post-execution
+    status, a success or a failure can be determined. To handle such component
+    in a convenient way, more information can be attached to the command like a
+    name, the elapsed time, the output, etc.
+    
+    In order to make test content flexible, there is no fixed list of
+    attributes. A Test() constructor is initialized via (*args, **kwargs), to
+    populate a dict `_array`.
+    
+    :cvar int Timeout_RC: special constant given to jobs exceeding their time limit.
+    :cvar str NOSTART_STR: constant, setting default output when job cannot be run.
+    """
     Timeout_RC = 127
     
     NOSTART_STR = b"This test cannot be started."
     
-    STATE_OTHER = -1
-    STATE_NOT_EXECUTED = 0
-    STATE_SUCCEED = 1
-    STATE_FAILED = 2
-    STATE_INVALID_SPEC = 3
-    STATE_IN_PROGRESS = 4
+    class State(IntEnum):
+        WAITING = 0
+        IN_PROGRESS = 1
+        SUCCEED = 2
+        FAILED = 3
+        ERR_DEP = 4
+        ERR_OTHER = 5
 
-    _strstate = {
-        STATE_OTHER: 'OTHER',
-        STATE_NOT_EXECUTED: 'NOT_EXEC',
-        STATE_SUCCEED: 'SUCCESS',
-        STATE_FAILED: 'FAILURE',
-        STATE_IN_PROGRESS: "IN PROGRESS",
-        STATE_INVALID_SPEC: 'INVALID'
-    }
+        def __str__(self):
+            return self.name
+        
+        def __repr__(self):
+            return (self.name, self.value)
+
 
     """A basic test representation, from one step to concretize the logic
     to the JCHRONOSS input datastruct."""
@@ -37,7 +50,7 @@ class Test:
         self._rc = 0
         self._time = 0.0
         self._out = None
-        self._state = self.STATE_NOT_EXECUTED
+        self._state = Test.State.WAITING
         
         if 'dep' in self._array:
             deparray = self._array['dep']
@@ -70,7 +83,7 @@ class Test:
         return not self.been_executed() and len([d for d in self.deps.values() if not d.been_executed()]) == 0
     
     def has_failed_dep(self):
-        return len([d for d in self.deps.values() if d.state == Test.STATE_FAILED]) > 0
+        return len([d for d in self.deps.values() if d.state == Test.State.FAILED]) > 0
     
     def first_valid_dep(self):
         for d in self.deps.values():
@@ -86,8 +99,11 @@ class Test:
     def get_dim(self, unit="n_node"):
         return self._array['nb_res']
 
-    def save_final_result(self, rc=0, time=0.0, out=b''):
-        self.executed(self.STATE_SUCCEED if self._rc == rc else self.STATE_FAILED)
+    def save_final_result(self, rc=0, time=0.0, out=b'', state=None):
+        
+        if state is None:
+            state = Test.State.SUCCEED if self._rc == rc else Test.State.FAILED
+        self.executed(state)
         self._rc = rc
         self._out = base64.b64encode(out).decode('ascii')
         self._time = time
@@ -100,36 +116,36 @@ class Test:
     def display(self):
         colorname = "yellow"
         icon = ""
-        label = self.strstate
-        if self._state == self.STATE_SUCCEED:
+        label = str(self._state)
+        if self._state == Test.State.SUCCEED:
             colorname = "green"
             icon = "succ"
-        if self._state == self.STATE_FAILED:
+        elif self._state == Test.State.FAILED:
             colorname = "red"
             icon = "fail"
+        elif self._state == Test.State.ERR_DEP:
+            colorname = "yellow"
+            icon = "fail"
     
+
         log.manager.print_job(label, self._time, self.name, colorname=colorname, icon=icon)
         if self._out:
-            if (log.manager.has_verb_level("info") and self.state == Test.STATE_FAILED) or log.manager.has_verb_level("debug"):
+            if (log.manager.has_verb_level("info") and self.state == Test.State.FAILED) or log.manager.has_verb_level("debug"):
                 log.manager.print(base64.b64decode(self._out))
 
-    def executed(self, state=STATE_FAILED):
-        self._state = state
+    def executed(self, state=None):
+        self._state = state if type(state) == Test.State else Test.State.FAILED
 
     def been_executed(self):
-        return self._state != self.STATE_NOT_EXECUTED
+        return self._state not in [Test.State.WAITING, Test.State.IN_PROGRESS]
     
     def picked(self):
-        self._state == self.STATE_IN_PROGRESS
+        self._state == Test.State.IN_PROGRESS
             
     @property
     def state(self):
         return self._state
     
-    @property
-    def strstate(self):
-        return self._strstate[self._state]
-
     def to_json(self):
         return {
             "id" : {
