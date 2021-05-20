@@ -248,7 +248,7 @@ class IOManager:
         """
         self.__print_rawline(txt)
 
-    def capture_exception(self, *e_type):
+    def capture_exception(self, e_type, user_func=None):
         """wraps functions to capture unhandled exceptions for high-level
             function not to crash.
             :param \*e_type: errors to be catched
@@ -260,8 +260,11 @@ class IOManager:
                     return func(*args, **kwargs)
                 except e_type as e:
                     #raise e
-                    manager.err("{}: {}".format(type(e).__name__, e))
-                    manager.info(traceback.format_exception(*sys.exc_info()))
+                    if user_func is None:
+                        manager.err("{}: {}".format(type(e).__name__, e))
+                        manager.info(traceback.format_exception(*sys.exc_info()))
+                    else:
+                        user_func(e)
                         
             return wrapper
         return inner_function

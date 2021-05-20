@@ -55,6 +55,25 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
     base = os.path.basename(abspath)
     return ['a' for p in next(os.walk(d))[1] if p.startswith(base)]
 
+
+def handle_build_lockfile(exc=None):
+    """Remove the file lock in build dir if the application stops abrubtly.
+    
+    This function will automatically forward the raising exception to the next
+    handler.
+    
+    :raises Exception: any exception triggering this handler
+    :param exc: The raising exception.
+    :type exc: Exception
+    """
+    lock = os.path.join(system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
+    if os.path.exists(lock):
+        utils.unlock_file(lock)
+    
+    if exc:
+        raise exc
+
+    
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cli_profile.compl_list_token,
@@ -87,6 +106,8 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
                 type=str, callback=iterate_dirs)
 @click.pass_context
 @log.manager.capture_exception(Exception)
+@log.manager.capture_exception(Exception, handle_build_lockfile)
+@log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
         simulated, bank, dup, dirs) -> None:
     """
@@ -100,7 +121,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     if output is not None:
         output = os.path.abspath(output)
 
-    global_config = system.MetaConfig()        
+    global_config = system.MetaConfig()
+    system.MetaConfig.root = global_config
 
     # then init the configuration
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)
@@ -173,8 +195,6 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         global_config.bootstrap_machine(pf.machine)
         global_config.bootstrap_criterion(pf.criterion)
         global_config.bootstrap_group(pf.group)
-
-    system.MetaConfig.root = global_config
 
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
