@@ -81,6 +81,10 @@ class TestException(CommonException):
     class TDFormatError(GenericError):
         """Test description is wrongly formatted."""
         pass
+    
+    class DynamicProcessError(GenericError):
+        """Test File is not properly formatted."""
+        pass
 
 
 class OrchestratorException(CommonException):
