@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
 import os
-from pcvs import NAME_BUILDIR_LOCKFILE
+from datetime import datetime, timedelta
 
 import click
 
+from pcvs import NAME_BUILDIR_LOCKFILE
 from pcvs.backend import session as pvSession
 from pcvs.helpers import log, utils
 

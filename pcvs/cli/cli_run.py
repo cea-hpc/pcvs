@@ -1,16 +1,16 @@
 import os
 from datetime import datetime
-from pcvs.helpers.exceptions import RunException
-from pcvs import NAME_BUILDIR_LOCKFILE
 
 import click
 
+from pcvs import NAME_BUILDIR_LOCKFILE
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
 from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
 from pcvs.helpers import log, system, utils
+from pcvs.helpers.exceptions import RunException
 
 
 def iterate_dirs(ctx, param, value) -> dict:

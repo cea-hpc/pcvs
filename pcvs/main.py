@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 import os
-
-import click
 import shutil
 
+import click
+
+from pcvs import version
 from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
                       cli_session, cli_utilities)
 from pcvs.helpers import log, utils
-from pcvs import version
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],

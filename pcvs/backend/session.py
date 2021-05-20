@@ -1,8 +1,9 @@
 import copy
 import os
 from datetime import datetime
-from multiprocessing import Process
 from enum import IntEnum
+from multiprocessing import Process
+
 import yaml
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE

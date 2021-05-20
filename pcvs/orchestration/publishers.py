@@ -4,6 +4,7 @@ import os
 from pcvs import NAME_BUILD_RESDIR
 from pcvs.helpers.system import ValidationScheme
 
+
 class Publisher:
     scheme = None
     increment = 0
