@@ -1,3 +1,4 @@
+import fcntl
 import os
 import shutil
 import time
@@ -22,12 +23,14 @@ STORAGES = {
 
 
 def create_home_dir():
+    """Create a home directory
+    """
     if not os.path.exists(PATH_HOMEDIR):
         os.makedirs(PATH_HOMEDIR)
 
 
 def storage_order():
-    """returns scopes in order of searching
+    """Return scopes in order of searching.
 
     :return: a list of scopes
     :rtype: list
@@ -36,7 +39,7 @@ def storage_order():
 
 
 def check_valid_scope(s):
-    """check if argument is a valid scope (local, user, global)
+    """Check if argument is a valid scope (local, user, global).
 
     :param s: scope to check
     :type s: str
@@ -45,17 +48,22 @@ def check_valid_scope(s):
     if s not in storage_order() and s is not None:
         raise CommonException.BadTokenError(s)
 
+
 def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
-    """Extract fields from tokens (a, b, c) from user's string
+    """Extract fields from tokens (a, b, c) from user's string.
 
-    Args:
-        s (string): the input string
-        pair (str, optional): padding side when only 2 tokens found. Defaults to "right".
-        single (str, optional): padding side when only 1 token found. Defaults to "right".
-
-    Returns:
-        3-string-tuple: mapping (scope, kind, name), any of them may be null
+    :param s: the input string
+    :type s: str
+    :param pair: padding side when only 2 tokens found, defaults to "right"
+    :type pair: str, optional
+    :param single: padding side when only 1 token found, defaults to "right"
+    :type single: str, optional
+    :param maxsplit: maximum split number for s, defaults to 3
+    :type maxsplit: int, optional
+    :return: 3-string-tuple: mapping (scope, kind, name), any of them may be null
+    :rtype: tuple
     """
+
     array = s.split(".")
     if len(array) >= maxsplit:
         return (array[0], array[1], ".".join(array[maxsplit-1:]))
@@ -78,14 +86,15 @@ def extract_infos_from_token(s, pair="right", single="right", maxsplit=3):
         pass
     return (None, None, None)  # pragma: no cover
 
-def __determine_local_prefix(path, prefix):
-    """search for the ``local`` storage in the current (or parent) directory
 
-    :param path: 
+def __determine_local_prefix(path, prefix):
+    """Search for the ``local`` storage in the current (or parent) directory.
+
+    :param path: ``local`` storage
     :type path: os.path, str
-    :param prefix: 
+    :param prefix: prefix for ``local`` storage
     :type prefix: os.path, str
-    :return: 
+    :return: complete path to ``local`` storage
     :rtype: os.path, str
     """
     cur = path
@@ -103,7 +112,7 @@ def __determine_local_prefix(path, prefix):
 
 
 def set_local_path(path):
-    """sets the prefix for the ``local`` storage
+    """Set the prefix for the ``local`` storage.
 
     :param path: path of the ``local`` storage
     :type path: os.path
@@ -120,8 +129,9 @@ def set_local_path(path):
 ####     PATH MANIPULATION      ####
 ####################################
 
+
 def create_or_clean_path(prefix, dir=False):
-    """creates a path or cleans it if it already exists
+    """Create a path or cleans it if it already exists.
 
     :param prefix: prefix of the path to create
     :type prefix: os.path, str
@@ -135,7 +145,7 @@ def create_or_clean_path(prefix, dir=False):
             assert(os.path.isdir(os.path.dirname(prefix)))
             open(prefix, 'w+').close()
         return
-    
+
     # else, a previous path exists
     if os.path.isdir(prefix):
         shutil.rmtree(prefix)
@@ -143,9 +153,10 @@ def create_or_clean_path(prefix, dir=False):
     elif os.path.isfile(prefix):
         os.remove(prefix)
 
+
 @contextmanager
 def cwd(path):
-    """change the working directory
+    """Change the working directory.
 
     :param path: new working directory
     :type path: os.path, str
@@ -178,8 +189,9 @@ def copy_file(src, dest):
 ####           MISC.            ####
 ####################################
 
+
 def generate_local_variables(label, subprefix):
-    """returns directories from PCVS working tree :
+    """Return directories from PCVS working tree :
 
         - the base source directory
         - the current source directory
@@ -197,19 +209,21 @@ def generate_local_variables(label, subprefix):
     """
     if label not in MetaConfig.root.validation.dirs:
         raise CommonException.NotFoundError(label)
-    
+
     if subprefix is None:
         subprefix = ""
 
     base_srcdir = MetaConfig.root.validation.dirs[label]
     cur_srcdir = os.path.join(base_srcdir, subprefix)
-    base_buildir = os.path.join(MetaConfig.root.validation.output, "test_suite", label)
-    cur_buildir = os.path.join(base_buildir, subprefix)        
+    base_buildir = os.path.join(
+        MetaConfig.root.validation.output, "test_suite", label)
+    cur_buildir = os.path.join(base_buildir, subprefix)
 
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir
 
+
 def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
-    """checks if p is a valid program, using the ``which`` function
+    """Check if p is a valid program, using the ``which`` function.
 
     :param p: program to check
     :type p: str
@@ -228,7 +242,7 @@ def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
     try:
         filepath = shutil.which(p)
         res = os.access(filepath, mode=os.X_OK)
-    except TypeError:  #which() can return None
+    except TypeError:  # which() can return None
         res = False
 
     if res is True and succ is not None:
@@ -242,27 +256,29 @@ def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
 
     return res
 
-def find_buildir_from_prefix(path):
-        """find the build directory from the ``path`` prefix
 
-        :param path: path to search the build directory from
-        :type path: os.path, str
-        :raises CommonException.NotFoundError: the build directory is not found
-        :return: the path of the build directory
-        :rtype: os.path
-        """
-        # three scenarios:
-        # - path = $PREFIX (being a buildir) -> use as build dir
-        # - path = $PREFIX (containing a buildir) - > join(.pcvs-build)
-        # - otherwise, raise a path error
-        if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)): 
-            path = os.path.join(path, NAME_BUILDIR)
-            if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
-                raise CommonException.NotFoundError("build-dir in {}".format(path))
-        return path
+def find_buildir_from_prefix(path):
+    """Find the build directory from the ``path`` prefix.
+
+    :param path: path to search the build directory from
+    :type path: os.path, str
+    :raises CommonException.NotFoundError: the build directory is not found
+    :return: the path of the build directory
+    :rtype: os.path
+    """
+    # three scenarios:
+    # - path = $PREFIX (being a buildir) -> use as build dir
+    # - path = $PREFIX (containing a buildir) - > join(.pcvs-build)
+    # - otherwise, raise a path error
+    if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
+        path = os.path.join(path, NAME_BUILDIR)
+        if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
+            raise CommonException.NotFoundError("build-dir in {}".format(path))
+    return path
+
 
 def unlock_file(f):
-    """Remove lock from a directory
+    """Remove lock from a directory.
 
     :param f: file locking the directory
     :type f: os.path
@@ -274,7 +290,7 @@ def unlock_file(f):
 
 
 def lock_file(f, reentrant=False, timeout=None):
-    """try to lock a directory
+    """Try to lock a directory.
 
     :param f: name of lock
     :type f: os.path
@@ -288,7 +304,7 @@ def lock_file(f, reentrant=False, timeout=None):
     :return: True if the file is reached, False otherwise
     :rtype: bool
     """
-    
+
     log.manager.debug("Attempt locking {}".format(f))
     locked = trylock_file(f, reentrant)
     count = 0
@@ -302,7 +318,7 @@ def lock_file(f, reentrant=False, timeout=None):
 
 
 def trylock_file(f, reentrant=False):
-    """try to lock a file (used in lock_file)
+    """Try to lock a file (used in lock_file).
 
     :param f: name of lock
     :type f: os.path
@@ -320,9 +336,9 @@ def trylock_file(f, reentrant=False):
     else:
         with open(f, 'r') as fh:
             pid = int(fh.read().strip())
-        
+
         if pid == os.getpid() and reentrant:
             log.manager.debug("Lock {}".format(f))
             return True
-        
+
         return False

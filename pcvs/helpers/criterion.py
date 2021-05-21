@@ -14,17 +14,30 @@ class Combination:
     For a given set of criterion, a Combination carries, for each kind, its
     associated value in order to generate the appropriate test
     """
+
     def __init__(self, crit_desc, dict_comb):
         """Build a combination from two components:
-        - the actual combination dict (k=criterion name, v=actual value)
-        - the dict of criterions (=their full description) represented in the
-          current combination.
+        - the actual combination dict
+        - the dict of criterions
+
+        :param crit_desc: dict of criterions (=their full description)
+            represented in the current combination.
+        :type crit_desc: dict
+        :param dict_comb: actual combination dict (k=criterion name, v=actual
+            value)
+        :type dict_comb: dict
         """
         self._criterions = crit_desc
         self._combination = dict_comb
 
     def get(self, k, dflt=None):
-        """Retrieve the actual value for a given combination element"""
+        """Retrieve the actual value for a given combination element
+
+        :param k: value to retrieve
+        :type k: str
+        :param dflt: default value if k is not a valid key
+        :type: object
+        """
         if k not in self._combination:
             return dflt
         return self._combination[k]
@@ -48,7 +61,7 @@ class Combination:
         on the representation of each criterion in the test semantic. It builds
         tokens to provide to properly build the test command. It can
         either be:
-        
+
         1. an environment variable to export before the test to run (gathering
            system-scope and program-scope elements)
         2. a runtime argument
@@ -71,10 +84,14 @@ class Combination:
             else:
                 args.append(value)
         return (envs, args, params)
-    
+
     def translate_to_dict(self):
+        """Translate the combination into a dictionary.
+
+        :return: configuration in the shape of a python dict
+        :rtype: dict
+        """
         return self._combination
-        
 
 
 class Serie:
@@ -90,7 +107,10 @@ class Serie:
 
     def __init__(self, dict_of_criterion):
         """Build a serie, by extracting the list of values.
-        Note that here, the dict also contains program-based criterions"""
+        Note that here, the dict also contains program-based criterions
+
+        :param dict_of_criterion: values to build the serie with
+        :type dict_of_criterion: dict"""
         self._values = list()
         self._keys = list()
         # this has to be saved, need to be forwarded to each combination
@@ -109,7 +129,7 @@ class Serie:
             if not valid_combination(d):
                 continue
             yield Combination(
-                self._dict, 
+                self._dict,
                 d
             )
 
@@ -118,13 +138,22 @@ class Criterion:
     """A Criterion is the representation of a component each program
     (i.e. test binary) should be run against. A criterion comes with a range of
     possible values, each leading to a different test"""
+
     def __init__(self, name, description, local=False, numeric=False):
-        """Initialize a criterion from its YAML/dict description"""
+        """Initialize a criterion from its YAML/dict description
+        :param name: name of the criterion
+        :type name: str
+        :param description: description of the criterion
+        :type description: str
+        :param local: True if the criterion is local, default to False
+        :type local: bool
+        :param numeric: True if the criterion is numeric, default to False
+        :type: numeric: bool"""
         self._name = name
         if description is None:
             self._values = None
             return
-        
+
         self._numeric = description.get('numeric', numeric) is True
         self._prefix = description.get('option', '')
         self._after = description.get('position', 'after') == 'after'
@@ -137,12 +166,18 @@ class Criterion:
         if not isinstance(self._values, list):
             self._values = [self._values]
 
-
     # only allow overriding values (for now)
+
     def override(self, desc):
+        """Replace the value of the criterion using a descriptor containing the
+            said value
+
+        :param desc: descriptor supposedly containing a ``value``entry
+        :type desc: dict
+        """
         if 'values' in desc:
             self._values = desc['values']
-            
+
     def intersect(self, other):
         """Update the calling Criterion with the interesection of the current
         range of possible values with the one given as a parameters.
@@ -151,7 +186,7 @@ class Criterion:
         system-wide's"""
         assert(isinstance(other, Criterion))
         assert(self._name == other._name)
-        
+
         # None is special value meaning, discard this criterion because
         # irrelevant
         if self._values is None or other._values is None:
@@ -164,7 +199,7 @@ class Criterion:
         May lead to errors, as it may indicates no common values has been
         found between user and system specifications"""
         return self._values is not None and len(self._values) == 0
-    
+
     def is_discarded(self):
         """Should this criterion be ignored from the current TE generaiton ?"""
         return self._values is None
@@ -180,31 +215,55 @@ class Criterion:
     @staticmethod
     def __convert_str_to_int(str_elt):
         """Convert a sequence (as a string) into a valid range of values.
-        
+
         This is used to build criterion numeric-only possible values"""
         # TODO: write sequence conversion for numeric values
         return 0
 
     @property
     def values(self):
+        """Get the ``value`` attribute of this criterion.
+
+        :return: values of this criterion
+        :rtype: list
+        """
         return self._values
 
     @property
     def name(self):
+        """Get the ``name`` attribute of this criterion.
+
+        :return: name of this criterion
+        :rtype: str
+        """
         return self._name
-    
+
     @property
     def subtitle(self):
+        """Get the ``subtitle`` attribute of this criterion.
+
+        :return: subtitle of this criterion
+        :rtype: str
+        """
         return self._str
 
     @property
     def numeric(self):
+        """Get the ``numeric`` attribute of this criterion.
+
+        :return: numeric of this criterion
+        :rtype: str
+        """
         return self._numeric
-    
+
     def concretize_value(self, val=''):
         """Return the exact string mapping this criterion, according to the
         specification. (is it aliased ? should the option be put before/after
-        the value?...)"""
+        the value?...)
+        :param val: value to add with prefix
+        :type val: str
+        :return: values with aliases replaced
+        :rtype: str"""
         # replace value with alias (if defined)
         val = str(self.aliased_value(val))
         # put value before of after the defined prefix
@@ -223,15 +282,28 @@ class Criterion:
         For instance, TEs manipulate 'ib' as a value to depict the 'infiniband'
         network layer. But once the test has to be built, the term will change
         depending on the runtime carrying it, the value may be different from
-        a runtime to another"""
+        a runtime to another
+        :param val: string with aliases to be replaced"""
         return self._alias[val] if val in self._alias else val
 
     @staticmethod
     def __convert_sequence_to_list(dic, s=-1, e=-1):
+        """converts a sequence (as a string) to a valid list of values
+
+        :param dic: dictionary to take the values from
+        :type dic: dict
+        :param s: start (can be overridden by ``from`` in ``dic``), defaults to
+            -1
+        :type s: int, optional
+        :param e: end (can be overridden by ``to`` in ``dic``), defaults to -1
+        :type e: int, optional
+        :return: list of values
+        :rtype: list
+        """
         assert(len(dic.keys()) == 1)
         name = list(dic.keys())[0]
         node = dic[name]
-        
+
         values = []
         start = s if 'from' not in node else node['from']
         end = e if 'to' not in node else node['to']
@@ -288,6 +360,7 @@ class Criterion:
 
         # TODO: handle criterion dependency (ex: n_mpi: ['n_node * 2'])
 
+
 def initialize_from_system():
     """Initialise system-wide criterions
 
@@ -307,37 +380,48 @@ def initialize_from_system():
     for it in criterion_iterators.keys():
         if it not in runtime_iterators:
             log.manager.warn("Undeclared criterion "
-                     "as part of runtime: '{}' ".format(it))
+                             "as part of runtime: '{}' ".format(it))
         elif criterion_iterators[it]['values'] is None:
             log.manager.debug('No combination found for {},'
-                      ' removing from schedule'.format(it))
+                              ' removing from schedule'.format(it))
         else:
             continue
         it_to_remove.append(it)
 
     # register the new dict {criterion_name: Criterion object}
     # the criterion object gathers both information from runtime & criterion
-    MetaConfig.root.set_internal('crit_obj', {k: Criterion(k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove})
-    
+    MetaConfig.root.set_internal('crit_obj', {k: Criterion(
+        k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove})
+
     # convert any sequence into valid range of integers for
-    
+
     # numeric criterions
     log.manager.print_item("Expand possible iterator expressions")
     for criterion in MetaConfig.root.get_internal('crit_obj').values():
         criterion.expand_values()
 
+
 first = True
 runtime_filter = None
+
+
 def valid_combination(dic):
+    """Check if dict is a valid criterion combination .
+
+    :param dic: dict to check
+    :type dic: dict
+    :return: True if dic is a valid combination
+    :rtype: bool
+    """
     global first, runtime_filter
     rt = MetaConfig.root.runtime
     val = MetaConfig.root.validation
     if first and rt.plugin:
         first = not first
-        rt.pluginfile =  os.path.join(val.buildcache, "rt-plugin.py")
+        rt.pluginfile = os.path.join(val.buildcache, "rt-plugin.py")
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
-        
+
         spec = importlib.util.spec_from_file_location("pcvs.user-rt-plugin",
                                                       rt.pluginfile)
         mod = importlib.util.module_from_spec(spec)

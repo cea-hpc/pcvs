@@ -5,7 +5,7 @@ import pygit2
 
 
 def request_git_attr(k) -> str:
-    """Get a git configuration
+    """Get a git configuration.
 
     :param k: parameter to get
     :type k: str
@@ -13,7 +13,7 @@ def request_git_attr(k) -> str:
     :rtype: str
     """
     try:
-        #TODO: not only look for user config
+        # TODO: not only look for user config
         git_conf = pygit2.Config.get_global_config()
         if k in git_conf:
             return git_conf[k]
@@ -24,7 +24,7 @@ def request_git_attr(k) -> str:
 
 
 def generate_data_hash(data) -> str:
-    """hash data with git protocol
+    """Hash data with git protocol.
 
     :param data: data to hash
     :type data: str
@@ -35,7 +35,7 @@ def generate_data_hash(data) -> str:
 
 
 def get_current_username() -> str:
-    """get the git username
+    """Get the git username.
 
     :return: git username
     :rtype: str
@@ -48,7 +48,7 @@ def get_current_username() -> str:
 
 
 def get_current_usermail():
-    """get the git user mail
+    """Get the git user mail.
 
     :return: git user mail
     :rtype: str

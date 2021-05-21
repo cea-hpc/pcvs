@@ -60,7 +60,7 @@ class IOManager:
     }
 
     verb_levels = [(0, "normal"), (1, "info"), (2, "debug")]
-    
+
     color_list = [
         "black",
         "red",
@@ -115,7 +115,7 @@ class IOManager:
         """disables tty
         """
         self.set_tty(enable=False)
-    
+
     @property
     def log_filename(self):
         """getter for logfile path
@@ -136,7 +136,7 @@ class IOManager:
         self._logs = enable
         if logfile is not None and os.path.abspath(logfile) != self.log_filename:
             self._logfile = open(os.path.abspath(logfile), 'w+')
-    
+
     def enable_logfile(self):
         """enables logging on file
         """
@@ -173,23 +173,24 @@ class IOManager:
         self._logs = False
         self._verbose = verbose
         self._unicode = enable_unicode
-        
+
         self.enable_unicode(self._unicode)
 
         if length is not None:
-            self._linelength = length if length > 0 else click.get_terminal_size()[0]
+            self._linelength = length if length > 0 else click.get_terminal_size()[
+                0]
         self._wrapper = textwrap.TextWrapper(width=self._linelength)
-    
+
         if logfile is not None:
             if os.path.isfile(logfile):
                 raise CommonException.AlreadyExistError(logfile)
             self._logs = True
             self._logfile = open(os.path.abspath(logfile), "w")
-        
+
     def __del__(self):
         """desctuctor for IOManager (closes streams)
         """
-        
+
         if self._logs:
             self._logfile.close()
 
@@ -204,7 +205,8 @@ class IOManager:
         if self._tty:
             click.echo(msg, err=err)
         if self._logs:
-            self._logfile.write('{}{}'.format(msg, '\n' if msg[-1] != "\n" else ""))
+            self._logfile.write('{}{}'.format(
+                msg, '\n' if msg[-1] != "\n" else ""))
             self._logfile.flush()
 
     def has_verb_level(self, match):
@@ -232,7 +234,7 @@ class IOManager:
         for e in self.verb_levels:
             if self._verbose == e[0]:
                 return e[1]
-        return  self.verb_levels[0][1]
+        return self.verb_levels[0][1]
 
     def print(self, *msg):
         """prints a raw line. Takes multiple arguments.
@@ -251,21 +253,35 @@ class IOManager:
     def capture_exception(self, e_type, user_func=None):
         """wraps functions to capture unhandled exceptions for high-level
             function not to crash.
-            :param \*e_type: errors to be catched
+            :param *e_type: errors to be caught
         """
         def inner_function(func):
+            """wrapper for inner function using try/except to avoid crashing
+
+            :param func: function to wrap
+            :type func: function
+            :raises e: exceptions to catch
+            :return: wrapper
+            :rtype: function
+            """
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
+                """functools wrapping function
+
+                :raises e: exception to catch
+                :return: result of wrapped function
+                :rtype: any
+                """
                 try:
                     return func(*args, **kwargs)
                 except e_type as e:
                     #raise e
                     if user_func is None:
                         manager.err("{}: {}".format(type(e).__name__, e))
-                        manager.info(traceback.format_exception(*sys.exc_info()))
+                        manager.info(
+                            traceback.format_exception(*sys.exc_info()))
                     else:
                         user_func(e)
-                        
             return wrapper
         return inner_function
 
@@ -276,7 +292,7 @@ class IOManager:
         :type e: bool, optional
         """
         self.glyphs = self.special_chars["unicode"] if e is True else self.special_chars["ascii"]
-    
+
     def avail_chars(self):
         """lists allowed bullet characters
 
@@ -284,7 +300,7 @@ class IOManager:
         :rtype: list
         """
         return self.glyphs.keys()
-    
+
     def utf(self, k):
         """returns the corresponding character to a bullet character
 
@@ -317,11 +333,14 @@ class IOManager:
         """
         hdr_char = self.utf('hdr')
         str_len = self._linelength - (len(s) + 2)  # surrounding spaces
-        begin = hdr_char * int(str_len / 2) # nb chars before the title (centering)
-        end = begin + (hdr_char * (str_len % 2 != 0)) #nb chars after the title (centering)
-        
+        # nb chars before the title (centering)
+        begin = hdr_char * int(str_len / 2)
+        # nb chars after the title (centering)
+        end = begin + (hdr_char * (str_len % 2 != 0))
+
         # formatting & colouring
-        final_string = click.style("\n{} {} {}".format(begin, s.upper(), end), fg="green")
+        final_string = click.style("\n{} {} {}".format(
+            begin, s.upper(), end), fg="green")
         if out:
             self.__print_rawline(final_string)
         else:
@@ -339,7 +358,7 @@ class IOManager:
         :rtype: str
         """
         f = "{} {}".format(self.utf('sec'), s)
-        self._wrapper.subsequent_indent = "  " 
+        self._wrapper.subsequent_indent = "  "
         s = self._wrapper.fill(click.style(f, fg='yellow'))
         if out:
             self.__print_rawline(s)
@@ -362,16 +381,18 @@ class IOManager:
         :rtype: str
         """
         indent = ("   " * depth)
-        bullet = indent + "{} ".format(self.utf('item')) if with_bullet is True else ""
+        bullet = indent + \
+            "{} ".format(self.utf('item')) if with_bullet is True else ""
         content = "{}".format(s)
 
         self._wrapper.subsequent_indent = indent + "  "
-        s = self._wrapper.fill(click.style(bullet, fg="red") + click.style(content, fg="reset"))
+        s = self._wrapper.fill(click.style(
+            bullet, fg="red") + click.style(content, fg="reset"))
         if out:
             self.__print_rawline(s)
         else:
             return s
-    
+
     def print_job(self, label, time, name, colorname="red", icon=None):
         """prints a job description
 
@@ -389,13 +410,13 @@ class IOManager:
         if icon is not None:
             icon = self.utf(icon)
         self.__print_rawline(click.style("   {} {:8.2f}s{}{}{}{}".format(
-                                            icon,
-                                            time,
-                                            self.utf("sep_v"),
-                                            label,
-                                            self.utf("sep_v"),
-                                            name),
-                             fg=colorname, bold=True))
+            icon,
+            time,
+            self.utf("sep_v"),
+            label,
+            self.utf("sep_v"),
+            name),
+            fg=colorname, bold=True))
 
     def debug(self, msg):
         """prints a debug message
@@ -405,7 +426,8 @@ class IOManager:
                 msg = [msg]
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__print_rawline("DEBUG: {}".format(click.style(line, fg="bright_black")), err=True)
+                    self.__print_rawline("DEBUG: {}".format(
+                        click.style(line, fg="bright_black")), err=True)
 
     def info(self, msg):
         """prints an info message
@@ -415,7 +437,8 @@ class IOManager:
                 msg = [msg]
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__print_rawline("INFO: {}".format(click.style(line, fg="cyan")),  err=True)
+                    self.__print_rawline("INFO: {}".format(
+                        click.style(line, fg="cyan")),  err=True)
 
     def warn(self, msg):
         """prints a warning message
@@ -424,7 +447,8 @@ class IOManager:
             msg = [msg]
         for elt in msg:
             for line in elt.split('\n'):
-                self.__print_rawline("WARNING: {}".format(click.style(line, fg="yellow", bold=True)),  err=True)
+                self.__print_rawline("WARNING: {}".format(
+                    click.style(line, fg="yellow", bold=True)),  err=True)
 
     def err(self, msg):
         """prints an error message
@@ -437,7 +461,8 @@ class IOManager:
         self.__print_rawline("{}".format(enclosing_line),  err=True)
         for elt in msg:
             for line in elt.split('\n'):
-                self.__print_rawline("ERROR: {}".format(click.style(line, fg="red", bold=True)),  err=True)
+                self.__print_rawline("ERROR: {}".format(
+                    click.style(line, fg="red", bold=True)),  err=True)
         self.__print_rawline("{}".format(enclosing_line),  err=True)
 
     def print_short_banner(self, string=False):
@@ -446,7 +471,7 @@ class IOManager:
         :param string: True if the banner has to be returned, False if it has to be logged
         :type string: bool
         """
-        logo =[
+        logo = [
             r"""             ____    ______  _    __  _____       """,
             r"""            / __ \  / ____/ | |  / / / ___/       """,
             r"""           / /_/ / / /      | | / /  \__ \        """,
@@ -454,15 +479,18 @@ class IOManager:
             r"""         /_/      \____/    |___/  /____/         """,
             r"""                                                  """,
             r"""      Parallel Computing -- Validation System     """,
-            r"""             Copyright {} 2017 -- CEA             """.format(self.utf('copy')),
+            r"""             Copyright {} 2017 -- CEA             """.format(
+                self.utf('copy')),
             r""""""
         ]
         s = []
         if self._linelength < max(map(lambda x: len(x), logo)):
             s = [
                 click.style("{}".format(self.utf("star")*14), fg="green"),
-                click.style("{} -- PCVS -- {}".format(self.utf("star"), self.utf('star')), fg="yellow"),
-                click.style("{} CEA {} 2017 {}".format(self.utf('star'), self.utf('copy'), self.utf('star')), fg="red"),
+                click.style("{} -- PCVS -- {}".format(self.utf("star"),
+                            self.utf('star')), fg="yellow"),
+                click.style("{} CEA {} 2017 {}".format(
+                    self.utf('star'), self.utf('copy'), self.utf('star')), fg="red"),
                 click.style("{}".format(self.utf("star")*14), fg="green")
             ]
         else:
@@ -477,13 +505,12 @@ class IOManager:
         else:
             self.__print_rawline("\n".join(s))
 
-
     def nimpl(self, *msg):  # pragma: no cover
         """prints the "not implemented" error
         """
-        self.err("This is not implemented (yet)!")  
+        self.err("This is not implemented (yet)!")
 
-    def print_n_stop(self, **kwargs):  #pragma: no cover
+    def print_n_stop(self, **kwargs):  # pragma: no cover
         """prints a message, then exits the program
         """
         # not replacing these prints (for debug only)
@@ -491,7 +518,6 @@ class IOManager:
             click.secho("{}: ".format(k), fg="yellow", nl=False)
             click.secho(pprint.pformat(v), fg="blue")
         sys.exit(0)
-
 
     def print_banner(self):
         """prints a large banner
@@ -505,37 +531,41 @@ class IOManager:
         #
         # the full header can be found under the /utils/ source dir.
         logo = [
-r"""    ____                   ____     __   ______                            __  _             """,
-r"""   / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _ """,
-r"""  / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/ """,
-r""" / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /  """,
-r"""/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /   """,
-r"""                                                          /_/                     /____/     """,
-r"""                                              {} (PCVS) {}""".format(self.utf('star'), self.utf('star')),
-r"""    _    __      ___     __      __  _                _____            __                    """,
-r"""   | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  _______/ /____  ____ ___      """,
-r"""   | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \     """,
-r"""   | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ /__  / /_/  __/ / / / / /     """,
-r"""   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      """,
-r"""                                                        /____/                               """,
-r"""                                                                                            """,
-r"""   Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA)   """.format(self.utf('copy')),
-r"""                                                                                            """,
-r"""  This program comes with ABSOLUTELY NO WARRANTY;                                           """,
-r"""  This is free software, and you are welcome to redistribute it                             """,
-r"""  under certain conditions; Please see COPYING for details.                                 """,
-r"""                                                                                            """,
+            r"""    ____                   ____     __   ______                            __  _             """,
+            r"""   / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _ """,
+            r"""  / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/ """,
+            r""" / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /  """,
+            r"""/_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /   """,
+            r"""                                                          /_/                     /____/     """,
+            r"""                                              {} (PCVS) {}""".format(
+                self.utf('star'), self.utf('star')),
+            r"""    _    __      ___     __      __  _                _____            __                    """,
+            r"""   | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  _______/ /____  ____ ___      """,
+            r"""   | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \     """,
+            r"""   | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ /__  / /_/  __/ / / / / /     """,
+            r"""   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      """,
+            r"""                                                        /____/                               """,
+            r"""                                                                                            """,
+            r"""   Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA)   """.format(
+                self.utf('copy')),
+            r"""                                                                                            """,
+            r"""  This program comes with ABSOLUTELY NO WARRANTY;                                           """,
+            r"""  This is free software, and you are welcome to redistribute it                             """,
+            r"""  under certain conditions; Please see COPYING for details.                                 """,
+            r"""                                                                                            """,
         ]
-        
+
         if self._linelength < max(map(lambda x: len(x), logo)):
-            
+
             self.print_short_banner()
             return
         else:
             self.__print_rawline(click.style("\n".join(logo[0:6]), fg="green"))
             self.__print_rawline(click.style("\n".join(logo[6:7])))
-            self.__print_rawline(click.style("\n".join(logo[7:10]), fg="green"))
-            self.__print_rawline(click.style("\n".join(logo[10:11]), fg="yellow"))
+            self.__print_rawline(click.style(
+                "\n".join(logo[7:10]), fg="green"))
+            self.__print_rawline(click.style(
+                "\n".join(logo[10:11]), fg="yellow"))
             self.__print_rawline(click.style("\n".join(logo[11:13]), fg="red"))
             self.__print_rawline(click.style("\n".join(logo[13:])))
 
@@ -559,6 +589,7 @@ def init(v=0, e=False, l=100, quiet=False):
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
 
+
 def progbar(it, print_func=None, man=None, **kargs):
     """prints a progress bar using click
 
@@ -575,8 +606,8 @@ def progbar(it, print_func=None, man=None, **kargs):
     if man is None:
         man = manager
     return click.progressbar(
-            it, empty_char=man.utf('empty_pg'),
-            info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
-            show_percent=False, show_eta=False, show_pos=False,
-            item_show_func=print_func,
-            **kargs)
+        it, empty_char=man.utf('empty_pg'),
+        info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
+        show_percent=False, show_eta=False, show_pos=False,
+        item_show_func=print_func,
+        **kargs)

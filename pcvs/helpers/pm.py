@@ -12,7 +12,7 @@ def identify(pm_node):
             pm_node['spack'] = [pm_node['spack']]
         for elt in pm_node['spack']:
             ret.append(SpackManager(elt))
-    
+
     if 'module' in pm_node:
         if not isinstance(pm_node['module'], list):
             pm_node['module'] = [pm_node['module']]
@@ -24,6 +24,7 @@ def identify(pm_node):
 class PManager:
     """generic Package Manager
     """
+
     def __init__(self, spec=None):
         """constructor for PManager object
 
@@ -33,6 +34,13 @@ class PManager:
         pass
 
     def get(self, load, install):
+        """Get specified packages for this manager
+
+        :param load: True to load the package
+        :type load: bool
+        :param install: True to install the package
+        :type install: bool
+        """
         pass
 
     def install(self):
@@ -44,6 +52,7 @@ class PManager:
 class SpackManager(PManager):
     """handles Spack package manager
     """
+
     def __init__(self, spec):
         """constructor for SpackManager object
 
@@ -73,6 +82,7 @@ class SpackManager(PManager):
 
 class ModuleManager(PManager):
     """handles Module package manager"""
+
     def __init__(self, spec):
         """constructor for Module package manager
 
