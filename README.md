@@ -1,9 +1,12 @@
 PCVS Documentation
 ==================
 
-PCVS stands for Parallel Computing Validation System and acts as a effort to help validating complex HPC architecture (compilers, runtimes, resource managers) at scale.
+PCVS stands for Parallel Computing Validation System and acts as a effort to
+help validating complex HPC architecture (compilers, runtimes, resource
+managers) at scale.
 
-This work is currently supported by the French Alternative Energies and Atomic Energy Commission (CEA). For any question and/or remarks, please contact :
+This work is currently supported by the French Alternative Energies and Atomic
+Energy Commission (CEA). For any question and/or remarks, please contact :
 
 * Julien JAEGER <julien.jaeger@cea.fr>
 
@@ -12,7 +15,8 @@ This work is currently supported by the French Alternative Energies and Atomic E
 * Julien ADAM <adamj@paratools.com>
 * Jean-Baptiste BESNARD <jbbesnard@paratools.com>
 
-PCVS is documented through ReStructuredText. which can be found under the `/docs` directory.
+PCVS is documented through ReStructuredText. which can be found under the
+`/docs` directory.
 
 Quick installation guide
 ------------------------
@@ -101,30 +105,11 @@ tox -l # available testenvs:
 	tests  # run tests
 	report  # buil reports (coverage.py)
 	yaml-lint  # yaml formatting
-	lint  # code formatting
+	lint-generic  # code formatting
+	lint-imports  # imports
+	lint-docs  # strict dosctring linting
 	imports  #code proper imports
 	docs   # properly formatted RST documentation
 ```
 
 ### Installation Troubleshooting
-
-#### Pygit2 issue(s)
-
-Cannot install pygit2 when running `pip install`. Error is of this kind:
-
-```
--> error: git2.h: No such file or directory
--> error: #error You need a compatible libgit2 version (1.1.x)
-```
-
-PCVS depends on pygit2 to deal with banks, pygit2 itself depending on libgit2
-(libs & dev). It is possible to manually install libgit2 (both libs &
-dev), but be aware that pygit2 >= 1.2.0 requires libgit2 >= 1.0.0.
-The latter may not be available on some systems, be sure to check out the proper
-version compatible with your pygit2 installation.
-
-Still, we recommend to rely on wheel packages to avoid installing extra
-third-party 
-tools. `pip3` is the best solution. An important note: some `pip3` versions have
-issues when dealing with wheels, please ensure to update it before reporting any
-bugs. (`pip3 install --upgrade pip`)
