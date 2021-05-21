@@ -14,6 +14,20 @@ from pcvs.helpers.exceptions import RunException
 
 
 def iterate_dirs(ctx, param, value) -> dict:
+    """Validate directories provided by users & format them correctly.
+
+    Set the defaul label for a given path if not specified & Configure default
+    directories if none was provided.
+
+    :param ctx: Click Context
+    :type ctx: :class:`Click.Context`
+    :param param: The arg targeting the function
+    :type param: str
+    :param value: The value given by the user:
+    :type value: List[str] or str
+    :return: properly formatted dict of user directories, keys are labels.
+    :rtype: dict
+    """
     list_of_dirs = dict()
     if not value:  # if not specified
         return None
@@ -26,27 +40,37 @@ def iterate_dirs(ctx, param, value) -> dict:
             else:  # otherwise, LABEL = dirname
                 testpath = os.path.abspath(d)
                 label = os.path.basename(testpath)
-            
+
             # if label already used for a different path
             if label in list_of_dirs.keys() and testpath != list_of_dirs[label]:
-                err_msg += "- '{}': Used more than once\n".format(label.upper())
+                err_msg += "- '{}': Used more than once\n".format(
+                    label.upper())
             elif not os.path.isdir(testpath):
-                err_msg += "- '{}': No such directory\n".format(testpath)   
+                err_msg += "- '{}': No such directory\n".format(testpath)
             # else, add it
             else:
                 list_of_dirs[label] = testpath
         if len(err_msg):
             raise click.BadArgumentUsage("\n".join([
-                    "While parsing user directories:",
-                    '{}'.format(err_msg),
-                    "please see '--help' for more information"
-                ]))
+                "While parsing user directories:",
+                '{}'.format(err_msg),
+                "please see '--help' for more information"
+            ]))
     return list_of_dirs
 
 
 def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
+    """directory completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     abspath = os.path.abspath(incomplete)
-    
+
     if ':' in incomplete:
         pass
     else:
@@ -58,22 +82,23 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
 
 def handle_build_lockfile(exc=None):
     """Remove the file lock in build dir if the application stops abrubtly.
-    
+
     This function will automatically forward the raising exception to the next
     handler.
-    
+
     :raises Exception: any exception triggering this handler
     :param exc: The raising exception.
     :type exc: Exception
     """
-    lock = os.path.join(system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
+    lock = os.path.join(
+        system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
     if os.path.exists(lock):
         utils.unlock_file(lock)
-    
+
     if exc:
         raise exc
 
-    
+
 @click.command(name="run", short_help="Run a validation")
 @click.option("-p", "--profile", "profilename", default="default",
               autocompletion=cli_profile.compl_list_token,
@@ -139,41 +164,43 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
-    
+
     # if dirs not set by config file nor CLI
     if not dirs and not val_cfg.dirs:
         testpath = os.getcwd()
         dirs = {os.path.basename(testpath): testpath}
-    
+
     # not overriding if dirs is None
     val_cfg.set_ifdef("dirs", dirs)
-    
+
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)
         if not obj.exists():
-            click.BadOptionUsage("--bank", "'{}' bank does not exist".format(obj.name))
+            click.BadOptionUsage(
+                "--bank", "'{}' bank does not exist".format(obj.name))
 
     # BEFORE the build dir still does not exist !
     lockfile = os.path.join(val_cfg.output, NAME_BUILDIR_LOCKFILE)
     if os.path.exists(val_cfg.output):
         if not val_cfg.override:
-            raise click.BadOptionUsage("--output", "target build directory already exist")
+            raise click.BadOptionUsage(
+                "--output", "target build directory already exist")
         if not utils.trylock_file(lockfile):
             raise RunException.InProgressError(val_cfg.output)
-            
-        
+
     elif not os.path.exists(val_cfg.output):
         os.makedirs(val_cfg.output)
-    
+
     # DO NOT move the logger init before the build dir exist (above)
-    log.manager.set_logfile(val_cfg.runlog is not None, val_cfg.runlog)    
-    
+    log.manager.set_logfile(val_cfg.runlog is not None, val_cfg.runlog)
+
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if val_cfg.reused_build is not None:
         try:
-            global_config = pvRun.dup_another_build(val_cfg.reused_build, val_cfg.output)
-            #TODO: Currently nothing can be overriden from cloned build except:
+            global_config = pvRun.dup_another_build(
+                val_cfg.reused_build, val_cfg.output)
+            # TODO: Currently nothing can be overriden from cloned build except:
             # - 'output'
         except FileNotFoundError:
             raise click.BadOptionUsage(
@@ -201,7 +228,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
                                   io_file=val_cfg.runlog)
     if val_cfg.background:
         sid = the_session.run_detached(the_session)
-        log.manager.print_item("Session successfully started, ID {}".format(sid))
+        log.manager.print_item(
+            "Session successfully started, ID {}".format(sid))
     else:
         the_session.run(the_session)
         utils.unlock_file(lockfile)

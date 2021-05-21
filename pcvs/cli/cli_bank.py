@@ -9,14 +9,32 @@ from pcvs.helpers.exceptions import BankException
 
 
 def compl_list_banks(ctx, args, incomplete):
-    """bank name completion function"""
+    """bank name completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     pvBank.init()
     array = list()
     for k, v in pvBank.BANKS.items():
-        array.append((k,v))
+        array.append((k, v))
     return [elt for elt in array if incomplete in elt[0]]
 
+
 def compl_bank_projects(ctx, args, incomplete):
+    """bank project completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     pvBank.init()
     array = list()
     for bankname, bankpath in compl_list_banks(None, None, ''):
@@ -31,15 +49,14 @@ def compl_bank_projects(ctx, args, incomplete):
 @click.group(name="bank", short_help="Persistent data repository management")
 @click.pass_context
 def bank(ctx):
-    """root function to handle a bank."""
+    """Bank entry-point."""
     pass
 
 
 @bank.command(name="list", short_help="List known repositories")
 @click.pass_context
 def bank_list(ctx):
-    """
-    List known repositories, stored under $HOME_STORAGE/banks.yml"""
+    """List known repositories, stored under ``PATH_BANK``."""
     log.manager.print_header("Bank View")
     for label, path in pvBank.list_banks().items():
         log.manager.print_item("{:<8}: {}".format(label.upper(), path))
@@ -69,7 +86,7 @@ def bank_create(ctx, name, path):
     log.manager.print_header("Bank View")
     if path is None:
         path = os.getcwd()
-    
+
     path = os.path.abspath(path)
 
     b = pvBank.Bank(path, token=name)
@@ -78,6 +95,7 @@ def bank_create(ctx, name, path):
     else:
         b.connect_repository()
         b.save_to_global()
+
 
 @bank.command(name="destroy", short_help="Delete an existing bank")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
@@ -99,10 +117,11 @@ def bank_destroy(ctx, name, symlink):
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         if not symlink:
-            log.manager.warn("To delete a bank, just remove the directory {}".format(b.prefix))
+            log.manager.warn(
+                "To delete a bank, just remove the directory {}".format(b.prefix))
         log.manager.print_item("Bank '{}' unlinked".format(name))
         pvBank.rm_banklink(name)
-        
+
 
 @bank.command(name="save", short_help="Save a new run to the datastore")
 @click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
@@ -110,21 +129,19 @@ def bank_destroy(ctx, name, symlink):
 @click.argument("project", nargs=1, required=False, type=str, default=None)
 @click.pass_context
 def bank_save_run(ctx, name, path, project):
-    
+
     b = pvBank.Bank(token=name)
     if not b.exists():
-       raise click.BadArgumentUsage("'{}' does not exist".format(name))
-   
+        raise click.BadArgumentUsage("'{}' does not exist".format(name))
+
     path = os.path.abspath(path)
-    
+
     b.connect_repository()
     if os.path.isfile(path):
         b.save_from_archive(project, path)
     elif os.path.isdir(path):
         path = utils.find_buildir_from_prefix(path)
         b.save_from_buildir(project, path)
-
-    
 
 
 @bank.command(name="load", short_help="Extract infos from the datastore")
@@ -139,7 +156,7 @@ def bank_save_run(ctx, name, path, project):
               help="Request a set of values from a given key")
 @click.pass_context
 def bank_load(ctx, name, key, format, start, end):
-    
+
     b = pvBank.Bank(token=name)
     raise BankException.WIPError("bank load")
     try:
@@ -148,5 +165,5 @@ def bank_load(ctx, name, key, format, start, end):
     except NotExist:
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     except KeyError:
-        raise click.BadArgumentUsage("The key \'{}\' is not valid within {} scope".format(key, name))
-    
+        raise click.BadArgumentUsage(
+            "The key \'{}\' is not valid within {} scope".format(key, name))

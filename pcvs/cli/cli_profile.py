@@ -9,6 +9,15 @@ from pcvs.helpers.exceptions import ProfileException, ValidationException
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
+    """profile name completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     pvProfile.init()
     flat_array = []
     for scope in utils.storage_order():
@@ -48,7 +57,7 @@ def profile_list(ctx, token):
     (scope, label) = (None, None)
     if token:
         (scope, _, label) = utils.extract_infos_from_token(token, single="left",
-                                                        maxsplit=2)
+                                                           maxsplit=2)
 
     if label:
         log.manager.warn("no LABEL required for this command")
@@ -67,14 +76,15 @@ def profile_list(ctx, token):
                             for elt in [array for array in profiles[sc]]])
             if not names:
                 log.manager.print_item("{: <6s}: {}".format(sc.upper(),
-                                                    log.manager.style('None',
-                                                             fg='bright_black')))
+                                                            log.manager.style('None',
+                                                                              fg='bright_black')))
             else:
                 log.manager.print_item("{: <6s}: {}".format(sc.upper(),
-                                                    ", ".join(names)))
+                                                            ", ".join(names)))
     else:
         names = sorted([x[0] for x in profiles])
-        log.manager.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+        log.manager.print_item("{: <6s}: {}".format(
+            scope.upper(), ", ".join(names)))
 
     # in case verbosity is enabled, add scope paths
     log.manager.info("Scopes are ordered as follows:")
@@ -101,6 +111,14 @@ def profile_show(ctx, token):
 
 
 def profile_interactive_select():
+    """Interactive selection of config blocks to build a profile.
+
+    Based on user input, this function displays, for each kind, possible blocks
+    and waits for a selection. A final profile is built from them.
+
+    :return: concatenation of basic blokcs
+    :rtype: dict
+    """
     composition = {}
     for kind in pvConfig.CONFIG_BLOCKS:
         log.manager.print_section("Pick up a {}".format(kind.capitalize()))
@@ -197,12 +215,13 @@ def profile_build(ctx, token, interactive, blocks, clone):
             base = pvProfile.Profile('default', None)
             base.load_template()
             pf.clone(base)
-        
+
     log.manager.print_header("profile view")
     pf.flush_to_disk()
     # pf.display()
 
-    log.manager.print_section("final profile (registered as {})".format(pf.scope))
+    log.manager.print_section(
+        "final profile (registered as {})".format(pf.scope))
     for k, v in pf_blocks.items():
         log.manager.print_item("{: >9s}: {}".format(
             k.upper(), ".".join([v.scope, v.short_name])))
@@ -225,12 +244,13 @@ def profile_destroy(ctx, token):
     # 'local.global' is allowed, 'global' isn't
     if scope is None and label in utils.storage_order():
         raise click.BadArgumentUsage("token is ambiguous. Please specify")
-        
+
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
-            pf.delete()
+        pf.delete()
     else:
-        raise click.BadArgumentUsage("Profile '{}' not found! Please check the 'list' command".format(label),)
+        raise click.BadArgumentUsage(
+            "Profile '{}' not found! Please check the 'list' command".format(label),)
 
 
 @profile.command(name="alter",
@@ -257,7 +277,7 @@ def profile_alter(ctx, token, editor, edit_plugin):
                 pf.edit(editor)
     else:
         raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
-                               "Please check the 'list' command")
+                                     "Please check the 'list' command")
 
 
 @profile.command(name="import",
@@ -275,6 +295,7 @@ def profile_import(ctx, token, src_file):
     else:
         ProfileException.AlreadyExistError(token)
 
+
 @profile.command(name="export",
                  short_help="Export a profile to a file")
 @click.argument("token", nargs=1, type=click.STRING,
@@ -288,15 +309,16 @@ def profile_export(ctx, token, dest_file):
     if pf.is_found():
         dest_file.write(yaml.safe_dump(pf.dump()))
 
+
 @profile.command(name="split",
                  short_help="Recreate conf. blocks based on a profile")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.option("-n", "--name", "name", default="default",
               help="name of the basic block to create (should not exist!)"
-        )
+              )
 @click.option("-b", "--block", "block_opt", nargs=1, type=click.STRING,
-            help="Re-build only a profile subset", default="all")
+              help="Re-build only a profile subset", default="all")
 @click.option("-s", "--scope", "scope",
               type=click.Choice(utils.storage_order()), default=None,
               help="Default scope to store the split (default: same as profile)")
@@ -310,14 +332,15 @@ def profile_decompose_profile(ctx, token, name, block_opt, scope):
             blocks = pvConfig.CONFIG_BLOCKS
             break
         if b not in pvConfig.CONFIG_BLOCKS:
-            raise click.BadOptionUsage("--block", "{} is not a valid component.".format(b))
+            raise click.BadOptionUsage(
+                "--block", "{} is not a valid component.".format(b))
 
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
-        click.BadArgumentUsage("Cannot decompose an non-existent profile: '{}'".format(token))
+        click.BadArgumentUsage(
+            "Cannot decompose an non-existent profile: '{}'".format(token))
     else:
         pf.load_from_disk()
-
 
     log.manager.print_section('"Create the subsequent configuration blocks:')
     for c in pf.split_into_configs(name, blocks, scope):

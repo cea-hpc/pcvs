@@ -32,26 +32,28 @@ def exec(ctx, output, argument, gen_list, display):
 
     if display:
         env.update({'PCVS_SHOW': str(display)})
-    
+
     if gen_list:
         script_path = pvUtils.locate_scriptpaths(output)
         argument = "--list"
         err = subprocess.DEVNULL
     else:
-        script_path = [pvUtils.compute_scriptpath_from_testname(argument, output)]
+        script_path = [
+            pvUtils.compute_scriptpath_from_testname(argument, output)]
     try:
         for f in script_path:
             if not os.path.isfile(f):
-                raise click.BadArgumentUsage("Launch script for '{}' not found".format(argument))
+                raise click.BadArgumentUsage(
+                    "Launch script for '{}' not found".format(argument))
             fds = subprocess.Popen(
-                    ['sh', f, argument],
-                    env=env,
-                    stderr=err)
+                ['sh', f, argument],
+                env=env,
+                stderr=err)
             fds.communicate()
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
         rc = e.returncode
-    
+
     # return code to console
     sys.exit(rc)
 
@@ -62,8 +64,8 @@ def exec(ctx, output, argument, gen_list, display):
 @click.option("--colouring", "-x", "color", default=False, is_flag=True,
               help="Check capability to print coloured characters properly")
 @click.option("--directory", "-d", "dir", default=None,
-             type=click.Path(exists=True, file_okay=False),
-             help="Check correctness for pcvs.* files")
+              type=click.Path(exists=True, file_okay=False),
+              help="Check correctness for pcvs.* files")
 @click.option("--configs", "-c", "configs", default=False, is_flag=True,
               help="Check correctness for all registered configuation block")
 @click.option("--profiles", "-p", "profiles", default=False, is_flag=True,
@@ -78,21 +80,22 @@ def check(ctx, dir, encoding, color, configs, profiles):
         ctx.color = True
         t.field_names = ["Name", "Foreground", "Background"]
         for k in sorted(log.manager.color_list):
-            t.add_row([k, click.style("Test", fg=k), click.style("Test", bg=k)])
+            t.add_row([k, click.style("Test", fg=k),
+                      click.style("Test", bg=k)])
         print(t)
 
     if encoding:
         log.manager.print_header("Encoding")
-        
+
         t = PrettyTable()
         t.field_names = ["Alias", "Symbol", "Fallback"]
         man_default = log.IOManager(0, False, 100, None, None)
         man_unicode = log.IOManager(0, True, 100, None, None)
-        
+
         for k in sorted(man_default.avail_chars()):
             t.add_row([k, man_unicode.utf(k), man_default.utf(k)])
         print(t)
-    
+
     if configs:
         log.manager.print_header("Configurations")
         errors = {**errors, **pvUtils.process_check_configs()}
@@ -108,13 +111,14 @@ def check(ctx, dir, encoding, color, configs, profiles):
         settings = MetaConfig()
         cfg_val = settings.bootstrap_validation({})
         cfg_val.set_ifdef('output', "/tmp/test")
-        errors = {**errors, **pvUtils.process_check_directory(os.path.abspath(dir))}
+        errors = {**errors, **
+                  pvUtils.process_check_directory(os.path.abspath(dir))}
 
     if errors:
         log.manager.print_section("Classification of errors:")
         table = PrettyTable()
         table.field_names = ["Count", "Type of error"]
-        
+
         for k, v in errors.items():
             table.add_row([v, base64.b64decode(k).decode('utf-8')])
 
@@ -128,14 +132,14 @@ def check(ctx, dir, encoding, color, configs, profiles):
             succ=log.manager.utf('succ'),
             cg=log.manager.style("Everything is OK!", fg='green', bold=True))
         )
-        
+
 
 @click.command(name="clean", short_help="Remove artifacts generated from PCVS")
 @click.option("-f", "--force", "force", default=False, is_flag=True,
               help="Acknowledge there is no way back.")
 @click.option("-d", "--dry-run", "fake", default=False, is_flag=True,
               help="Print artefacts instead of deleting them")
-@click.option('-i', '--interactive', 'interactive', 
+@click.option('-i', '--interactive', 'interactive',
               is_flag=True, default=False,
               help="Manage cleanup process interactively")
 @click.argument("paths", required=False, type=click.Path(exists=True), nargs=-1)
@@ -143,13 +147,13 @@ def check(ctx, dir, encoding, color, configs, profiles):
 def clean(ctx, force, fake, paths, interactive):
     if not fake and not force:
         log.manager.warn(["IMPORTANT NOTICE:",
-                 "This command will delete files from previous run(s) and",
-                 "no recovery will be possible after deletion.",
-                 "Please use --force to indicate you acknowledge the risks",
-                 "and will face consequences in case of improper use.",
-                 "",
-                 "To list files to be deleted instead, you may use --dry-run."]
-        )
+                          "This command will delete files from previous run(s) and",
+                          "no recovery will be possible after deletion.",
+                          "Please use --force to indicate you acknowledge the risks",
+                          "and will face consequences in case of improper use.",
+                          "",
+                          "To list files to be deleted instead, you may use --dry-run."]
+                         )
         sys.exit(0)
     if not paths:
         paths = [os.getcwd()]
@@ -191,9 +195,9 @@ def discover(ctx, paths, set, force):
 
     if not paths:
         paths = [os.getcwd()]
-    
+
     paths = [os.path.abspath(x) for x in paths]
-    
+
     for p in paths:
         log.manager.print_section("{}".format(p))
         pvUtils.process_discover_directory(p, set, force)

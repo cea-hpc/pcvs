@@ -6,6 +6,15 @@ from pcvs.helpers import log, utils
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
+    """config name completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     pvConfig.init()
     flat_array = []
     for kind in pvConfig.CONFIG_BLOCKS:
@@ -40,7 +49,13 @@ def config(ctx) -> None:
 
 
 def config_list_single_kind(kind, scope) -> None:
-    """Related to 'config list' command, handling a single 'kind' at a time"""
+    """Related to 'config list' command, handling a single 'kind' at a time.
+
+    :param kind: config kind
+    :type kind: str
+    :param scope: config scope
+    :type scope: str
+    """
     # retrieve blocks to print
     blocks = pvConfig.list_blocks(kind, scope)
     if not blocks:
@@ -52,15 +67,16 @@ def config_list_single_kind(kind, scope) -> None:
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
                 log.manager.print_item("{: <6s}: {}".format(
-                                sc.upper(),
-                                log.manager.style('None', fg='bright_black')))
+                    sc.upper(),
+                    log.manager.style('None', fg='bright_black')))
             else:
                 log.manager.print_item("{: <6s}: {}".format(
-                                sc.upper(),
-                                ", ".join(names)))
+                    sc.upper(),
+                    ", ".join(names)))
     else:
         names = sorted([x[0] for x in blocks])
-        log.manager.print_item("{: <6s}: {}".format(scope.upper(), ", ".join(names)))
+        log.manager.print_item("{: <6s}: {}".format(
+            scope.upper(), ", ".join(names)))
 
 
 @config.command(name="list", short_help="List available configuration blocks")
@@ -166,12 +182,12 @@ def config_create(ctx, token, clone, interactive) -> None:
         if not base.is_found():
             raise click.BadArgumentUsage(
                 "There is no such conf.block named '{}'".format(clone)
-                )
+            )
         base.load_from_disk()
     else:
         base = pvConfig.ConfigurationBlock(kind, 'default', None)
         base.load_template()
-        
+
     copy = pvConfig.ConfigurationBlock(kind, label, scope)
     if not copy.is_found():
         copy.clone(base)
@@ -203,7 +219,8 @@ def config_destroy(ctx, token) -> None:
     if c.is_found():
         c.delete()
     else:
-        raise click.BadArgumentUsage("Configuration '{}' not found!\nPlease check the 'list' command".format(label))
+        raise click.BadArgumentUsage(
+            "Configuration '{}' not found!\nPlease check the 'list' command".format(label))
 
 
 @config.command(name="edit", short_help="edit the config block")
@@ -232,7 +249,8 @@ def config_edit(ctx, token, editor, edit_plugin) -> None:
         else:
             block.edit(editor)
     else:
-        raise click.BadArgumentUsage("Cannot open this configuration: does not exist!")
+        raise click.BadArgumentUsage(
+            "Cannot open this configuration: does not exist!")
 
 
 @config.command(name="import", short_help="Import config from a file")
@@ -255,7 +273,8 @@ def config_import(ctx, token, in_file) -> None:
         obj.fill(yaml.safe_load(in_file.read()))
         obj.flush_to_disk()
     else:
-        raise click.BadArgumentUsage("Cannot import into an already created conf. block!")
+        raise click.BadArgumentUsage(
+            "Cannot import into an already created conf. block!")
 
 
 @config.command(name="export", short_help="Export config into a file")
@@ -276,4 +295,5 @@ def config_export(ctx, token, out_file):
     if obj.is_found():
         out_file.write(yaml.safe_dump(obj.dump()))
     else:
-        raise click.BadArgumentUsage("Config block not found: '{}'".format(token))
+        raise click.BadArgumentUsage(
+            "Config block not found: '{}'".format(token))

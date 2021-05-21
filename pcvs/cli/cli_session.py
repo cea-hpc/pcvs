@@ -9,6 +9,16 @@ from pcvs.helpers import log, utils
 
 
 def compl_session_token(ctx, args, incomplete) -> list:
+    """Session name completion function.
+
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
+
     sessions = pvSession.list_alive_sessions()
     if sessions is None:
         return []
@@ -32,14 +42,17 @@ def session(ctx, ack, list, ack_all):
         for session_id in sessions.keys():
             if sessions[session_id]['state'] != pvSession.Session.State.IN_PROGRESS:
                 pvSession.remove_session_from_file(session_id)
-                lockfile = os.path.join(sessions[session_id]['path'], NAME_BUILDIR_LOCKFILE)
+                lockfile = os.path.join(
+                    sessions[session_id]['path'], NAME_BUILDIR_LOCKFILE)
                 utils.unlock_file(lockfile)
     elif ack is not None:
         if ack not in sessions.keys():
-            raise click.BadOptionUsage('--ack', "No such Session id (see pcvs session)")
+            raise click.BadOptionUsage(
+                '--ack', "No such Session id (see pcvs session)")
         elif sessions[ack]['state'] not in [pvSession.Session.State.ERROR, pvSession.Session.State.COMPLETED]:
-            raise click.BadOptionUsage('--ack', "This session is not completed yet")
-        
+            raise click.BadOptionUsage(
+                '--ack', "This session is not completed yet")
+
         pvSession.remove_session_from_file(ack)
         lockfile = os.path.join(sessions[ack]['path'], NAME_BUILDIR_LOCKFILE)
         utils.unlock_file(lockfile)
@@ -53,11 +66,12 @@ def session(ctx, ack, list, ack_all):
 
             if s.state == pvSession.Session.State.IN_PROGRESS:
                 duration = datetime.now() - s.property('started')
-                status = "In Progress -- {:4.2f}%".format(s.property('progress'))
+                status = "In Progress -- {:4.2f}%".format(
+                    s.property('progress'))
             elif s.state == pvSession.Session.State.COMPLETED:
                 duration = s.property('ended') - s.property('started')
-                status = "Completed"    
-            
+                status = "Completed"
+
             log.manager.print_item("SID {: >2s}: {} ({})".format(
                 str(s.id),
                 status.upper(),
