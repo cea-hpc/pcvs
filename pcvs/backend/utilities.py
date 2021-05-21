@@ -18,6 +18,8 @@ def locate_scriptpaths(output=None):
 
     :param output: prefix to walk through, defaults to current directory
     :type output: str, optional
+    :return: the list of scripts found in prefix
+    :rtype: List[str]
     """
     if output is None:
         output = os.getcwd()
@@ -37,7 +39,8 @@ def compute_scriptpath_from_testname(testname, output=None):
     :type testname: str
     :param output: prefix to walk through, defaults to current directory
     :type output: str, optional
-
+    :return: the associated path with testname
+    :rtype: str
     """
     if output is None:
         output = os.getcwd()
@@ -54,7 +57,10 @@ def compute_scriptpath_from_testname(testname, output=None):
 
 def process_check_configs():
     """Analyse available configurations to ensure their correctness relatively
-    to their respective schemes."""
+    to their respective schemes.
+
+    :return: caught errors, as a dict, where the keys is the errmsg base64
+    :rtype: dict"""
     errors = dict()
     t = PrettyTable()
     t.field_names = ["Valid", "ID"]
@@ -84,7 +90,10 @@ def process_check_configs():
 
 def process_check_profiles():
     """Analyse availables profiles and check their correctness relatively to the
-    base scheme."""
+    base scheme.
+
+    :return: list of caught errors as a dict, where keys are error msg base64
+    :rtype: dict"""
     t = PrettyTable()
     errors = dict()
     t.field_names = ["Valid", "ID"]
@@ -154,6 +163,8 @@ def process_check_yaml_stream(data):
     standard. 
     :param data: the stream to process
     :type data: str
+    :return: a tuple (err_msg, load status icon, yaml format status icon)
+    :rtype: tuple
     """
     global scheme
     token_load = token_yaml = "{}".format(log.manager.style(
@@ -181,6 +192,8 @@ def process_check_directory(dir):
 
     :param dir: the directory to process.
     :type dir: str
+    :return: a dict of caught errors
+    :rtype: dict
     """
     errors = dict()
     setup_files, yaml_files = run.find_files_to_process(
@@ -245,28 +258,51 @@ def process_check_directory(dir):
 
 
 class BuildSystem:
+    """Manage a generic build system discovery service.
+
+    :ivar _root: the root directory the discovery service is attached to.
+    :type _root: str
+    :ivar _dirs: list of directory found in _root.
+    :type _dirs: List[str]
+    :ivar _files: list of files found in _root
+    :type _files: List[str]
+    :ivar _stream: the resulted dict, representing targeted YAML architecture
+    :type _stream: dict"""
+
     def __init__(self, root, dirs=None, files=None):
+        """Constructor method.
+
+        :param root: root dir where discovery service is applied
+        :type root: str
+        :param dirs: list of dirs, defaults to None
+        :type dirs: str, optional
+        :param files: list of files, defaults to None
+        :type files: str, optional
+        """
         self._root = root
         self._dirs = dirs
         self._files = files
         self._stream = Dict()
 
-    def __append_listdir(self):
-        self._dirs = list()
-        self._files = list()
-        for f in os.listdir(self._root):
-            if os.path.isdir(f):
-                self._dirs.append(f)
-            else:
-                self._files.append(f)
-
     def fill(self):
-        pass
+        """This function should be overriden by overriden classes.
 
-    def generate_file(self, filename="pcvs.yml"):
+        Nothing to do, by default.
+        """
+        assert(False)
+
+    def generate_file(self, filename="pcvs.yml", force=False):
+        """Build the YAML test file, based on path introspection and build
+        model.
+
+        :param filename: test file suffix
+        :type filename: str
+        :param force: erase target file if exist.
+        :type force: bool
+        """
         out_file = os.path.join(self._root, filename)
-        if os.path.isfile(out_file):
-            log.manager.warn("template already exist ! Skip.")
+        if os.path.isfile(out_file) and not force:
+            log.manager.warn(" --> skipped, already exist;")
             return
 
         with open(out_file, 'w') as fh:
@@ -274,7 +310,11 @@ class BuildSystem:
 
 
 class AutotoolsBuildSystem(BuildSystem):
+    """Derived BuildSystem targeting Autotools projects."""
+
     def fill(self):
+        """Populate the dict relatively to the build system to build the proper
+        YAML representation."""
         name = os.path.basename(self._root)
         self._stream[name].build.autotools.autogen = (
             'autogen.sh' in self._files)
@@ -283,7 +323,11 @@ class AutotoolsBuildSystem(BuildSystem):
 
 
 class CMakeBuildSystem(BuildSystem):
+    """Derived BuildSystem targeting CMake projects."""
+
     def fill(self):
+        """Populate the dict relatively to the build system to build the proper
+        YAML representation."""
         name = os.path.basename(self._root)
         self._stream[name].build.cmake.vars = "CMAKE_BUILD_TYPE=Debug"
         self._stream[name].build.files = os.path.join(
@@ -291,21 +335,26 @@ class CMakeBuildSystem(BuildSystem):
 
 
 class MakefileBuildSystem(BuildSystem):
+    """Derived BuildSystem targeting Makefile-based projects."""
+
     def fill(self):
+        """Populate the dict relatively to the build system to build the proper
+        YAML representation."""
         name = os.path.basename(self._root)
         self._stream[name].build.make.target = ''
         self._stream[name].build.files = os.path.join(self._root, 'Makefile')
 
 
-def process_autotools_suite(root, dirs, files):
-    stream = Dict()
-    name = os.path.basename(root)
-    stream[name].build.files = os.path.join(root, "configure")
-    stream[name].build.autogen = ('autogen.sh' in files)
+def process_discover_directory(path, override=False, force=False):
+    """Path discovery to detect & intialize build systems found.
 
-
-def process_discover_directory(path):
-
+    :param path: the root path to start with
+    :type path: str
+    :param override: True if test files should be generated, default to False
+    :type override: bool
+    :param force: True if test files should be replaced if exist, defaut to False
+    :type force: bool
+    """
     for root, dirs, files in os.walk(path):
         obj = None
         if 'configure' in files:
@@ -322,4 +371,5 @@ def process_discover_directory(path):
             dirs[:] = []
             log.manager.print_item("{} [{}]".format(root, n))
             obj.fill()
-            obj.generate_file(filename="pcvs.yml")
+            if override:
+                obj.generate_file(filename="pcvs.yml", force=force)

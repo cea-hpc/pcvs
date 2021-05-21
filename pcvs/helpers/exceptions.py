@@ -33,7 +33,9 @@ class CommonException:
 
 class BankException(CommonException):
     "Bank-specific exceptions."""
-    pass
+    class ProjectNameError(GenericError):
+        """name is not a valid project under the given bank."""
+        pass
 
 
 class ConfigException(CommonException):

@@ -184,8 +184,10 @@ def clean(ctx, force, fake, paths, interactive):
 @click.command(name="scan",
                short_help="Analyze directories to build up test conf. files")
 @click.argument("paths", default=None, nargs=-1)
+@click.option("-s/-c", "--set/--check", "set", is_flag=True, default=False)
+@click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
-def discover(ctx, paths):
+def discover(ctx, paths, set, force):
 
     if not paths:
         paths = [os.getcwd()]
@@ -194,4 +196,4 @@ def discover(ctx, paths):
     
     for p in paths:
         log.manager.print_section("{}".format(p))
-        pvUtils.process_discover_directory(p)
+        pvUtils.process_discover_directory(p, set, force)

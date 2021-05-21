@@ -75,6 +75,13 @@ class Profile:
     """
 
     def __init__(self, name, scope=None):
+        """Constructor method.
+
+        :param name: profile name
+        :type name: str
+        :param scope: desired scope, automatically set if not provided
+        :type scope: str, optional
+        """
         utils.check_valid_scope(scope)
         self._name = name
         self._scope = scope

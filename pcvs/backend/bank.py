@@ -14,6 +14,8 @@ from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 
+#: :var BANKS: list of available banks when PCVS starts up
+#: :type BANKS: dict, keys are bank names, values are file path
 BANKS: typing.Dict[str, str] = dict()
 
 
@@ -485,10 +487,8 @@ class Bank:
         """
         refname = self.__build_target_branch_name(None)
 
-        class ProjectNameError(Exception):
-            pass
         if refname not in self._repo.references:
-            raise ProjectNameError()
+            raise BankException.ProjectNameError()
 
         head, _ = self._repo.resolve_refish(refname)
         for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):

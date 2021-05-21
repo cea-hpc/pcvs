@@ -146,6 +146,8 @@ def main_detached_session(sid, user_func, *args, **kwargs):
     This function is called by Session.run_detached() and is launched from
     cloned process (same global env, new main function).
 
+    :raises Exception: any error occuring during the main process is re-raised.
+
     :param sid: the session id
     :param user_func: the Python function used as the new main()
     :param args: user_func() arguments
@@ -200,17 +202,24 @@ class Session:
 
     """
     class State(IntEnum):
+        """Enum of possible Session states."""
         WAITING = 0
         IN_PROGRESS = 1
         COMPLETED = 2
         ERROR = 3
-        
+
         def __str__(self):
-            return self.name  
-    
+            """Stringify the state.
+
+            :return: the enum name.
+            :rtype: str
+            """
+            return self.name
+
     @property
     def state(self):
         """Getter to session status.
+
         :return: session status
         :rtype: int
         """
@@ -219,6 +228,7 @@ class Session:
     @property
     def id(self):
         """Getter to session id.
+
         :return: session id
         :rtype: int
         """
@@ -227,6 +237,7 @@ class Session:
     @property
     def infos(self):
         """Getter to session infos.
+
         :return: session infos
         :rtype: dict
         """
@@ -237,12 +248,20 @@ class Session:
 
         :param kw: the information to retrieve. kw must be a valid key
         :type kw: str
+        :return: the requested session infos if exist
+        :rtype: Any
         """
         assert(kw in self._session_infos)
         return self._session_infos[kw]
 
     def __init__(self, date=None, path="."):
-        """constructor method"""
+        """constructor method.
+
+        :param date: the start timestamp
+        :type date: datetime.datetime
+        :param path: the build directory
+        :type path: str
+        """
         self._func = None
         self._sid = -1
         # this dict is then flushed to the session.yml
@@ -296,6 +315,9 @@ class Session:
         :type args: tuple
         :param kwargs user function keyword-based arguments.
         :type kwargs: tuple
+
+        :return: the Session id created for this run.
+        :rtype: int
         """
         if self._func is not None:
             # some sessions can have their starting time set directly when
@@ -344,7 +366,7 @@ class Session:
             # same as above, shifted starting time or not
             if self.property('started') == None:
                 self._session_infos['started'] = datetime.now()
-            
+
             self._session_infos['state'] = self.State.IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
@@ -359,17 +381,38 @@ class Session:
                 remove_session_from_file(self._sid)
 
 
-def enum_representer(dumper, data):
+def enum_representer(dumper: yaml.Dumper, data):
+    """Convert a Test.State to a valid YAML representation.
+
+    A new tag is created: 'Session.State' as a scalar (str).
+    :param dumper: the YAML dumper object 
+    :type dumper: :class:`yaml.Dumper`
+    :param data: the object to represent
+    :type data: class:`Session.State`
+    :return: the YAML representation
+    :rtype: Any
+    """
     return dumper.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
 
 
-def enum_constructor(loader, node):
+def enum_constructor(loader: yaml.FullLoader, node):
+    """Construct a :class:`Session.State` from its YAML representation.
+
+    Relies on the fact the node contains a 'Session.State' tag.
+    :param loader: the YAML loader
+    :type loader: :class:`yaml.FullLoader`
+    :param node: the YAML representation
+    :type node: Any
+    :return: The session State as an object
+    :rtype: :class:`Session.State`
+    """
     s = loader.construct_scalar(node)
     name, value = s.split('||')
     obj = Session.State(int(value))
     assert(obj.name == name)
-    
+
     return obj
+
 
 yaml.add_constructor(u'!Session.State', enum_constructor)
 yaml.add_representer(Session.State, enum_representer)
