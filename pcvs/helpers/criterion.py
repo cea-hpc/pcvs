@@ -33,7 +33,6 @@ class Combination:
 
     def get(self, k, dflt=None):
         """Retrieve the actual value for a given combination element
-
         :param k: value to retrieve
         :type k: str
         :param dflt: default value if k is not a valid key
@@ -109,7 +108,6 @@ class Serie:
     def __init__(self, dict_of_criterion):
         """Build a serie, by extracting the list of values.
         Note that here, the dict also contains program-based criterions
-
         :param dict_of_criterion: values to build the serie with
         :type dict_of_criterion: dict"""
         self._values = list()
