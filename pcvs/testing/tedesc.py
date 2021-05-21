@@ -158,7 +158,7 @@ class TEDescriptor:
         :type label: str
         :param subprefix: relative path between user dir & current TE testfile
         :type subprefix: str or NoneType
-        
+
         :raises TDFormatError: Unproper YAML TE format (sanity check)
         """
         if not isinstance(node, dict):

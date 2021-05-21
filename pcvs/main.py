@@ -20,9 +20,20 @@ CONTEXT_SETTINGS = dict(
 
 
 def print_version(ctx, param, value):
+    """Print current version.
+
+    This is used as an option formatter, PCVS is not event loaded yet.
+
+    :param ctx: Click Context.
+    :type ctx: :class:`Click.Context`
+    :param param: the option triggering the callback (unused here)
+    :type param: str
+    :param value: the value provided with the option (unused here)
+    """
     if not value or ctx.resilient_parsing:
         return
-    click.echo('Parallel Computing Validation System (pcvs) -- version {}'.format(version.__version__))
+    click.echo(
+        'Parallel Computing Validation System (pcvs) -- version {}'.format(version.__version__))
     ctx.exit()
 
 
@@ -45,6 +56,7 @@ def print_version(ctx, param, value):
               help="Terminal width (autodetection if omitted")
 @click.pass_context
 def cli(ctx, verbose, color, encoding, exec_path, width):
+    """PCVS main program."""
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
@@ -65,40 +77,6 @@ def cli(ctx, verbose, color, encoding, exec_path, width):
     config.init()
     profile.init()
     bank.init()
-    
-    
-
-@cli.command(
-    "help",
-    short_help="Quick Guide to prepare PCVS after a fresh installation")
-@click.argument("category", nargs=1, required=False, default=None,
-                type=click.Choice(['completion', 'config', 'scope', 'token']))
-@click.pass_context
-def cli_doc(ctx, category):
-
-    log.manager.print_header("Documentation")
-
-    log.manager.print_section("Enable completion (cmds to be run or added to ~/.*rc)")
-    for shell in ['zsh', 'bash']:
-        log.manager.print_item(
-            "{: >4s}: eval \"$(_PCVS_COMPLETE=source_{} pcvs)\"".
-            format(shell.upper(), shell))
-    pass
-
-    log.manager.print_section("Create basic configuration blocks")
-    log.manager.print_item("WIP")
-
-    log.manager.print_section("Create a profile")
-    log.manager.print_item("WIP")
-
-    log.manager.print_section("Make a compliant test-suite")
-    log.manager.print_item("WIP")
-
-    log.manager.print_section("Run a  simple validation")
-    log.manager.print_item("WIP")
-
-    log.manager.print_section("Browse results")
-    log.manager.print_item("WIP")
 
 
 cli.add_command(cli_config.config)
@@ -110,7 +88,7 @@ cli.add_command(cli_utilities.exec)
 cli.add_command(cli_utilities.check)
 cli.add_command(cli_utilities.clean)
 cli.add_command(cli_utilities.discover)
-#cli.add_command(cli_gui.gui)
+# cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
 
 if __name__ == "__main__":

@@ -21,12 +21,12 @@ def separate_key_and_value(s: str, c: str) -> tuple:
     if len(array) > 1:
         k = array[0]
         v = "".join(array[1:])
-        
+
         if v.lower() == 'true':
             v = True
         elif v.lower() == 'false':
             v = False
-        
+
         return (k, v)
     else:
         return (s, None)
@@ -278,7 +278,8 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
 
     # load the scheme
     if not scheme:
-        scheme = open(os.path.join(pcvs.PATH_INSTDIR, "converter/convert.json"))
+        scheme = open(os.path.join(
+            pcvs.PATH_INSTDIR, "converter/convert.json"))
     log.manager.print_item("Load scheme file: {}".format(scheme.name))
     tmp = json.load(scheme)
 
@@ -290,7 +291,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
                                               tmp['__tokens'])
 
     log.manager.info("Conversion list {old_key -> new_key):",
-              "{}".format(pprint.pformat(desc_dict)))
+                     "{}".format(pprint.pformat(desc_dict)))
 
     # first, "flattening" the original array: {(1, 2, 3): "val"}
     data_to_convert = flatten(data_to_convert, kind)
@@ -309,9 +310,10 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     # remove template key from the output to avoid polluting the caller
     log.manager.print_item("Pruning templates from the final data")
     invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
-    log.manager.info("Prune the following:", "{}".format(pprint.pformat(invalid_nodes)))
+    log.manager.info("Prune the following:", "{}".format(
+        pprint.pformat(invalid_nodes)))
     [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
-    
+
     log.manager.info("Final layout:", "{}".format(pprint.pformat(final_data)))
 
     if stdout:
@@ -327,6 +329,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     yaml.safe_dump(final_data, f)
 
     f.close()
+
 
 """
 MISSING:

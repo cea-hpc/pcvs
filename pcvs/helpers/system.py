@@ -187,6 +187,12 @@ class MetaConfig(Dict):
     validation_default_file = pcvs.PATH_VALCFG
 
     def __init__(self, *args, **kwargs):
+        """constructor method.
+
+        :param args: list of positional arguments
+        :type args: tuple
+        :param kwargs: list of keyword-based arguments
+        """
         super().__init__(*args, **kwargs)
 
         # The 'internal' node is a special one. Put here anything not requiring
