@@ -175,7 +175,7 @@ def prepare():
         valcfg.output, 'save_for_export'), dir=True)
     utils.create_or_clean_path(os.path.join(
         valcfg.output, NAME_BUILD_RESDIR), dir=True)
-    utils.create_or_clean_path(valcfg.buildcache)
+    utils.create_or_clean_path(valcfg.buildcache, dir=True)
 
     log.manager.print_item("Create subdirs for each provided directories")
     os.makedirs(buildir, exist_ok=True)
@@ -417,10 +417,9 @@ def process_static_yaml_files(yaml_files):
                 err.append((f, e.output))
                 log.manager.info("{}: {}".format(f, e.output))
                 continue
-            except Exception as e:
-                err.append((f, e))
-                log.manager.info(
-                    "Failed to read {}: ".format(f), "{}".format(e))
+            #except Exception as e:
+            #    err.append((f, e))
+            #    log.manager.info("Failed to read {}: {}".format(f, e))
     return err
 
 

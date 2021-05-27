@@ -42,6 +42,9 @@ class CommonException:
         """Work in Progress, not a real error."""
 
         pass
+    
+    class NotImplementedError(GenericError):
+        """Missing implementation for this particular feature."""
 
 
 class BankException(CommonException):
@@ -137,10 +140,20 @@ class LockException(CommonException):
     class BadOwnerError(GenericError):
         """Attempt to manipulate the lock while the current process is not the
         owner."""
-
         pass
 
     class TimeoutError(GenericError):
         """Timeout reached before lock."""
+        pass
+    
 
+class PluginException(CommonException):
+    """Plugin-related exceptions."""
+    
+    class BadStepError(GenericError):
+        """targeted pass does not exist."""
+        pass
+    
+    class LoadError(GenericError):
+        """Unable to load plugin directory."""
         pass

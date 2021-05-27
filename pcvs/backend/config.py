@@ -353,10 +353,15 @@ class ConfigurationBlock:
                 stream_yaml['plugin']).decode('ascii')
         else:
             plugin_code = """import math
-def check_valid_combination(dict_of_combinations=dict()):
+from pcvs.plugins import Plugin
+
+class MyPlugin(Plugin):
+    target = Plugin.Step.TEST_EVAL
+    def run(self, *args, **kwargs):
     # this dict maps keys (it name) with values (it value)
     # returns True if the combination should be used
-    return True"""
+    return True
+"""
 
         edited_code = click.edit(
             plugin_code, editor=e, extension=".py", require_save=True)

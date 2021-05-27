@@ -276,8 +276,11 @@ def profile_alter(ctx, token, editor, edit_plugin):
             else:
                 pf.edit(editor)
     else:
-        raise click.BadArgumentUsage("Profile '{}' not found!".format(label),
-                                     "Please check the 'list' command")
+        raise click.BadArgumentUsage(
+            "\n".join([
+                "Profile '{}' not found!\n".format(label),
+                "Please check the 'list' command"]))
+                                     
 
 
 @profile.command(name="import",

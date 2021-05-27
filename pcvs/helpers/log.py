@@ -280,6 +280,7 @@ class IOManager:
                         manager.err("{}: {}".format(type(e).__name__, e))
                         manager.info(
                             traceback.format_exception(*sys.exc_info()))
+                        sys.exit(1)
                     else:
                         user_func(e)
             return wrapper

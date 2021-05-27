@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from pcvs.helpers.exceptions import PluginException
 import shutil
 
 import click
@@ -10,6 +11,7 @@ from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
                       cli_session, cli_utilities)
 from pcvs.helpers import log, utils
+from pcvs.plugins import Plugin, PluginCollection
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -54,29 +56,51 @@ def print_version(ctx, param, value):
               is_flag=True, help="Display current version")
 @click.option("-w", "--width", "width", type=int, default=None,
               help="Terminal width (autodetection if omitted")
+@click.option("-P", "--plugin-path", "plugins", default=None,
+              type=click.Path(exists=True), show_envvar=True,
+              help="Default Plugin path prefix")
+@click.option("-L", "--plugin-list", "list_plugins", is_flag=True, default=False,
+              help="List plugins to be used.")
 @click.pass_context
-def cli(ctx, verbose, color, encoding, exec_path, width):
+@log.manager.capture_exception(PluginException.NotFoundError)
+def cli(ctx, verbose, color, encoding, exec_path, width, plugins, list_plugins):
     """PCVS main program."""
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
     ctx.obj['exec'] = os.path.abspath(exec_path)
-
+    
     # Click specific-related
     ctx.color = color
 
     if width is None:
         width = shutil.get_terminal_size()[0]
     log.init(verbose, encoding, width)
+    
     utils.set_local_path(ctx.obj['exec'])
 
     utils.create_home_dir()
+    
+    pcoll = PluginCollection()
+    ctx.obj['plugins'] = pcoll
+    
+    pcoll.init_default_plugins()
+    if plugins:
+        pcoll.register_plugin_by_dir(plugins)
+    
+    if list_plugins:
+        pcoll.show_plugins()
+        return
 
+    pcoll.invoke_plugins(Plugin.Step.START_BEFORE)
+    
     # detections
     config.init()
     profile.init()
     bank.init()
+    
+    pcoll.invoke_plugins(Plugin.Step.START_AFTER)
 
 
 cli.add_command(cli_config.config)

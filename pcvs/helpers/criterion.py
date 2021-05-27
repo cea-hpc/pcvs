@@ -6,6 +6,7 @@ import os
 
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
+from pcvs.plugins import Plugin, PluginCollection
 
 
 class Combination:
@@ -416,25 +417,21 @@ def valid_combination(dic):
     global first, runtime_filter
     rt = MetaConfig.root.runtime
     val = MetaConfig.root.validation
+    pCollection = MetaConfig.root.get_internal('pColl')
+
     if first and rt.plugin:
         first = not first
+        
         rt.pluginfile = os.path.join(val.buildcache, "rt-plugin.py")
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
 
-        spec = importlib.util.spec_from_file_location("pcvs.user-rt-plugin",
-                                                      rt.pluginfile)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-
-        if hasattr(mod, 'check_valid_combination') and \
-           callable(mod.check_valid_combination):
-            runtime_filter = mod.check_valid_combination
-            # add here any relevant information to be accessed by modules
-            mod.sys_nodes = MetaConfig.root.machine.nodes
-            mod.sys_cores_per_node = MetaConfig.root.machine.cores_per_node
-
-    if runtime_filter:
-        return runtime_filter(dic)
-    else:
-        return True
+        pCollection.register_plugin_by_file(rt.pluginfile)
+    
+    ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL, combination=dic)
+    
+    # by default, no plugin = always true
+    if ret is None:
+        ret = True
+        
+    return ret

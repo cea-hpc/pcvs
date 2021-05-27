@@ -148,6 +148,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config
+    global_config.set_internal("pColl", ctx.obj['plugins'])
 
     # then init the configuration
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)
