@@ -11,6 +11,7 @@ from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import RunException
+from pcvs.orchestration import communications
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -127,6 +128,9 @@ def handle_build_lockfile(exc=None):
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
+@click.option("-r", "--report", 
+              default=None, is_flag=True,
+              help="launches an embedded report")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
@@ -134,7 +138,7 @@ def handle_build_lockfile(exc=None):
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
-        simulated, bank, dup, dirs) -> None:
+        simulated, bank, dup, dirs, report) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -234,3 +238,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     else:
         the_session.run(the_session)
         utils.unlock_file(lockfile)
+    
+    server_comm = "remote" if report is None else "embedded"
+    communications.initserver(server_comm)
+    print("starting with {} server".format(server_comm))
