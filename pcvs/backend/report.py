@@ -23,7 +23,7 @@ def locate_json_files(path):
     return array
 
 
-def build_data_tree(path=os.getcwd(), files=None):
+def build_data_tree(path=os.getcwd(), files=[]):
     """Build the whole static data tree, browsed by Flask upon request.
 
     The tree is duplicated into three sections:
@@ -140,9 +140,13 @@ def webview_run_server(path):
     :param path: where result files are stored (under 'rawdata' dir)
     :type path: str
     """
-    print("Load YAML files")
-    json_files = [os.path.join(path, f) for f in os.listdir(
-        path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
-    print("Build global tree ({} files)".format(len(json_files)))
-    global_tree = build_data_tree(path, json_files)
+    try:
+        print("Load YAML files")
+        json_files = [os.path.join(path, f) for f in os.listdir(
+            path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
+        print("Build global tree ({} files)".format(len(json_files)))
+        global_tree = build_data_tree(path, json_files)
+    except Exception:
+        print("No files found.\nRunning remote server ...")
+        global_tree = build_data_tree(path)
     create_app(global_tree).run(host='0.0.0.0')
