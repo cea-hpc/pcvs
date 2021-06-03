@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, abort, jsonify, render_template, request
+import json
 
 from pcvs import PATH_INSTDIR
 
@@ -129,6 +130,19 @@ def create_app(global_tree=None, test_config=None):
             for test in global_tree[selection][request_item]['tests']:
                 out.append(test)
         return jsonify(out)
+
+    @app.route("/submit", methods=["POST", "GET"])
+    def submit():
+        if request.method == "GET":
+            #TODO
+            return ""
+        elif request.method == "POST":
+            to_add = request.get_json()
+            for i in to_add:
+                if i not in global_tree:
+                    global_tree[i] = to_add[i]
+            print(to_add)
+            return "ok boomer"
 
     @app.errorhandler(404)
     def page_not_found(e):
