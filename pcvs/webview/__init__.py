@@ -134,14 +134,17 @@ def create_app(global_tree=None, test_config=None):
     @app.route("/submit", methods=["POST", "GET"])
     def submit():
         if request.method == "GET":
-            #TODO
+            # TODO
             return ""
         elif request.method == "POST":
             to_add = request.get_json()
-            for i in to_add:
-                if i not in global_tree:
-                    global_tree[i] = to_add[i]
-            print(to_add)
+            printjson(to_add)
+            for label in to_add["label"]:
+                if label not in global_tree["label"]:
+                    global_tree["label"][label] = {"tests": []}
+                global_tree["label"][label]["tests"].append(to_add["label"][label])
+                printjson(global_tree)
+            global_tree["metadata"] = to_add ["metadata"]
             return "ok boomer"
 
     @app.errorhandler(404)
@@ -155,3 +158,6 @@ def create_app(global_tree=None, test_config=None):
         """
         return render_template('404.html')
     return app
+
+def printjson(jsonstr):
+    print(json.dumps(jsonstr, indent=4))
