@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template
+import json
 import requests
 
 CommManager = None
@@ -10,10 +11,20 @@ def initserver(kind="remote"):
         CommManager = RemoteServer()
     elif kind == "embedded":
         CommManager = EmbeddedServer()
-
 class GenericServer:
     def __init__(self):
-        #TODO
+        self.labels=[]
+        self.tags = []
+        self.metadata = {
+            "rootdir": "remote server",
+            "count": {
+                "tests": 0,
+                "labels": 0,
+                "tags": 0,
+                "files": 0
+            }
+        }
+        
         pass
     def send(self, data):
         #TODO
@@ -23,6 +34,7 @@ class GenericServer:
         pass
 class EmbeddedServer(GenericServer):
     def __init__(self):
+        super().__init__()
         #TODO
         pass
     def send(self):
@@ -32,9 +44,14 @@ class EmbeddedServer(GenericServer):
         #TODO
         pass
 class RemoteServer(GenericServer):
-    def send(self, data=None, json=None):
+    def send(self, test):
+        if(test["id"]["label"] not in self.labels):
+            self.metadata["count"]["labels"] += 1
+            self.labels.append(test["id"]["label"])
+        to_send = {"metadata": self.metadata,
+                   "label": {test["id"]["label"]: {"tests": [test]}}}
         try:
-            requests.post("http://localhost:5000/submit", json=json, data=data, timeout=1)
+            requests.post("http://localhost:5000/submit", json=to_send, timeout=1)
             return True
         except Exception:
             return False
@@ -42,5 +59,6 @@ class RemoteServer(GenericServer):
     def recv(self):
         return requests.get("http://localhost:5000/submit")
     def __init__(self):
+        super().__init__()
         #TODO
         pass
