@@ -11,7 +11,7 @@ from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import RunException
-from pcvs.orchestration import communications
+from pcvs.helpers import communications
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -198,7 +198,6 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
     # DO NOT move the logger init before the build dir exist (above)
     log.manager.set_logfile(val_cfg.runlog is not None, val_cfg.runlog)
-
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if val_cfg.reused_build is not None:
@@ -231,6 +230,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=val_cfg.runlog)
+    server_comm = "remote" if report is None else "embedded"
+    communications.initserver(server_comm)
     if val_cfg.background:
         sid = the_session.run_detached(the_session)
         log.manager.print_item(
@@ -238,7 +239,3 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     else:
         the_session.run(the_session)
         utils.unlock_file(lockfile)
-    
-    server_comm = "remote" if report is None else "embedded"
-    communications.initserver(server_comm)
-    print("starting with {} server".format(server_comm))
