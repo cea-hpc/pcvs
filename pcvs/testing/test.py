@@ -6,7 +6,7 @@ from enum import IntEnum
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
 from pcvs.helpers.pm import PManager
-
+from pcvs.helpers import communications
 
 class Test:
     """Smallest component of a validation process.
@@ -224,6 +224,8 @@ class Test:
                 with open(elt_v, 'rb') as fh:
                     self._array['artifacts'][elt_k] = base64.b64encode(
                         fh.read()).decode("ascii")
+        if communications.sendData:
+            communications.CommManager.send()#TODO
 
     def display(self):
         """Print the Test into stdout (through the manager)."""
@@ -239,6 +241,8 @@ class Test:
         elif self._state == Test.State.ERR_DEP:
             colorname = "yellow"
             icon = "fail"
+
+        communications.CommManager.send(self.to_json())
 
         log.manager.print_job(label, self._time, self.name,
                               colorname=colorname, icon=icon)
