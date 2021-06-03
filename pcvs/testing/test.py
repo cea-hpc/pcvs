@@ -224,8 +224,6 @@ class Test:
                 with open(elt_v, 'rb') as fh:
                     self._array['artifacts'][elt_k] = base64.b64encode(
                         fh.read()).decode("ascii")
-        if communications.sendData:
-            communications.CommManager.send()#TODO
 
     def display(self):
         """Print the Test into stdout (through the manager)."""
