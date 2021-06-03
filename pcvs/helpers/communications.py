@@ -2,6 +2,7 @@ from flask import Flask, request, render_template
 import requests
 
 CommManager = None
+sendData = False
 
 def initserver(kind="remote"):
     global CommManager
@@ -32,7 +33,11 @@ class EmbeddedServer(GenericServer):
         pass
 class RemoteServer(GenericServer):
     def send(self, data=None, json=None):
-        return requests.post("http://localhost:5000/submit", json=json, data=data)
+        try:
+            requests.post("http://localhost:5000/submit", json=json, data=data, timeout=1)
+            return True
+        except Exception:
+            return False
     
     def recv(self):
         return requests.get("http://localhost:5000/submit")
