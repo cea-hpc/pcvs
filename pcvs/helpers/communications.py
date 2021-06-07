@@ -44,12 +44,17 @@ class EmbeddedServer(GenericServer):
         #TODO
         pass
 class RemoteServer(GenericServer):
-    def send(self, test):
+    def send(self, label, test):
         if(test["id"]["label"] not in self.labels):
-            self.metadata["count"]["labels"] += 1
             self.labels.append(test["id"]["label"])
+            self.metadata["count"]["labels"] = len(self.labels)
+        if(test["id"]["tags"] not in self.tags):
+            self.labels.append(test["id"]["label"])
+            self.metadata["count"]["labels"] = len(self.tags)
+        self.metadata["count"]["tests"] += 1
         to_send = {"metadata": self.metadata,
-                   "label": {test["id"]["label"]: {"tests": [test]}}}
+                   "test_data": test,
+                   "state": label}
         try:
             requests.post("http://localhost:5000/submit", json=to_send, timeout=1)
             return True
