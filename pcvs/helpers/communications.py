@@ -45,10 +45,10 @@ class EmbeddedServer(GenericServer):
         pass
 class RemoteServer(GenericServer):
     def send(self, label, test):
-        if(test["id"]["label"] not in self.labels):
+        if("label" in test["id"] and test["id"]["label"] not in self.labels):
             self.labels.append(test["id"]["label"])
             self.metadata["count"]["labels"] = len(self.labels)
-        if(test["id"]["tags"] not in self.tags):
+        if("tags" in test["id"] and test["id"]["tags"] not in self.tags):
             self.labels.append(test["id"]["label"])
             self.metadata["count"]["labels"] = len(self.tags)
         self.metadata["count"]["tests"] += 1
