@@ -240,8 +240,7 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        communications.CommManager.send(self.to_json())
-
+        communications.CommManager.send(label, self.to_json())
         log.manager.print_job(label, self._time, self.name,
                               colorname=colorname, icon=icon)
         if self._out:
