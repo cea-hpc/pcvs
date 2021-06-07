@@ -47,12 +47,18 @@ def create_app(global_tree=None, test_config=None):
         :return: webpage content
         :rtype: str
         """
+        if 'json' in request.args.get('render', []):
+            return jsonify({"tag": global_tree["metadata"]["count"]["tags"],
+                            "label": global_tree["metadata"]["count"]["labels"],
+                            "test": global_tree["metadata"]["count"]["tests"],
+                            "files": global_tree["metadata"]["count"]["files"]})
         return render_template('main.html',
                                rootdir=global_tree['metadata']['rootdir'],
                                nb_tests=global_tree['metadata']['count']['tests'],
                                nb_labels=global_tree['metadata']['count']['labels'],
                                nb_tags=global_tree['metadata']['count']['tags'],
                                nb_files=global_tree['metadata']['count']['files'])
+
 
     @app.route('/realtime')
     def rt():
@@ -129,23 +135,41 @@ def create_app(global_tree=None, test_config=None):
         if request_item in global_tree[selection].keys():
             for test in global_tree[selection][request_item]['tests']:
                 out.append(test)
+        printjson(global_tree)
         return jsonify(out)
 
     @app.route("/submit", methods=["POST", "GET"])
     def submit():
         if request.method == "GET":
-            # TODO
             return ""
         elif request.method == "POST":
             to_add = request.get_json()
-            printjson(to_add)
-            for label in to_add["label"]:
-                if label not in global_tree["label"]:
-                    global_tree["label"][label] = {"tests": []}
-                global_tree["label"][label]["tests"].append(to_add["label"][label])
-                printjson(global_tree)
-            global_tree["metadata"] = to_add ["metadata"]
-            return "ok boomer"
+            addToGlobalTree(to_add, "label", [to_add["test_data"]["id"]["label"]])
+            addToGlobalTree(to_add, "tag", to_add["test_data"]["data"]["tags"])
+            addToGlobalTree(to_add, "status", [to_add["state"]])
+            global_tree["metadata"] = to_add["metadata"]
+            return "This page is not meant to be visited"
+
+    def addToGlobalTree(to_add, sorting_type, names):
+        if sorting_type not in global_tree:
+            global_tree["sorting_type"] = {}
+        for name in names:
+            if name not in global_tree[sorting_type]:
+                global_tree[sorting_type][name] = {"tests": []}
+                global_tree[sorting_type][name]["metadata"] = {
+                    "count": {
+                        "WAITING": 0,
+                        "IN_PROGRESS": 0,
+                        "SUCCEED": 0,
+                        "FAILED": 0,
+                        "ERR_DEP": 0,
+                        "ERR_OTHER": 0,
+                        "total": 0
+                    }
+                }
+            global_tree[sorting_type][name]["tests"].append(to_add["test_data"])
+            global_tree[sorting_type][name]["metadata"]["count"][to_add["state"]] += 1
+            global_tree[sorting_type][name]["metadata"]["count"]["total"] += 1
 
     @app.errorhandler(404)
     def page_not_found(e):
@@ -158,6 +182,7 @@ def create_app(global_tree=None, test_config=None):
         """
         return render_template('404.html')
     return app
+
 
 def printjson(jsonstr):
     print(json.dumps(jsonstr, indent=4))
