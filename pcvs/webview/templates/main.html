@@ -3,17 +3,6 @@
 
 <!--TODO: ajouter une condition : si pas de report -> pas de refresh (sinon bug pour les reports statiques)-->
 
-<script language="javascript" type="text/javascript">
-	var timeout = setInterval(refresh, 2000)
-	function refresh(){
-		metadata = $.getJSON("main?render=json", function(resp){
-			document.getElementById("labelnumber").textContent = resp.label
-			document.getElementById("tagnumber").textContent = resp.tag
-			
-		})
-	}
-</script>
-
 <h1 id="main-page-title">PCVS reporting interface</h1>
 
 <p>This mini-webserver gathers validation results processed from <code>{{ main_directory }}</code>
