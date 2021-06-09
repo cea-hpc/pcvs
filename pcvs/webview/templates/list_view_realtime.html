@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<script type="text/javascript">
+	function refresh(){
+		$.getJSON("/realtime/{{selection}}/list?render=json", function(resp){
+		$('#theTable').DataTable({
+		bDestroy: true,
+		"paging": true,
+		data: resp,
+		order: [[0, 'desc']],
+		columns: [
+			{
+				"data": 'count',
+				"render": {
+					"_": function(d, t, r){
+					if (typeof(d) == "number"){
+					return '<div class="progress" data-order="'+d+'">' +
+					'<div class="progress-bar bg-primary" style="width: 100%"></div>' +
+					'</div>'
+					} else {
+					return '<div class="progress" data-order="'+d.failure+'">' +
+					'<div class="progress-bar bg-danger" style="width: '+(100 * d['FAILED']/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-warning" style="width: '+(100 * d['ERR_DEP']/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-success" style="width: '+(100 * d['SUCCEED']/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-secondary" style="width: '+(100 * d['IN_PROGRESS']/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-primary" style="width: '+(100 * d['WAITING']/d.total)+'%"></div>' +
+					'</div>';
+					}
+					}
+				}
+			},
+			{"data": 'name', "render": function(d, tr, r){
+				return "<a href='/{{selection}}/detail?name="+d+"'>"+d+"</a>"
+			}},
+			{"data": 'count', "render": function(d, t, r){
+				if(typeof(d) == "number"){
+					return d;
+				} else {
+					return d.total;
+				}},"className": 'detail-control'}
+		]
+		});
+		}).done(function(){
+			page_ready();
+		});	
+	}
+	$(document).ready(function() {
+		page_waiting()
+		refresh()
+	});
+	var timeout = setInterval(refresh, 2000)
+</script>
+
+<table id='theTable' class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th>Progress</th>
+			<th>Name</th>
+			<th>Test Count</th>
+		</tr>
+	</thead>
+</table>
+{% endblock %}

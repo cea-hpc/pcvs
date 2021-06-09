@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block body %}
+<script type="text/javascript">
+	function refresh(){
+		$.getJSON("/realtime/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
+			$('#theTable').DataTable({
+			bDestroy: true,
+			"responsive": true,
+			order: [[1, 'asc']],
+			"createdRow": function(row, data, index)
+			{
+				if(data['result']['state'] == "0")
+				{
+					$(row).addClass("text-secondary")
+				}
+				else if(data['result']['state'] == "1")
+				{
+					$(row).addClass("text-primary")
+				}
+				else if(data['result']['state'] == "2")
+				{
+					$(row).addClass("text-success")
+				}
+				else if (data['result']['state'] == "4")
+				{
+					$(row).addClass("text-warning font-weight-bold")
+				}
+				else
+				{
+					$(row).addClass("text-danger font-weight-bold")
+				}
+			},
+			"search": {
+				"regex": true
+			},
+			data: resp,
+			columns: [
+				{
+					"responsivePriority": 1,
+					"orderable": false,
+					"data": null,
+					"className": 'detail-control text-center',
+					"render": function(d,t,s){return '<span class="oi oi-plus"></span>';}
+				},
+				{"responsivePriority": 2, "data": 'id.full_name'},
+				{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.state;}},
+				{"responsivePriority": 3, "data": 'result', "render": function(d, t, s){return d.time.toFixed(2)+" s";}}
+			]
+			});
+		}).done(function(){	
+		function format_testline(data)
+		{
+			var raw_log = "";
+			if(data.result['output'])
+			{
+				raw_log = "<pre>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</pre>";
+			}
+			return '<pre>'+
+				data['exec']+
+				'</pre>'+
+				raw_log
+		}
+		$("#theTable tbody").on('click', 'td.detail-control',function(){
+			var line = $(this).closest('tr');
+			var row = $('#theTable').DataTable().row(line);
+			if(row.child.isShown())
+			{
+				row.child.hide();
+				$(this).html("<span class='oi oi-plus'></span>")
+				line.removeClass('shown');
+			}
+			else
+			{
+				row.child(format_testline(row.data())).show();
+				$(this).html("<span class='oi oi-minus'></span>")
+				line.addClass('shown');
+			}
+		});
+		page_ready();
+		});
+	}
+	$(document).ready(function(){
+		page_waiting();
+		refresh();
+	});
+	var timeout = setInterval(refresh, 2000);
+
+</script>
+
+<h2 id="#page-title" class="container-fluid text-center">{{selection}} View -- {{sel_item}} </h2>
+<table id='theTable' class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Name</th>
+			<th>status</th>
+			<th>Elapsed time</th>
+			
+		</tr>
+	</thead>
+</table>
+
+{% endblock %}
