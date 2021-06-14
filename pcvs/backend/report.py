@@ -149,4 +149,11 @@ def webview_run_server(path):
     except Exception:
         print("No files found.\nRunning remote server ...")
         global_tree = build_data_tree(path)
-    create_app(global_tree).run(host='0.0.0.0')
+        
+    for port in [5000, 0]:
+        try:
+            create_app(global_tree).run(host='0.0.0.0', port=port)
+            break
+        except OSError as e:
+            print("Fail to run on port {}. Try automatically-defined".format(port))
+            continue
