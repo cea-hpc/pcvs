@@ -6,7 +6,6 @@ from enum import IntEnum
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
 from pcvs.helpers.pm import PManager
-from pcvs.helpers import communications
 
 class Test:
     """Smallest component of a validation process.
@@ -240,7 +239,6 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        communications.CommManager.send(label, self.to_json())
         log.manager.print_job(label, self._time, self.name,
                               colorname=colorname, icon=icon)
         if self._out:

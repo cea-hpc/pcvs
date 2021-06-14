@@ -6,12 +6,13 @@ from typing import List
 from addict import Dict
 
 from pcvs.backend import session
-from pcvs.helpers import log
+from pcvs.helpers import communications, log
 from pcvs.helpers.exceptions import OrchestratorException
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.publishers import Publisher
 from pcvs.testing.test import Test
 
+comman: communications.GenericServer = None
 
 class Manager:
     """Gather and manipulate Jobs under a hiararchical architecture.
@@ -170,6 +171,8 @@ class Manager:
                                                   out=Test.NOSTART_STR,
                                                   state=Test.State.ERR_DEP)
                             job.display()
+                            if comman:
+                                comman.send(job)
                             self._count.executed += 1
                             self._publisher.add(job.to_json())
                         # sad to break, should retry
@@ -346,6 +349,8 @@ class Set(threading.Thread):
                 raise
             job.save_final_result(time=final, rc=rc, out=stdout)
             job.display()
+            if comman:
+                comman.send(job)
 
         self._completed = True
 
@@ -405,6 +410,10 @@ class Orchestrator:
         """
         self._manager.resolve_deps()
         self.print_infos()
+        
+        global comman
+        comman = MetaConfig.root.get_internal('comman')
+
         nb_nodes = self._max_res
         last_progress = 0
         # While some jobs are available to run
