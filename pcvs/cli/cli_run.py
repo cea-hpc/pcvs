@@ -128,9 +128,9 @@ def handle_build_lockfile(exc=None):
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
-@click.option("-r", "--report", 
-              default=None, is_flag=True,
-              help="launches an embedded report")
+@click.option("-r", "--report", "webreport", show_envvar=True,
+              is_flag=False, default=None, flag_value="localhost:5000",
+              help="Attach a webview server to the current session run.")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
@@ -138,7 +138,7 @@ def handle_build_lockfile(exc=None):
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
-        simulated, bank, dup, dirs, report) -> None:
+        simulated, bank, dup, dirs, webreport) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -169,6 +169,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
+    val_cfg.set_ifdef('webreport', webreport)
 
     # if dirs not set by config file nor CLI
     if not dirs and not val_cfg.dirs:
@@ -227,11 +228,18 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         global_config.bootstrap_criterion(pf.criterion)
         global_config.bootstrap_group(pf.group)
 
+    if webreport:
+        comman = None
+        if webreport == "local":
+            comman = communications.EmbeddedServer()
+        else:
+            comman = communications.RemoteServer(webreport)
+        global_config.set_internal('comman', comman)
+        
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=val_cfg.runlog)
-    server_comm = "remote" if report is None else "embedded"
-    communications.initserver(server_comm)
+    
     if val_cfg.background:
         sid = the_session.run_detached(the_session)
         log.manager.print_item(
