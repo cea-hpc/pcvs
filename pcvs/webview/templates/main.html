@@ -3,6 +3,24 @@
 
 <!--TODO: ajouter une condition : si pas de report -> pas de refresh (sinon bug pour les reports statiques)-->
 
+<script language="javascript" type="text/javascript">
+	function refresh(){
+		metadata = $.getJSON("/?render=json", function(resp){
+			document.getElementById("labelnumber").textContent = resp.label
+			document.getElementById("tagnumber").textContent = resp.tag
+			document.getElementById("testnumber").textContent = resp.test
+			document.getElementById("filenumber").textContent = resp.files
+		}).done(function(){
+			page_ready()
+		})
+	}
+	$(document).ready(function(){
+		page_waiting();
+		refresh();
+	});
+	var timeout = setInterval(refresh, 2000)
+</script>
+
 <h1 id="main-page-title">PCVS reporting interface</h1>
 
 <p>This mini-webserver gathers validation results processed from <code>{{ main_directory }}</code>
@@ -16,7 +34,7 @@ The content of this main page is still in progress. Here a short list of pages a
 
 <div id="stat_cards" class="row">
 <div class="col-sm-3"><div class="card text-center"><div class="card-body">
-<h4 class="card-title">{{"{:,}".format(nb_tests)}}</h4>
+<h4 id="testnumber" class="card-title">{{"{:,}".format(nb_tests)}}</h4>
 <p class="card-text">Tests in Total</p>
 </div></div></div>
 
@@ -31,7 +49,7 @@ The content of this main page is still in progress. Here a short list of pages a
 </div></div></div>
 
 <div class="col-sm-3"><div class=" card text-center"><div class="card-body">
-<h4 class="card-title">{{"{:,}".format(nb_files)}}</h4>
+<h4 id="filenumber" class="card-title">{{"{:,}".format(nb_files)}}</h4>
 <p class="card-text">Processed Files</p>
 </div></div></div>
 </div>

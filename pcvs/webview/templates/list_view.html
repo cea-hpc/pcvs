@@ -2,10 +2,10 @@
 {% block body %}
 
 <script type="text/javascript">
-	$(document).ready(function() {
-		page_waiting()
+	function refresh(){
 		$.getJSON("/{{selection}}/list?render=json", function(resp){
 		$('#theTable').DataTable({
+		bDestroy: true,
 		"paging": true,
 		data: resp,
 		order: [[0, 'desc']],
@@ -43,8 +43,13 @@
 		});
 		}).done(function(){
 			page_ready();
-		});
+		});	
+	}
+	$(document).ready(function() {
+		page_waiting()
+		refresh()
 	});
+	var timeout = setInterval(refresh, 2000)
 </script>
 
 <table id='theTable' class="display" style="width:100%">

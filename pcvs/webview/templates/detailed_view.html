@@ -1,85 +1,93 @@
 {% extends 'base.html' %}
 {% block body %}
 <script type="text/javascript">
-$(document).ready(function(){
-	page_waiting();
-	$.getJSON("/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
-		$('#theTable').DataTable({
-		"responsive": true,
-		order: [[1, 'asc']],
-		"createdRow": function(row, data, index)
+	function createRow(row, data, index)
+				{
+					if(data['result']['state'] == "0")
+					{
+						$(row).addClass("text-secondary")
+					}
+					else if(data['result']['state'] == "1")
+					{
+						$(row).addClass("text-primary")
+					}
+					else if(data['result']['state'] == "2")
+					{
+						$(row).addClass("text-success")
+					}
+					else if (data['result']['state'] == "4")
+					{
+						$(row).addClass("text-warning font-weight-bold")
+					}
+					else
+					{
+						$(row).addClass("text-danger font-weight-bold")
+					}
+				}
+	function refresh(){
+		if(pause){page_ready();
+			return;
+		}
+		$.getJSON("/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
+			$('#theTable').DataTable({
+			bDestroy: true,
+			"responsive": true,
+			order: [[1, 'asc']],
+			"createdRow": createRow,
+			"search": {
+				"regex": true
+			},
+			data: resp,
+			columns: [
+				{
+					"responsivePriority": 1,
+					"orderable": false,
+					"data": null,
+					"className": 'detail-control text-center',
+					"render": function(d,t,s){return '<span class="oi oi-plus"></span>';}
+				},
+				{"responsivePriority": 2, "data": 'id.full_name'},
+				{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.state;}},
+				{"responsivePriority": 3, "data": 'result', "render": function(d, t, s){return d.time.toFixed(2)+" s";}}
+			]
+			});
+		}).done(function(){	
+		function format_testline(data)
 		{
-			if(data['result']['state'] == "0")
+			var raw_log = "";
+			if(data.result['output'])
 			{
-				$(row).addClass("text-secondary")
+				raw_log = "<pre>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</pre>";
 			}
-			else if(data['result']['state'] == "1")
+			return '<pre>'+
+				data['exec']+
+				'</pre>'+
+				raw_log
+		}
+		$("#theTable tbody").on('click', 'td.detail-control',function(){
+			var line = $(this).closest('tr');
+			var row = $('#theTable').DataTable().row(line);
+			if(row.child.isShown())
 			{
-				$(row).addClass("text-primary")
-			}
-			else if(data['result']['state'] == "2")
-			{
-				$(row).addClass("text-success")
-			}
-			else if (data['result']['state'] == "4")
-			{
-				$(row).addClass("text-warning font-weight-bold")
+				row.child.hide();
+				$(this).html("<span class='oi oi-plus'></span>")
+				line.removeClass('shown');
 			}
 			else
 			{
-				$(row).addClass("text-danger font-weight-bold")
+				row.child(format_testline(row.data())).show();
+				$(this).html("<span class='oi oi-minus'></span>")
+				line.addClass('shown');
 			}
-		},
-		"search": {
-			"regex": true
-		},
-		data: resp,
-		columns: [
-			{
-				"responsivePriority": 1,
-				"orderable": false,
-				"data": null,
-				"className": 'detail-control text-center',
-				"render": function(d,t,s){return '<span class="oi oi-plus"></span>';}
-			},
-			{"responsivePriority": 2, "data": 'id.full_name'},
-			{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.state;}},
-			{"responsivePriority": 3, "data": 'result', "render": function(d, t, s){return d.time.toFixed(2)+" s";}}
-		]
 		});
-	}).done(function(){	
-	function format_testline(data)
-	{
-		var raw_log = "";
-		if(data.result['output'])
-		{
-			raw_log = "<pre>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</pre>";
-		}
-		return '<pre>'+
-			data['exec']+
-			'</pre>'+
-			raw_log
+		page_ready();
+		});
 	}
-	$("#theTable tbody").on('click', 'td.detail-control',function(){
-		var line = $(this).closest('tr');
-		var row = $('#theTable').DataTable().row(line);
-		if(row.child.isShown())
-		{
-			row.child.hide();
-			$(this).html("<span class='oi oi-plus'></span>")
-			line.removeClass('shown');
-		}
-		else
-		{
-			row.child(format_testline(row.data())).show();
-			$(this).html("<span class='oi oi-minus'></span>")
-			line.addClass('shown');
-		}
+	$(document).ready(function(){
+		page_waiting();
+		refresh();
 	});
-	page_ready();
-	});
-	
-});
+	var timeout = setInterval(refresh, 2000);
 
 </script>
 
