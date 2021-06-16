@@ -90,8 +90,8 @@ def create_app(global_tree=None, test_config=None):
         """
         return render_template('tbw.html')
 
-    @app.route("/<selection>/list")
-    def get_list(selection):
+    @app.route("/run/<sid>/<selection>/list")
+    def get_list(sid, selection):
         """Get a listing.
 
         The response will depend on the request, which can be:
@@ -106,19 +106,19 @@ def create_app(global_tree=None, test_config=None):
         :return: web content
         :rtype: str
         """
+        sid = int(sid)
         if 'json' not in request.args.get('render', []):
-            return render_template('list_view.html', selection=selection)
+            return render_template('list_view.html', sid=sid, selection=selection)
 
         out = list()
-        request_sid = int(request.args.get('sid', 0))
-        for name, value in global_tree_recv[request_sid][selection].items():
+        for name, value in global_tree_recv[sid][selection].items():
             out.append({
                 "name": name,
                 "count": value['metadata']['count']
             })
 
-    @app.route("/<selection>/detail")
-    def get_details(selection):
+    @app.route("/run/<sid>/<selection>/detail")
+    def get_details(sid, selection):
         """Get a detailed view of a component.
 
         The response will depend on the request, which can be:
@@ -133,6 +133,7 @@ def create_app(global_tree=None, test_config=None):
         :return: web response
         :rtype: str
         """
+        sid = int(sid)
         out = list()
         request_item = request.args.get('name', None)
 
@@ -141,13 +142,12 @@ def create_app(global_tree=None, test_config=None):
 
         if 'json' not in request.args.get('render', []):
             return render_template("detailed_view.html",
+                                   sid=sid,
                                    selection=selection,
                                    sel_item=request_item)
 
-        request_sid = int(request.args.get('sid', 0))
-        
-        if request_item in global_tree_recv[request_sid][selection].keys():
-            for test in global_tree_recv[request_sid][selection][request_item]['tests']:
+        if request_item in global_tree_recv[sid][selection].keys():
+            for test in global_tree_recv[sid][selection][request_item]['tests']:
                 out.append(test.to_json())
         return jsonify(out)
 

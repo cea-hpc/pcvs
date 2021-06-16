@@ -3,7 +3,7 @@
 
 <script type="text/javascript">
 	function refresh(){
-		$.getJSON("/{{selection}}/list?render=json", function(resp){
+		$.getJSON("/run/{{sid}}/{{selection}}/list?render=json", function(resp){
 		$('#theTable').DataTable({
 		bDestroy: true,
 		"paging": true,
@@ -31,7 +31,7 @@
 				}
 			},
 			{"data": 'name', "render": function(d, tr, r){
-				return "<a href='/{{selection}}/detail?name="+d+"'>"+d+"</a>"
+				return "<a href='/run/{{sid}}/{{selection}}/detail?name="+d+"'>"+d+"</a>"
 			}},
 			{"data": 'count', "render": function(d, t, r){
 				if(typeof(d) == "number"){

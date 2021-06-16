@@ -28,7 +28,7 @@
 		if(pause){page_ready();
 			return;
 		}
-		$.getJSON("/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
+		$.getJSON("/run/{{sid}}/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
 			$('#theTable').DataTable({
 			bDestroy: true,
 			"responsive": true,
