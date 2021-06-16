@@ -54,17 +54,32 @@ def create_app(global_tree=None, test_config=None):
         :return: webpage content
         :rtype: str
         """
+        if 'json' in request.args.get("render", []):
+            res = {}
+            for k in global_tree_recv.keys():
+                res[k] = {}
+                res[k]["path"] = global_tree_recv[k]["path"]
+            return jsonify(res)
+        return render_template("main.html")
+    
+    @app.route("/run/<sid>")
+    def session_main(sid):
+        sid = int(sid)
+        assert(sid in global_tree_recv)
+        print(global_tree_recv[sid])
+        
         if 'json' in request.args.get('render', []):
-            return jsonify({"tag": global_tree["metadata"]["count"]["tags"],
-                            "label": global_tree["metadata"]["count"]["labels"],
-                            "test": global_tree["metadata"]["count"]["tests"],
-                            "files": global_tree["metadata"]["count"]["files"]})
-        return render_template('main.html',
-                               rootdir=global_tree['metadata']['rootdir'],
-                               nb_tests=global_tree['metadata']['count']['tests'],
-                               nb_labels=global_tree['metadata']['count']['labels'],
-                               nb_tags=global_tree['metadata']['count']['tags'],
-                               nb_files=global_tree['metadata']['count']['files'])
+            return jsonify({"tag": len(global_tree_recv[sid]["tags"].keys()),
+                            "label": len(global_tree_recv[sid]["fs-tree"].keys()),
+                            "test": sum(global_tree_recv[sid]["fs-tree"]["__metadata"]["count"].values()),
+                            "files": -1})
+        return render_template('session_main.html',
+                               sid=sid,
+                               rootdir=global_tree_recv[sid]["path"],
+                               nb_tests=sum(global_tree_recv[sid]["fs-tree"]["__metadata"]["count"].values()),
+                               nb_labels=len(global_tree_recv[sid]["fs-tree"].keys()),
+                               nb_tags=len(global_tree_recv[sid]["tags"].keys()),
+                               nb_files=-1)
 
     @app.route('/compare')
     def compare():
@@ -165,7 +180,8 @@ def create_app(global_tree=None, test_config=None):
                             "count": {k: 0 for k in list(map(int, Test.State))}
                         }
                     },
-            "state": session.Session.State(json_session["state"])
+            "state": session.Session.State(json_session["state"]),
+            "path": json_session["buildpath"]
         })
         return "OK!", 200
     

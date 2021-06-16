@@ -1,9 +1,11 @@
 from abc import abstractmethod
 from pcvs.backend.session import Session
 from pcvs.testing.test import Test
+from pcvs.helpers.system import MetaConfig
 from flask import Flask, request, render_template
 import json
 import requests
+
 
 sendData = False
 
@@ -48,7 +50,9 @@ class RemoteServer(GenericServer):
             
         self._json_send("/submit/session_init", {
             "sid": self._metadata['sid'],
-            "state": Session.State.IN_PROGRESS
+            "state": Session.State.IN_PROGRESS,
+            "buildpath": MetaConfig.root.validation.output,
+            "dirs": MetaConfig.root.validation.dirs
         })
 
     def close_connection(self):
