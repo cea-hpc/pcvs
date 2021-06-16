@@ -8,10 +8,11 @@ sendData = False
 
 class GenericServer:
 
-    def __init__(self):
+    def __init__(self, session_id):
         self._waitlist = []
         self._metadata = {
             "rootdir": "remote server",
+            "sid": session_id,
             "count": {
             }
         }
@@ -27,8 +28,8 @@ class GenericServer:
 
 class EmbeddedServer(GenericServer):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, sid):
+        super().__init__(sid)
 
     def send(self):
         pass
@@ -39,11 +40,15 @@ class EmbeddedServer(GenericServer):
 
 class RemoteServer(GenericServer):
 
-    def __init__(self, server_address):
-        super().__init__()
+    def __init__(self, sid, server_address):
+        super().__init__(sid)
         if not server_address.startswith("http"):
             self._serv = "http://" + server_address
 
+    @property
+    def endpoint(self):
+        return self._serv
+    
     def send(self, test):
         if self._send_unitary_test(test):
             self.retry_pending()

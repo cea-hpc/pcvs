@@ -12,7 +12,7 @@ from addict import Dict
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
-from pcvs.helpers import criterion, log, utils
+from pcvs.helpers import communications, criterion, log, utils
 from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration import Orchestrator
@@ -59,6 +59,7 @@ def process_main_workflow(the_session=None):
     valcfg = global_config.validation
 
     log.manager.set_logfile(valcfg.runlog is not None, valcfg.runlog)
+    valcfg.sid = the_session.id
 
     log.manager.print_banner()
     log.manager.print_header("Prepare Environment")
@@ -192,6 +193,18 @@ def prepare():
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
+    
+    if valcfg.webreport:
+        log.manager.print_section("Interface to Reporting Server")
+        comman = None
+        if valcfg.webreport == "local":
+            comman = communications.EmbeddedServer(valcfg.sid)
+            log.manager.print_item("Running a local instance")
+        else:
+            comman = communications.RemoteServer(valcfg.sid, valcfg.webreport)
+            log.manager.print_item("Listening on {}".format(comman.endpoint))
+        MetaConfig.root.set_internal('comman', comman)
+    
 
     MetaConfig.root.set_internal('orchestrator', Orchestrator())
 

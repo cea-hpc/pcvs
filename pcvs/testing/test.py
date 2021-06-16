@@ -1,5 +1,11 @@
 import base64
 import os
+
+import json
+from pcvs.helpers.exceptions import ValidationException
+
+from jsonschema import exceptions
+from pcvs.helpers.system import ValidationScheme
 import shlex
 from enum import IntEnum
 
@@ -23,6 +29,7 @@ class Test:
     :cvar str NOSTART_STR: constant, setting default output when job cannot be run.
     """
     Timeout_RC = 127
+    res_scheme = ValidationScheme("test-result")
 
     NOSTART_STR = b"This test cannot be started."
 
@@ -82,6 +89,24 @@ class Test:
             deparray = self._array['dep']
             self._array['dep'] = {k: None for k in deparray}
 
+    @property
+    def tags(self):
+        """Getter for the full list of tags.
+        
+        :return: the list of of tags
+        :rtype: list
+        """
+        return self._array["tags"]
+    
+    @property
+    def label(self):
+        """Getter to the test label.
+        
+        :return: the label
+        :rtype: str
+        """
+        return self._array["label"]
+        
     @property
     def name(self):
         """Getter for fully-qualified job name.
@@ -301,6 +326,34 @@ class Test:
                 "combination": self._array['comb_dict']
             }
         }
+        
+    def from_json(self, test_json: str) -> None : 
+        """Replace the whole Test structure based on input JSON.
+        
+        :param json: the json used to set this Test
+        :type json: test-result-valid JSON-formated str
+        """
+        
+        if isinstance(test_json, str):
+            test_json = json.load(test_json) 
+        assert(isinstance(test_json, dict))
+        self.res_scheme.validate(test_json)
+        self._array = {
+            "te_name": test_json["id"]["te_name"],
+            "label": test_json["id"]["label"],
+            "subtree": test_json["id"]["subtree"],
+            "name": test_json["id"]["full_name"],
+            "command": test_json["exec"],
+            "tags": test_json["data"]["tags"],
+            "metrics": "TBD",
+            "artifacts": test_json["data"]["artifacts"],
+            "comb_dict": test_json["data"]["combination"]
+        }
+        
+        self._rc = test_json["result"]["rc"]
+        self._out = test_json["result"]["output"]
+        self._state = Test.State(test_json["result"]["state"])
+        self._time = test_json["result"]["time"]
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation.

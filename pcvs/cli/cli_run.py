@@ -227,15 +227,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         global_config.bootstrap_machine(pf.machine)
         global_config.bootstrap_criterion(pf.criterion)
         global_config.bootstrap_group(pf.group)
-
-    if webreport:
-        comman = None
-        if webreport == "local":
-            comman = communications.EmbeddedServer()
-        else:
-            comman = communications.RemoteServer(webreport)
-        global_config.set_internal('comman', comman)
-        
+    
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=val_cfg.runlog)
