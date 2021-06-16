@@ -8,6 +8,12 @@ properties:
       subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
       te_name: {"type": "string"}
       full_name: {"type": "string"}
+      comb:
+        OneOf:
+          - type: null
+          - type: object
+            patternProperties:
+              "^.*$": {type: "string"}
     additionalProperties: false
     required: ["label", "subtree", "te_name", "full_name"]
   exec: {"type": "string"}
@@ -28,13 +34,6 @@ properties:
           type: array
           items: {"type": "string"}
       artifacts:
-        OneOf:
-          - type: null
-          - type: object
-            patternProperties:
-              "^.*$": {type: "string"}
-        
-      combination:
         OneOf:
           - type: null
           - type: object

@@ -560,6 +560,12 @@ def terminate():
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             raise RunException.ProgramError(e, cmd)
+    
+    comman = MetaConfig.root.get_internal("comman")
+    if comman:
+        log.manager.print_item("Close connection to Reporting Server")
+        comman.close_connection()
+    
 
 
 def dup_another_build(build_dir, outdir):

@@ -3,7 +3,11 @@
         "te_name": "test_main",
         "label": "MPI-BENCHS",
         "subtree": "basics",
-        "full_name": "MPI-BENCHS/basics/test_main_N1_n2_arg=c"
+        "full_name": "MPI-BENCHS/basics/test_main_N1_n2_arg=c",
+        "comb": {
+            "n_node": 1, "n_mpi": 2,
+            "program": {"arg": "c"}
+        }
     },
     "exec": "sh /.../list_of_tests.sh &apos;tmp/test_main&apos;", 
     "result": {
@@ -16,9 +20,6 @@
         "tags": ["compilation", "tag_1", "tag_2"],
         "artifacts": {"file.txt": "ZHVtbXlfYXJ0aWZhY3QK"},
         "metrics": {"metric_a": "value_a"},
-        "combination": {
-            "n_node": 1, "n_mpi": 2,
-            "program": {"arg": "c"}
-        }
+        
     }
 }

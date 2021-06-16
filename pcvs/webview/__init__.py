@@ -1,10 +1,14 @@
 import os
-
-from flask import Flask, abort, jsonify, render_template, request
+import copy
+import random
+            
+from flask import Flask, abort, jsonify, render_template, request, sessions
+from pcvs.testing.test import Test
 import json
 
 from pcvs import PATH_INSTDIR
 from pcvs.testing.test import Test
+from pcvs.backend import session
 
 
 def create_app(global_tree=None, test_config=None):
@@ -17,6 +21,7 @@ def create_app(global_tree=None, test_config=None):
     :return: the application
     :rtype: :class:`Flask`
     """
+    global_tree_recv = {}
 
     app = Flask(__name__, template_folder=os.path.join(
         PATH_INSTDIR, "webview/templates"))
@@ -90,12 +95,12 @@ def create_app(global_tree=None, test_config=None):
             return render_template('list_view.html', selection=selection)
 
         out = list()
-        for name, value in global_tree[selection].items():
+        request_sid = int(request.args.get('sid', 0))
+        for name, value in global_tree_recv[request_sid][selection].items():
             out.append({
                 "name": name,
                 "count": value['metadata']['count']
             })
-        return jsonify(out)
 
     @app.route("/<selection>/detail")
     def get_details(selection):
@@ -124,44 +129,111 @@ def create_app(global_tree=None, test_config=None):
                                    selection=selection,
                                    sel_item=request_item)
 
-        if request_item in global_tree[selection].keys():
-            for test in global_tree[selection][request_item]['tests']:
-                out.append(test)
+        request_sid = int(request.args.get('sid', 0))
+        
+        if request_item in global_tree_recv[request_sid][selection].keys():
+            for test in global_tree_recv[request_sid][selection][request_item]['tests']:
+                out.append(test.to_json())
         return jsonify(out)
 
-    @app.route("/submit", methods=["POST", "GET"])
+    @app.route("/submit/session_init", methods=["POST"])
+    def submit_new_session():
+        json_session = request.get_json()
+        sid = json_session["sid"]
+        if sid in global_tree_recv.keys():
+            while sid in global_tree_recv.keys():
+                sid = random.randint(0, 10000)
+            
+        global_tree_recv.setdefault(sid, {
+            "fs-tree": {
+                        "__metadata": {
+                            "count": {k: 0 for k in list(map(int, Test.State))}
+                        }
+                    },
+            "tags": {
+                        "__metadata": {
+                            "count": {k: 0 for k in list(map(int, Test.State))}
+                        }
+                    },
+            "iterators": {
+                        "__metadata": {
+                            "count": {k: 0 for k in list(map(int, Test.State))}
+                        }
+                    },
+            "failures": {
+                        "__metadata": {
+                            "count": {k: 0 for k in list(map(int, Test.State))}
+                        }
+                    },
+            "state": session.Session.State(json_session["state"])
+        })
+        return "OK!", 200
+    
+    @app.route("/submit/session_fini", methods=["POST"])
+    def submit_end_session():
+        json_session = request.get_json()
+        assert(json_session["sid"] in global_tree_recv.keys())
+        global_tree_recv[json_session["sid"]]["state"] = json_session["state"]
+        import pprint
+        pprint.pprint(global_tree_recv)
+        return "OK!", 200
+    
+    @app.route("/submit/test", methods=["POST"])
     def submit():
-        if request.method == "GET":
-            return ""
-        elif request.method == "POST":
-            to_add = request.get_json()
-            addToGlobalTree(to_add, "label", [to_add["test_data"]["id"]["label"]])
-            addToGlobalTree(to_add, "tag", to_add["test_data"]["data"]["tags"])
-            addToGlobalTree(to_add, "status", [to_add["state"]])
-            global_tree["metadata"] = to_add["metadata"]
-            return "This page is not meant to be visited"
-
-    def addToGlobalTree(to_add, sorting_type, names):
-        test_to_add = Test(**to_add["test_data"])
-        if sorting_type not in global_tree:
-            global_tree["sorting_type"] = {}
-        for name in names:
-            if name not in global_tree[sorting_type]:
-                global_tree[sorting_type][name] = {"tests": []}
-                global_tree[sorting_type][name]["metadata"] = {
-                    "count": {
-                        "WAITING": 0,
-                        "IN_PROGRESS": 0,
-                        "SUCCEED": 0,
-                        "FAILED": 0,
-                        "ERR_DEP": 0,
-                        "ERR_OTHER": 0,
-                        "total": 0
-                    }
-                }
-            global_tree[sorting_type][name]["tests"].append(to_add["test_data"])
-            global_tree[sorting_type][name]["metadata"]["count"][to_add["state"]] += 1
-            global_tree[sorting_type][name]["metadata"]["count"]["total"] += 1
+        json_str = request.get_json()
+        
+        test_sid = json_str["metadata"]["sid"]
+        test_obj = Test()
+        
+        test_obj.from_json(json_str["test_data"])
+        
+        ok = _insert_to_split(test_sid, test_obj)
+        
+        if not ok:
+            return "", 406
+        else:
+            return "OK!", 200
+    
+    def __insert_in_tree(test, node, depth):
+            assert('__metadata' in node.keys())
+            
+            node["__metadata"]["count"][int(test.state)] += 1
+            
+            if len(depth) == 0:
+                #do something
+                if '__elems' not in node:
+                    node['__elems'] = list()
+                node['__elems'].append(test)
+            else:
+                node.setdefault('__elems', {})
+                node["__elems"].setdefault(depth[0],
+                    {
+                        "__metadata": {
+                            "count": {k: 0 for k in list(map(int, Test.State))}
+                        }
+                    })
+                __insert_in_tree(test, node["__elems"][depth[0]], depth[1:])
+        
+    def _insert_to_split(sid, test: Test):
+        # first, insert the test in the hierachy
+        label = test.label
+        subtree = test.subtree
+        te_name = test.te_name
+        
+        sid_tree = global_tree_recv[sid]
+        __insert_in_tree(test, sid_tree["fs-tree"], [label, subtree, te_name])
+        
+        for tag in test.tags:
+            __insert_in_tree(test, sid_tree["tags"], [tag])
+        
+        if test.combination:
+            for iter_k, iter_v in test.combination.items():
+                __insert_in_tree(test, sid_tree["iterators"], [iter_k, iter_v])
+            
+        if test.state != Test.State.SUCCEED:
+            
+            __insert_in_tree(test, sid_tree["failures"], [])
+        return True
 
     @app.errorhandler(404)
     def page_not_found(e):
@@ -174,7 +246,3 @@ def create_app(global_tree=None, test_config=None):
         """
         return render_template('404.html')
     return app
-
-
-def printjson(jsonstr):
-    print(json.dumps(jsonstr, indent=4))

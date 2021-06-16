@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from pcvs.backend.session import Session
 from pcvs.testing.test import Test
 from flask import Flask, request, render_template
 import json
@@ -44,6 +45,17 @@ class RemoteServer(GenericServer):
         super().__init__(sid)
         if not server_address.startswith("http"):
             self._serv = "http://" + server_address
+            
+        self._json_send("/submit/session_init", {
+            "sid": self._metadata['sid'],
+            "state": Session.State.IN_PROGRESS
+        })
+
+    def close_connection(self):
+        self._json_send("/submit/session_fini", {
+            "sid": self._metadata['sid'],
+            "state": Session.State.COMPLETED
+        })
 
     @property
     def endpoint(self):
@@ -66,8 +78,12 @@ class RemoteServer(GenericServer):
         to_send = {"metadata": self._metadata,
                    "test_data": test.to_json(),
                    "state": test.state}
+        
+        return self._json_send("/submit/test", to_send)
+    
+    def _json_send(self, prefix, json_data):
         try:
-            requests.post(self._serv + "/submit", json=to_send, timeout=1)
+            requests.post(self._serv + prefix, json=json_data, timeout=1)
             return True
         except requests.exceptions.ConnectionError:
             return False

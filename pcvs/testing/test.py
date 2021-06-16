@@ -115,7 +115,18 @@ class Test:
         :rtype: str
         """
         return self._array['name']
+    
+    @property
+    def subtree(self):
+        return self._array["subtree"]
 
+    @property
+    def te_name(self):
+        return self._array["te_name"]
+
+    @property
+    def combination(self):
+        return self._array["comb_dict"]
     @property
     def command(self):
         """Getter for the full command.
@@ -310,7 +321,8 @@ class Test:
                 "te_name": self._array["te_name"],
                 "label": self._array["label"],
                 "subtree": self._array["subtree"],
-                "full_name": self._array["name"]
+                "full_name": self._array["name"],
+                "comb": self._array['comb_dict']
             },
             "exec": self._array["command"],
             "result": {
@@ -323,7 +335,6 @@ class Test:
                 "tags": self._array['tags'],
                 "metrics": "TBD",
                 "artifacts": self._array['artifacts'],
-                "combination": self._array['comb_dict']
             }
         }
         
@@ -347,7 +358,7 @@ class Test:
             "tags": test_json["data"]["tags"],
             "metrics": "TBD",
             "artifacts": test_json["data"]["artifacts"],
-            "comb_dict": test_json["data"]["combination"]
+            "comb_dict": test_json["id"]["comb"]
         }
         
         self._rc = test_json["result"]["rc"]
