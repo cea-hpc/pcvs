@@ -53,13 +53,16 @@ def store_session_to_file(c):
         # currently running and registered.
         # Please not a session is not flushed away from logs until the user
         # explicitly does it
-        if all_sessions is not None:
-            sid = max(all_sessions.keys()) + 1
-        else:
-            # yaml.load returns None if empty
-            sid = 0
-            all_sessions = dict()
+        if all_sessions is None:
+            all_sessions = {"__metadata": {"next": 0}}
+        
+        # Lookup for an available session id number
+        sid = all_sessions["__metadata"]["next"]
+        while sid in all_sessions.keys() or sid == -1:
+            sid += 1
 
+        all_sessions["__metadata"]["next"] = (sid + 1) % 1000000
+            
         assert(sid not in all_sessions.keys())
         all_sessions[sid] = c
 
@@ -133,6 +136,7 @@ def list_alive_sessions():
     try:
         with open(PATH_SESSION, 'r') as fh:
             all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
+            del all_sessions["__metadata"]
     except FileNotFoundError as e:
         all_sessions = {}
     finally:

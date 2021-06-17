@@ -72,7 +72,7 @@ def session(ctx, ack, list, ack_all):
                 duration = s.property('ended') - s.property('started')
                 status = "Completed"
 
-            log.manager.print_item("SID {: >2s}: {} ({})".format(
+            log.manager.print_item("SID #{:0>6s}: {} ({})".format(
                 str(s.id),
                 status.upper(),
                 str(timedelta(days=duration.days, seconds=duration.seconds))
