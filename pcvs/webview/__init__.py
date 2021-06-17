@@ -55,10 +55,14 @@ def create_app(global_tree=None, test_config=None):
         :rtype: str
         """
         if 'json' in request.args.get("render", []):
-            res = {}
+            res = list()
             for k in global_tree_recv.keys():
-                res[k] = {}
-                res[k]["path"] = global_tree_recv[k]["path"]
+                res.append({
+                    "path": global_tree_recv[k]["path"],
+                    "state": str(session.Session.State(global_tree_recv[k]["state"])),
+                    "count": global_tree_recv[k]["fs-tree"]["__metadata"]["count"],
+                    "sid": k
+                    })
             return jsonify(res)
         return render_template("main.html")
     
@@ -66,7 +70,6 @@ def create_app(global_tree=None, test_config=None):
     def session_main(sid):
         sid = int(sid)
         assert(sid in global_tree_recv)
-        print(global_tree_recv[sid])
         
         if 'json' in request.args.get('render', []):
             return jsonify({"tag": len(global_tree_recv[sid]["tags"].keys()),
@@ -190,8 +193,6 @@ def create_app(global_tree=None, test_config=None):
         json_session = request.get_json()
         assert(json_session["sid"] in global_tree_recv.keys())
         global_tree_recv[json_session["sid"]]["state"] = json_session["state"]
-        import pprint
-        pprint.pprint(global_tree_recv)
         return "OK!", 200
     
     @app.route("/submit/test", methods=["POST"])

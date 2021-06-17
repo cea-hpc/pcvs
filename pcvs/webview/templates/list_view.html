@@ -6,7 +6,8 @@
 		$.getJSON("/run/{{sid}}/{{selection}}/list?render=json", function(resp){
 		$('#theTable').DataTable({
 		bDestroy: true,
-		"paging": true,
+		paging: true,
+		lengthmenu: [10, 50, 100, -1],
 		data: resp,
 		order: [[0, 'desc']],
 		columns: [

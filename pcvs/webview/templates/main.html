@@ -15,14 +15,34 @@ session is available, you may be redirected to the Session page directly.
 
 function refresh(){
 	$.getJSON("/?render=json", function(resp){
-		container = document.getElementById('sessions')
-		$("#session_count").html("Number of sessions: "+Object.keys(resp).length)
-		for(const session in resp) {
-			$("#sessions").append('<div class="col-sm-3"><div class="card text-center"><div class="card-body"><a href="/run/'+session+'"><h4 class="card-title">#'+session+'</h4><p class="card-text">Output: '+resp[session]['path']+'</p></div></div>'
-			)
-		}
-	}).done(function(){
+		$('#theTable').DataTable({
+			bDestroy: true,
+			responsive: true,
+			order: [[0, 'desc']],
+			paging: true,
+			lengthMenu: [10, 50, 100, -1],
+			data: resp,
+			columnDefs: [
+				{targets: [0], "cellType": "th"},
+				{targets: [0, 1, 5], "className": "dt-body-center"},
+				{targets: [2, 3, 4], "className": "dt-body-right"}
+			],
+			columns: [
+				{"responsivePriority": 1, "title": "Session ID", "class": "center", "data": 'sid', "render": function(d, tr, r){
+					return "<a href='/run/"+d+"'>"+d+"</a>"
+			}},
+				{"responsivePriority": 2, "title": "State", "class": "center", "data": 'state'},
+				{"responsivePriority": 5, "title": "Successes", "data": 'count', "render": function(d, t, s){return d["2"];}},
+				{"responsivePriority": 3, "title": "Failures", "data": 'count', "render": function(d, t, s){return d["3"];}},
+				{"responsivePriority": 6, "title": "Other", "data": 'count', "render": function(d, t, s){return d["0"]+d["1"]+d["4"]+d["5"];}},
+				{"responsivePriority": 4, "title": "Build path", "data": 'path'},
+			]
+			});
+			
+		}).done(function(){
 		page_ready()
+	})
+		$("#theTable").on('click', 'tbody tr', function(){
 	})
 }
 	
@@ -30,9 +50,10 @@ $(document).ready(function(){
 	page_waiting();
 	refresh();
 });
-//var timeout = setInterval(refresh, 2000);
+var timeout = setInterval(refresh, 2000);
 </script>
 
-<div id="sessions" class="row"></div>
+<table id="theTable" class="display" style="width:100%">
+</table>
 
 {% endblock %}
