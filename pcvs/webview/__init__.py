@@ -9,19 +9,17 @@ import json
 from pcvs import PATH_INSTDIR
 from pcvs.testing.test import Test
 from pcvs.backend import session
+from pcvs.webview import datalayer
 
+data_manager = datalayer.DataRepresentation()
 
-def create_app(global_tree=None, test_config=None):
+def create_app():
     """Start and run the Flask application.
 
-    :param global_tree: the full static result tree.
-    :type global_tree: dict
-    :param test_config: the loaded run configuration.
-    :type test_config: dict
     :return: the application
     :rtype: :class:`Flask`
     """
-    global_tree_recv = {}
+    global data_manager
 
     app = Flask(__name__, template_folder=os.path.join(
         PATH_INSTDIR, "webview/templates"))
@@ -55,33 +53,25 @@ def create_app(global_tree=None, test_config=None):
         :rtype: str
         """
         if 'json' in request.args.get("render", []):
-            res = list()
-            for k in global_tree_recv.keys():
-                res.append({
-                    "path": global_tree_recv[k]["path"],
-                    "state": str(session.Session.State(global_tree_recv[k]["state"])),
-                    "count": global_tree_recv[k]["fs-tree"]["__metadata"]["count"],
-                    "sid": k
-                    })
-            return jsonify(res)
+            return jsonify(data_manager.get_sessions())
         return render_template("main.html")
     
     @app.route("/run/<sid>")
     def session_main(sid):
         sid = int(sid)
-        assert(sid in global_tree_recv)
+        assert(sid in data_manager.session_ids)
         
         if 'json' in request.args.get('render', []):
-            return jsonify({"tag": len(global_tree_recv[sid]["tags"].keys()),
-                            "label": len(global_tree_recv[sid]["fs-tree"].keys()),
-                            "test": sum(global_tree_recv[sid]["fs-tree"]["__metadata"]["count"].values()),
+            return jsonify({"tag": data_manager.get_tag_cnt(sid),
+                            "label": data_manager.get_label_cnt(sid),
+                            "test": data_manager.get_test_cnt(sid),
                             "files": -1})
         return render_template('session_main.html',
                                sid=sid,
-                               rootdir=global_tree_recv[sid]["path"],
-                               nb_tests=sum(global_tree_recv[sid]["fs-tree"]["__metadata"]["count"].values()),
-                               nb_labels=len(global_tree_recv[sid]["fs-tree"].keys()),
-                               nb_tags=len(global_tree_recv[sid]["tags"].keys()),
+                               rootdir=data_manager.get_root_path(sid),
+                               nb_tests=data_manager.get_test_cnt(sid),
+                               nb_labels=data_manager.get_label_cnt(sid),
+                               nb_tags=data_manager.get_tag_cnt(sid),
                                nb_files=-1)
 
     @app.route('/compare')
@@ -158,43 +148,16 @@ def create_app(global_tree=None, test_config=None):
     def submit_new_session():
         json_session = request.get_json()
         sid = json_session["sid"]
-        if sid in global_tree_recv.keys():
-            while sid in global_tree_recv.keys():
-                sid = random.randint(0, 10000)
-            
-        global_tree_recv.setdefault(sid, {
-            "fs-tree": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
-            "tags": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
-            "iterators": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
-            "failures": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
-            "state": session.Session.State(json_session["state"]),
-            "path": json_session["buildpath"]
-        })
+        data_manager.insert_session(sid, json_session)
+
         return "OK!", 200
     
     @app.route("/submit/session_fini", methods=["POST"])
     def submit_end_session():
         json_session = request.get_json()
-        assert(json_session["sid"] in global_tree_recv.keys())
-        global_tree_recv[json_session["sid"]]["state"] = json_session["state"]
+        data_manager.close_session(json_session["sid"], json_session)
         return "OK!", 200
-    
+ 
     @app.route("/submit/test", methods=["POST"])
     def submit():
         json_str = request.get_json()
@@ -204,53 +167,13 @@ def create_app(global_tree=None, test_config=None):
         
         test_obj.from_json(json_str["test_data"])
         
-        ok = _insert_to_split(test_sid, test_obj)
+        ok = data_manager.insert_test(test_sid, test_obj)
         
         if not ok:
             return "", 406
         else:
             return "OK!", 200
     
-    def __insert_in_tree(test, node, depth):
-            assert('__metadata' in node.keys())
-            
-            node["__metadata"]["count"][int(test.state)] += 1
-            
-            if len(depth) == 0:
-                #do something
-                if '__elems' not in node:
-                    node['__elems'] = list()
-                node['__elems'].append(test)
-            else:
-                node.setdefault('__elems', {})
-                node["__elems"].setdefault(depth[0],
-                    {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    })
-                __insert_in_tree(test, node["__elems"][depth[0]], depth[1:])
-        
-    def _insert_to_split(sid, test: Test):
-        # first, insert the test in the hierachy
-        label = test.label
-        subtree = test.subtree
-        te_name = test.te_name
-        
-        sid_tree = global_tree_recv[sid]
-        __insert_in_tree(test, sid_tree["fs-tree"], [label, subtree, te_name])
-        
-        for tag in test.tags:
-            __insert_in_tree(test, sid_tree["tags"], [tag])
-        
-        if test.combination:
-            for iter_k, iter_v in test.combination.items():
-                __insert_in_tree(test, sid_tree["iterators"], [iter_k, iter_v])
-            
-        if test.state != Test.State.SUCCEED:
-            
-            __insert_in_tree(test, sid_tree["failures"], [])
-        return True
 
     @app.errorhandler(404)
     def page_not_found(e):
