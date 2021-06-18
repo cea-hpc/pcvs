@@ -101,7 +101,7 @@ class DataRepresentation:
     def get_sessions(self):
         return [{
                 'path': v['path'],
-                'state': str(Test.State(v['state'])),
+                'state': str(Session.State(v['state'])),
                 'sid': k,
                 'count': v['fs-tree']['__metadata']['count']
             } for k, v in self.rootree.items()]

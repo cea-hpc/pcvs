@@ -13,7 +13,10 @@ session is available, you may be redirected to the Session page directly.
 
 <script type="text/javascript">
 
-function refresh(){
+var pause = false;
+
+function init_the_table(){
+
 	$.getJSON("/?render=json", function(resp){
 		$('#theTable').DataTable({
 			bDestroy: true,
@@ -42,17 +45,46 @@ function refresh(){
 		}).done(function(){
 		page_ready()
 	})
-		$("#theTable").on('click', 'tbody tr', function(){
-	})
+}
+
+function togglePause()
+{
+	//trigger the refresh again
+	pause = !pause
+	if(!pause)
+		refresh_the_table();
+}
+
+function refresh_the_table()
+{
+	if(!pause)
+	{
+		$.getJSON("/?render=json", function(resp){
+			var table = $("#theTable").DataTable();
+			console.log(JSON.stringify(resp));
+			for(k in resp)
+			{
+				row_id = table.columns(0).data().eq(0).indexOf(resp[k]["sid"]);
+				if(row_id == -1)
+					table.row.add(resp[k]);
+				else
+					table.row(row_id).data(resp[k]);
+			}
+			table.draw();
+		}).done(function(){
+			setTimeout(refresh_the_table, 5000);
+		});
+	}
 }
 	
 $(document).ready(function(){
 	page_waiting();
-	refresh();
+	init_the_table();
+	setTimeout(refresh_the_table, 5000);
 });
-var timeout = setInterval(refresh, 2000);
 </script>
 
+<button type="button" class="btn btn-primary" onclick="togglePause()">Play/Pause</button>
 <table id="theTable" class="display" style="width:100%">
 </table>
 
