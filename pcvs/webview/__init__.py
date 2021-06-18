@@ -185,4 +185,8 @@ def create_app():
         :rtype: str
         """
         return render_template('404.html')
+
+    def get_data_manager():
+        return data_manager
+
     return app

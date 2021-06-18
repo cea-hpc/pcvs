@@ -7,19 +7,27 @@ from pcvs.backend import report as pvReport
 
 
 @click.command('report', short_help="Manage PCVS result reporting interface")
-@click.option('-w', '--web', 'mode', flag_value='web', default=True,
-              help="Generate web-based GUI")
-@click.argument("path", required=False, default=None)
+@click.option("-s", "--static-pages", "static", flag_value=".", default=None)
+@click.argument("path_list", nargs=-1, required=False)
 @click.pass_context
-def report(ctx, mode, path):
+def report(ctx, path_list, static):
     inputs = list()
-    if path is None:
-        path = os.path.join(os.getcwd(), NAME_BUILDIR)
+    if len(path_list) == 0:
+        inputs.append(os.path.join(os.getcwd(), NAME_BUILDIR))
 
-    if not os.path.isfile(os.path.join(path, NAME_BUILDFILE)):
-        click.BadArgumentUsage('{} is not a build directory.'.format(path))
+    # sanity check
+    for prefix in path_list:
+        if not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
+            raise click.BadArgumentUsage('{} is not a build directory.'.format(prefix))
+        inputs.append(os.path.abspath(prefix))
 
-    path = os.path.join(path, 'rawdata')
-
-    if mode == "web":
-        pvReport.webview_run_server(path)
+    if static:
+        # server old-style JCRHONOSS pages after JSON transformation
+        for prefix in inputs:
+            pvReport.build_static_pages(prefix)
+    else:
+        # feed with prefixes
+        for prefix in inputs:
+            pvReport.upload_buildir_results(prefix)
+        # create the app
+        pvReport.start_server()

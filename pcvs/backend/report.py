@@ -1,10 +1,13 @@
 import json
+import yaml
+from addict import Dict
 import os
 
 from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.system import ValidationScheme
 from pcvs.testing.test import Test
-from pcvs.webview import create_app
+from pcvs.webview import create_app, data_manager
+from pcvs.backend.session import Session
 
 
 def locate_json_files(path):
@@ -23,137 +26,51 @@ def locate_json_files(path):
     return array
 
 
-def build_data_tree(path=os.getcwd(), files=[]):
-    """Build the whole static data tree, browsed by Flask upon request.
-
-    The tree is duplicated into three sections:
-        * tests are gathered by labels
-        * tests are gathered by tags
-        * tests are gathered by status
-
-    :param path: where build dir is located, defaults to os.getcwd()
-    :type path: str, optional
-    :param files: list of result files, defaults to None
-    :type files: list, optional
-    :return: the global tree
-    :rtype: dict
-    """
-    global_tree = {
-        "metadata": {},
-        "label": {},
-        "tag": {},
-        "status": {}
-    }
-    labels = global_tree["label"]
-    tags = global_tree["tag"]
-    statuses = global_tree["status"]
-    cnt_tests = 0
-    scheme = ValidationScheme("test-result")
-
-    # with open(os.path.join(os.getcwd(), "result-scheme.yml"), "r") as fh:
-    #    val_str = yaml.safe_load(fh)
-
-    for idx, f in enumerate(files):
-        print("Dealing with n°{}".format(idx+1))
-        with open(f, 'r') as fh:
-            stream = json.load(fh)
-            # TODO: read & store metadata
-            for test in stream.get('tests', []):
-                try:
-                    pass
-                    # veeeeery slow
-                    # scheme.validate(test)
-
-                except ValidationException.FormatError:
-                    print("\t- skip {} (bad formatting)".format(f))
-                    continue
-
-                cnt_tests += 1
-                test_label = test['id'].get('label', "NOLABEL")
-                test_tags = test['data'].get('tags', [])
-                state = test['result'].get('state', Test.State.ERR_OTHER)
-                test_status = str(Test.State(state))
-
-                statuses.setdefault(test_status, {
-                    "tests": list(),
-                    "metadata": {
-                        "count": 0
-                    }
-                })
-                statuses[test_status]["tests"].append(test)
-                statuses[test_status]['metadata']['count'] += 1
-
-                # Per-label
-                labels.setdefault(test_label, {
-                    "tests": list(),
-                    "metadata": {
-                        "count": {
-                            str(Test.State.WAITING): 0,
-                            str(Test.State.IN_PROGRESS): 0,
-                            str(Test.State.SUCCEED): 0,
-                            str(Test.State.FAILED): 0,
-                            str(Test.State.ERR_DEP): 0,
-                            str(Test.State.ERR_OTHER): 0,
-                            "total": 0
-                        }
-                    }
-                })
-                labels[test_label]['metadata']["count"][test_status] += 1
-                labels[test_label]['metadata']["count"]['total'] += 1
-                labels[test_label]["tests"].append(test)
-
-                for tag in test_tags:
-                    tags.setdefault(tag, {
-                        "tests": list(),
-                        "metadata": {
-                            "count": {
-                                str(Test.State.WAITING): 0,
-                                str(Test.State.IN_PROGRESS): 0,
-                                str(Test.State.SUCCEED): 0,
-                                str(Test.State.FAILED): 0,
-                                str(Test.State.ERR_DEP): 0,
-                                str(Test.State.ERR_OTHER): 0,
-                                "total": 0
-                            }
-                        }
-                    })
-                    tags[tag]['tests'].append(test)
-                    tags[tag]["metadata"]["count"][test_status] += 1
-                    tags[tag]["metadata"]["count"]["total"] += 1
-    global_tree['metadata'] = {
-        "rootdir": path,
-        "count": {
-            "tests": cnt_tests,
-            "labels": len(labels.keys()),
-            "tags": len(tags.keys()),
-            "files": len(files)
-        }
-    }
-    return global_tree
-
-
-def webview_run_server(path):
-    """Init the report interface.
-
-    Start the Flask application after processing result files.
-
-    :param path: where result files are stored (under 'rawdata' dir)
-    :type path: str
-    """
-    try:
-        print("Load YAML files")
-        json_files = [os.path.join(path, f) for f in os.listdir(
-            path) if f.startswith("pcvs_rawdat") and f.endswith(".json")]
-        print("Build global tree ({} files)".format(len(json_files)))
-        global_tree = build_data_tree(path, json_files)
-    except Exception:
-        print("No files found.\nRunning remote server ...")
-        global_tree = build_data_tree(path)
-        
+def start_server():
+    app = None
     for port in [5000, 0]:
         try:
-            create_app(global_tree).run(host='0.0.0.0', port=port)
+            app = create_app().run(host='0.0.0.0', port=port)
             break
         except OSError as e:
             print("Fail to run on port {}. Try automatically-defined".format(port))
             continue
+    return app
+
+def upload_buildir_results(buildir):
+    # first, need to determine the session ID -> conf.yml
+    with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
+        conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+    
+    sid = conf_yml.validation.sid
+    dataman = data_manager
+
+    result_dir = os.path.join(buildir, 'rawdata')
+    dataman.insert_session(sid, {
+        'buildpath': buildir,
+        'state': Session.State.COMPLETED,
+        'dirs': conf_yml.validation.dirs
+    })
+
+    for f in os.listdir(result_dir):
+        assert(f.endswith(".json"))
+        with open(os.path.join(result_dir, f), 'r') as fh:
+            data = json.load(fh)
+            for t in data["tests"]:
+                obj = Test()
+                obj.from_json(t)
+                dataman.insert_test(sid, obj)
+
+    dataman.close_session(sid, {'state': Session.State.COMPLETED})
+
+
+def build_static_pages(buildir):
+    with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
+        conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+    
+    sid = conf_yml.validation.sid
+
+    result_dir = os.path.join(buildir, 'rawdata')
+    for f in os.listdir(result_dir):
+        pass
+
