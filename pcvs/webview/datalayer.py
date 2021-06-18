@@ -1,3 +1,4 @@
+import random
 from pcvs.testing.test import Test
 from pcvs.backend.session import Session
 
@@ -29,7 +30,7 @@ class DataRepresentation:
 
         if sid in self.rootree.keys():
             while sid in self.rootree.keys():
-                sid = random.randint(0, 10000)
+                sid = random.randint(0, 10000) * (-1)
             
         self.rootree.setdefault(sid, {
             "fs-tree": {

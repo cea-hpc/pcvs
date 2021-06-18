@@ -12,14 +12,22 @@ from pcvs.backend import report as pvReport
 @click.pass_context
 def report(ctx, path_list, static):
     inputs = list()
-    if len(path_list) == 0:
-        inputs.append(os.path.join(os.getcwd(), NAME_BUILDIR))
-
     # sanity check
     for prefix in path_list:
+        # if given prefix does not point to a valid build directory
         if not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
-            raise click.BadArgumentUsage('{} is not a build directory.'.format(prefix))
+            # if the 'builddir' default name was missing for resolution, add it
+            if os.path.isfile(os.path.join(prefix, NAME_BUILDIR, NAME_BUILDFILE)):
+                prefix = os.path.join(prefix, NAME_BUILDIR)
+            else:  # otherwise, it is a wrong path -> error
+                raise click.BadArgumentUsage('{} is not a build directory.'.format(prefix))
+
         inputs.append(os.path.abspath(prefix))
+
+    # extra step, if the user didn't specify anything, attempt to add cwd
+    current_dir = os.path.join(os.getcwd(), NAME_BUILDIR)
+    if len(inputs) == 0 and os.path.isfile(os.path.join(current_dir, NAME_BUILDFILE)):
+        inputs.append(current_dir)
 
     if static:
         # server old-style JCRHONOSS pages after JSON transformation
