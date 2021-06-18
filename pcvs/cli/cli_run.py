@@ -94,7 +94,9 @@ def handle_build_lockfile(exc=None):
     lock = os.path.join(
         system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
     if os.path.exists(lock):
-        utils.unlock_file(lock)
+        with open(lock, 'r') as fh:
+            if int(fh.read()) == os.getpid():
+                utils.unlock_file(lock)
 
     if exc:
         raise exc
