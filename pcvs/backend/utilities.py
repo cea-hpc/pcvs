@@ -129,7 +129,6 @@ def process_check_setup_file(filename, prefix):
     :rtype: tuple
     """
     err_msg = None
-    token = log.manager.style(log.manager.utf('fail'), fg="red", bold=True)
     data = None
     env = os.environ
     env.update(run.build_env_from_configuration({}))
@@ -147,12 +146,10 @@ def process_check_setup_file(filename, prefix):
                 err_msg = base64.b64encode(fds[1])
             else:
                 data = fds[0].decode('utf-8')
-                token = log.manager.style(
-                    log.manager.utf('succ'), fg="green", bold=True)
     except subprocess.CalledProcessError as e:
         err_msg = base64.b64encode(str(e.stderr).encode('utf-8'))
-
-    return (err_msg, token, data)
+    
+    return (err_msg, data)
 
 
 scheme = system.ValidationScheme('te')
@@ -167,26 +164,31 @@ def process_check_yaml_stream(data):
     :rtype: tuple
     """
     global scheme
-    token_load = token_yaml = "{}".format(log.manager.style(
-        log.manager.utf('fail'), fg="red", bold=True))
     err_msg = None
+    nb_nodes = "----"
     try:
         stream = yaml.safe_load(data)
-        token_load = "{}".format(log.manager.style(
-            log.manager.utf('succ'), fg="green", bold=True))
-
         scheme.validate(stream)
-        token_yaml = "{}".format(log.manager.style(
-            log.manager.utf('succ'), fg="green", bold=True))
-
+        nb_nodes = len(stream.keys())
+    
     except yaml.YAMLError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
     except ValidationException.FormatError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
 
-    return (err_msg, token_load, token_yaml)
+    return (err_msg, nb_nodes)
 
-
+def __set_token(token, nset=None) -> str:
+    
+    if not nset:
+        nset = log.manager.utf("none")
+    if token is None:
+        return log.manager.style(nset, fg="yellow", bold=True)
+    elif token:
+        return log.manager.style(log.manager.utf("succ"), fg="green", bold=True)
+    else:
+        return log.manager.style(log.manager.utf("fail"), fg="red", bold=True)
+    
 def process_check_directory(dir):
     """Analyze a directory to ensure defined test files are valid.
 
@@ -199,61 +201,46 @@ def process_check_directory(dir):
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
 
-    if setup_files:
-        log.manager.print_section(
-            'Analyzing scripts: (script{s}YAML{s}valid)'.format(s=log.manager.utf('sep_v')))
-        for _, subprefix, f in setup_files:
-            if subprefix is None:
-                subprefix = ""
-            token_script = token_load = token_yaml = log.manager.style(
-                log.manager.utf('fail'), fg="red", bold=True)
-            err, token_script, data = process_check_setup_file(
+    log.manager.print_section(
+            'Analyzing: Setup{s}Output{s}test Node(s)'.format(s=log.manager.utf('sep_v')))
+        
+    for _, subprefix, f in [*setup_files, *yaml_files]:
+        setup_ok = __set_token(None)
+        yaml_ok = __set_token(None)
+        nb_nodes = __set_token(None, "----")
+        data = ""
+        err = None
+
+        if subprefix is None:
+            subprefix = ""
+        
+        if f.endswith("pcvs.setup"):
+            err, data = process_check_setup_file(
                 os.path.join(dir, subprefix, f), subprefix)
-            if err:
-                errors.setdefault(err, 0)
-                errors[err] += 1
-            else:
-                err, token_load, token_yaml = process_check_yaml_stream(data)
-
-                if err:
-                    errors.setdefault(err, 0)
-                    errors[err] += 1
-            log.manager.print_item(' {}{}{}{}{} {}'.format(
-                token_script,
-                log.manager.utf('sep_v'),
-                token_load,
-                log.manager.utf('sep_v'),
-                token_yaml,
-                os.path.join(dir, subprefix)
-            ), with_bullet=False)
-
-            if err:
-                log.manager.info("FAILED: {}".format(
-                    base64.b64decode(err).decode('utf-8')))
-
-    if yaml_files:
-        log.manager.print_section(
-            "Analysis: pcvs.yml* (YAML{}Valid)".format(log.manager.utf('sep_v')))
-        for _, subprefix, f in yaml_files:
-            if subprefix is None:
-                subprefix = ""
-
+            setup_ok = __set_token(err is None)
+        else:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:
-                err, token_load, token_yaml = process_check_yaml_stream(
-                    fh.read())
-                if err:
-                    errors.setdefault(err, 0)
-                    errors[err] += 1
+                data = fh.read()
+            
+        if not err:
+            err, nb_nodes = process_check_yaml_stream(data)
+            yaml_ok = __set_token(err is None)
 
-            log.manager.print_item(' {}{}{} {}'.format(
-                token_load,
+        log.manager.print_item(' {}{}{}{}{}{}{}'.format(
+                setup_ok,
                 log.manager.utf('sep_v'),
-                token_yaml,
-                os.path.join(dir, subprefix)), with_bullet=False)
+                yaml_ok,
+                log.manager.utf('sep_v'),
+                log.manager.style("{:>4}".format(nb_nodes), fg="yellow", bold=True),
+                log.manager.utf('sep_v'),
+                subprefix), with_bullet=False)
 
-            if err:
-                log.manager.info("FAILED: {}".format(
-                    base64.b64decode(err).decode('utf-8')))
+        if err:
+            log.manager.info("FAILED: {}".format(
+                base64.b64decode(err).decode('utf-8')))
+            errors.setdefault(err, 0)
+            errors[err] += 1
+
     return errors
 
 
