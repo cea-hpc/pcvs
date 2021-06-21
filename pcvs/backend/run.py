@@ -362,6 +362,8 @@ def process_dyn_setup_scripts(setup_files):
 
             f = os.path.join(cur_src, fname)
 
+            if not subprefix:
+                subprefix = ""
             # Run the script
             try:
                 fds = subprocess.Popen([f, subprefix], env=env,

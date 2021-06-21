@@ -1,12 +1,15 @@
 class GenericError(Exception):
     """Generic error (custom errors will inherit of this)."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, msg, **kwargs):
         """Constructor for generic errors.
         :param *args: unused
         :param **kwargs: messages for the error.
         """
-        message = "{}:\n{}".format(type(self), kwargs)
+        message = "{}".format(msg)
+        for k, v in kwargs.items():
+            message += "\n- {}: {}".format(k, v)
+        
         super().__init__(message)
 
 

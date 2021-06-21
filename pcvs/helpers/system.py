@@ -67,13 +67,10 @@ class ValidationScheme:
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             raise ValidationException.FormatError(
-                "Wrong format: {} ('{}'):".format(filepath, self._name),
-                "{}".format(e.message))
+                "{}:\n{}".format(filepath, e))
         except jsonschema.exceptions.SchemaError as e:
             raise ValidationException.SchemeError(
-                "Unable to use the scheme {}".format(self._name),
-                '{}'.format(e)
-            )
+                "{}: {}".format(self._name, e))
 
 
 class Config(Dict):
