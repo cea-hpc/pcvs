@@ -45,9 +45,11 @@ class RemoteServer(GenericServer):
 
     def __init__(self, sid, server_address):
         super().__init__(sid)
+        self._serv = server_address
         if not server_address.startswith("http"):
             self._serv = "http://" + server_address
-            self.open_connection()
+        self.open_connection()
+
             
     def open_connection(self):
         self._json_send("/submit/session_init", {
