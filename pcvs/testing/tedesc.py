@@ -475,6 +475,7 @@ class TEDescriptor:
 
         # count number of built tests
         self._effective_cnt += 1
+        
         yield Test(
             te_name=self._te_name,
             label=self._te_label,

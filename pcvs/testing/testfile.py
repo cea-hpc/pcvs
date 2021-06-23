@@ -2,6 +2,7 @@ import functools
 import operator
 import os
 import pathlib
+from pcvs.plugins import Plugin
 import subprocess
 
 import jsonschema
@@ -183,9 +184,11 @@ class TestFile:
 
         # main loop, parse each node to register tests
         for k, content, in self._raw.items():
+            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_BEFORE)
             td = tedesc.TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
+            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)
 
             # register debug informations relative to the loaded TEs
             self._debug[k] = td.get_debug()

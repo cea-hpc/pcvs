@@ -1,3 +1,4 @@
+from pcvs.plugins import Plugin
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
@@ -59,6 +60,9 @@ class Orchestrator:
         :param restart: whether the run is starting from scratch
         :type restart: False for a brand new run.
         """
+        
+        MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.SCHED_BEFORE)
+        
         self._manager.resolve_deps()
         self.print_infos()
         
@@ -111,6 +115,8 @@ class Orchestrator:
         self._publisher.flush()
         assert(self._manager.get_count('executed')
                == self._manager.get_count('total'))
+    
+        MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.SCHED_AFTER)
 
     def run(self, session):
         """Start the orchestrator.

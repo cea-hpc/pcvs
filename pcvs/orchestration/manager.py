@@ -1,3 +1,4 @@
+from pcvs.plugins import Plugin
 from addict import Dict 
 
 from pcvs.helpers import communications, log
@@ -40,6 +41,7 @@ class Manager:
         :type publisher: :class:`Publisher`
         """
         self._comman = MetaConfig.root.get_internal('comman')
+        self._plugin = MetaConfig.root.get_internal('pColl')
 
         self._dims = dict()
         self._max_size = max_size
@@ -146,48 +148,55 @@ class Manager:
             return None
 
         the_set = None
-        for k in sorted(self._dims.keys(), reverse=True):
-            if len(self._dims[k]) <= 0:
-                continue
-            else:
-                # assert(self._builder.job_grabber)
-                job: Test = self._dims[k].pop()
+        self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_BEFORE)
+        
+        if self._plugin.has_step(Plugin.Step.SCHED_SET_EVAL):
+            the_set = self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_EVAL, jobman=self)
+        else:
+            for k in sorted(self._dims.keys(), reverse=True):
+                if len(self._dims[k]) <= 0:
+                    continue
+                else:
+                    # assert(self._builder.job_grabber)
+                    job: Test = self._dims[k].pop()
 
-                if job:
-                    if job.been_executed() or job.has_failed_dep():
-                        # jobs can be picked up outside of this pop() call
-                        # if tagged executed, they have been fully handled
-                        # and should just be removed from scheduling
-                        #
-                        # Another case: test can't be picked up because
-                        # job deps have failed.
-                        # in that case, no job management occured.
-                        # do it now.
-                        if job.has_failed_dep():
-                            job.save_final_result(rc=-1, time=0.0,
-                                                  out=Test.NOSTART_STR,
-                                                  state=Test.State.ERR_DEP)
-                            job.display()
-                            if self._comman:
-                                self._comman.send(job)
-                            self._count.executed += 1
-                            self._publisher.add(job.to_json())
-                        # sad to break, should retry
+                    if job:
+                        if job.been_executed() or job.has_failed_dep():
+                            # jobs can be picked up outside of this pop() call
+                            # if tagged executed, they have been fully handled
+                            # and should just be removed from scheduling
+                            #
+                            # Another case: test can't be picked up because
+                            # job deps have failed.
+                            # in that case, no job management occured.
+                            # do it now.
+                            if job.has_failed_dep():
+                                job.save_final_result(rc=-1, time=0.0,
+                                                    out=Test.NOSTART_STR,
+                                                    state=Test.State.ERR_DEP)
+                                job.display()
+                                if self._comman:
+                                    self._comman.send(job)
+                                self._count.executed += 1
+                                self._publisher.add(job.to_json())
+                            # sad to break, should retry
+                            break
+                        elif not job.is_pickable():
+                            self._dims[k].append(job)
+
+                            # careful: it means jobs are picked up
+                            # but not popped from
+                            while job and not job.is_pickable():
+                                job = job.first_valid_dep()
+
+                    if job:
+                        job.pick()
+                        the_set = Set()
+                        the_set.add(job)
                         break
-                    elif not job.is_pickable():
-                        self._dims[k].append(job)
-
-                        # careful: it means jobs are picked up
-                        # but not popped from
-                        while job and not job.is_pickable():
-                            job = job.first_valid_dep()
-
-                if job:
-                    job.pick()
-                    the_set = Set()
-                    the_set.add(job)
-                    break
-
+        
+        self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
+        
         return the_set
 
     def merge_subset(self, set):

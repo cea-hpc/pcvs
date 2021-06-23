@@ -1,12 +1,11 @@
 import base64
-import importlib
 import itertools
 import math
 import os
 
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
-from pcvs.plugins import Plugin, PluginCollection
+from pcvs.plugins import Plugin
 
 
 class Combination:

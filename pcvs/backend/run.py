@@ -1,5 +1,6 @@
 import fileinput
 import os
+from pcvs.plugins import Plugin
 import pprint
 import shutil
 import subprocess
@@ -390,6 +391,7 @@ def process_dyn_setup_scripts(setup_files):
                 continue
 
             # Now create the file handler
+            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
             obj = TestFile(file_in=out_file,
                            path_out=cur_build,
                            data=te_node,
@@ -398,6 +400,7 @@ def process_dyn_setup_scripts(setup_files):
                            )
             obj.process()
             obj.flush_sh_file()
+            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
     return err
 
 
@@ -534,6 +537,7 @@ def terminate():
 
     :raises ProgramError: Problem occured while invoking the archive tool.
     """
+    MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_BEFORE)
     archive_name = "pcvsrun_{}.tar.gz".format(
         MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
     outdir = MetaConfig.root.validation.output
@@ -567,6 +571,7 @@ def terminate():
     if comman:
         log.manager.print_item("Close connection to Reporting Server")
         comman.close_connection()
+    MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_AFTER)
     
 
 

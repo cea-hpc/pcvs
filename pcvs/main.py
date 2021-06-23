@@ -11,7 +11,7 @@ from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
                       cli_session, cli_utilities)
 from pcvs.helpers import log, utils
-from pcvs.plugins import Plugin, PluginCollection
+from pcvs.plugins import Plugin, Collection
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -82,10 +82,10 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugins, list_plugins):
 
     utils.create_home_dir()
     
-    pcoll = PluginCollection()
+    pcoll = Collection()
     ctx.obj['plugins'] = pcoll
     
-    pcoll.init_default_plugins()
+    pcoll.init_system_plugins()
     if plugins:
         pcoll.register_plugin_by_dir(plugins)
     

@@ -1,8 +1,9 @@
 import json
 import os
+from pcvs.plugins import Plugin
 
 from pcvs import NAME_BUILD_RESDIR
-from pcvs.helpers.system import ValidationScheme
+from pcvs.helpers.system import MetaConfig, ValidationScheme
 
 
 class Publisher:
@@ -81,6 +82,7 @@ class Publisher:
 
         The Publisher is then reset for the next flush (next file).
         """
+        MetaConfig.root.get_internal('pColl').invoke_plugins(Plugin.Step.SCHED_PUBLISH_BEFORE)
         # nothing to flush since the last call
         if len(self._layout['tests']) <= 0:
             return
@@ -94,3 +96,5 @@ class Publisher:
         with open(filename, 'w+') as fh:
             json.dump(self._layout, fh)
             self.empty_entries()
+
+        MetaConfig.root.get_internal('pColl').invoke_plugins(Plugin.Step.SCHED_PUBLISH_BEFORE)

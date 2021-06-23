@@ -46,21 +46,26 @@ class Plugin:
         raise PluginException.NotImplementedError(type(self))
 
 
-class PluginCollection:
+class Collection:
     def __init__(self):
-        self._plugins = {name: [] for name in list(Plugin.Step)}
+        self._plugins = {name: None for name in list(Plugin.Step)}
         
-    def init_default_plugins(self):
+    def init_system_plugins(self):
         self.register_plugin_by_package("pcvs-contrib")
         
     def invoke_plugins(self, step, *args, **kwargs):
         if step not in list(Plugin.Step):
             raise PluginException.BadStepError(step)
         
-        for plugin in self._plugins[step]:
-            return plugin.run(*args, **kwargs)
+        if self._plugins[step]:
+            return self._plugins[step].run(*args, **kwargs)
         return None
         
+    def has_step(self, step):
+        if step not in self._plugins:
+            return False
+        
+        return self._plugins[step] is not None
     def show_plugins(self):
         for step, elements in self._plugins.items():
             if len(elements) > 0:
@@ -78,8 +83,13 @@ class PluginCollection:
     def register_plugin_by_module(self, mod):
         for (_, the_class) in inspect.getmembers(mod, inspect.isclass):
             if issubclass(the_class, Plugin) and the_class is not Plugin:
-                log.manager.info("Loading {} ({})".format(the_class.__name__, str(the_class.step)))
-                self._plugins[the_class.step].append(the_class())
+                step_str = str(the_class.step)
+                class_name = the_class.__name__
+                log.manager.debug("Loading {} ({})".format(class_name, step_str))
+                if self._plugins[the_class.step]:
+                    log.manager.info("{} overriden: {} -> {}".format(step_str, type(self._plugins[the_class.step]).__name__, class_name))
+                
+                self._plugins[the_class.step] = the_class()
                 
     def register_plugin_by_dir(self, pkgpath):
         path = os.path.join(os.path.abspath(pkgpath), "..")
