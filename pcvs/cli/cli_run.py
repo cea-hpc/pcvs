@@ -91,12 +91,13 @@ def handle_build_lockfile(exc=None):
     :param exc: The raising exception.
     :type exc: Exception
     """
-    lock = os.path.join(
-        system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
-    if os.path.exists(lock):
-        with open(lock, 'r') as fh:
-            if int(fh.read()) == os.getpid():
-                utils.unlock_file(lock)
+    if system.MetaConfig.root: 
+        lock = os.path.join(
+            system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
+        if os.path.exists(lock):
+            with open(lock, 'r') as fh:
+                if int(fh.read()) == os.getpid():
+                    utils.unlock_file(lock)
 
     if exc:
         raise exc
@@ -130,9 +131,11 @@ def handle_build_lockfile(exc=None):
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
-@click.option("-r", "--report", "webreport", show_envvar=True,
-              is_flag=False, default=None, flag_value="localhost:5000",
+@click.option("-r", "--report", "enable_report", show_envvar=True,
+              is_flag=True, default=False,
               help="Attach a webview server to the current session run.")
+@click.option("--report-uri", "report_addr", default=None,
+              help="Override default Server address")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
@@ -140,7 +143,7 @@ def handle_build_lockfile(exc=None):
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
-        simulated, bank, dup, dirs, webreport) -> None:
+        simulated, bank, dup, dirs, enable_report, report_addr) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -171,7 +174,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
-    val_cfg.set_ifdef('webreport', webreport)
+    val_cfg.set_ifdef('enable_report', enable_report)
+    val_cfg.set_ifdef('report_addr', report_addr)
 
     # if dirs not set by config file nor CLI
     if not dirs and not val_cfg.dirs:

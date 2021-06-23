@@ -194,14 +194,14 @@ def prepare():
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
     
-    if valcfg.webreport:
+    if valcfg.enable_report:
         log.manager.print_section("Interface to Reporting Server")
         comman = None
-        if valcfg.webreport == "local":
+        if valcfg.report_addr == "local":
             comman = communications.EmbeddedServer(valcfg.sid)
             log.manager.print_item("Running a local instance")
         else:
-            comman = communications.RemoteServer(valcfg.sid, valcfg.webreport)
+            comman = communications.RemoteServer(valcfg.sid, valcfg.report_addr)
             log.manager.print_item("Listening on {}".format(comman.endpoint))
         MetaConfig.root.set_internal('comman', comman)
     
