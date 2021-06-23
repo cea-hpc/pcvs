@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from io import DEFAULT_BUFFER_SIZE
 from pcvs.backend.session import Session
 from pcvs.testing.test import Test
 from pcvs.helpers.system import MetaConfig
@@ -42,12 +43,19 @@ class EmbeddedServer(GenericServer):
 
 
 class RemoteServer(GenericServer):
-
+    
+    DEFAULT_SRV_ADDR = "http://localhost:5000"
+    
     def __init__(self, sid, server_address):
         super().__init__(sid)
+        if not server_address:
+            server_address = self.DEFAULT_SRV_ADDR
+
         self._serv = server_address
+        
         if not server_address.startswith("http"):
             self._serv = "http://" + server_address
+
         self.open_connection()
 
             
