@@ -7,8 +7,6 @@ from pcvs.helpers import communications, log
 from pcvs.helpers.system import MetaConfig
 from pcvs.testing.test import Test
 
-comman: communications.GenericServer = None
-
 
 class Set(threading.Thread):
     """Gather multiple jobs to be scheduled.
@@ -29,6 +27,7 @@ class Set(threading.Thread):
     :type _is_wrapped: bool
     """
     global_increment = 0
+    comman: communications.GenericServer = None
 
     def __init__(self):
         """constructor method."""
@@ -38,6 +37,11 @@ class Set(threading.Thread):
         self._jobs: List[Test] = list()
         self._completed = False
         self._is_wrapped = False
+        
+        if not self.comman:
+            if MetaConfig.root.get_internal('comman') is not None:
+                self.comman = MetaConfig.root.get_internal('comman')
+                
         super().__init__()
 
     def enable_wrapping(self, wrap_cli):
@@ -151,7 +155,8 @@ class Set(threading.Thread):
                 raise
             job.save_final_result(time=final, rc=rc, out=stdout)
             job.display()
-            if comman:
-                comman.send(job)
+            
+            if self.comman:
+                self.comman.send(job)
 
         self._completed = True

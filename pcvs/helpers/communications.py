@@ -94,7 +94,6 @@ class RemoteServer(GenericServer):
         to_send = {"metadata": self._metadata,
                    "test_data": test.to_json(),
                    "state": test.state}
-        
         return self._json_send("/submit/test", to_send)
     
     def _json_send(self, prefix, json_data):
