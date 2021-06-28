@@ -51,6 +51,15 @@ class Manager:
             "executed": 0
         })
 
+    def get_dim(self, dim):
+        if dim not in self._dims:
+            return []
+        return self._dims[dim]
+    
+    @property
+    def nb_dims(self):
+        return self._max_size
+
     def add_job(self, job):
         """Store a new job to the Manager table.
 
@@ -151,7 +160,11 @@ class Manager:
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_BEFORE)
         
         if self._plugin.has_step(Plugin.Step.SCHED_SET_EVAL):
-            the_set = self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_EVAL, jobman=self)
+            the_set = self._plugin.invoke_plugins(
+                Plugin.Step.SCHED_SET_EVAL,
+                jobman=self,
+                max_dim=max_dim
+            )
         else:
             for k in sorted(self._dims.keys(), reverse=True):
                 if len(self._dims[k]) <= 0:
