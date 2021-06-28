@@ -193,8 +193,10 @@ class MetaConfig(Dict):
         super().__init__(*args, **kwargs)
 
         # The 'internal' node is a special one. Put here anything not requiring
-        # to be published (like conf.yml, etc...). mainly one-time Python objects
-        self['__internal'] = Config()
+        # to be published (like conf.yml, etc...). mainly one-time Python
+        # objects
+        if '__internal' not in self:
+            self['__internal'] = Config()
 
     def __setitem__(self, param, value):
         """Extend the default Dict setter mthod to reach the base class one"""

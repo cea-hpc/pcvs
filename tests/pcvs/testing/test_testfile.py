@@ -7,7 +7,8 @@ from click.testing import CliRunner
 
 import pcvs
 from pcvs import NAME_BUILDIR, PATH_INSTDIR
-from pcvs.helpers import log, system
+from pcvs.helpers import log, system, pm
+from pcvs.plugins import Collection
 from pcvs.testing import testfile as tested
 
 
@@ -95,7 +96,8 @@ def isolated_yml_test():
 
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
     "__internal": {
-        "cc_pm": "test_cc_pm"
+        "cc_pm": [pm.SpackManager("fakespec")],
+        "pColl": Collection()
     },
     "validation": {
         "output": "test_output",
@@ -110,6 +112,7 @@ def test_TestFile(tedesc, isolated_yml_test):
     def dummydesc():
         pass
     tedesc.construct_tests = dummydesc
+    
     l = log.IOManager(logfile = "out.log")
     testfile = tested.TestFile(os.path.join(isolated_yml_test, "test-dir/pcvs.yml"), 
         os.path.dirname(__file__), 
