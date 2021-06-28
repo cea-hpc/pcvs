@@ -8,6 +8,7 @@ from pcvs.helpers.system import ValidationScheme
 from pcvs.testing.test import Test
 from pcvs.webview import create_app, data_manager
 from pcvs.backend.session import Session
+from pcvs.helpers import log
 
 
 def locate_json_files(path):
@@ -54,6 +55,7 @@ def upload_buildir_results(buildir):
 
     for f in os.listdir(result_dir):
         assert(f.endswith(".json"))
+        log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
         with open(os.path.join(result_dir, f), 'r') as fh:
             data = json.load(fh)
             for t in data["tests"]:

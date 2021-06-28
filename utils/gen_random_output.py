@@ -7,7 +7,7 @@ import random
 import jsonschema
 import yaml
 
-file_count = 90
+file_count = 9000
 test_count = 1000000
 test_per_file = int(test_count/file_count)
 prefix = os.path.join(os.getcwd(), "rawdata")
@@ -58,6 +58,9 @@ for f in range(0, file_count):
                 "subtree": "sub",
                 "te_name" : "test_{}".format(t),
                 "full_name": "{}/{}/test_{}".format(label, "sub", t),
+                "comb": {
+                    "n_mpi": f
+                }
             },
             "exec": "sh list_of_tests.sh '{}'".format("{}/{}/test_{}".format(label, "sub", t)),
             "result": {
@@ -68,9 +71,8 @@ for f in range(0, file_count):
             },
             "data": {
                 "tags": tags,
-                "combination": {
-                    "n_mpi": f
-                }
+                "artifacts": {
+                    "this_is_a_test.txt": "dGhlIHRlc3Qgd29ya2VkCg=="}
             }
         })
     
