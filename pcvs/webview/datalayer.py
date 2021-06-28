@@ -98,6 +98,22 @@ class DataRepresentation:
     def get_root_path(self, sid):
         return self.rootree[sid]["path"]
     
+    def get_token_content(self, sid, token):
+        if token not in self.rootree[sid]:
+            return {}
+        
+        return self.rootree[sid][token]
+    
+    def extract_tests_under(self, node):
+        assert('__elems' in node.keys())
+        if isinstance(node['__elems'], list):
+            return [x.to_json() for x in node['__elems'] if isinstance(x, Test)]
+        
+        ret = list()
+        for elt in node['__elems'].values():
+            ret += self.extract_tests_under(elt)
+        return ret
+    
     def get_sessions(self):
         return [{
                 'path': v['path'],

@@ -25,9 +25,6 @@
 					}
 				}
 	function refresh(){
-		if(pause){page_ready();
-			return;
-		}
 		$.getJSON("/run/{{sid}}/{{selection}}/detail?render=json&name={{sel_item}}", function(resp) {
 			$('#theTable').DataTable({
 			bDestroy: true,

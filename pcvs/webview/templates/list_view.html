@@ -20,12 +20,13 @@
 					'<div class="progress-bar bg-primary" style="width: 100%"></div>' +
 					'</div>'
 					} else {
+						total = Object.values(d).reduce(function(a, b) { return a+b;}, 0)
 					return '<div class="progress" data-order="'+d.failure+'">' +
-					'<div class="progress-bar bg-danger" style="width: '+(100 * d['FAILED']/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-warning" style="width: '+(100 * d['ERR_DEP']/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-success" style="width: '+(100 * d['SUCCEED']/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-secondary" style="width: '+(100 * d['IN_PROGRESS']/d.total)+'%"></div>' +
-					'<div class="progress-bar bg-primary" style="width: '+(100 * d['WAITING']/d.total)+'%"></div>' +
+					'<div class="progress-bar bg-danger" style="width: '+(100 * d[3]/total)+'%"></div>' +
+					'<div class="progress-bar bg-warning" style="width: '+(100 * d[1]/total)+'%"></div>' +
+					'<div class="progress-bar bg-success" style="width: '+(100 * d[2]/total)+'%"></div>' +
+					'<div class="progress-bar bg-secondary" style="width: '+(100 * d[4]/total)+'%"></div>' +
+					'<div class="progress-bar bg-primary" style="width: '+(100 * d[5]/total)+'%"></div>' +
 					'</div>';
 					}
 					}
@@ -38,7 +39,7 @@
 				if(typeof(d) == "number"){
 					return d;
 				} else {
-					return d.total;
+					return Object.values(d).reduce(function(a, b) { return a+b;}, 0);
 				}},"className": 'detail-control'}
 		]
 		});
@@ -53,6 +54,7 @@
 	var timeout = setInterval(refresh, 2000)
 </script>
 
+<h2 id="#page-title" class="container-fluid text-center">{{selection}} View</h2>
 <table id='theTable' class="display" style="width:100%">
 	<thead>
 		<tr>

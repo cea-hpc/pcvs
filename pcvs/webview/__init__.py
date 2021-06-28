@@ -100,15 +100,17 @@ def create_app():
         :rtype: str
         """
         sid = int(sid)
-        if 'json' not in request.args.get('render', []):
-            return render_template('list_view.html', sid=sid, selection=selection)
-
-        out = list()
-        for name, value in global_tree_recv[sid][selection].items():
-            out.append({
-                "name": name,
-                "count": value['metadata']['count']
-            })
+        if 'json' in request.args.get('render', []):   
+            out = list()
+            infos = data_manager.get_token_content(sid, selection)
+            for k, v in infos['__elems'].items():
+                out.append({
+                    "name": k,
+                    "count": v['__metadata']['count']
+                })
+            return jsonify(out)
+        
+        return render_template('list_view.html', sid=sid, selection=selection)
 
     @app.route("/run/<sid>/<selection>/detail")
     def get_details(sid, selection):
@@ -130,19 +132,18 @@ def create_app():
         out = list()
         request_item = request.args.get('name', None)
 
-        if selection not in global_tree.keys():
-            abort(404, description="{} is not a valid selection!".format(selection))
-
-        if 'json' not in request.args.get('render', []):
-            return render_template("detailed_view.html",
+        if 'json' in request.args.get('render', []):
+            infos = data_manager.get_token_content(sid, selection)
+            if request_item in infos['__elems'].keys():
+                out = data_manager.extract_tests_under(infos['__elems'][request_item])
+            return jsonify(out)
+        
+        return render_template("detailed_view.html",
                                    sid=sid,
                                    selection=selection,
                                    sel_item=request_item)
 
-        if request_item in global_tree_recv[sid][selection].keys():
-            for test in global_tree_recv[sid][selection][request_item]['tests']:
-                out.append(test.to_json())
-        return jsonify(out)
+        
 
     @app.route("/submit/session_init", methods=["POST"])
     def submit_new_session():
