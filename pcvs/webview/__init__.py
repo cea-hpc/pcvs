@@ -58,6 +58,13 @@ def create_app():
     
     @app.route("/run/<sid>")
     def session_main(sid):
+        """Provide the per-session main page
+
+        :param sid: session id
+        :type sid: str
+        :return: page content
+        :rtype: str
+        """
         sid = int(sid)
         assert(sid in data_manager.session_ids)
         
@@ -147,6 +154,11 @@ def create_app():
 
     @app.route("/submit/session_init", methods=["POST"])
     def submit_new_session():
+        """Entry point to receive new session request.
+
+        :return: OK
+        :rtype: HTTP request
+        """
         json_session = request.get_json()
         sid = json_session["sid"]
         data_manager.insert_session(sid, json_session)
@@ -155,12 +167,22 @@ def create_app():
     
     @app.route("/submit/session_fini", methods=["POST"])
     def submit_end_session():
+        """Entry point to request a session end.
+
+        :return: OK
+        :rtype: HTTP request
+        """
         json_session = request.get_json()
         data_manager.close_session(json_session["sid"], json_session)
         return "OK!", 200
  
     @app.route("/submit/test", methods=["POST"])
     def submit():
+        """Entry point to receive test data.
+
+        :return: OK
+        :rtype: HTTP request
+        """
         json_str = request.get_json()
         
         test_sid = json_str["metadata"]["sid"]
