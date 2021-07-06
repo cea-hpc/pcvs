@@ -5,7 +5,7 @@ import json
 from pcvs.helpers.exceptions import ValidationException
 
 from jsonschema import exceptions
-from pcvs.helpers.system import ValidationScheme
+from pcvs.helpers.system import MetaConfig, ValidationScheme
 import shlex
 from enum import IntEnum
 
@@ -84,6 +84,9 @@ class Test:
         self._time = 0.0
         self._out = None
         self._state = Test.State.WAITING
+        
+        if MetaConfig.root.validation.simulated:
+            self._array["command"] = "echo " + self._array["command"]
 
         if 'dep' in self._array:
             deparray = self._array['dep']
