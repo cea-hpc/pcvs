@@ -52,12 +52,24 @@ class Manager:
         })
 
     def get_dim(self, dim):
+        """Get the list of jobs satisfying the given dimension.
+        
+        :param dim: the target dim
+        :type dim: int
+        :return: the list of jobs for this dimension, empty if dim is invalid
+        :rtype: list
+        """
         if dim not in self._dims:
             return []
         return self._dims[dim]
     
     @property
     def nb_dims(self):
+        """Get max number of defined dimensions.
+        
+        :return: the max dimension length
+        :rtype: int
+        """
         return self._max_size
 
     def add_job(self, job):

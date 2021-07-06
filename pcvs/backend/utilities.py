@@ -179,7 +179,19 @@ def process_check_yaml_stream(data):
     return (err_msg, nb_nodes)
 
 def __set_token(token, nset=None) -> str:
-    
+    """Manage display token (job display) depending on given condition.
+
+    if the condition is a success, insert the UTF 'succ' code, 'fail' otherwise.
+    A custom str can be provided if the condition is neither a success or a
+    failure (=None was given).
+
+    :param token: the condition
+    :type token: bool
+    :param nset: default pattern to insert
+    :type nset: str, optional
+    :return: the pretty-printable token
+    :rtype: str
+    """
     if not nset:
         nset = log.manager.utf("none")
     if token is None:

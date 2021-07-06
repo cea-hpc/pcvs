@@ -28,10 +28,18 @@ def locate_json_files(path):
 
 
 def start_server():
+    """Initialize the Flask server, default to 5000.
+    
+    A random port is picked if the default is already in use.
+
+    :return: the application handler
+    :rtype: class:`Flask`
+    """
     app = None
     for port in [5000, 0]:
         try:
-            app = create_app().run(host='0.0.0.0', port=port)
+            app = create_app()
+            app.run(host='0.0.0.0', port=port)
             break
         except OSError as e:
             print("Fail to run on port {}. Try automatically-defined".format(port))
@@ -39,6 +47,11 @@ def start_server():
     return app
 
 def upload_buildir_results(buildir):
+    """Upload a whole test-suite from disk to the server data model.
+
+    :param buildir: the build directory
+    :type buildir: str
+    """
     # first, need to determine the session ID -> conf.yml
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
         conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
@@ -56,6 +69,7 @@ def upload_buildir_results(buildir):
     for f in os.listdir(result_dir):
         assert(f.endswith(".json"))
         log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
+        
         with open(os.path.join(result_dir, f), 'r') as fh:
             data = json.load(fh)
             for t in data["tests"]:
@@ -67,6 +81,14 @@ def upload_buildir_results(buildir):
 
 
 def build_static_pages(buildir):
+    """From a given build directory, generate static pages.
+    
+    This can be used only for already run test-suites (no real-time support) and
+    when Flask cannot/don't want to be used.
+
+    :param buildir: the build directory to load
+    :type buildir: str
+    """
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
         conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
     

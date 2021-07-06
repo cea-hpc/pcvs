@@ -118,15 +118,33 @@ class Test:
     
     @property
     def subtree(self):
+        """Getter to the test subtree.
+        
+        :return: test subtree.
+        :rtype: str.
+        """
         return self._array["subtree"]
 
     @property
     def te_name(self):
+        """Getter to the test TE name.
+        
+        :return: test TE name.
+        :rtype: str.
+        """
+        
         return self._array["te_name"]
 
     @property
     def combination(self):
+        """Getter to the test combination dict.
+        
+        :return: test comb dict.
+        :rtype: dict
+        """
+        
         return self._array["comb_dict"]
+    
     @property
     def command(self):
         """Getter for the full command.
