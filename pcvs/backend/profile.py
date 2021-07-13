@@ -5,7 +5,7 @@ import random
 
 import click
 import jsonschema
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 
 from pcvs import PATH_INSTDIR
@@ -207,7 +207,7 @@ class Profile:
 
         log.manager.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
-            self._details = Dict(yaml.safe_load(f))
+            self._details = Dict(YAML(typ='safe').load(f))
 
     def load_template(self):
         """Populate the profile from templates of 5 basic config. blocks.
@@ -220,7 +220,7 @@ class Profile:
             filepath = os.path.join(
                 PATH_INSTDIR, "templates", "{}-format.yml".format(kind))
             with open(filepath, "r") as fh:
-                self.fill({kind: yaml.safe_load(fh)})
+                self.fill({kind: YAML(typ='safe').load(fh)})
 
     def check(self):
         """Ensure profile meets scheme requirements, as a concatenation of 5
@@ -250,7 +250,7 @@ class Profile:
             os.makedirs(prefix_file, exist_ok=True)
 
         with open(self._file, 'w') as f:
-            yaml.safe_dump(self._details.to_dict(), f)
+            YAML(typ='safe').dump(self._details.to_dict(), f)
 
     def clone(self, clone):
         """Duplicate a valid profile into the current one.
@@ -308,7 +308,7 @@ class Profile:
             stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
-                edited_yaml = Dict(yaml.safe_load(edited_stream))
+                edited_yaml = Dict(YAML(typ='safe').load(edited_stream))
                 self.fill(edited_yaml)
                 self.check()
             except Exception as e:

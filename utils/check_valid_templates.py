@@ -1,5 +1,5 @@
 import jsonschema
-import yaml
+from ruamel.yaml import YAML
 import os
 import sys
 
@@ -30,9 +30,9 @@ if __name__ == '__main__':
             try:
                 # load both
                 with open(os.path.join(scheme_dir, scheme_name), 'r') as fh:
-                    scheme_yaml = yaml.safe_load(fh)
+                    scheme_yaml = YAML(typ='safe').load(fh)
                 with open(os.path.join(template_dir, t), 'r') as fh:
-                    template_yaml = yaml.safe_load(fh)
+                    template_yaml = YAML(typ='safe').load(fh)
                 
                 # ... and validate
                 jsonschema.validate(template_yaml, scheme_yaml)

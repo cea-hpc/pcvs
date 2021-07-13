@@ -1,5 +1,5 @@
 import click
-import yaml
+from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
@@ -293,7 +293,7 @@ def profile_import(ctx, token, src_file):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found():
-        pf.fill(yaml.safe_load(src_file.read()))
+        pf.fill(YAML(typ='safe').load(src_file.read()))
         pf.flush_to_disk()
     else:
         ProfileException.AlreadyExistError(token)
@@ -310,7 +310,7 @@ def profile_export(ctx, token, dest_file):
 
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
-        dest_file.write(yaml.safe_dump(pf.dump()))
+        dest_file.write(YAML(typ='safe').dump(pf.dump()))
 
 
 @profile.command(name="split",

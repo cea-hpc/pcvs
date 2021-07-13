@@ -6,7 +6,7 @@ from pcvs.plugins import Plugin
 import subprocess
 
 import jsonschema
-import yaml
+from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
@@ -96,7 +96,7 @@ def load_yaml_file(f, source, build, prefix):
         with open(f, 'r') as fh:
             stream = fh.read()
             stream = replace_special_token(stream, source, build, prefix)
-            obj = yaml.safe_load(stream)
+            obj = YAML(typ='safe').load(stream)
     # badly formatted YAML
     except yaml.YAMLError:
         need_conversion = True
@@ -104,14 +104,14 @@ def load_yaml_file(f, source, build, prefix):
     # attempt to convert of the fly the YAML file
     if need_conversion:
         log.manager.debug("\t--> Legacy syntax: {}".format(f))
-        obj = yaml.safe_load(__load_yaml_file_legacy(f))
+        obj = YAML(typ='safe').load(__load_yaml_file_legacy(f))
 
         # when 'debug' is activated, print the converted YAML file
         if log.manager.has_verb_level('debug'):
             cv_file = os.path.join(os.path.split(f)[0], "converted-pcvs.yml")
             log.manager.debug("\t--> Stored file to {}".format(cv_file))
             with open(cv_file, 'w') as fh:
-                yaml.safe_dump(obj, fh)
+                YAML(typ='safe').dump(obj, fh)
     return obj
 
 
@@ -262,4 +262,6 @@ for arg in "$@"; do case $arg in
                 for c_k, c_v in MetaConfig.root.criterion.iterators.items():
                     self._debug[".system-values"][c_k] = c_v['values']
                 self._debug[".system-values"]['stats']['theoric'] = sys_cnt
-                yaml.safe_dump(self._debug, fh, default_flow_style=None)
+                yml = YAML(typ='safe')
+                yml.default_flow_style = None
+                yml.dump(self._debug, fh)

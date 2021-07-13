@@ -85,7 +85,7 @@ class Test:
         self._out = None
         self._state = Test.State.WAITING
         
-        if MetaConfig.root.validation.simulated:
+        if MetaConfig.root.validation.simulated is True:
             self._array["command"] = "echo " + self._array["command"]
 
         if 'dep' in self._array:

@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import IntEnum
 from multiprocessing import Process
 
-import yaml
+from ruamel.yaml import YAML
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
 from pcvs.helpers import log, utils
@@ -41,13 +41,15 @@ def store_session_to_file(c):
     """
     all_sessions = None
     sid = -1
+    yml = YAML()
+    yml.register_class(Session.State)
 
     lock_session_file()
     try:
         # to operate, PCVS needs to full-read and then full-write the whole file
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
+                all_sessions = yml.load(fh)
 
         # compute the session id, incrementally done from the highest session id
         # currently running and registered.
@@ -68,7 +70,7 @@ def store_session_to_file(c):
 
         # dump the file back
         with open(PATH_SESSION, 'w') as fh:
-            yaml.dump(all_sessions, fh)
+            yml.dump(all_sessions, fh)
     finally:
         unlock_session_file()
     return sid
@@ -84,20 +86,21 @@ def update_session_from_file(sid, update):
     :param update: the keys to update. If already existing, content is replaced
     :type: dict
     """
-
+    yml = YAML()
+    yml.register_class(Session.State)
     lock_session_file()
     try:
         all_sessions = None
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
+                all_sessions = yml.load(fh)
 
         if all_sessions is not None and sid in all_sessions:
             for k, v in update.items():
                 all_sessions[sid][k] = v
             # only if editing is done, flush the file back
             with open(PATH_SESSION, 'w') as fh:
-                yaml.dump(all_sessions, fh)
+                yml.dump(all_sessions, fh)
     finally:
         unlock_session_file()
 
@@ -108,18 +111,20 @@ def remove_session_from_file(sid):
     :param sid: the session id to remove.
     :type sid: int
     """
+    yml = YAML()
+    yml.register_class(Session.State)
     lock_session_file()
     try:
         all_sessions = None
         if os.path.isfile(PATH_SESSION):
             with open(PATH_SESSION, 'r') as fh:
-                all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
+                all_sessions = yml.load(fh)
 
         if all_sessions is not None and sid in all_sessions:
             del all_sessions[sid]
             with open(PATH_SESSION, 'w') as fh:
                 if len(all_sessions) > 0:
-                    yaml.dump(all_sessions, fh)
+                    yml.dump(all_sessions, fh)
                 # else, truncate the file to zero -> open(w) with no data
     finally:
         unlock_session_file()
@@ -131,11 +136,13 @@ def list_alive_sessions():
     :return: the session dict
     :rtype: dict
     """
+    yml = YAML()
+    yml.register_class(Session.State)
     lock_session_file(timeout=15)
 
     try:
         with open(PATH_SESSION, 'r') as fh:
-            all_sessions = yaml.load(fh, Loader=yaml.FullLoader)
+            all_sessions = yml.load(fh)
             del all_sessions["__metadata"]
     except FileNotFoundError as e:
         all_sessions = {}
@@ -211,6 +218,39 @@ class Session:
         IN_PROGRESS = 1
         COMPLETED = 2
         ERROR = 3
+                
+        @classmethod
+        def to_yaml(cls, representer, data):
+            """Convert a Test.State to a valid YAML representation.
+
+            A new tag is created: 'Session.State' as a scalar (str).
+            :param dumper: the YAML dumper object 
+            :type dumper: :class:`YAML().dumper`
+            :param data: the object to represent
+            :type data: class:`Session.State`
+            :return: the YAML representation
+            :rtype: Any
+            """
+            return representer.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
+        
+        @classmethod
+        def from_yaml(cls, constructor, node):
+            """Construct a :class:`Session.State` from its YAML representation.
+
+            Relies on the fact the node contains a 'Session.State' tag.
+            :param loader: the YAML loader
+            :type loader: :class:`yaml.FullLoader`
+            :param node: the YAML representation
+            :type node: Any
+            :return: The session State as an object
+            :rtype: :class:`Session.State`
+            """
+            s = constructor.construct_scalar(node)
+            name, value = s.split('||')
+            obj = Session.State(int(value))
+            assert(obj.name == name)
+
+            return obj
 
         def __str__(self):
             """Stringify the state.
@@ -383,40 +423,3 @@ class Session:
                 # in that mode, no information is left to users once the session
                 # is complete.
                 remove_session_from_file(self._sid)
-
-
-def enum_representer(dumper: yaml.Dumper, data):
-    """Convert a Test.State to a valid YAML representation.
-
-    A new tag is created: 'Session.State' as a scalar (str).
-    :param dumper: the YAML dumper object 
-    :type dumper: :class:`yaml.Dumper`
-    :param data: the object to represent
-    :type data: class:`Session.State`
-    :return: the YAML representation
-    :rtype: Any
-    """
-    return dumper.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
-
-
-def enum_constructor(loader: yaml.FullLoader, node):
-    """Construct a :class:`Session.State` from its YAML representation.
-
-    Relies on the fact the node contains a 'Session.State' tag.
-    :param loader: the YAML loader
-    :type loader: :class:`yaml.FullLoader`
-    :param node: the YAML representation
-    :type node: Any
-    :return: The session State as an object
-    :rtype: :class:`Session.State`
-    """
-    s = loader.construct_scalar(node)
-    name, value = s.split('||')
-    obj = Session.State(int(value))
-    assert(obj.name == name)
-
-    return obj
-
-
-yaml.add_constructor(u'!Session.State', enum_constructor)
-yaml.add_representer(Session.State, enum_representer)

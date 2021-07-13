@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 
 import jsonschema
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 from prettytable import PrettyTable
 
@@ -167,7 +167,7 @@ def process_check_yaml_stream(data):
     err_msg = None
     nb_nodes = "----"
     try:
-        stream = yaml.safe_load(data)
+        stream = YAML(typ='safe').load(data)
         scheme.validate(stream)
         nb_nodes = len(stream.keys())
     
@@ -305,7 +305,7 @@ class BuildSystem:
             return
 
         with open(out_file, 'w') as fh:
-            yaml.safe_dump(self._stream.to_dict(), fh)
+            YAML(typ='safe').dump(self._stream.to_dict(), fh)
 
 
 class AutotoolsBuildSystem(BuildSystem):

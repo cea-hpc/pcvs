@@ -1,11 +1,10 @@
+import click
 import base64
 import glob
 import os
-import random
 
-import click
-import yaml
 from addict import Dict
+from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
@@ -236,14 +235,14 @@ class ConfigurationBlock:
             raise ConfigException.NotFoundError()
 
         with open(self._file) as f:
-            self._details = Dict(yaml.safe_load(f))
+            self._details = Dict(YAML(typ='safe').load(f))
 
     def load_template(self) -> None:
         """load from the specific template, to create a new config block"""
         self._exists = True
         with open(os.path.join(PATH_INSTDIR,
                                'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
-            self.fill(yaml.safe_load(fh))
+            self.fill(YAML(typ='safe').load(fh))
 
     def flush_to_disk(self) -> None:
         """write the configuration block to disk"""
@@ -257,7 +256,7 @@ class ConfigurationBlock:
                 os.makedirs(prefix_file, exist_ok=True)
 
         with open(self._file, 'w') as f:
-            yaml.safe_dump(self._details.to_dict(), f)
+            YAML(typ='safe').dump(self._details.to_dict(), f)
 
         self._exists = True
 
@@ -317,7 +316,7 @@ class ConfigurationBlock:
             stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
-                edited_yaml = Dict(yaml.safe_load(edited_stream))
+                edited_yaml = Dict(YAML(typ='safe').load(edited_stream))
                 system.ValidationScheme(self._kind).validate(edited_yaml)
                 self.fill(edited_yaml)
                 self.flush_to_disk()
@@ -346,7 +345,7 @@ class ConfigurationBlock:
 
         stream_yaml = dict()
         with open(self._file, 'r') as fh:
-            stream_yaml = yaml.safe_load(fh)
+            stream_yaml = YAML(typ='safe').load(fh)
 
         if 'plugin' in stream_yaml.keys():
             plugin_code = base64.b64decode(
@@ -369,4 +368,4 @@ class MyPlugin(Plugin):
             stream_yaml['plugin'] = base64.b64encode(
                 edited_code.encode('ascii'))
             with open(self._file, 'w') as fh:
-                yaml.safe_dump(stream_yaml, fh)
+                YAML(typ='safe').dump(stream_yaml, fh)

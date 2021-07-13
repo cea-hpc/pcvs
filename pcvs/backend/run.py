@@ -1,4 +1,5 @@
 import fileinput
+from memory_profiler import profile
 import os
 from pcvs.plugins import Plugin
 import pprint
@@ -7,7 +8,7 @@ import subprocess
 import time
 from subprocess import CalledProcessError
 
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
@@ -403,7 +404,6 @@ def process_dyn_setup_scripts(setup_files):
             MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
     return err
 
-
 def process_static_yaml_files(yaml_files):
     """Process 'pcvs.yml' files to contruct the test base.
 
@@ -430,7 +430,8 @@ def process_static_yaml_files(yaml_files):
                                )
                 obj.process()
                 obj.flush_sh_file()
-            except (yaml.YAMLError, CalledProcessError) as e:
+                del obj
+            except (CalledProcessError) as e:
                 # log errors to be printed all at once
                 err.append((f, e.output))
                 log.manager.info("{}: {}".format(f, e.output))
@@ -457,8 +458,9 @@ def run(the_session):
     conf_file = os.path.join(
         MetaConfig.root.validation.output, NAME_BUILD_CONF_FN)
     with open(conf_file, 'w') as conf_fh:
-        yaml.safe_dump(MetaConfig.root.dump_for_export(),
-                       conf_fh, default_flow_style=None)
+        handler = YAML(typ='safe')
+        handler.default_flow_style = None
+        handler.dump(MetaConfig.root.dump_for_export(), conf_fh)
 
     log.manager.print_section("Run the Orchestrator")
     MetaConfig.root.get_internal('orchestrator').run(the_session)
@@ -592,7 +594,7 @@ def dup_another_build(build_dir, outdir):
 
     # First, load the whole config
     with open(os.path.join(build_dir, NAME_BUILD_CONF_FN), 'r') as fh:
-        d = Dict(yaml.safe_load(fh))
+        d = Dict(YAML(typ='safe').load(fh))
         global_config = MetaConfig(d)
 
     # first, clear fields overridden by current run

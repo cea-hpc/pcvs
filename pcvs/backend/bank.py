@@ -7,7 +7,7 @@ import typing
 from typing import List, Optional
 
 import pygit2
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
@@ -345,7 +345,7 @@ class Bank:
         :param s: the configuration data
         :type s: str
         """
-        self._config = Dict(yaml.safe_load(s))
+        self._config = Dict(YAML(typ='safe').load(s))
 
     def load_config_from_file(self, path: str) -> None:
         """Load the configuration file associated with the archive to process.
@@ -354,7 +354,7 @@ class Bank:
         :type path: str
         """
         with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
-            self._config = Dict(yaml.safe_load(fh))
+            self._config = Dict(YAML(typ='safe').load(fh))
 
     def save_from_buildir(self, tag: str, buildpath: str) -> None:
         """Extract results from the given build directory & store into the bank.
@@ -370,7 +370,7 @@ class Bank:
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
         for result_file in os.listdir(rawdata_dir):
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
-                data = Dict(yaml.safe_load(fh))
+                data = Dict(YAML(typ='safe').load(fh))
                 # TODO: validate
 
             for elt in data['tests']:
@@ -515,7 +515,7 @@ def init() -> None:
     global BANKS
     try:
         with open(PATH_BANK, 'r') as f:
-            BANKS = yaml.safe_load(f)
+            BANKS = YAML(typ='safe').load(f)
     except FileNotFoundError:
         # nothing to do, file may not exist
         pass
@@ -568,6 +568,6 @@ def flush_to_disk() -> None:
         if not os.path.isdir(prefix_file):
             os.makedirs(prefix_file, exist_ok=True)
         with open(PATH_BANK, 'w+') as f:
-            yaml.safe_dump(BANKS, f)
+            YAML(typ='safe').dump(BANKS, f)
     except IOError as e:
         raise BankException.IOError(e)

@@ -1,4 +1,4 @@
-PyYAML>=5.1
+ruamel.yaml
 Click<8.1
 requests
 jsonschema

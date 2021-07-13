@@ -1,5 +1,5 @@
 import json
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 import os
 
@@ -54,7 +54,7 @@ def upload_buildir_results(buildir):
     """
     # first, need to determine the session ID -> conf.yml
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
-        conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+        conf_yml = Dict(YAML().load(fh))
     
     sid = conf_yml.validation.sid
     dataman = data_manager
@@ -90,7 +90,7 @@ def build_static_pages(buildir):
     :type buildir: str
     """
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
-        conf_yml = Dict(yaml.load(fh, Loader=yaml.FullLoader))
+        conf_yml = Dict(YAML().load(fh))
     
     sid = conf_yml.validation.sid
 

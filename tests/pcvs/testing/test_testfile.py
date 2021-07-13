@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-import yaml
+from ruamel.yaml import YAML
 from click.testing import CliRunner
 
 import pcvs
@@ -89,7 +89,7 @@ def isolated_yml_test():
         testdir = "test-dir"
         os.makedirs(testdir)
         with open(os.path.join(path, testdir, "pcvs.yml"), "w") as fh:
-            fh.write(yaml.safe_dump(testyml))
+            fh.write(YAML(typ='safe').dump(testyml))
         yield path
     # utils.delete_folder(testdir)
 

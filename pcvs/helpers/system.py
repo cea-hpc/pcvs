@@ -1,7 +1,7 @@
 import os
 
 import jsonschema
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 
 import pcvs
@@ -46,7 +46,7 @@ class ValidationScheme:
             with open(os.path.join(
                     PATH_INSTDIR,
                     'schemes/{}-scheme.yml'.format(name)), 'r') as fh:
-                self._scheme = yaml.safe_load(fh)
+                self._scheme = YAML(typ='safe').load(fh)
         except (IOError, yaml.YAMLError):
             raise ValidationException.SchemeError(
                 "Unable to load scheme {}".format(name))
@@ -163,7 +163,7 @@ class Config(Dict):
         """
         try:
             with open(filename, 'r') as fh:
-                d = yaml.safe_load(fh)
+                d = YAML(typ='safe').load(fh)
             self.from_dict(d)
         except (IOError, yaml.YAMLError) as e:
             raise CommonException.IOError(
@@ -268,7 +268,7 @@ class MetaConfig(Dict):
         if os.path.isfile(filepath):
             try:
                 with open(filepath, 'r') as fh:
-                    node = Dict(yaml.safe_load(fh))
+                    node = Dict(YAML(typ='safe').load(fh))
             except (IOError, yaml.YAMLError) as e:
                 raise CommonException.IOError(
                     "Error(s) found while loading (}".format(filepath))

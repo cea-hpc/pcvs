@@ -121,7 +121,7 @@ def handle_build_lockfile(exc=None):
               default=None, is_flag=True, show_envvar=True,
               help="Allow to reuse an already existing output directory")
 @click.option("-d", "--dry-run", "simulated",
-              default=None, is_flag=True,
+              default=False, is_flag=True,
               help="Reproduce the whole process without running tests")
 @click.option("-a", "--anonymize", "anon",
               default=None, is_flag=True,

@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 
 import pygit2
 import pytest
-import yaml
+from ruamel.yaml import YAML
 from addict import Dict
 from click.testing import CliRunner
 
@@ -60,7 +60,7 @@ def dummy_run():
             content.validation.author.email = "johndoe@example.com"
             content.validation.datetime = datetime.now()
             content.validation.pf_hash = "profile_hash"
-            yaml.safe_dump(content.to_dict(), fh)
+            YAML(typ='safe').dump(content.to_dict(), fh)
 
         yield path
 

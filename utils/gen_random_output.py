@@ -5,7 +5,6 @@ import os
 import random
 
 import jsonschema
-import yaml
 
 file_count = 9000
 test_count = 1000000

@@ -1,5 +1,5 @@
 import click
-import yaml
+from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
 from pcvs.helpers import log, utils
@@ -270,7 +270,7 @@ def config_import(ctx, token, in_file) -> None:
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found():
-        obj.fill(yaml.safe_load(in_file.read()))
+        obj.fill(YAML(typ='safe').load(in_file.read()))
         obj.flush_to_disk()
     else:
         raise click.BadArgumentUsage(
@@ -293,7 +293,7 @@ def config_export(ctx, token, out_file):
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
-        out_file.write(yaml.safe_dump(obj.dump()))
+        out_file.write(YAML(typ='safe').dump(obj.dump()))
     else:
         raise click.BadArgumentUsage(
             "Config block not found: '{}'".format(token))

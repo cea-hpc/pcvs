@@ -6,7 +6,7 @@ import sys
 
 import click
 import pkg_resources
-import yaml
+from ruamel.yaml import YAML
 
 import pcvs
 from pcvs.helpers import log
@@ -272,7 +272,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
         if template:
             log.manager.print_item("Load template file: {}".format(template))
             stream = open(template, 'r').read() + stream
-        data_to_convert = yaml.safe_load(stream)
+        data_to_convert = YAML(typ='safe').load(stream)
     except yaml.composer.ComposerError as e:
         CommonException.IOError(e, template)
 
@@ -326,7 +326,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
         f = open(out, "w")
 
     log.manager.print_section("Converted data written into {}".format(f.name))
-    yaml.safe_dump(final_data, f)
+    YAML(typ='safe').dump(final_data, f)
 
     f.close()
 
