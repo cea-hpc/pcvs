@@ -3,7 +3,7 @@ import os
 import re
 from xml.sax.saxutils import escape
 
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, pm, utils
@@ -177,14 +177,14 @@ class TEDescriptor:
         # to get all the fields in their final form
         if 'group' in node:
             assert(node['group'] in MetaConfig.root.group.keys())
-            tmp = Dict(MetaConfig.root.group[node['group']])
-            tmp.update(Dict(node))
+            tmp = MetaDict(MetaConfig.root.group[node['group']])
+            tmp.update(MetaDict(node))
             node = tmp
         # load from descriptions
-        self._build = Dict(node.get('build', None))
-        self._run = Dict(node.get('run', None))
-        self._validation = Dict(node.get('validate', None))
-        self._artifacts = Dict(node.get('artifact', None))
+        self._build = MetaDict(node.get('build', None))
+        self._run = MetaDict(node.get('run', None))
+        self._validation = MetaDict(node.get('validate', None))
+        self._artifacts = MetaDict(node.get('artifact', None))
         self._template = node.get('group', None)
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0

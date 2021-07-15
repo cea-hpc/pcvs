@@ -2,18 +2,18 @@ import os
 from datetime import datetime
 from unittest.mock import patch
 
-import addict
 import pytest
 from click.testing import CliRunner
 
 import pcvs
+from pcvs.helpers.system import MetaDict
 from pcvs.backend import run as tested
 
 
 @pytest.fixture
 def mock_config():
     with CliRunner().isolated_filesystem():
-        with patch.object(pcvs.helpers.system.MetaConfig, 'root', addict.Dict({
+        with patch.object(pcvs.helpers.system.MetaConfig, 'root', MetaDict({
             'validation': {
                 'output': os.getcwd(),
                 'dirs': {'L1': os.getcwd()},

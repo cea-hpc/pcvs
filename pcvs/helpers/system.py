@@ -1,8 +1,9 @@
 import os
-
+import addict
 import jsonschema
+import ruamel
 from ruamel.yaml import YAML
-from addict import Dict
+from ruamel.yaml.main import yaml_object
 
 import pcvs
 from pcvs import NAME_BUILDIR, PATH_INSTDIR
@@ -73,15 +74,19 @@ class ValidationScheme:
                 "{}: {}".format(self._name, e))
 
 
-class Config(Dict):
-    """a 'Config' is a dict extension (an addict.Dict), used to manage all
+class MetaDict(addict.Dict):
+    def to_dict(self):
+        return super().to_dict()
+
+class Config(MetaDict):
+    """a 'Config' is a dict extension (an MetaDict), used to manage all
     configuration fields. While it can contain arbitrary data, the whole PCVS
     configuration is composed of 5 distinct 'categories', each being a single
     Config. These are then gathered in a `MetaConfig` object (see below)
     """
 
     def __init__(self, d={}, *args, **kwargs):
-        """Init the object and propagate properly the init to Dict() object
+        """Init the object and propagate properly the init to MetaDict() object
         :param d: items of the configuration
         :type d: dict
         :param *arg: items of the configuration
@@ -104,13 +109,13 @@ class Config(Dict):
         ValidationScheme(kw).validate(self)
 
     def __setitem__(self, param, value):
-        """extend it to handle dict initialization (needs Dict conversion)
+        """extend it to handle dict initialization (needs MetaDict conversion)
         :param param: name of value to add to configuration
         :type param: str
         :param value: value to add to configuration
         :type value: object"""
         if isinstance(value, dict):
-            value = Dict(value)
+            value = MetaDict(value)
         super().__setitem__(param, value)
 
     def set_ifdef(self, k, v):
@@ -146,7 +151,7 @@ class Config(Dict):
         # sub-Dict() into dict(). This double call to to_dict() seems
         # to fix the issue. But an alternative to addict should be used
         # (customly handled ?)
-        copy = Dict(super().to_dict())
+        copy = MetaDict(super().to_dict())
         return copy.to_dict()
 
     def from_dict(self, d):
@@ -164,13 +169,13 @@ class Config(Dict):
         try:
             with open(filename, 'r') as fh:
                 d = YAML(typ='safe').load(fh)
-            self.from_dict(d)
+                self.from_dict(d)
         except (IOError, yaml.YAMLError) as e:
             raise CommonException.IOError(
                 "{} invalid or badly formatted".format(filename))
 
 
-class MetaConfig(Dict):
+class MetaConfig(MetaDict):
     """Root configuration object. It is composed of Config(), categorizing
     each configuration blocks. This MetaConfig() contains the whole profile
     along with any validation and current run information.
@@ -199,7 +204,7 @@ class MetaConfig(Dict):
             self['__internal'] = Config()
 
     def __setitem__(self, param, value):
-        """Extend the default Dict setter mthod to reach the base class one"""
+        """Extend the default MetaDict setter mthod to reach the base class one"""
         super().__setitem__(param, value)
 
     def bootstrap_generic(self, subnode, node):
@@ -261,14 +266,14 @@ class MetaConfig(Dict):
             :raises CommonException.IOError: file is not found or badly 
                 formatted
         """
-        node = Dict()
+        node = MetaDict()
         if filepath is None:
             filepath = self.validation_default_file
 
         if os.path.isfile(filepath):
             try:
                 with open(filepath, 'r') as fh:
-                    node = Dict(YAML(typ='safe').load(fh))
+                    node = MetaDict(YAML(typ='safe').load(fh))
             except (IOError, yaml.YAMLError) as e:
                 raise CommonException.IOError(
                     "Error(s) found while loading (}".format(filepath))
@@ -314,7 +319,7 @@ class MetaConfig(Dict):
 
         # Annoying here:
         # self.result should be allowed even without the 'set_nosquash' above
-        # but because of inheritance, it does not result as a Dict()
+        # but because of inheritance, it does not result as a MetaDict()
         # As the 'set_nosquash' is required, it is solving the issue
         # but this corner-case should be remembered as it WILL happen again :(
         if 'format' not in subtree.result:
@@ -382,7 +387,7 @@ class MetaConfig(Dict):
         """Export the whole configuration as a dict. Prune any __internal node
         beforehand.
         """
-        res = Dict()
+        res = MetaDict()
         for k, v in self.items():
             if k == '__internal':
                 continue

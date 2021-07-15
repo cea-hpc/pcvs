@@ -1,8 +1,8 @@
 ruamel.yaml
+addict
 Click<8.1
 requests
 jsonschema
-addict
 PrettyTable
 flask
 pygit2

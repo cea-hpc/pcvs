@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
 
 from pcvs.helpers import utils as tested
@@ -52,7 +52,7 @@ def test_cwd_manager(wd_dir):
         with tested.cwd(wd_dir):
             assert(os.getcwd() == ref_path)
 
-@patch("pcvs.helpers.system.MetaConfig.root", Dict({
+@patch("pcvs.helpers.system.MetaConfig.root", MetaDict({
     "validation": {
         'output': "/prefix_build",
         "dirs": {'LABEL1': '/prefix1', 'LABEL2': "/prefix2"}

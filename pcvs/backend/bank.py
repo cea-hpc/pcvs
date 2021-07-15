@@ -3,12 +3,11 @@ import os
 import tarfile
 import tempfile
 import time
-import typing
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import pygit2
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
 from pcvs.helpers import git
@@ -16,7 +15,7 @@ from pcvs.helpers.exceptions import BankException
 
 #: :var BANKS: list of available banks when PCVS starts up
 #: :type BANKS: dict, keys are bank names, values are file path
-BANKS: typing.Dict[str, str] = dict()
+BANKS: Dict[str, str] = dict()
 
 
 class Bank:
@@ -32,7 +31,7 @@ class Bank:
     :param repo: the Pygit2 handle
     :type repo:  :class:`Pygit2.Repository`
     :param config: when set, configuration file of the just-submitted archive
-    :type config: :class:`addict.Dict`
+    :type config: :class:`MetaDict`
     :param rootree: When set, root handler to the next commit to insert
     :type rootree: :class:`Pygit2.Object`
     :param locked: Serialize Bank manipulation among multiple processes
@@ -62,7 +61,7 @@ class Bank:
         """
         self._root: Optional[str] = path
         self._repo: Optional[pygit2.Repository] = None
-        self._config: Optional[Dict] = None
+        self._config: Optional[MetaDict] = None
         self._rootree: Optional[pygit2.TreeBuilder] = None
         self._locked: bool = False
         self._preferred_proj: Optional[str] = None
@@ -345,7 +344,7 @@ class Bank:
         :param s: the configuration data
         :type s: str
         """
-        self._config = Dict(YAML(typ='safe').load(s))
+        self._config = MetaDict(YAML(typ='safe').load(s))
 
     def load_config_from_file(self, path: str) -> None:
         """Load the configuration file associated with the archive to process.
@@ -354,7 +353,7 @@ class Bank:
         :type path: str
         """
         with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
-            self._config = Dict(YAML(typ='safe').load(fh))
+            self._config = MetaDict(YAML(typ='safe').load(fh))
 
     def save_from_buildir(self, tag: str, buildpath: str) -> None:
         """Extract results from the given build directory & store into the bank.
@@ -370,7 +369,7 @@ class Bank:
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
         for result_file in os.listdir(rawdata_dir):
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
-                data = Dict(YAML(typ='safe').load(fh))
+                data = MetaDict(YAML(typ='safe').load(fh))
                 # TODO: validate
 
             for elt in data['tests']:
@@ -432,7 +431,7 @@ class Bank:
             # otherwise the commit to be created will be the first
             # and won't have any parent
             parent_coid = []
-            ref = Dict({"name": None})
+            ref = MetaDict({"name": None})
 
         # create the commit
         # ref.name may be None

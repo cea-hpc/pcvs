@@ -2,14 +2,14 @@ import os
 from unittest.mock import patch
 
 import pytest
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 import pcvs
 from pcvs.helpers import exceptions, pm, system
 from pcvs.testing import tedesc as tested
 
 
-@patch('pcvs.helpers.system.MetaConfig.root', Dict({
+@patch('pcvs.helpers.system.MetaConfig.root', MetaDict({
             'compiler': {
                 'commands': {
                     'cc': 'CC',
@@ -42,7 +42,7 @@ def test_lang_detection():
                                       "/path/to/a.f08"]) == 'f08')
     
 
-@patch('pcvs.helpers.system.MetaConfig.root', Dict({
+@patch('pcvs.helpers.system.MetaConfig.root', MetaDict({
             'compiler': {
                 'variants': {
                     'openmp': {'args': '-fopenmp'},
@@ -122,6 +122,6 @@ def test_TEDescriptor():
     # raise Exception
     with pytest.raises(exceptions.TestException.TDFormatError):
         tested.TEDescriptor("foo", 
-            "StrInsteadOfDict",
+            "StrInsteadOfMetaDict",
             "keytestdir", 
             "bar")

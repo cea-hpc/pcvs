@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
 
 import pcvs
@@ -67,7 +67,7 @@ def test_config_load_template(kind, capsys):
     with open(os.path.join(
                     pcvs.PATH_INSTDIR,
                     "templates/{}-format.yml".format(kind)), 'r') as fh:
-        ref = Dict(YAML(typ='safe').load(fh))
+        ref = MetaDict(YAML(typ='safe').load(fh))
         assert(res == ref)
     
     obj.display()

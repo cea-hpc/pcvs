@@ -5,7 +5,7 @@ import tempfile
 
 import jsonschema
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 from prettytable import PrettyTable
 
 from pcvs.backend import config, profile, run
@@ -281,7 +281,7 @@ class BuildSystem:
         self._root = root
         self._dirs = dirs
         self._files = files
-        self._stream = Dict()
+        self._stream = MetaDict()
 
     def fill(self):
         """This function should be overriden by overriden classes.

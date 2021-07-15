@@ -6,7 +6,7 @@ import random
 import click
 import jsonschema
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
@@ -85,7 +85,7 @@ class Profile:
         utils.check_valid_scope(scope)
         self._name = name
         self._scope = scope
-        self._details = Dict()
+        self._details = MetaDict()
         self._exists = False
         self._file = None
 
@@ -150,7 +150,7 @@ class Profile:
         # of from 'clone' (dict of raw file inputs)
         for k, v in raw.items():
             if isinstance(v, config.ConfigurationBlock):
-                self._details[k] = Dict(v.dump())
+                self._details[k] = MetaDict(v.dump())
             else:
                 self._details[k] = v
 
@@ -163,7 +163,7 @@ class Profile:
         :rtype: dict
         """
         self.load_from_disk()
-        return Dict(self._details).to_dict()
+        return MetaDict(self._details).to_dict()
 
     def is_found(self):
         """Check if the current profile exists on disk.
@@ -207,7 +207,7 @@ class Profile:
 
         log.manager.info("load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
-            self._details = Dict(YAML(typ='safe').load(f))
+            self._details = MetaDict(YAML(typ='safe').load(f))
 
     def load_template(self):
         """Populate the profile from templates of 5 basic config. blocks.
@@ -308,7 +308,7 @@ class Profile:
             stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
-                edited_yaml = Dict(YAML(typ='safe').load(edited_stream))
+                edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
                 self.fill(edited_yaml)
                 self.check()
             except Exception as e:

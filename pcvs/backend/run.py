@@ -9,7 +9,7 @@ import time
 from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_SRCDIR)
@@ -594,7 +594,7 @@ def dup_another_build(build_dir, outdir):
 
     # First, load the whole config
     with open(os.path.join(build_dir, NAME_BUILD_CONF_FN), 'r') as fh:
-        d = Dict(YAML(typ='safe').load(fh))
+        d = MetaDict(YAML(typ='safe').load(fh))
         global_config = MetaConfig(d)
 
     # first, clear fields overridden by current run

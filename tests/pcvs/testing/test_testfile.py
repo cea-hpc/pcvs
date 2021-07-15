@@ -89,7 +89,7 @@ def isolated_yml_test():
         testdir = "test-dir"
         os.makedirs(testdir)
         with open(os.path.join(path, testdir, "pcvs.yml"), "w") as fh:
-            fh.write(YAML(typ='safe').dump(testyml))
+            YAML(typ='safe').dump(testyml, fh)
         yield path
     # utils.delete_folder(testdir)
 

@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pygit2
 import pytest
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
 
 from pcvs import NAME_BUILD_RESDIR, NAME_BUILDIR
@@ -54,7 +54,7 @@ def dummy_run():
             json.dump(content, fh)
         
         with open(os.path.join(build_path, "conf.yml"), 'w') as fh:
-            content = Dict()
+            content = MetaDict()
             content.validation.dirs = {'LABEL_A': "DIR_A"}
             content.validation.author.name = "John Doe"
             content.validation.author.email = "johndoe@example.com"

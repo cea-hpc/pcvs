@@ -5,10 +5,13 @@ from enum import IntEnum
 from multiprocessing import Process
 
 from ruamel.yaml import YAML
+from ruamel.yaml.main import yaml_object
 
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
 from pcvs.helpers import log, utils
 
+
+yml = YAML()
 
 def unlock_session_file():
     """Release the lock after manipulating the session.yml file.
@@ -41,9 +44,8 @@ def store_session_to_file(c):
     """
     all_sessions = None
     sid = -1
-    yml = YAML()
-    yml.register_class(Session.State)
-
+    global yml
+    
     lock_session_file()
     try:
         # to operate, PCVS needs to full-read and then full-write the whole file
@@ -86,8 +88,7 @@ def update_session_from_file(sid, update):
     :param update: the keys to update. If already existing, content is replaced
     :type: dict
     """
-    yml = YAML()
-    yml.register_class(Session.State)
+    global yml
     lock_session_file()
     try:
         all_sessions = None
@@ -111,8 +112,7 @@ def remove_session_from_file(sid):
     :param sid: the session id to remove.
     :type sid: int
     """
-    yml = YAML()
-    yml.register_class(Session.State)
+    global yml
     lock_session_file()
     try:
         all_sessions = None
@@ -136,8 +136,7 @@ def list_alive_sessions():
     :return: the session dict
     :rtype: dict
     """
-    yml = YAML()
-    yml.register_class(Session.State)
+    global yml
     lock_session_file(timeout=15)
 
     try:
@@ -212,6 +211,7 @@ class Session:
     :type _session_infos: dict
 
     """
+    @yaml_object(yml)
     class State(IntEnum):
         """Enum of possible Session states."""
         WAITING = 0

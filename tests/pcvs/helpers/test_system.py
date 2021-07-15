@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 
 import pcvs
 from pcvs import PATH_INSTDIR
@@ -91,7 +91,7 @@ def kw_keys():
 
 @pytest.fixture
 def init_config():
-    d = Dict({"": "value1", "key2": "value2"})
+    d = MetaDict({"": "value1", "key2": "value2"})
     conf = system.Config(d)
 
 def test_validate(kw_keys):
@@ -160,15 +160,15 @@ def test_validate(kw_keys):
     ]
     # for kw in ["compiler", "criterion", "group"]:
     #     with open(os.path.join(PATH_INSTDIR, "templates/{}-format.yml".format(kw))) as blk:
-    #         to_validate = Dict(yaml.load(blk))
+    #         to_validate = MetaDict(yaml.load(blk))
     #         conf = system.Config(to_validate)
     #         conf.validate(kw)
     for kw in keywords:
-        to_validate = Dict(kw[0])
+        to_validate = MetaDict(kw[0])
         conf = system.Config(to_validate)
         conf.validate(kw[1])
     with pytest.raises(pcvs.helpers.exceptions.ValidationException.FormatError):
-        to_validate = Dict(criterion_wrong)
+        to_validate = MetaDict(criterion_wrong)
         conf = system.Config(to_validate)
         conf.validate(kw[1])
     with pytest.raises(AssertionError):

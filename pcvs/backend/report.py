@@ -1,6 +1,6 @@
 import json
 from ruamel.yaml import YAML
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 import os
 
 from pcvs.helpers.exceptions import ValidationException
@@ -54,7 +54,7 @@ def upload_buildir_results(buildir):
     """
     # first, need to determine the session ID -> conf.yml
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
-        conf_yml = Dict(YAML().load(fh))
+        conf_yml = MetaDict(YAML().load(fh))
     
     sid = conf_yml.validation.sid
     dataman = data_manager
@@ -90,7 +90,7 @@ def build_static_pages(buildir):
     :type buildir: str
     """
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
-        conf_yml = Dict(YAML().load(fh))
+        conf_yml = MetaDict(YAML().load(fh))
     
     sid = conf_yml.validation.sid
 

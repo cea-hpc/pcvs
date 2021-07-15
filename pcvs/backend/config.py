@@ -3,7 +3,7 @@ import base64
 import glob
 import os
 
-from addict import Dict
+from pcvs.helpers.system import MetaDict
 from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
@@ -200,7 +200,7 @@ class ConfigurationBlock:
         :param raw: the data to fill.
         :type raw: dict
         """
-        self._details = Dict(raw)
+        self._details = MetaDict(raw)
 
     def dump(self) -> dict:
         """Convert the configuration Block to a regular dict.
@@ -211,7 +211,7 @@ class ConfigurationBlock:
         :rtype: dict
         """
         self.load_from_disk()
-        return Dict(self._details).to_dict()
+        return MetaDict(self._details).to_dict()
 
     def check(self) -> None:
         """Validate a single configuration block according to its scheme."""
@@ -235,7 +235,7 @@ class ConfigurationBlock:
             raise ConfigException.NotFoundError()
 
         with open(self._file) as f:
-            self._details = Dict(YAML(typ='safe').load(f))
+            self._details = MetaDict(YAML(typ='safe').load(f))
 
     def load_template(self) -> None:
         """load from the specific template, to create a new config block"""
@@ -256,7 +256,9 @@ class ConfigurationBlock:
                 os.makedirs(prefix_file, exist_ok=True)
 
         with open(self._file, 'w') as f:
-            YAML(typ='safe').dump(self._details.to_dict(), f)
+            yml = YAML(typ='safe')
+            yml.default_flow_style = False
+            yml.dump(self._details.to_dict(), f)
 
         self._exists = True
 
@@ -316,7 +318,7 @@ class ConfigurationBlock:
             stream, editor=e, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
-                edited_yaml = Dict(YAML(typ='safe').load(edited_stream))
+                edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
                 system.ValidationScheme(self._kind).validate(edited_yaml)
                 self.fill(edited_yaml)
                 self.flush_to_disk()

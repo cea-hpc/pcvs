@@ -1,5 +1,5 @@
 from pcvs.plugins import Plugin
-from addict import Dict 
+from pcvs.helpers.system import MetaDict 
 
 from pcvs.helpers import communications, log
 from pcvs.helpers.exceptions import OrchestratorException
@@ -46,7 +46,7 @@ class Manager:
         self._dims = dict()
         self._max_size = max_size
         self._publisher = publisher
-        self._count = Dict({
+        self._count = MetaDict({
             "total": 0,
             "executed": 0
         })
