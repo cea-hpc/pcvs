@@ -66,12 +66,12 @@ class Test:
             return self.name
 
         def __repr__(self):
-            """Enum represenation a tuple (name, value).
+            """Enum representation a tuple (name, value).
 
             :return: a tuple mapping the enum.
             :rtype: tuple
             """
-            return (self.name, self.value)
+            return "({}, {})".format(self.name, self.value)
 
     def __init__(self, **kwargs):
         """constructor method.
