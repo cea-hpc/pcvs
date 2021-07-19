@@ -85,6 +85,8 @@ class Test:
         self._out = None
         self._state = Test.State.WAITING
         
+        self._expect_rc = self._array["rc"] if "rc" in self._array else 0
+        
         if MetaConfig.root.validation.simulated is True:
             self._array["command"] = "echo " + self._array["command"]
 
@@ -269,7 +271,7 @@ class Test:
         :type state: :class:`Test.State`, optional
         """
         if state is None:
-            state = Test.State.SUCCEED if self._rc == rc else Test.State.FAILED
+            state = Test.State.SUCCEED if self._expect_rc == rc else Test.State.FAILED
         self.executed(state)
         self._rc = rc
         self._out = base64.b64encode(out).decode('ascii')
