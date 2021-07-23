@@ -62,20 +62,18 @@ def test_build_variants():
 @patch('pcvs.helpers.pm.identify')
 def test_handle_job_deps(mock_id):
     #mock_pmlister.return_value = 
-    assert(tested.handle_job_deps({'depends_on': {
-        'test': ['a', 'b', 'c']
-    }}, "label", "prefix") == ["label/prefix/a", "label/prefix/b", "label/prefix/c"])
+    assert(tested.build_job_deps({'depends_on': ['a', 'b', 'c']
+    }, "label", "prefix") == ["label/prefix/a", "label/prefix/b", "label/prefix/c"])
 
-    assert(tested.handle_job_deps({'depends_on': {
-        'test': ['/a', '/b', '/c']
-    }}, "label", "prefix") == ["/a", "/b", "/c"])
+    assert(tested.build_job_deps({'depends_on': ['/a', '/b', '/c']
+    }, "label", "prefix") == ["/a", "/b", "/c"])
 
     mock_id.return_value = ["spack..p1", "spack..p1c2", "spack..p1p3%c4"]
-    assert(len(tested.handle_job_deps({'depends_on': {
-        'pm': ['p1', 'p1@c2', 'p1 p3 %c4']
-    }}, "label", "prefix")) == 3)
+    assert(len(tested.build_pm_deps({'package_manager': {
+        'spack': ['p1', 'p1@c2', 'p1 p3 %c4']
+    }})) == 3)
 
-    assert(len(tested.handle_job_deps({}, "", "")) == 0)
+    assert(len(tested.build_job_deps({}, "", "")) == 0)
 
 
 @patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})

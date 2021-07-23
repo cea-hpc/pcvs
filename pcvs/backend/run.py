@@ -277,6 +277,8 @@ def process():
         pprint.pformat(yaml_files)))
 
     errors = []
+    
+    
     errors += process_dyn_setup_scripts(setup_files)
     errors += process_static_yaml_files(yaml_files)
 

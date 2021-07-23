@@ -1,4 +1,6 @@
 import functools
+from pcvs.testing.test import Test
+from memory_profiler import profile
 import operator
 import os
 import pathlib
@@ -188,10 +190,11 @@ class TestFile:
             td = tedesc.TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
+                
             MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)
 
             # register debug informations relative to the loaded TEs
-            self._debug[k] = td.get_debug()
+            #self._debug[k] = td.get_debug()
 
     def flush_sh_file(self):
         """Store the given input file into their destination."""
@@ -212,6 +215,7 @@ class TestFile:
 
         with open(fn_sh, 'w') as fh_sh:
             fh_sh.write("""#!/bin/sh
+test -n '{simulated}' && PCVS_SHOW='all'
 if test -n "$PCVS_SHOW"; then
     test "$PCVS_SHOW" = "all" -o "$PCVS_SHOW" = "loads" && echo '{pm_string}'
 else
@@ -219,7 +223,8 @@ else
     :
 fi
 for arg in "$@"; do case $arg in
-""".format(pm_string="#Package-manager set by profile: \n"+"\n".join([
+""".format(simulated="sim" if MetaConfig.root.validation.simulated is True else "",
+    pm_string="#Package-manager set by profile: \n"+"\n".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
                         ])))

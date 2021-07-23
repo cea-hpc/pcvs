@@ -129,7 +129,7 @@ class Set(threading.Thread):
         :raises Exception: Something occured while running a test"""
         for job in self._jobs:
             try:
-                p = subprocess.Popen('{}'.format(job.wrapped_command),
+                p = subprocess.Popen('{}'.format(job.invocation_command),
                                      shell=True,
                                      stderr=subprocess.STDOUT,
                                      stdout=subprocess.PIPE)

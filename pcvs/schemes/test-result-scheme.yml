@@ -7,7 +7,7 @@ properties:
       label: {"type": "string"}
       subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
       te_name: {"type": "string"}
-      full_name: {"type": "string"}
+      fq_name: {"type": "string"}
       comb:
         OneOf:
           - type: null
@@ -15,7 +15,7 @@ properties:
             patternProperties:
               "^.*$": {type: "string"}
     additionalProperties: false
-    required: ["label", "subtree", "te_name", "full_name"]
+    required: ["label", "subtree", "te_name", "fq_name"]
   exec: {"type": "string"}
   result:
     type: object

@@ -20,17 +20,17 @@ patternProperties:
                 items:
                   type: string
           depends_on:
+            type: array
+            items:
+              type: string
+          package_manager:
             type: object
-            patternProperties:
-              "^test$":
+            properties:
+              spack:
                 type: array
                 items:
                   type: string
-              "^spack$":
-                type: array
-                items:
-                  type: string
-              "^module$":
+              module:
                 type: array
                 items:
                   type: string
@@ -84,21 +84,9 @@ patternProperties:
           cwd:
             type: string
           depends_on:
-            type: object
-            patternProperties:
-              "^test$":
-                type: array
-                items:
-                  type: string
-              "^spack$":
-                type: array
-                items:
-                  type: string
-              "^module$":
-                type: array
-                items:
-                  type: string
-            additionalProperties: false
+            type: array
+            items:
+              type: string
           package_manager:
             type: object
             properties:

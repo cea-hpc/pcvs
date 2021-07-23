@@ -74,7 +74,7 @@ def prepare_cmd_build_variants(variants=[]):
     return s
 
 
-def handle_job_deps(deps_node, pkg_label, pkg_prefix):
+def build_job_deps(deps_node, pkg_label, pkg_prefix):
     """Build the dependency list from a given depenency YAML node.
 
     A ``depends_on`` is used by test to establish their relationship. It looks
@@ -97,16 +97,12 @@ def handle_job_deps(deps_node, pkg_label, pkg_prefix):
     :rtype: list
     """
     deps = list()
-    if 'depends_on' in deps_node:
-        for name, values in deps_node['depends_on'].items():
-            if name == 'test':
-                for d in values:
-                    deps.append(
-                        d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
-            else:
-                deps += [d for d in pm.identify({name: values})]
+    for d in deps_node.get('depends_on', list()):
+        deps.append(d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
     return deps
 
+def build_pm_deps(deps_node):
+    return pm.identify(deps_node.get('package_manager', {}))
 
 class TEDescriptor:
     """A Test Descriptor (named TD, TE or TED), maps a test prograzm
@@ -453,8 +449,7 @@ class TEDescriptor:
 
     def __construct_compil_tests(self):
         """Meta-function steering compilation tests."""
-        deps = []
-        chdir = None
+        job_deps = []
 
         # ensure consistency when 'files' node is used
         # can be a list or a single value
@@ -462,12 +457,12 @@ class TEDescriptor:
             self._build.files = [self._build.files]
 
         # manage deps (tests, package_managers...)
-        deps = handle_job_deps(self._build, self._te_label, self._te_subtree)
-
-        if 'cwd' in self._build:
-            chdir = self._build.cwd
-            if not os.path.isabs(chdir):
-                chdir = os.path.abspath(os.path.join(self._buildir, chdir))
+        job_deps = build_job_deps(self._build, self._te_label, self._te_subtree)
+        mod_deps = build_pm_deps(self._build)
+        
+        chdir = self._build.get('cwd')
+        if chdir is not None and not os.path.isabs(chdir):
+            chdir = os.path.abspath(os.path.join(self._buildir, chdir))
 
         tags = ["compilation"] + self._tags
 
@@ -483,31 +478,28 @@ class TEDescriptor:
             name=self._full_name,
             command=command,
             tags=tags,
-            dep=deps,
-            nb_res=1,
-            time=self._validation.time.get("mean", None),
+            job_deps=job_deps,
+            mod_deps=mod_deps,
+            time=self._validation.time.get("mean", 0),
             delta=self._validation.time.get("tolerance", 0),
             rc=self._validation.get("expect_exit", 0),
             artifacts=self._artifacts,
             resources=1,
-            comb_dict=None,
-            valscript=None,
-            env=None,
-            matchers=None,
             chdir=chdir
         )
-
+    
     def __construct_runtime_tests(self):
         """Generate tests to be run by the runtime command."""
-        te_deps = handle_job_deps(self._run, self._te_label, self._te_subtree)
+        te_job_deps = build_job_deps(self._run, self._te_label, self._te_subtree)
+        te_mod_deps = build_pm_deps(self._run)
 
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
             # clone deps as it may be updated by each test
-            deps = copy.deepcopy(te_deps)
+            te_job_deps = copy.deepcopy(te_job_deps)
             chdir = None
             if self._build:
-                deps.append(self._full_name)
+                te_job_deps.append(self._full_name)
 
             # start to build the proper command, three parts:
             # the environment variables to export
@@ -545,17 +537,16 @@ class TEDescriptor:
                 subtree=self._te_subtree,
                 name="_".join([self._full_name, comb.translate_to_str()]),
                 command=command,
-                dep=deps,
+                job_deps=te_job_deps,
+                mod_deps=te_mod_deps,
                 tags=self._tags,
-                env=env,
-                nb_res=1,
-                time=self._validation.time.get("mean", None),
+                environment=env,
+                dim=comb.get('n_mpi'),
+                time=self._validation.time.get("mean", 0),
                 delta=self._validation.time.get("tolerance", 0),
                 rc=self._validation.get("expect_exit", 0),
-                resources=comb.get(self._base_it, 1),
                 valscript=self._validation.script.get('path', None),
-                build=None,
-                comb_dict=comb.translate_to_dict(),
+                comb=comb,
                 chdir=chdir,
                 artifacts=self._artifacts,
                 matchers=self._validation.get('match', None)
@@ -570,12 +561,14 @@ class TEDescriptor:
         # if this TE does not lead to a single test, skip now
         if self._skipped:
             return
-
+        
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
             self._serie = Serie({**self._criterion, **self._program_criterion})
             yield from self.__construct_runtime_tests()
+            del self._serie
+        
 
     def get_debug(self):
         """Build information debug for the current TE.

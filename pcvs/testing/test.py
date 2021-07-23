@@ -1,4 +1,5 @@
 import base64
+from itertools import combinations
 import os
 
 import json
@@ -79,20 +80,47 @@ class Test:
         :param kwargs: flexible list of arguments to initialize a Test with.
         :type kwargs: dict
         """
-        self._array = kwargs
         self._rc = 0
-        self._time = 0.0
-        self._out = None
+        self._comb = kwargs.get('comb')
+        self._cwd = kwargs.get('wd')
+        self._exectime = 0.0
+        self._output = None
         self._state = Test.State.WAITING
+        self._dim = kwargs.get('dim', 1)
+        self._testenv = kwargs.get('environment')
+        self._id = {
+            'te_name': kwargs.get('te_name', 'noname'),
+            'label': kwargs.get('label', 'nolabel'),
+            'subtree': kwargs.get('subtree', ''),
+        }
+        comb_str = self._comb.translate_to_str() if self._comb else ""
         
-        self._expect_rc = self._array["rc"] if "rc" in self._array else 0
+        self._id['fq_name'] = "_".join([
+                "/".join(filter(None, [
+                    self._id['label'],
+                    self._id['subtree'],
+                    self._id['te_name']])),
+                comb_str])
         
-        if MetaConfig.root.validation.simulated is True:
-            self._array["command"] = "echo " + self._array["command"]
-
-        if 'dep' in self._array:
-            deparray = self._array['dep']
-            self._array['dep'] = {k: None for k in deparray}
+        
+        self._execmd = kwargs.get('command', '')
+        self._data = {
+            'metrics': None,
+            'tags': kwargs.get('tags', []),
+            'artifacts': kwargs.get('artifacts', {}),
+            
+        }
+        self._validation = {
+            'matchers': kwargs.get('matchers'),
+            'script': kwargs.get('valscript'),
+            'expect_rc': kwargs.get('rc', 0),
+            'time': kwargs.get('time', 0),
+            'delta': kwargs.get('delta', 0),
+        }
+        
+        self._mod_deps = kwargs.get("mod_deps", [])
+        self._depnames = kwargs.get('deps', [])
+        self._deps = []
 
     @property
     def tags(self):
@@ -101,7 +129,7 @@ class Test:
         :return: the list of of tags
         :rtype: list
         """
-        return self._array["tags"]
+        return self._data['tags']
     
     @property
     def label(self):
@@ -110,7 +138,7 @@ class Test:
         :return: the label
         :rtype: str
         """
-        return self._array["label"]
+        return self._id["label"]
         
     @property
     def name(self):
@@ -119,7 +147,7 @@ class Test:
         :return: test name.
         :rtype: str
         """
-        return self._array['name']
+        return self._id['fq_name']
     
     @property
     def subtree(self):
@@ -128,7 +156,7 @@ class Test:
         :return: test subtree.
         :rtype: str.
         """
-        return self._array["subtree"]
+        return self._id["subtree"]
 
     @property
     def te_name(self):
@@ -138,7 +166,7 @@ class Test:
         :rtype: str.
         """
         
-        return self._array["te_name"]
+        return self._id["te_name"]
 
     @property
     def combination(self):
@@ -148,7 +176,7 @@ class Test:
         :rtype: dict
         """
         
-        return self._array["comb_dict"]
+        return self._id["comb"]
     
     @property
     def command(self):
@@ -160,10 +188,10 @@ class Test:
         :return: unescaped command line
         :rtype: str
         """
-        return self._array['command']
+        return self._execmd
 
     @property
-    def wrapped_command(self):
+    def invocation_command(self):
         """Getter for the list_of_test.sh invocation leading to run the job.
 
         This command is under the form: `sh /path/list_of_tests.sh <test-name>`
@@ -171,10 +199,10 @@ class Test:
         :return: wrapper command line
         :rtype: str
         """
-        return self._array['wrapped_command']
+        return self._invocation_cmd
 
     @property
-    def deps(self):
+    def job_deps(self):
         """"Getter to the dependency list for this job.
 
         The dependency struct is an array, where for each name (=key), the
@@ -182,9 +210,17 @@ class Test:
         :return: the dict, potentially not resolved yet
         :rtype: dict
         """
-        return self._array["dep"]
+        return self._deps
+    
+    @property
+    def job_depnames(self):
+        return self._depnames
 
-    def set_dep(self, name, obj):
+    @property
+    def mod_deps(self):
+        return self._mod_deps
+
+    def resolve_a_dep(self, name, obj):
         """Resolve the dep object for a given dep name.
 
         :param name: the dep name to resolve, should be a valid dep.
@@ -192,9 +228,12 @@ class Test:
         :param obj: the dep object, should be a Test()
         :type obj: :class:`Test`
         """
-        assert(name in self._array['dep'])
-        self._array['dep'][name] = obj
-
+        if name not in self._depnames:
+            return
+        
+        self._depnames.remove(name)
+        self._deps.append(obj)
+    
     def is_pickable(self):
         """Check if the test can be scheduled.
 
@@ -204,7 +243,7 @@ class Test:
         :return: True if the job can be scheduled
         :rtype: bool
         """
-        return not self.been_executed() and len([d for d in self.deps.values() if not d.been_executed()]) == 0
+        return not self.been_executed() and len([d for d in self._deps if not d.been_executed()]) == 0
 
     def has_failed_dep(self):
         """Check if at least one dep is blocking this job from ever be
@@ -213,7 +252,7 @@ class Test:
         :return: True if at least one dep is shown a `Test.State.FAILED` state.
         :rtype: bool
         """
-        return len([d for d in self.deps.values() if d.state == Test.State.FAILED]) > 0
+        return len([d for d in self._deps if d.state == Test.State.FAILED]) > 0
 
     def first_valid_dep(self):
         """Retrive the first ready-for-schedule dep.
@@ -224,7 +263,7 @@ class Test:
         :return: a Test object if possible, None otherwise
         :rtype: :class:`Test` or NoneType
         """
-        for d in self.deps.values():
+        for d in self._deps:
             if d.is_pickable():
                 return d
         return None
@@ -239,9 +278,9 @@ class Test:
         :return: an integer if a timeout is defined, None otherwise
         :rtype: int or NoneType
         """
-        if self._array['time'] is None:
+        if self._validation['time'] == 0:
             return None
-        return self._array['time'] + self._array['delta']
+        return self._validation['time'] + self._validation['delta']
 
     def get_dim(self, unit="n_node"):
         """Return the orch-dimension value for this test.
@@ -256,7 +295,7 @@ class Test:
         :return: The number of resource this Test is requesting.
         :rtype: int
         """
-        return self._array['nb_res']
+        return self._dim
 
     def save_final_result(self, rc=0, time=0.0, out=b'', state=None):
         """Build the final Test result node.
@@ -271,16 +310,16 @@ class Test:
         :type state: :class:`Test.State`, optional
         """
         if state is None:
-            state = Test.State.SUCCEED if self._expect_rc == rc else Test.State.FAILED
+            state = Test.State.SUCCEED if self._validation['expect_rc'] == rc else Test.State.FAILED
         self.executed(state)
         self._rc = rc
-        self._out = base64.b64encode(out).decode('ascii')
-        self._time = time
+        self._output = base64.b64encode(out).decode('ascii')
+        self._exectime = time
 
-        for elt_k, elt_v in self._array['artifacts'].items():
+        for elt_k, elt_v in self._data['artifacts'].items():
             if os.path.isfile(elt_v):
                 with open(elt_v, 'rb') as fh:
-                    self._array['artifacts'][elt_k] = base64.b64encode(
+                    self._data['artifacts'][elt_k] = base64.b64encode(
                         fh.read()).decode("ascii")
 
     def display(self):
@@ -298,11 +337,11 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        log.manager.print_job(label, self._time, self.name,
+        log.manager.print_job(label, self._exectime, self.name,
                               colorname=colorname, icon=icon)
-        if self._out:
+        if self._output:
             if (log.manager.has_verb_level("info") and self.state == Test.State.FAILED) or log.manager.has_verb_level("debug"):
-                log.manager.print(base64.b64decode(self._out))
+                log.manager.print(base64.b64decode(self._output))
 
     def executed(self, state=None):
         """Set current Test as executed.
@@ -340,28 +379,18 @@ class Test:
         :rtype: str
         """
         return {
-            "id": {
-                "te_name": self._array["te_name"],
-                "label": self._array["label"],
-                "subtree": self._array["subtree"],
-                "full_name": self._array["name"],
-                "comb": self._array['comb_dict']
-            },
-            "exec": self._array["command"],
+            "id": self._id,
+            "exec": self._execmd,
             "result": {
                 "rc": self._rc,
                 "state": self._state,
-                "time": self._time,
-                "output": self._out,
+                "time": self._exectime,
+                "output": self._output,
             },
-            "data": {
-                "tags": self._array['tags'],
-                "metrics": "TBD",
-                "artifacts": self._array['artifacts'],
-            }
+            "data": self._data,
         }
         
-    def from_json(self, test_json: str) -> None : 
+    def from_json(self, test_json: str) -> None:
         """Replace the whole Test structure based on input JSON.
         
         :param json: the json used to set this Test
@@ -370,24 +399,18 @@ class Test:
         
         if isinstance(test_json, str):
             test_json = json.load(test_json) 
+            
         assert(isinstance(test_json, dict))
         self.res_scheme.validate(test_json)
-        self._array = {
-            "te_name": test_json["id"]["te_name"],
-            "label": test_json["id"]["label"],
-            "subtree": test_json["id"]["subtree"],
-            "name": test_json["id"]["full_name"],
-            "command": test_json["exec"],
-            "tags": test_json["data"]["tags"],
-            "metrics": "TBD",
-            "artifacts": test_json["data"]["artifacts"],
-            "comb_dict": test_json["id"]["comb"]
-        }
+        
+        self._id = test_json["id"]
+        self._execmd = test_json["exec"]
+        self._data = test_json["data"]
         
         self._rc = test_json["result"]["rc"]
-        self._out = test_json["result"]["output"]
+        self._output = test_json["result"]["output"]
         self._state = Test.State(test_json["result"]["state"])
-        self._time = test_json["result"]["time"]
+        self._exectime = test_json["result"]["time"]
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation.
@@ -406,30 +429,25 @@ class Test:
         cmd_code = ""
         post_code = ""
 
-        self._array['wrapped_command'] = 'sh {} {}'.format(
-            srcfile, self._array['name'])
+        self._invocation_cmd = 'sh {} {}'.format(srcfile, self._id['fq_name'])
 
         # if changing directory is required by the test
-        if self._array['chdir'] is not None:
-            cd_code += "cd '{}'\n".format(shlex.quote(self._array['chdir']))
+        if self._cwd is not None:
+            cd_code += "cd '{}'\n".format(shlex.quote(self._cwd))
 
         # manage package-manager deps
-        if self._array['dep'] is not None:
-            pm_code += "\n".join([
-                elt.get(load=True, install=True)
-                for elt in self._array['dep']
-                if isinstance(elt, PManager)
-            ])
+        for elt in self._mod_deps:
+            pm_code += "\n".join([elt.get(load=True, install=True)])
 
         # manage environment variables defined in TE
-        if self._array['env'] is not None:
-            for e in self._array['env']:
+        if self._testenv is not None:
+            for e in self._testenv:
                 env_code += "{}; export {}\n".format(
                     shlex.quote(e), shlex.quote(e.split('=')[0]))
 
         # if test should be validated through a matching regex
-        if self._array['matchers'] is not None:
-            for k, v in self._array['matchers'].items():
+        if self._validation['matchers'] is not None:
+            for k, v in self._validation['matchers'].items():
                 expr = v['expr']
                 required = (v.get('expect', True) is True)
                 # if match is required set 'ret' to 1 when grep fails
@@ -440,13 +458,13 @@ class Test:
                     fail='||' if required else "&&")
 
         # if a custom script is provided (in addition or not to matchers)
-        if self._array['valscript'] is not None:
+        if self._validation['script'] is not None:
             post_code += "{echo} | {script}; ret=$?".format(
                 echo='echo "$output"',
-                script=shlex.quote(self._array['valscript'])
+                script=shlex.quote(self._validation['script'])
             )
 
-        cmd_code = self._array['command']
+        cmd_code = self._execmd
 
         return """
         "{name}")
@@ -472,5 +490,5 @@ class Test:
             env_code=env_code,
             cmd_code=cmd_code,
             post_code=post_code,
-            name=self._array['name']
+            name=self._id['fq_name']
         )

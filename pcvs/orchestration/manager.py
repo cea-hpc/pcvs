@@ -131,20 +131,19 @@ class Manager:
         """
         chain.append(job.name)
 
-        for depname, depobj in job.deps.items():
-            if depobj is None:
-                hashed_dep = hash(depname)
-                if hashed_dep not in self.job_hashes:
-                    raise OrchestratorException.UndefDependencyError(depname)
+        for depname in job.job_depnames:
+            hashed_dep = hash(depname)
+            if hashed_dep not in self.job_hashes:
+                raise OrchestratorException.UndefDependencyError(depname)
 
-                job_dep = self.job_hashes[hashed_dep]
+            job_dep = self.job_hashes[hashed_dep]
 
-                if job_dep.name in chain:
-                    raise OrchestratorException.CircularDependencyError(
-                        job_dep.name)
+            if job_dep.name in chain:
+                raise OrchestratorException.CircularDependencyError(
+                    job_dep.name)
 
-                self.resolve_single_job_deps(job_dep, chain)
-                job.set_dep(depname, job_dep)
+            self.resolve_single_job_deps(job_dep, chain)
+            job.resolve_a_dep(depname, job_dep)
 
     def get_leftjob_count(self):
         """Return the number of jobs remainig to be executed.

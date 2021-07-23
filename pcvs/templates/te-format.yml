@@ -15,8 +15,7 @@
       # program binary (if needed)
       binary: "a.out"
     # dependency scheme
-    depends_on:
-      test: ["this_is_another_test"]
+    depends_on: ["this_is_another_test"]
     # extra cflags
     cflags: "extra cflags"
     # extra ldflags
@@ -46,9 +45,8 @@
     # directory where program should be built
     cwd: "dir/to/build"
     # dependency scheme
-    depends_on:
-      test:
-        - "this_is_another_run_test_in_the_same_file"
+    depends_on: ["this_is_another_run_test_in_the_same_file"]
+    package_manager:
       spack:
         - protobuf@3.1.1
         - gcc@7.3.0
