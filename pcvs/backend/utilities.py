@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 
 import jsonschema
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
 from pcvs.helpers.system import MetaDict
 from prettytable import PrettyTable
 
@@ -171,7 +171,7 @@ def process_check_yaml_stream(data):
         scheme.validate(stream)
         nb_nodes = len(stream.keys())
     
-    except yaml.YAMLError as e:
+    except YAMLError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
     except ValidationException.FormatError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))

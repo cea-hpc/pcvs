@@ -1,5 +1,5 @@
 import jsonschema
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
 import os
 import sys
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
                 state = "OK"
                 
             # error while loading YAML (either one)
-            except yaml.YAMLError as e:
+            except YAMLError as e:
                 state = "NOK (YAML)"
                 err = e
                 

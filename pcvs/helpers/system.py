@@ -1,8 +1,7 @@
 import os
 import addict
 import jsonschema
-import ruamel
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
 from ruamel.yaml.main import yaml_object
 
 import pcvs
@@ -48,7 +47,7 @@ class ValidationScheme:
                     PATH_INSTDIR,
                     'schemes/{}-scheme.yml'.format(name)), 'r') as fh:
                 self._scheme = YAML(typ='safe').load(fh)
-        except (IOError, yaml.YAMLError):
+        except (IOError, YAMLError):
             raise ValidationException.SchemeError(
                 "Unable to load scheme {}".format(name))
 
@@ -170,7 +169,7 @@ class Config(MetaDict):
             with open(filename, 'r') as fh:
                 d = YAML(typ='safe').load(fh)
                 self.from_dict(d)
-        except (IOError, yaml.YAMLError) as e:
+        except (IOError, YAMLError) as e:
             raise CommonException.IOError(
                 "{} invalid or badly formatted".format(filename))
 
@@ -274,7 +273,7 @@ class MetaConfig(MetaDict):
             try:
                 with open(filepath, 'r') as fh:
                     node = MetaDict(YAML(typ='safe').load(fh))
-            except (IOError, yaml.YAMLError) as e:
+            except (IOError, YAMLError) as e:
                 raise CommonException.IOError(
                     "Error(s) found while loading (}".format(filepath))
 

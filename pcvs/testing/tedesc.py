@@ -495,7 +495,7 @@ class TEDescriptor:
 
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
-            # clone deps as it may be updated by each test
+            # clone deps as i"t may be updated by each test
             te_job_deps = copy.deepcopy(te_job_deps)
             chdir = None
             if self._build:

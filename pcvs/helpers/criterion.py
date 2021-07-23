@@ -285,7 +285,7 @@ class Criterion:
         return self._alias[val] if val in self._alias else val
 
     @staticmethod
-    def __convert_sequence_to_list(dic, s=-1, e=-1):
+    def __convert_sequence_to_list(node, s=-1, e=-1):
         """converts a sequence (as a string) to a valid list of values
 
         :param dic: dictionary to take the values from
@@ -298,34 +298,32 @@ class Criterion:
         :return: list of values
         :rtype: list
         """
-        assert(len(dic.keys()) == 1)
-        name = list(dic.keys())[0]
-        node = dic[name]
-
+        
         values = []
-        start = s if 'from' not in node else node['from']
-        end = e if 'to' not in node else node['to']
-        of = 1 if 'of' not in node else node['of']
+        start = node.get('from', s)
+        end = node.get('to', e)
+        of = node.get('of', 1)
+        op = node.get('op', 'seq').lower()
 
-        if name.lower() in ['seq', 'sequence']:
+        if op in ['seq', 'sequence']:
             values = range(start, end+1, of)
-        elif name.lower() in ['mul', 'multiplication']:
+        elif op in ['mul', 'multiplication']:
             cur = start if start > 0 else 1
             while cur < end:
                 values.append(cur)
                 cur *= of
-        elif name.lower() in ['fact', 'factor']:
+        elif op in ['fact', 'factor']:
             mult = 1
             for i in range(start, start+of):
                 if i % of == 0:
                     mult = i
             values = range(mult, end+1, of)
-        elif name.lower() in ['pow', 'power']:
+        elif op in ['pow', 'power']:
             cur = start if start > 1 else 2
             while cur < end:
                 values.append(cur)
                 cur = cur ** of
-        elif name.lower() in ['powerof']:
+        elif op in ['powerof']:
             if start < 1:
                 start = 1
             start = math.ceil(start**(1/of))

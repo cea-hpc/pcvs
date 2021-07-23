@@ -8,7 +8,7 @@ from pcvs.plugins import Plugin
 import subprocess
 
 import jsonschema
-from ruamel.yaml import YAML
+from ruamel.yaml import YAML, YAMLError
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
@@ -100,7 +100,7 @@ def load_yaml_file(f, source, build, prefix):
             stream = replace_special_token(stream, source, build, prefix)
             obj = YAML(typ='safe').load(stream)
     # badly formatted YAML
-    except yaml.YAMLError:
+    except YAMLError:
         need_conversion = True
 
     # attempt to convert of the fly the YAML file
