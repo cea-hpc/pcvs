@@ -401,6 +401,7 @@ def process_dyn_setup_scripts(setup_files):
                            label=label,
                            prefix=subprefix
                            )
+            obj.load_from_str(fdout.decode('utf-8'))
             obj.process()
             obj.flush_sh_file()
             MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)

@@ -168,6 +168,9 @@ class TestFile:
         if TestFile.val_scheme is None:
             TestFile.val_scheme = system.ValidationScheme('te')
 
+    def load_from_str(self, data):
+        self._raw = YAML(typ='safe').load(data)
+        
     def process(self):
         """Load the YAML file and map YAML nodes to Test()."""
         src, _, build, _ = utils.generate_local_variables(
