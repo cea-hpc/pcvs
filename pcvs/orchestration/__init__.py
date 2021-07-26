@@ -30,7 +30,7 @@ class Orchestrator:
         config_tree = MetaConfig.root
         self._conf = config_tree
         self._pending_sets = dict()
-        self._max_res = config_tree.machine.nodes
+        self._max_res = config_tree.machine.get('nodes', 1)
         self._publisher = Publisher(config_tree.validation.output)
         self._manager = Manager(self._max_res, publisher=self._publisher)
         self._maxconcurrent = config_tree.machine.concurrent_run

@@ -118,7 +118,7 @@ def process_check_profiles():
     return errors
 
 
-def process_check_setup_file(filename, prefix):
+def process_check_setup_file(filename, prefix, run_configuration):
     """Check if a given pcvs.setup could be parsed if used in a regular process.
 
     :param filename: the pcvs.setup filepath
@@ -131,7 +131,8 @@ def process_check_setup_file(filename, prefix):
     err_msg = None
     data = None
     env = os.environ
-    env.update(run.build_env_from_configuration({}))
+    env.update(run_configuration)
+    
     try:
         tdir = tempfile.mkdtemp()
         with utils.cwd(tdir):
@@ -201,7 +202,7 @@ def __set_token(token, nset=None) -> str:
     else:
         return log.manager.style(log.manager.utf("fail"), fg="red", bold=True)
     
-def process_check_directory(dir):
+def process_check_directory(dir, pf_name="default"):
     """Analyze a directory to ensure defined test files are valid.
 
     :param dir: the directory to process.
@@ -210,6 +211,12 @@ def process_check_directory(dir):
     :rtype: dict
     """
     errors = dict()
+    pf = profile.Profile(pf_name)
+    if not pf.is_found():
+        pf.load_template()
+    else:
+        pf.load_from_disk()
+    buildenv = run.build_env_from_configuration(pf.dump())
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
 
@@ -228,7 +235,7 @@ def process_check_directory(dir):
         
         if f.endswith("pcvs.setup"):
             err, data = process_check_setup_file(
-                os.path.join(dir, subprefix, f), subprefix)
+                os.path.join(dir, subprefix, f), subprefix, buildenv)
             setup_ok = __set_token(err is None)
         else:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:

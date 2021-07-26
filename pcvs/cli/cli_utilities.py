@@ -70,8 +70,10 @@ def exec(ctx, output, argument, gen_list, display):
               help="Check correctness for all registered configuation block")
 @click.option("--profiles", "-p", "profiles", default=False, is_flag=True,
               help="Check correctness for all registered profiles")
+@click.option("--profile-model", "-m", "pf_name", default="default",
+              help="Custom profile to use when checking pcvs.setup scripts")
 @click.pass_context
-def check(ctx, dir, encoding, color, configs, profiles):
+def check(ctx, dir, encoding, color, configs, profiles, pf_name):
     log.manager.print_banner()
     errors = dict()
     if color:
@@ -112,7 +114,7 @@ def check(ctx, dir, encoding, color, configs, profiles):
         cfg_val = settings.bootstrap_validation({})
         cfg_val.set_ifdef('output', "/tmp/test")
         errors = {**errors, **
-                  pvUtils.process_check_directory(os.path.abspath(dir))}
+                  pvUtils.process_check_directory(os.path.abspath(dir), pf_name)}
 
     if errors:
         log.manager.print_section("Classification of errors:")

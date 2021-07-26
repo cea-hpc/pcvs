@@ -541,7 +541,7 @@ class TEDescriptor:
                 mod_deps=te_mod_deps,
                 tags=self._tags,
                 environment=env,
-                dim=comb.get('n_mpi'),
+                dim=comb.get('n_mpi', 1),
                 time=self._validation.time.get("mean", 0),
                 delta=self._validation.time.get("tolerance", 0),
                 rc=self._validation.get("expect_exit", 0),

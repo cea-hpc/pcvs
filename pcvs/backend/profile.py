@@ -162,7 +162,7 @@ class Profile:
         :return: a regular dict for this profile
         :rtype: dict
         """
-        self.load_from_disk()
+        #self.load_from_disk()
         return MetaDict(self._details).to_dict()
 
     def is_found(self):
