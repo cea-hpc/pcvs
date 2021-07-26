@@ -497,11 +497,13 @@ class IOManager:
                 click.style("{}".format(self.utf("star")*14), fg="green")
             ]
         else:
+            start = " " * ((self._linelength - len(logo[0]))//2-1)
+            newline = "\n" + start
             s = [
-                click.style("\n".join(logo[0:3]), fg="green"),
-                click.style("\n".join(logo[3:4]), fg="yellow"),
-                click.style("\n".join(logo[4:5]), fg="red"),
-                click.style("\n".join(logo[5:]))
+                click.style(start + newline.join(logo[0:3]), fg="green"),
+                click.style(start + newline.join(logo[3:4]), fg="yellow"),
+                click.style(start + newline.join(logo[4:5]), fg="red"),
+                click.style(start + newline.join(logo[5:]))
             ]
         if string is True:
             return "\n".join(s)
@@ -563,14 +565,16 @@ class IOManager:
             self.print_short_banner()
             return
         else:
-            self.__print_rawline(click.style("\n".join(logo[0:6]), fg="green"))
-            self.__print_rawline(click.style("\n".join(logo[6:7])))
-            self.__print_rawline(click.style(
-                "\n".join(logo[7:10]), fg="green"))
-            self.__print_rawline(click.style(
-                "\n".join(logo[10:11]), fg="yellow"))
-            self.__print_rawline(click.style("\n".join(logo[11:13]), fg="red"))
-            self.__print_rawline(click.style("\n".join(logo[13:])))
+            start = " " * ((self._linelength - len(logo[0]))//2-1)
+            newline = "\n" + start
+            self.__print_rawline(click.style(start + newline.join(logo[0:6]), fg="green"))
+            self.__print_rawline(click.style(start + newline.join(logo[6:7])))
+            self.__print_rawline(click.style(start +
+                newline.join(logo[7:10]), fg="green"))
+            self.__print_rawline(click.style(start +
+                newline.join(logo[10:11]), fg="yellow"))
+            self.__print_rawline(click.style(start + newline.join(logo[11:13]), fg="red"))
+            self.__print_rawline(click.style(start + newline.join(logo[13:])))
 
 
 manager = IOManager()
