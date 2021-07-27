@@ -93,14 +93,14 @@ class Test:
             'label': kwargs.get('label', 'nolabel'),
             'subtree': kwargs.get('subtree', ''),
         }
-        comb_str = self._comb.translate_to_str() if self._comb else ""
+        comb_str = self._comb.translate_to_str() if self._comb else None
         
-        self._id['fq_name'] = "_".join([
+        self._id['fq_name'] = "_".join(filter(None, [
                 "/".join(filter(None, [
                     self._id['label'],
                     self._id['subtree'],
                     self._id['te_name']])),
-                comb_str])
+                comb_str]))
         
         
         self._execmd = kwargs.get('command', '')
