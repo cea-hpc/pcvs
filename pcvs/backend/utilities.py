@@ -140,13 +140,18 @@ def process_check_setup_file(filename, prefix, run_configuration):
             env['pcvs_testbuild'] = tdir
             if not os.path.isdir(os.path.join(tdir, prefix)):
                 os.makedirs(os.path.join(tdir, prefix))
+            if not prefix:
+                prefix = ''
             proc = subprocess.Popen(
                 [filename, prefix], env=env, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            fds = proc.communicate()
-            if fds[1]:
-                err_msg = base64.b64encode(fds[1])
+            fdout, fderr = proc.communicate()
+            
+            if proc.returncode != 0:
+                if not fderr:
+                    fderr = "Non-zero status (no stderr): {}".format(proc.returncode).encode('utf-8')
+                err_msg = base64.b64encode(fderr)
             else:
-                data = fds[0].decode('utf-8')
+                data = fdout.decode('utf-8')
     except subprocess.CalledProcessError as e:
         err_msg = base64.b64encode(str(e.stderr).encode('utf-8'))
     

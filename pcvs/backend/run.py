@@ -376,7 +376,7 @@ def process_dyn_setup_scripts(setup_files):
                 fdout, fderr = fds.communicate()
 
                 if fds.returncode != 0:
-                    err.append((f, fderr.decode('utf-8')))
+                    err.append((f, "{} (exited {}): {}".format(f, fds.returncode, fderr.decode('utf-8'))))
                     log.manager.info("{}: {}".format(f, fderr.decode('utf-8')))
                     continue
 
@@ -436,12 +436,12 @@ def process_static_yaml_files(yaml_files):
                 del obj
             except (CalledProcessError) as e:
                 # log errors to be printed all at once
-                err.append((f, e.output))
-                log.manager.info("{}: {}".format(f, e.output))
+                err.append((f, "test"))
+                log.manager.info("FAILURE {}/{}/{}: {}".format(label, subprefix, fname, e.output))
                 continue
-            #except Exception as e:
-            #    err.append((f, e))
-            #    log.manager.info("Failed to read {}: {}".format(f, e))
+            except Exception as e:
+                err.append((f, e))
+                log.manager.info("Failed to read {}: {}".format(f, e))
     return err
 
 
