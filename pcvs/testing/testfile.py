@@ -190,6 +190,9 @@ class TestFile:
         # main loop, parse each node to register tests
         for k, content, in self._raw.items():
             MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_BEFORE)
+            if content is None:
+                # skip empty nodes
+                continue
             td = tedesc.TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
