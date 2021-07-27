@@ -2,6 +2,7 @@ import base64
 import itertools
 import math
 import os
+from pcvs.helpers.exceptions import CommonException
 
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
@@ -300,11 +301,28 @@ class Criterion:
         """
         
         values = []
-        start = node.get('from', s)
-        end = node.get('to', e)
-        of = node.get('of', 1)
+        
+        # these must be integers
+        def _convert_sequence_item_to_int(val):
+            if not isinstance(val, int) or not isinstance(val, float):
+                try:
+                    n = float(val)
+                    if n.is_integer():
+                        return int(n)
+                    else:
+                        return n
+                except ValueError:
+                    raise CommonException.BadTokenError(val)
+                    
+            else:
+                return val
+            
+        start = _convert_sequence_item_to_int(node.get('from', s))
+        end = _convert_sequence_item_to_int(node.get('to', e))
+        of = _convert_sequence_item_to_int(node.get('of', 1))
+        
         op = node.get('op', 'seq').lower()
-
+        
         if op in ['seq', 'sequence']:
             values = range(start, end+1, of)
         elif op in ['mul', 'multiplication']:
