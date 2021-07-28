@@ -37,11 +37,11 @@ class Orchestrator:
 
     def print_infos(self):
         """display pre-run infos."""
-        log.manager.print_item("Total base: {} test(s)".format(
+        log.manager.print_item("Test count: {}".format(
             self._manager.get_count('total')))
         log.manager.print_item(
-            "Concurrent launches: {} job(s)".format(self._maxconcurrent))
-        log.manager.print_item("Number of resources: {}".format(self._max_res))
+            "Max simultaneous Sets: {}".format(self._maxconcurrent))
+        log.manager.print_item("Resource count: {}".format(self._max_res))
 
     # This func should only be a passthrough to the job manager
     def add_new_job(self, job):
@@ -64,7 +64,6 @@ class Orchestrator:
         MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.SCHED_BEFORE)
         
         self._manager.resolve_deps()
-        self.print_infos()
         
         nb_nodes = self._max_res
         last_progress = 0

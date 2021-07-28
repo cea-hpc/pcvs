@@ -440,7 +440,7 @@ class IOManager:
                 msg = [msg]
             for elt in msg:
                 for line in elt.split('\n'):
-                    self.__print_rawline("INFO: {}".format(
+                    self.__print_rawline("INFO : {}".format(
                         click.style(line, fg="cyan")),  err=True)
 
     def warn(self, msg):
@@ -450,7 +450,7 @@ class IOManager:
             msg = [msg]
         for elt in msg:
             for line in elt.split('\n'):
-                self.__print_rawline("WARNING: {}".format(
+                self.__print_rawline("WARN : {}".format(
                     click.style(line, fg="yellow", bold=True)),  err=True)
 
     def err(self, msg):

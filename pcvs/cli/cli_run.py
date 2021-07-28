@@ -151,6 +151,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     May also be provided as a list of directories as described by tests
     found in DIRS.
     """
+    log.manager.info("PRE-RUN: start")
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
@@ -160,6 +161,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     global_config.set_internal("pColl", ctx.obj['plugins'])
 
     # then init the configuration
+    log.manager.debug("PRE-RUN: load settings from local file: {}".format(settings_file))
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)
 
     # save 'run' parameters into global configuration
@@ -187,8 +189,9 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)
+        log.manager.debug("PRE-RUN: configure target bank: {}".format(obj.name))
         if not obj.exists():
-            click.BadOptionUsage(
+            raise click.BadOptionUsage(
                 "--bank", "'{}' bank does not exist".format(obj.name))
 
     # BEFORE the build dir still does not exist !
@@ -201,6 +204,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
             raise RunException.InProgressError(val_cfg.output)
 
     elif not os.path.exists(val_cfg.output):
+        log.manager.debug("PRE-RUN: Prepare output directory: {}".format(val_cfg.output))
         os.makedirs(val_cfg.output)
 
     # DO NOT move the logger init before the build dir exist (above)
@@ -208,7 +212,9 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if val_cfg.reused_build is not None:
+        log.manager.info("PRE-RUN: Clone previous build to be reused")
         try:
+            log.manager.debug("PRE-RUN: previous build: {}".format(val_cfg.reused_build))
             global_config = pvRun.dup_another_build(
                 val_cfg.reused_build, val_cfg.output)
             # TODO: Currently nothing can be overriden from cloned build except:
@@ -218,6 +224,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
                 "--duplicate", "{} is not a valid build directory!".format(val_cfg.reused_build))
     else:
         # otherwise create own settings command block
+        log.manager.info("PRE-RUN: Profile lookup: {}".format(val_cfg.default_profile))
         (scope, _, label) = utils.extract_infos_from_token(val_cfg.default_profile,
                                                            maxsplit=2)
         pf = pvProfile.Profile(label, scope)
@@ -238,6 +245,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=val_cfg.runlog)
     
+    log.manager.info("PRE-RUN: Session to be started")
     if val_cfg.background:
         sid = the_session.run_detached(the_session)
         log.manager.print_item(

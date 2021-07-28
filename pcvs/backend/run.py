@@ -47,6 +47,43 @@ def str_dict_as_envvar(d):
     """
     return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
 
+def display_summary(the_session):
+    """Display a summary for this run, based on profile & CLI arguments."""
+    cfg = MetaConfig.root.validation
+
+    log.manager.print_section("Global Information")
+    log.manager.print_item("Date of execution: {}".format(
+        MetaConfig.root.validation.datetime.strftime("%c")))
+    log.manager.print_item("Run by: {} <{}>".format(cfg.author.name, cfg.author.email))
+    log.manager.print_item("Active session ID: {}".format(the_session.id))
+    log.manager.print_item("Loaded profile: '{}'".format(cfg.pf_name))
+    log.manager.print_item("Build stored to: {}".format(cfg.output))
+    log.manager.print_item("Criterion matrix size per job: {}".format(
+        MetaConfig.root.get_internal("comb_cnt")
+    ))
+    if cfg.target_bank:
+        log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
+    log.manager.print_item("Verbosity: {}".format(
+        log.manager.get_verbosity_str().capitalize()))
+    log.manager.print_section("User directories:")
+    width = max([len(i) for i in cfg.dirs])
+    for k, v in cfg.dirs.items():
+        log.manager.print_item("{:<{width}}: {:<{width}}".format(
+            k.upper(),
+            v,
+            width=width),
+            depth=2)
+    
+    log.manager.print_section("Orchestration infos")
+    MetaConfig.root.get_internal("orchestrator").print_infos()
+    
+    if cfg.simulated is True:
+        log.manager.warn([
+            "==============================================",
+            ">>>> DRY-RUN : TEST EXECUTION IS EMULATED <<<<",
+            "=============================================="])
+    
+    
 
 def process_main_workflow(the_session=None):
     """Main run.py entry point, triggering a PCVS validation run.
@@ -57,6 +94,7 @@ def process_main_workflow(the_session=None):
     :param the_session: the session handler this run is connected to, defaults to None
     :type the_session: :class:`Session`, optional
     """
+    log.manager.info("RUN: Session start")
     global_config = MetaConfig.root
     valcfg = global_config.validation
 
@@ -64,24 +102,26 @@ def process_main_workflow(the_session=None):
     valcfg.sid = the_session.id
 
     log.manager.print_banner()
-    log.manager.print_header("Prepare Environment")
+    log.manager.print_header("Initialization")
     # prepare PCVS and third-party tools
     prepare()
 
-    log.manager.print_header("Process benchmarks")
     if valcfg.reused_build is not None:
         log.manager.print_section("Reusing previously generated inputs")
-        log.manager.print_section("Duplicated from {}".format(
-            os.path.abspath(valcfg.reused_build)))
     else:
+        log.manager.print_section("Load Test Suites")
         start = time.time()
         process()
         end = time.time()
         log.manager.print_section(
             "===> Processing done in {:<.3f} sec(s)".format(end-start))
 
-    log.manager.print_header("Validation Start")
-    run(the_session)
+    log.manager.print_header("Summary")
+    display_summary(the_session)
+    
+
+    log.manager.print_header("Execution")
+    MetaConfig.root.get_internal('orchestrator').run(the_session)
 
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
@@ -92,7 +132,7 @@ def process_main_workflow(the_session=None):
         bank = pvBank.Bank(token=bank_token)
         pref_proj = bank.preferred_proj
         if bank.exists():
-            log.manager.print_item("Upload to the bank '{}{}'".format(
+            log.manager.print_item("Upload results to bank: '{}{}'".format(
                 bank.name.upper(),
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
@@ -101,24 +141,6 @@ def process_main_workflow(the_session=None):
                 None,
                 os.path.join(valcfg.output)
             )
-
-
-def __print_summary():
-    """Display a summary for this run, based on profile & CLI arguments."""
-    cfg = MetaConfig.root.validation
-    log.manager.print_section("Summary:")
-    log.manager.print_item("Loaded profile: '{}'".format(cfg.pf_name))
-    log.manager.print_item("Built into: {}".format(cfg.output))
-    log.manager.print_item("Verbosity: {}".format(
-        log.manager.get_verbosity_str().capitalize()))
-    log.manager.print_item("User directories:")
-    width = max([len(i) for i in cfg.dirs])
-    for k, v in cfg.dirs.items():
-        log.manager.print_item("{:<{width}}: {:<{width}}".format(
-            k.upper(),
-            v,
-            width=width),
-            depth=2)
 
 
 def __check_defined_program_validity():
@@ -156,8 +178,6 @@ def prepare():
     This function prepares the build dir, create trees...
     """
     log.manager.print_section("Prepare environment")
-    log.manager.print_item("Date: {}".format(
-        MetaConfig.root.validation.datetime.strftime("%c")))
     valcfg = MetaConfig.root.validation
 
     log.manager.print_item("Check whether build directory is valid")
@@ -180,24 +200,27 @@ def prepare():
         valcfg.output, NAME_BUILD_RESDIR), dir=True)
     utils.create_or_clean_path(valcfg.buildcache, dir=True)
 
-    log.manager.print_item("Create subdirs for each provided directories")
+    log.manager.print_item("Create test subtrees")
     os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, NAME_BUILDFILE), 'w').close()
 
-    log.manager.print_section("Ensure user-defined programs exist")
+    log.manager.print_item("Ensure user-defined programs exist")
     __check_defined_program_validity()
 
-    log.manager.print_section("Load and initialize validation criterions")
+    log.manager.print_item("Init & expand criterions")
     criterion.initialize_from_system()
     # Pick on criterion used as 'resources' by JCHRONOSS
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
     
+    log.manager.print_item("Init the global Orchestrator")
+    MetaConfig.root.set_internal('orchestrator', Orchestrator())
+    
     if valcfg.enable_report:
-        log.manager.print_section("Interface to Reporting Server")
+        log.manager.print_section("Connection to the Reporting Server")
         comman = None
         if valcfg.report_addr == "local":
             comman = communications.EmbeddedServer(valcfg.sid)
@@ -206,9 +229,14 @@ def prepare():
             comman = communications.RemoteServer(valcfg.sid, valcfg.report_addr)
             log.manager.print_item("Listening on {}".format(comman.endpoint))
         MetaConfig.root.set_internal('comman', comman)
-    
+        
+    log.manager.print_item("Save Configurations into {}".format(valcfg.output))
+    conf_file = os.path.join(valcfg.output, NAME_BUILD_CONF_FN)
+    with open(conf_file, 'w') as conf_fh:
+        handler = YAML(typ='safe')
+        handler.default_flow_style = None
+        handler.dump(MetaConfig.root.dump_for_export(), conf_fh)
 
-    MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
 
 def find_files_to_process(path_dict):
@@ -234,7 +262,6 @@ def find_files_to_process(path_dict):
     yaml_files = list()
 
     # discovery may take a while with some systems
-    log.manager.print_item("PCVS-related file detection")
     # iterate over user directories
     for label, path in path_dict.items():
         # for each, walk through the tree
@@ -267,7 +294,7 @@ def process():
 
     :raises TestUnfoldError: An error occured while processing files
     """
-    log.manager.print_section("Load from filesystem")
+    log.manager.print_item("Locate benchmarks from user directories")
     setup_files, yaml_files = find_files_to_process(
         MetaConfig.root.validation.dirs)
 
@@ -277,9 +304,10 @@ def process():
         pprint.pformat(yaml_files)))
 
     errors = []
-    
-    
+
+    log.manager.print_item("Extract tests from dynamic definitions")
     errors += process_dyn_setup_scripts(setup_files)
+    log.manager.print_item("Extract tests from static definitions")
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
@@ -338,7 +366,7 @@ def process_dyn_setup_scripts(setup_files):
     :rtype: list
     """
     err = []
-    log.manager.print_item("Convert configuation to Shell variables")
+    log.manager.info("Convert configuration to Shell variables")
     env = os.environ.copy()
     env.update(build_env_from_configuration(MetaConfig.root))
 
@@ -347,10 +375,10 @@ def process_dyn_setup_scripts(setup_files):
         fh.write(str_dict_as_envvar(env))
         fh.close()
 
-    log.manager.print_item("Manage dynamic files (scripts)")
+    log.manager.info("Iteration over files")
     with log.progbar(setup_files, print_func=print_progbar_walker) as itbar:
         for label, subprefix, fname in itbar:
-            log.manager.info("process {} ({})".format(subprefix, label))
+            log.manager.debug("process {} ({})".format(subprefix, label))
             base_src, cur_src, base_build, cur_build = utils.generate_local_variables(
                 label, subprefix)
 
@@ -376,10 +404,8 @@ def process_dyn_setup_scripts(setup_files):
                 fdout, fderr = fds.communicate()
 
                 if fds.returncode != 0:
-                    err.append((f, "{} (exited {}): {}".format(f, fds.returncode, fderr.decode('utf-8'))))
-                    log.manager.info("{}: {}".format(f, fderr.decode('utf-8')))
-                    continue
-
+                    raise subprocess.CalledProcessError(fds.returncode, '')
+                    
                 # flush the output to $BUILD/pcvs.yml
                 out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
@@ -387,7 +413,10 @@ def process_dyn_setup_scripts(setup_files):
                 te_node = load_yaml_file(
                     out_file, base_src, base_build, subprefix)
             except CalledProcessError:
-                pass
+                if fds.returncode != 0:
+                    err.append((f, "{} (exited {}): {}".format(f, fds.returncode, fderr.decode('utf-8'))))
+                    log.manager.info("EXEC FAILED: {}: {}".format(f, fderr.decode('utf-8')))
+                continue
 
             # If the script did not generate any output, skip
             if te_node is None:  # empty file
@@ -416,7 +445,7 @@ def process_static_yaml_files(yaml_files):
     :rtype: list
     """
     err = []
-    log.manager.print_item("Process static test files")
+    log.manager.info("Iteration over files")
     with log.progbar(yaml_files, print_func=print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
             _, cur_src, _, cur_build = utils.generate_local_variables(
@@ -433,41 +462,10 @@ def process_static_yaml_files(yaml_files):
                                )
                 obj.process()
                 obj.flush_sh_file()
-                del obj
-            except (CalledProcessError) as e:
-                # log errors to be printed all at once
-                err.append((f, "test"))
-                log.manager.info("FAILURE {}/{}/{}: {}".format(label, subprefix, fname, e.output))
-                continue
             except Exception as e:
                 err.append((f, e))
-                log.manager.info("Failed to read {}: {}".format(f, e))
-    return err
-
-
-def run(the_session):
-    """Trigger the validation. 
-
-    This function is called by :func:`process_main_workflow` once the session is
-    fully started.
-
-    :param the_session: is set, the actual session handling the run
-    :type the_session: class:`Session`
-    """
-    __print_summary()
-    log.manager.print_item("Save Configurations into {}".format(
-        MetaConfig.root.validation.output))
-
-    conf_file = os.path.join(
-        MetaConfig.root.validation.output, NAME_BUILD_CONF_FN)
-    with open(conf_file, 'w') as conf_fh:
-        handler = YAML(typ='safe')
-        handler.default_flow_style = None
-        handler.dump(MetaConfig.root.dump_for_export(), conf_fh)
-
-    log.manager.print_section("Run the Orchestrator")
-    MetaConfig.root.get_internal('orchestrator').run(the_session)
-
+                log.manager.info("{} (failed to parse): {}".format(f, e))
+    return err    
 
 def anonymize_archive():
     """Erase from results any undesired output from the generated archive.
@@ -547,17 +545,16 @@ def terminate():
         MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
     outdir = MetaConfig.root.validation.output
 
-    log.manager.print_section("Exporting results")
+    log.manager.print_section("Prepare results")
 
-    log.manager.print_item("Prepare the archive")
     save_for_export(os.path.join(outdir, NAME_BUILD_RESDIR))
     save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
 
     if MetaConfig.root.validation.anonymize:
-        log.manager.print_item("Anonymizing data")
+        log.manager.print_item("Anonymize data")
         anonymize_archive()
 
-    log.manager.print_item("Create the archive: {}".format(archive_name))
+    log.manager.print_item("Generate the archive: {}".format(archive_name))
 
     with utils.cwd(outdir):
         cmd = [
@@ -567,7 +564,7 @@ def terminate():
             "save_for_export"
         ]
         try:
-            log.manager.info('cmd: {}'.format(" ".join(cmd)))
+            log.manager.debug('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             raise RunException.ProgramError(e, cmd)
@@ -577,7 +574,6 @@ def terminate():
         log.manager.print_item("Close connection to Reporting Server")
         comman.close_connection()
     MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_AFTER)
-    
 
 
 def dup_another_build(build_dir, outdir):

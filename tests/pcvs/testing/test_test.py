@@ -34,7 +34,7 @@ def test_Test():
         env = ["testenv"],
         matchers = {"matcher1": {"expr": "test"}},
         valscript = "testvalscript",)
-    assert(test.name == "label/testsubtree/testte_name_")
+    assert(test.name == "label/testsubtree/testte_name")
     assert(test.command == "testcommand")
     assert(test.get_dim() == 10)
     assert(not test.been_executed())

@@ -205,7 +205,7 @@ class Profile:
         if not os.path.isfile(self._file):
             raise ProfileException.NotFoundError(self._file)
 
-        log.manager.info("load {} ({})".format(self._name, self._scope))
+        log.manager.debug("Load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = MetaDict(YAML(typ='safe').load(f))
 

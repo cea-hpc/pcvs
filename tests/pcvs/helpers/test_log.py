@@ -113,22 +113,22 @@ def test_print_logcall(capsys):
         with open("normal.log", 'r') as fh:
             stream = fh.read()
             assert('ERROR: ' in stream)
-            assert('WARNING: ' in stream)
-            assert('INFO: ' not in stream)
+            assert('WARN : ' in stream)
+            assert('INFO : ' not in stream)
             assert('DEBUG: ' not in stream)
         
         with open("info.log", 'r') as fh:
             stream = fh.read()
             assert('ERROR:' in stream)
-            assert('WARNING:' in stream)
-            assert('INFO:' in stream)
+            assert('WARN :' in stream)
+            assert('INFO :' in stream)
             assert('DEBUG:' not in stream)
 
         with open("debug.log", 'r') as fh:
             stream = fh.read()
             assert('ERROR:' in stream)
-            assert('WARNING:' in stream)
-            assert('INFO:' in stream)
+            assert('WARN :' in stream)
+            assert('INFO :' in stream)
             assert('DEBUG:' in stream)
     
 def test_banners(capsys):

@@ -227,6 +227,9 @@ class Criterion:
         :rtype: list
         """
         return self._values
+    
+    def __len__(self):
+        return len(self._values)
 
     @property
     def name(self):
@@ -385,8 +388,7 @@ def initialize_from_system():
     runtime_iterators = MetaConfig.root.runtime.iterators
     criterion_iterators = MetaConfig.root.criterion.iterators
     it_to_remove = []
-    log.manager.print_item("Prune undesired iterators from the run")
-
+    
     # if a criterion defined in criterion.yaml but
     # not declared as part of a runtime, the criterion
     # should be silently discarded
@@ -400,6 +402,8 @@ def initialize_from_system():
                               ' removing from schedule'.format(it))
         else:
             continue
+        
+        log.manager.info("Removing '{}'".format(it))
         it_to_remove.append(it)
 
     # register the new dict {criterion_name: Criterion object}
@@ -410,13 +414,15 @@ def initialize_from_system():
     # convert any sequence into valid range of integers for
 
     # numeric criterions
-    log.manager.print_item("Expand possible iterator expressions")
+    comb_cnt = 1
     for criterion in MetaConfig.root.get_internal('crit_obj').values():
         criterion.expand_values()
+        comb_cnt *= len(criterion)
+    MetaConfig.root.set_internal("comb_cnt", comb_cnt)
+    
 
 
 first = True
-runtime_filter = None
 
 
 def valid_combination(dic):
@@ -427,7 +433,7 @@ def valid_combination(dic):
     :return: True if dic is a valid combination
     :rtype: bool
     """
-    global first, runtime_filter
+    global first
     rt = MetaConfig.root.runtime
     val = MetaConfig.root.validation
     pCollection = MetaConfig.root.get_internal('pColl')
