@@ -311,7 +311,10 @@ def process():
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        raise RunException.TestUnfoldError(errors)
+        log.manager.err(["Test-suites failed to be parsed, with the following errors:"]+
+                        [ "\t-{}: {}".format(e[0], e[1]) for e in errors]
+            )
+        raise RunException.TestUnfoldError("See previous errors above.")
 
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
@@ -414,7 +417,7 @@ def process_dyn_setup_scripts(setup_files):
                     out_file, base_src, base_build, subprefix)
             except CalledProcessError:
                 if fds.returncode != 0:
-                    err.append((f, "{} (exited {}): {}".format(f, fds.returncode, fderr.decode('utf-8'))))
+                    err.append((f, "(exit {}): {}".format(fds.returncode, fderr.decode('utf-8'))))
                     log.manager.info("EXEC FAILED: {}: {}".format(f, fderr.decode('utf-8')))
                 continue
 
