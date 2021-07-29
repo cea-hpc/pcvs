@@ -216,6 +216,7 @@ def process_check_directory(dir, pf_name="default"):
     :rtype: dict
     """
     errors = dict()
+    total_nodes = 0
     pf = profile.Profile(pf_name)
     if not pf.is_found():
         pf.load_template()
@@ -249,6 +250,7 @@ def process_check_directory(dir, pf_name="default"):
         if not err:
             err, nb_nodes = process_check_yaml_stream(data)
             yaml_ok = __set_token(err is None)
+            total_nodes += nb_nodes
 
         log.manager.print_item(' {}{}{}{}{}{}{}'.format(
                 setup_ok,
@@ -264,7 +266,7 @@ def process_check_directory(dir, pf_name="default"):
                 base64.b64decode(err).decode('utf-8')))
             errors.setdefault(err, 0)
             errors[err] += 1
-
+    log.manager.print_item("Jobs count: {}".format(total_nodes))
     return errors
 
 
