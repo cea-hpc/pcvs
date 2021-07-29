@@ -1,11 +1,9 @@
-from pcvs.plugins import Plugin
-from pcvs.helpers.system import MetaDict 
-
 from pcvs.helpers import communications, log
 from pcvs.helpers.exceptions import OrchestratorException
-from pcvs.helpers.system import MetaConfig
-from pcvs.testing.test import Test
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration.set import Set
+from pcvs.plugins import Plugin
+from pcvs.testing.test import Test
 
 comman: communications.GenericServer = None
 
@@ -53,7 +51,7 @@ class Manager:
 
     def get_dim(self, dim):
         """Get the list of jobs satisfying the given dimension.
-        
+
         :param dim: the target dim
         :type dim: int
         :return: the list of jobs for this dimension, empty if dim is invalid
@@ -62,11 +60,11 @@ class Manager:
         if dim not in self._dims:
             return []
         return self._dims[dim]
-    
+
     @property
     def nb_dims(self):
         """Get max number of defined dimensions.
-        
+
         :return: the max dimension length
         :rtype: int
         """
@@ -169,7 +167,7 @@ class Manager:
 
         the_set = None
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_BEFORE)
-        
+
         if self._plugin.has_step(Plugin.Step.SCHED_SET_EVAL):
             the_set = self._plugin.invoke_plugins(
                 Plugin.Step.SCHED_SET_EVAL,
@@ -196,8 +194,8 @@ class Manager:
                             # do it now.
                             if job.has_failed_dep():
                                 job.save_final_result(rc=-1, time=0.0,
-                                                    out=Test.NOSTART_STR,
-                                                    state=Test.State.ERR_DEP)
+                                                      out=Test.NOSTART_STR,
+                                                      state=Test.State.ERR_DEP)
                                 job.display()
                                 if self._comman:
                                     self._comman.send(job)
@@ -218,9 +216,9 @@ class Manager:
                         the_set = Set()
                         the_set.add(job)
                         break
-        
+
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
-        
+
         return the_set
 
     def merge_subset(self, set):

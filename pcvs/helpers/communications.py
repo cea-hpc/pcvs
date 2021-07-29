@@ -1,14 +1,16 @@
+import json
 from abc import abstractmethod
 from io import DEFAULT_BUFFER_SIZE
-from pcvs.backend.session import Session
-from pcvs.testing.test import Test
-from pcvs.helpers.system import MetaConfig
-from flask import Flask, request, render_template
-import json
-import requests
 
+import requests
+from flask import Flask, render_template, request
+
+from pcvs.backend.session import Session
+from pcvs.helpers.system import MetaConfig
+from pcvs.testing.test import Test
 
 sendData = False
+
 
 class GenericServer:
 
@@ -43,22 +45,21 @@ class EmbeddedServer(GenericServer):
 
 
 class RemoteServer(GenericServer):
-    
+
     DEFAULT_SRV_ADDR = "http://localhost:5000"
-    
+
     def __init__(self, sid, server_address):
         super().__init__(sid)
         if not server_address:
             server_address = self.DEFAULT_SRV_ADDR
 
         self._serv = server_address
-        
+
         if not server_address.startswith("http"):
             self._serv = "http://" + server_address
 
         self.open_connection()
 
-            
     def open_connection(self):
         self._json_send("/submit/session_init", {
             "sid": self._metadata['sid'],
@@ -76,7 +77,7 @@ class RemoteServer(GenericServer):
     @property
     def endpoint(self):
         return self._serv
-    
+
     def send(self, test):
         if self._send_unitary_test(test):
             self.retry_pending()
@@ -95,7 +96,7 @@ class RemoteServer(GenericServer):
                    "test_data": test.to_json(),
                    "state": test.state}
         return self._json_send("/submit/test", to_send)
-    
+
     def _json_send(self, prefix, json_data):
         try:
             requests.post(self._serv + prefix, json=json_data, timeout=1)

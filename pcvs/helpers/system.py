@@ -1,4 +1,5 @@
 import os
+
 import addict
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
@@ -76,6 +77,7 @@ class ValidationScheme:
 class MetaDict(addict.Dict):
     def to_dict(self):
         return super().to_dict()
+
 
 class Config(MetaDict):
     """a 'Config' is a dict extension (an MetaDict), used to manage all

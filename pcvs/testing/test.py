@@ -1,18 +1,18 @@
 import base64
-from itertools import combinations
-import os
-
 import json
-from pcvs.helpers.exceptions import ValidationException
-
-from jsonschema import exceptions
-from pcvs.helpers.system import MetaConfig, ValidationScheme
+import os
 import shlex
 from enum import IntEnum
+from itertools import combinations
+
+from jsonschema import exceptions
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
+from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.pm import PManager
+from pcvs.helpers.system import MetaConfig, ValidationScheme
+
 
 class Test:
     """Smallest component of a validation process.
@@ -94,21 +94,20 @@ class Test:
             'subtree': kwargs.get('subtree', ''),
         }
         comb_str = self._comb.translate_to_str() if self._comb else None
-        
+
         self._id['fq_name'] = "_".join(filter(None, [
-                "/".join(filter(None, [
-                    self._id['label'],
-                    self._id['subtree'],
-                    self._id['te_name']])),
-                comb_str]))
-        
-        
+            "/".join(filter(None, [
+                self._id['label'],
+                self._id['subtree'],
+                self._id['te_name']])),
+            comb_str]))
+
         self._execmd = kwargs.get('command', '')
         self._data = {
             'metrics': None,
             'tags': kwargs.get('tags', []),
             'artifacts': kwargs.get('artifacts', {}),
-            
+
         }
         self._validation = {
             'matchers': kwargs.get('matchers'),
@@ -117,7 +116,7 @@ class Test:
             'time': kwargs.get('time', 0),
             'delta': kwargs.get('delta', 0),
         }
-        
+
         self._mod_deps = kwargs.get("mod_deps", [])
         self._depnames = kwargs.get('deps', [])
         self._deps = []
@@ -125,21 +124,21 @@ class Test:
     @property
     def tags(self):
         """Getter for the full list of tags.
-        
+
         :return: the list of of tags
         :rtype: list
         """
         return self._data['tags']
-    
+
     @property
     def label(self):
         """Getter to the test label.
-        
+
         :return: the label
         :rtype: str
         """
         return self._id["label"]
-        
+
     @property
     def name(self):
         """Getter for fully-qualified job name.
@@ -148,11 +147,11 @@ class Test:
         :rtype: str
         """
         return self._id['fq_name']
-    
+
     @property
     def subtree(self):
         """Getter to the test subtree.
-        
+
         :return: test subtree.
         :rtype: str.
         """
@@ -161,23 +160,23 @@ class Test:
     @property
     def te_name(self):
         """Getter to the test TE name.
-        
+
         :return: test TE name.
         :rtype: str.
         """
-        
+
         return self._id["te_name"]
 
     @property
     def combination(self):
         """Getter to the test combination dict.
-        
+
         :return: test comb dict.
         :rtype: dict
         """
-        
+
         return self._id["comb"]
-    
+
     @property
     def command(self):
         """Getter for the full command.
@@ -211,7 +210,7 @@ class Test:
         :rtype: dict
         """
         return self._deps
-    
+
     @property
     def job_depnames(self):
         return self._depnames
@@ -230,10 +229,10 @@ class Test:
         """
         if name not in self._depnames:
             return
-        
+
         self._depnames.remove(name)
         self._deps.append(obj)
-    
+
     def is_pickable(self):
         """Check if the test can be scheduled.
 
@@ -389,24 +388,24 @@ class Test:
             },
             "data": self._data,
         }
-        
+
     def from_json(self, test_json: str) -> None:
         """Replace the whole Test structure based on input JSON.
-        
+
         :param json: the json used to set this Test
         :type json: test-result-valid JSON-formated str
         """
-        
+
         if isinstance(test_json, str):
-            test_json = json.load(test_json) 
-            
+            test_json = json.load(test_json)
+
         assert(isinstance(test_json, dict))
         self.res_scheme.validate(test_json)
-        
+
         self._id = test_json["id"]
         self._execmd = test_json["exec"]
         self._data = test_json["data"]
-        
+
         self._rc = test_json["result"]["rc"]
         self._output = test_json["result"]["output"]
         self._state = Test.State(test_json["result"]["state"])

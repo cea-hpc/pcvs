@@ -1,16 +1,18 @@
 import random
-from pcvs.testing.test import Test
+
 from pcvs.backend.session import Session
+from pcvs.testing.test import Test
+
 
 class DataRepresentation:
     """
     Data Manager from the Flask server side.
-    
+
     This class manages insertion & requests to the data tree gathering test
     results from a single report server.
-    
+
     the data representation looks like:
-    
+
     ```yaml
       0:
     fs-tree:
@@ -37,15 +39,16 @@ class DataRepresentation:
     failures: [ Test(), Test(), Test()]
     # ...
     ```
-    
+
     """
+
     def __init__(self):
         """constructor method"""
         self.rootree = {}
 
     def __insert_in_tree(self, test, node, depth):
         """insert the given test to the given subtree.
-        
+
         This function can be called recursively. depth being the list of node
         names where the Test() should be inserted. The 'node' maps to the
         current node level.
@@ -58,9 +61,9 @@ class DataRepresentation:
         :type depth: list
         """
         assert('__metadata' in node.keys())
-        
+
         node["__metadata"]["count"][int(test.state)] += 1
-        
+
         # if targeted node is reached, insert the test
         if len(depth) == 0:
             if '__elems' not in node:
@@ -70,13 +73,13 @@ class DataRepresentation:
             # create default for the first access + init counters to zero
             node.setdefault('__elems', {})
             node["__elems"].setdefault(depth[0],
-                {
-                    "__metadata": {
-                        "count": {k: 0 for k in list(map(int, Test.State))}
-                    }
-                })
+                                       {
+                "__metadata": {
+                    "count": {k: 0 for k in list(map(int, Test.State))}
+                }
+            })
             self.__insert_in_tree(test, node["__elems"][depth[0]], depth[1:])
-        
+
     def insert_session(self, sid, session_data):
         """Insert a new session into the tree.
 
@@ -85,35 +88,35 @@ class DataRepresentation:
         :param session_data: session basic infos (buildpath, state)
         :type session_data: dict
         """
-        
+
         # if the SID already exist, a dummy one is generated.
         # a negative value is used to identify such pattern
         if sid in self.rootree.keys():
             while sid in self.rootree.keys():
                 sid = random.randint(0, 10000) * (-1)
-            
+
         # initialize the subtree for this session
         self.rootree.setdefault(sid, {
             "fs-tree": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
+                "__metadata": {
+                    "count": {k: 0 for k in list(map(int, Test.State))}
+                }
+            },
             "tags": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
+                "__metadata": {
+                    "count": {k: 0 for k in list(map(int, Test.State))}
+                }
+            },
             "iterators": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
+                "__metadata": {
+                    "count": {k: 0 for k in list(map(int, Test.State))}
+                }
+            },
             "failures": {
-                        "__metadata": {
-                            "count": {k: 0 for k in list(map(int, Test.State))}
-                        }
-                    },
+                "__metadata": {
+                    "count": {k: 0 for k in list(map(int, Test.State))}
+                }
+            },
             "state": Session.State(session_data["state"]),
             "path": session_data["buildpath"]
         })
@@ -131,7 +134,7 @@ class DataRepresentation:
 
     def insert_test(self, sid, test: Test):
         """Insert a new test.
-        
+
         This test is bound to a session.
 
         :param sid: session id
@@ -145,20 +148,22 @@ class DataRepresentation:
         label = test.label
         subtree = test.subtree
         te_name = test.te_name
-        
+
         sid_tree = self.rootree[sid]
         # insert under hierarchical subtree
-        self.__insert_in_tree(test, sid_tree["fs-tree"], [label, subtree, te_name])
-        
+        self.__insert_in_tree(
+            test, sid_tree["fs-tree"], [label, subtree, te_name])
+
         for tag in test.tags:
             # insert for each tag subtree
             self.__insert_in_tree(test, sid_tree["tags"], [tag])
-        
+
         if test.combination:
             # insert fo each combination subtree
             for iter_k, iter_v in test.combination.items():
-                self.__insert_in_tree(test, sid_tree["iterators"], [iter_k, iter_v])
-            
+                self.__insert_in_tree(
+                    test, sid_tree["iterators"], [iter_k, iter_v])
+
         if test.state != Test.State.SUCCEED:
             # if failed, save it
             self.__insert_in_tree(test, sid_tree["failures"], [])
@@ -182,7 +187,7 @@ class DataRepresentation:
         :rtype: int
         """
         return len(self.rootree[sid]['tags'].keys())
-    
+
     def get_label_cnt(self, sid):
         """Get the number of labels for a given session.
 
@@ -212,7 +217,7 @@ class DataRepresentation:
         :rtype: str
         """
         return self.rootree[sid]["path"]
-    
+
     def get_token_content(self, sid, token):
         """Advanced function to access partial data tree.
 
@@ -225,9 +230,9 @@ class DataRepresentation:
         """
         if token not in self.rootree[sid]:
             return {}
-        
+
         return self.rootree[sid][token]
-    
+
     def extract_tests_under(self, node):
         """Retrieve all tests undef a given data tree subnode.
 
@@ -239,12 +244,12 @@ class DataRepresentation:
         assert('__elems' in node.keys())
         if isinstance(node['__elems'], list):
             return [x.to_json() for x in node['__elems'] if isinstance(x, Test)]
-        
+
         ret = list()
         for elt in node['__elems'].values():
             ret += self.extract_tests_under(elt)
         return ret
-    
+
     def get_sessions(self):
         """Get the list of current known sessions.
 
@@ -256,4 +261,4 @@ class DataRepresentation:
                 'state': str(Session.State(v['state'])),
                 'sid': k,
                 'count': v['fs-tree']['__metadata']['count']
-            } for k, v in self.rootree.items()]
+                } for k, v in self.rootree.items()]

@@ -1,7 +1,5 @@
 import fileinput
-from memory_profiler import profile
 import os
-from pcvs.plugins import Plugin
 import pprint
 import shutil
 import subprocess
@@ -9,15 +7,15 @@ import time
 from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
-from pcvs.helpers.system import MetaDict
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import communications, criterion, log, utils
 from pcvs.helpers.exceptions import RunException
-from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
+from pcvs.plugins import Plugin
 from pcvs.testing.tedesc import TEDescriptor
 from pcvs.testing.testfile import TestFile, load_yaml_file
 
@@ -47,6 +45,7 @@ def str_dict_as_envvar(d):
     """
     return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
 
+
 def display_summary(the_session):
     """Display a summary for this run, based on profile & CLI arguments."""
     cfg = MetaConfig.root.validation
@@ -54,7 +53,8 @@ def display_summary(the_session):
     log.manager.print_section("Global Information")
     log.manager.print_item("Date of execution: {}".format(
         MetaConfig.root.validation.datetime.strftime("%c")))
-    log.manager.print_item("Run by: {} <{}>".format(cfg.author.name, cfg.author.email))
+    log.manager.print_item("Run by: {} <{}>".format(
+        cfg.author.name, cfg.author.email))
     log.manager.print_item("Active session ID: {}".format(the_session.id))
     log.manager.print_item("Loaded profile: '{}'".format(cfg.pf_name))
     log.manager.print_item("Build stored to: {}".format(cfg.output))
@@ -73,17 +73,16 @@ def display_summary(the_session):
             v,
             width=width),
             depth=2)
-    
+
     log.manager.print_section("Orchestration infos")
     MetaConfig.root.get_internal("orchestrator").print_infos()
-    
+
     if cfg.simulated is True:
         log.manager.warn([
             "==============================================",
             ">>>> DRY-RUN : TEST EXECUTION IS EMULATED <<<<",
             "=============================================="])
-    
-    
+
 
 def process_main_workflow(the_session=None):
     """Main run.py entry point, triggering a PCVS validation run.
@@ -118,7 +117,6 @@ def process_main_workflow(the_session=None):
 
     log.manager.print_header("Summary")
     display_summary(the_session)
-    
 
     log.manager.print_header("Execution")
     MetaConfig.root.get_internal('orchestrator').run(the_session)
@@ -215,10 +213,10 @@ def prepare():
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
-    
+
     log.manager.print_item("Init the global Orchestrator")
     MetaConfig.root.set_internal('orchestrator', Orchestrator())
-    
+
     if valcfg.enable_report:
         log.manager.print_section("Connection to the Reporting Server")
         comman = None
@@ -226,17 +224,17 @@ def prepare():
             comman = communications.EmbeddedServer(valcfg.sid)
             log.manager.print_item("Running a local instance")
         else:
-            comman = communications.RemoteServer(valcfg.sid, valcfg.report_addr)
+            comman = communications.RemoteServer(
+                valcfg.sid, valcfg.report_addr)
             log.manager.print_item("Listening on {}".format(comman.endpoint))
         MetaConfig.root.set_internal('comman', comman)
-        
+
     log.manager.print_item("Save Configurations into {}".format(valcfg.output))
     conf_file = os.path.join(valcfg.output, NAME_BUILD_CONF_FN)
     with open(conf_file, 'w') as conf_fh:
         handler = YAML(typ='safe')
         handler.default_flow_style = None
         handler.dump(MetaConfig.root.dump_for_export(), conf_fh)
-
 
 
 def find_files_to_process(path_dict):
@@ -311,9 +309,9 @@ def process():
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        log.manager.err(["Test-suites failed to be parsed, with the following errors:"]+
-                        [ "\t-{}: {}".format(e[0], e[1]) for e in errors]
-            )
+        log.manager.err(["Test-suites failed to be parsed, with the following errors:"] +
+                        ["\t-{}: {}".format(e[0], e[1]) for e in errors]
+                        )
         raise RunException.TestUnfoldError("See previous errors above.")
 
 
@@ -408,7 +406,7 @@ def process_dyn_setup_scripts(setup_files):
 
                 if fds.returncode != 0:
                     raise subprocess.CalledProcessError(fds.returncode, '')
-                    
+
                 # flush the output to $BUILD/pcvs.yml
                 out_file = os.path.join(cur_build, 'pcvs.yml')
                 with open(out_file, 'w') as fh:
@@ -417,8 +415,10 @@ def process_dyn_setup_scripts(setup_files):
                     out_file, base_src, base_build, subprefix)
             except CalledProcessError:
                 if fds.returncode != 0:
-                    err.append((f, "(exit {}): {}".format(fds.returncode, fderr.decode('utf-8'))))
-                    log.manager.info("EXEC FAILED: {}: {}".format(f, fderr.decode('utf-8')))
+                    err.append((f, "(exit {}): {}".format(
+                        fds.returncode, fderr.decode('utf-8'))))
+                    log.manager.info("EXEC FAILED: {}: {}".format(
+                        f, fderr.decode('utf-8')))
                 continue
 
             # If the script did not generate any output, skip
@@ -426,7 +426,8 @@ def process_dyn_setup_scripts(setup_files):
                 continue
 
             # Now create the file handler
-            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
+            MetaConfig.root.get_internal(
+                "pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
             obj = TestFile(file_in=out_file,
                            path_out=cur_build,
                            data=te_node,
@@ -436,8 +437,10 @@ def process_dyn_setup_scripts(setup_files):
             obj.load_from_str(fdout.decode('utf-8'))
             obj.process()
             obj.flush_sh_file()
-            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
+            MetaConfig.root.get_internal(
+                "pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
     return err
+
 
 def process_static_yaml_files(yaml_files):
     """Process 'pcvs.yml' files to contruct the test base.
@@ -468,7 +471,8 @@ def process_static_yaml_files(yaml_files):
             except Exception as e:
                 err.append((f, e))
                 log.manager.info("{} (failed to parse): {}".format(f, e))
-    return err    
+    return err
+
 
 def anonymize_archive():
     """Erase from results any undesired output from the generated archive.
@@ -543,7 +547,8 @@ def terminate():
 
     :raises ProgramError: Problem occured while invoking the archive tool.
     """
-    MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_BEFORE)
+    MetaConfig.root.get_internal(
+        "pColl").invoke_plugins(Plugin.Step.END_BEFORE)
     archive_name = "pcvsrun_{}.tar.gz".format(
         MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
     outdir = MetaConfig.root.validation.output
@@ -571,7 +576,7 @@ def terminate():
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             raise RunException.ProgramError(e, cmd)
-    
+
     comman = MetaConfig.root.get_internal("comman")
     if comman:
         log.manager.print_item("Close connection to Reporting Server")

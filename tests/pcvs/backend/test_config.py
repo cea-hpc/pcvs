@@ -2,15 +2,15 @@ import os
 from unittest.mock import patch
 
 import pytest
-from ruamel.yaml import YAML
-from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
+from ruamel.yaml import YAML
 
 import pcvs
 from pcvs.backend import config as tested
 from pcvs.backend.config import CONFIG_BLOCKS
 from pcvs.helpers import utils
 from pcvs.helpers.exceptions import ConfigException
+from pcvs.helpers.system import MetaDict
 
 
 @patch('glob.glob', return_value=[

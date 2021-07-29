@@ -1,7 +1,8 @@
-import jsonschema
-from ruamel.yaml import YAML, YAMLError
 import os
 import sys
+
+import jsonschema
+from ruamel.yaml import YAML, YAMLError
 
 if __name__ == '__main__':
     ret = 0

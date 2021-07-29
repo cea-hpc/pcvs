@@ -1,14 +1,14 @@
-import click
 import base64
 import glob
 import os
 
-from pcvs.helpers.system import MetaDict
+import click
 from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ConfigException
+from pcvs.helpers.system import MetaDict
 
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()

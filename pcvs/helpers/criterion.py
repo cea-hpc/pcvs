@@ -2,9 +2,9 @@ import base64
 import itertools
 import math
 import os
-from pcvs.helpers.exceptions import CommonException
 
 from pcvs.helpers import log
+from pcvs.helpers.exceptions import CommonException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
 
@@ -227,7 +227,7 @@ class Criterion:
         :rtype: list
         """
         return self._values
-    
+
     def __len__(self):
         return len(self._values)
 
@@ -302,9 +302,9 @@ class Criterion:
         :return: list of values
         :rtype: list
         """
-        
+
         values = []
-        
+
         # these must be integers
         def _convert_sequence_item_to_int(val):
             if not isinstance(val, int) or not isinstance(val, float):
@@ -316,16 +316,16 @@ class Criterion:
                         return n
                 except ValueError:
                     raise CommonException.BadTokenError(val)
-                    
+
             else:
                 return val
-            
+
         start = _convert_sequence_item_to_int(node.get('from', s))
         end = _convert_sequence_item_to_int(node.get('to', e))
         of = _convert_sequence_item_to_int(node.get('of', 1))
-        
+
         op = node.get('op', 'seq').lower()
-        
+
         if op in ['seq', 'sequence']:
             values = range(start, end+1, of)
         elif op in ['mul', 'multiplication']:
@@ -388,7 +388,7 @@ def initialize_from_system():
     runtime_iterators = MetaConfig.root.runtime.iterators
     criterion_iterators = MetaConfig.root.criterion.iterators
     it_to_remove = []
-    
+
     # if a criterion defined in criterion.yaml but
     # not declared as part of a runtime, the criterion
     # should be silently discarded
@@ -402,7 +402,7 @@ def initialize_from_system():
                               ' removing from schedule'.format(it))
         else:
             continue
-        
+
         log.manager.info("Removing '{}'".format(it))
         it_to_remove.append(it)
 
@@ -419,7 +419,6 @@ def initialize_from_system():
         criterion.expand_values()
         comb_cnt *= len(criterion)
     MetaConfig.root.set_internal("comb_cnt", comb_cnt)
-    
 
 
 first = True
@@ -440,17 +439,17 @@ def valid_combination(dic):
 
     if first and rt.plugin:
         first = not first
-        
+
         rt.pluginfile = os.path.join(val.buildcache, "rt-plugin.py")
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
 
         pCollection.register_plugin_by_file(rt.pluginfile)
-    
+
     ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL, combination=dic)
-    
+
     # by default, no plugin = always true
     if ret is None:
         ret = True
-        
+
     return ret

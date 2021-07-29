@@ -1,10 +1,7 @@
 import functools
-from pcvs.testing.test import Test
-from memory_profiler import profile
 import operator
 import os
 import pathlib
-from pcvs.plugins import Plugin
 import subprocess
 
 import jsonschema
@@ -14,7 +11,9 @@ from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig
+from pcvs.plugins import Plugin
 from pcvs.testing import tedesc
+from pcvs.testing.test import Test
 
 
 def __load_yaml_file_legacy(f):
@@ -170,7 +169,7 @@ class TestFile:
 
     def load_from_str(self, data):
         self._raw = YAML(typ='safe').load(data)
-        
+
     def process(self):
         """Load the YAML file and map YAML nodes to Test()."""
         src, _, build, _ = utils.generate_local_variables(
@@ -189,15 +188,17 @@ class TestFile:
 
         # main loop, parse each node to register tests
         for k, content, in self._raw.items():
-            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_BEFORE)
+            MetaConfig.root.get_internal(
+                "pColl").invoke_plugins(Plugin.Step.TDESC_BEFORE)
             if content is None:
                 # skip empty nodes
                 continue
             td = tedesc.TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
-                
-            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)
+
+            MetaConfig.root.get_internal(
+                "pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)
 
             # register debug informations relative to the loaded TEs
             #self._debug[k] = td.get_debug()
@@ -230,7 +231,7 @@ else
 fi
 for arg in "$@"; do case $arg in
 """.format(simulated="sim" if MetaConfig.root.validation.simulated is True else "",
-    pm_string="#Package-manager set by profile: \n"+"\n".join([
+                pm_string="#Package-manager set by profile: \n"+"\n".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
                         ])))

@@ -9,7 +9,7 @@ class GenericError(Exception):
         message = "{}".format(msg)
         for k, v in kwargs.items():
             message += "\n- {}: {}".format(k, v)
-        
+
         super().__init__(message)
 
 
@@ -45,7 +45,7 @@ class CommonException:
         """Work in Progress, not a real error."""
 
         pass
-    
+
     class NotImplementedError(GenericError):
         """Missing implementation for this particular feature."""
 
@@ -148,15 +148,15 @@ class LockException(CommonException):
     class TimeoutError(GenericError):
         """Timeout reached before lock."""
         pass
-    
+
 
 class PluginException(CommonException):
     """Plugin-related exceptions."""
-    
+
     class BadStepError(GenericError):
         """targeted pass does not exist."""
         pass
-    
+
     class LoadError(GenericError):
         """Unable to load plugin directory."""
         pass

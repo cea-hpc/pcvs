@@ -3,13 +3,11 @@ import os
 import re
 from xml.sax.saxutils import escape
 
-from pcvs.helpers.system import MetaDict
-
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import log, pm, utils
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
-from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.testing.test import Test
 
 
@@ -98,11 +96,14 @@ def build_job_deps(deps_node, pkg_label, pkg_prefix):
     """
     deps = list()
     for d in deps_node.get('depends_on', list()):
-        deps.append(d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
+        deps.append(
+            d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
     return deps
+
 
 def build_pm_deps(deps_node):
     return pm.identify(deps_node.get('package_manager', {}))
+
 
 class TEDescriptor:
     """A Test Descriptor (named TD, TE or TED), maps a test prograzm
@@ -457,9 +458,10 @@ class TEDescriptor:
             self._build.files = [self._build.files]
 
         # manage deps (tests, package_managers...)
-        job_deps = build_job_deps(self._build, self._te_label, self._te_subtree)
+        job_deps = build_job_deps(
+            self._build, self._te_label, self._te_subtree)
         mod_deps = build_pm_deps(self._build)
-        
+
         chdir = self._build.get('cwd')
         if chdir is not None and not os.path.isabs(chdir):
             chdir = os.path.abspath(os.path.join(self._buildir, chdir))
@@ -470,7 +472,7 @@ class TEDescriptor:
 
         # count number of built tests
         self._effective_cnt += 1
-        
+
         yield Test(
             te_name=self._te_name,
             label=self._te_label,
@@ -487,10 +489,11 @@ class TEDescriptor:
             resources=1,
             chdir=chdir
         )
-    
+
     def __construct_runtime_tests(self):
         """Generate tests to be run by the runtime command."""
-        te_job_deps = build_job_deps(self._run, self._te_label, self._te_subtree)
+        te_job_deps = build_job_deps(
+            self._run, self._te_label, self._te_subtree)
         te_mod_deps = build_pm_deps(self._run)
 
         # for each combination generated from the collection of criterions
@@ -561,14 +564,13 @@ class TEDescriptor:
         # if this TE does not lead to a single test, skip now
         if self._skipped:
             return
-        
+
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
             self._serie = Serie({**self._criterion, **self._program_criterion})
             yield from self.__construct_runtime_tests()
             del self._serie
-        
 
     def get_debug(self):
         """Build information debug for the current TE.

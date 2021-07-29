@@ -20,7 +20,8 @@ def report(ctx, path_list, static):
             if os.path.isfile(os.path.join(prefix, NAME_BUILDIR, NAME_BUILDFILE)):
                 prefix = os.path.join(prefix, NAME_BUILDIR)
             else:  # otherwise, it is a wrong path -> error
-                raise click.BadArgumentUsage('{} is not a build directory.'.format(prefix))
+                raise click.BadArgumentUsage(
+                    '{} is not a build directory.'.format(prefix))
 
         inputs.append(os.path.abspath(prefix))
 

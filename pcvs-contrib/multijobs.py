@@ -1,6 +1,7 @@
-from pcvs.plugins import Plugin
 from pcvs.helpers import log
 from pcvs.orchestration.set import Set
+from pcvs.plugins import Plugin
+
 
 class PickRandomJobs(Plugin):
     step = Plugin.Step.INVALID

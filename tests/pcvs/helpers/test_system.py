@@ -2,13 +2,13 @@ import os
 from unittest.mock import patch
 
 import pytest
-from pcvs.helpers.system import MetaDict
 
 import pcvs
 from pcvs import PATH_INSTDIR
 from pcvs.helpers import pm
 from pcvs.helpers import system
 from pcvs.helpers import system as s
+from pcvs.helpers.system import MetaDict
 
 
 def test_bootstrap_compiler():

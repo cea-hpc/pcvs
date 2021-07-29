@@ -3,15 +3,15 @@ import os
 import tarfile
 import tempfile
 import time
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 import pygit2
 from ruamel.yaml import YAML
-from pcvs.helpers.system import MetaDict
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
+from pcvs.helpers.system import MetaDict
 
 #: :var BANKS: list of available banks when PCVS starts up
 #: :type BANKS: dict, keys are bank names, values are file path

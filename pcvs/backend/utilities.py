@@ -4,13 +4,13 @@ import subprocess
 import tempfile
 
 import jsonschema
-from ruamel.yaml import YAML, YAMLError
-from pcvs.helpers.system import MetaDict
 from prettytable import PrettyTable
+from ruamel.yaml import YAML, YAMLError
 
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers.system import MetaDict
 
 
 def locate_scriptpaths(output=None):
@@ -132,7 +132,7 @@ def process_check_setup_file(filename, prefix, run_configuration):
     data = None
     env = os.environ
     env.update(run_configuration)
-    
+
     try:
         tdir = tempfile.mkdtemp()
         with utils.cwd(tdir):
@@ -145,16 +145,17 @@ def process_check_setup_file(filename, prefix, run_configuration):
             proc = subprocess.Popen(
                 [filename, prefix], env=env, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             fdout, fderr = proc.communicate()
-            
+
             if proc.returncode != 0:
                 if not fderr:
-                    fderr = "Non-zero status (no stderr): {}".format(proc.returncode).encode('utf-8')
+                    fderr = "Non-zero status (no stderr): {}".format(
+                        proc.returncode).encode('utf-8')
                 err_msg = base64.b64encode(fderr)
             else:
                 data = fdout.decode('utf-8')
     except subprocess.CalledProcessError as e:
         err_msg = base64.b64encode(str(e.stderr).encode('utf-8'))
-    
+
     return (err_msg, data)
 
 
@@ -176,13 +177,14 @@ def process_check_yaml_stream(data):
         stream = YAML(typ='safe').load(data)
         scheme.validate(stream)
         nb_nodes = len(stream.keys())
-    
+
     except YAMLError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
     except ValidationException.FormatError as e:
         err_msg = base64.b64encode(str(e).encode('utf-8'))
 
     return (err_msg, nb_nodes)
+
 
 def __set_token(token, nset=None) -> str:
     """Manage display token (job display) depending on given condition.
@@ -206,7 +208,8 @@ def __set_token(token, nset=None) -> str:
         return log.manager.style(log.manager.utf("succ"), fg="green", bold=True)
     else:
         return log.manager.style(log.manager.utf("fail"), fg="red", bold=True)
-    
+
+
 def process_check_directory(dir, pf_name="default"):
     """Analyze a directory to ensure defined test files are valid.
 
@@ -227,8 +230,8 @@ def process_check_directory(dir, pf_name="default"):
         {os.path.basename(dir): dir})
 
     log.manager.print_section(
-            'Analyzing: Setup{s}Output{s}test Node(s)'.format(s=log.manager.utf('sep_v')))
-        
+        'Analyzing: Setup{s}Output{s}test Node(s)'.format(s=log.manager.utf('sep_v')))
+
     for _, subprefix, f in [*setup_files, *yaml_files]:
         setup_ok = __set_token(None)
         yaml_ok = __set_token(None)
@@ -238,7 +241,7 @@ def process_check_directory(dir, pf_name="default"):
 
         if subprefix is None:
             subprefix = ""
-        
+
         if f.endswith("pcvs.setup"):
             err, data = process_check_setup_file(
                 os.path.join(dir, subprefix, f), subprefix, buildenv)
@@ -246,20 +249,21 @@ def process_check_directory(dir, pf_name="default"):
         else:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:
                 data = fh.read()
-            
+
         if not err:
             err, nb_nodes = process_check_yaml_stream(data)
             yaml_ok = __set_token(err is None)
             total_nodes += nb_nodes
 
         log.manager.print_item(' {}{}{}{}{}{}{}'.format(
-                setup_ok,
-                log.manager.utf('sep_v'),
-                yaml_ok,
-                log.manager.utf('sep_v'),
-                log.manager.style("{:>4}".format(nb_nodes), fg="yellow", bold=True),
-                log.manager.utf('sep_v'),
-                subprefix), with_bullet=False)
+            setup_ok,
+            log.manager.utf('sep_v'),
+            yaml_ok,
+            log.manager.utf('sep_v'),
+            log.manager.style("{:>4}".format(nb_nodes),
+                              fg="yellow", bold=True),
+            log.manager.utf('sep_v'),
+            subprefix), with_bullet=False)
 
         if err:
             log.manager.info("FAILED: {}".format(

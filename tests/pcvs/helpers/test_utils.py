@@ -2,11 +2,11 @@ import os
 from unittest.mock import patch
 
 import pytest
-from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
 
 from pcvs.helpers import utils as tested
 from pcvs.helpers.exceptions import CommonException, RunException
+from pcvs.helpers.system import MetaDict
 
 
 @pytest.mark.parametrize("token", ["test1", "test/test1"])

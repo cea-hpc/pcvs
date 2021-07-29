@@ -567,13 +567,15 @@ class IOManager:
         else:
             start = " " * ((self._linelength - len(logo[0]))//2-1)
             newline = "\n" + start
-            self.__print_rawline(click.style(start + newline.join(logo[0:6]), fg="green"))
+            self.__print_rawline(click.style(
+                start + newline.join(logo[0:6]), fg="green"))
             self.__print_rawline(click.style(start + newline.join(logo[6:7])))
             self.__print_rawline(click.style(start +
-                newline.join(logo[7:10]), fg="green"))
+                                             newline.join(logo[7:10]), fg="green"))
             self.__print_rawline(click.style(start +
-                newline.join(logo[10:11]), fg="yellow"))
-            self.__print_rawline(click.style(start + newline.join(logo[11:13]), fg="red"))
+                                             newline.join(logo[10:11]), fg="yellow"))
+            self.__print_rawline(click.style(
+                start + newline.join(logo[11:13]), fg="red"))
             self.__print_rawline(click.style(start + newline.join(logo[13:])))
 
 

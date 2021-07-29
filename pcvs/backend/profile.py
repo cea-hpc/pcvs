@@ -6,13 +6,13 @@ import random
 import click
 import jsonschema
 from ruamel.yaml import YAML
-from pcvs.helpers.system import MetaDict
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend import config
 from pcvs.helpers import git, log, system, utils
 from pcvs.helpers.exceptions import (ConfigException, ProfileException,
                                      ValidationException)
+from pcvs.helpers.system import MetaDict
 
 PROFILE_EXISTING = dict()
 
@@ -162,7 +162,7 @@ class Profile:
         :return: a regular dict for this profile
         :rtype: dict
         """
-        #self.load_from_disk()
+        # self.load_from_disk()
         return MetaDict(self._details).to_dict()
 
     def is_found(self):

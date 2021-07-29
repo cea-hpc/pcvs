@@ -2,12 +2,12 @@ import os
 from unittest.mock import patch
 
 import pytest
-from ruamel.yaml import YAML
 from click.testing import CliRunner
+from ruamel.yaml import YAML
 
 import pcvs
 from pcvs import NAME_BUILDIR, PATH_INSTDIR
-from pcvs.helpers import log, system, pm
+from pcvs.helpers import log, pm, system
 from pcvs.plugins import Collection
 from pcvs.testing import testfile as tested
 

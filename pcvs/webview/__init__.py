@@ -1,17 +1,17 @@
-import os
 import copy
-import random
-            
-from flask import Flask, abort, jsonify, render_template, request, sessions
-from pcvs.testing.test import Test
 import json
+import os
+import random
+
+from flask import Flask, abort, jsonify, render_template, request, sessions
 
 from pcvs import PATH_INSTDIR
-from pcvs.testing.test import Test
 from pcvs.backend import session
+from pcvs.testing.test import Test
 from pcvs.webview import datalayer
 
 data_manager = datalayer.DataRepresentation()
+
 
 def create_app():
     """Start and run the Flask application.
@@ -55,7 +55,7 @@ def create_app():
         if 'json' in request.args.get("render", []):
             return jsonify(data_manager.get_sessions())
         return render_template("main.html")
-    
+
     @app.route("/run/<sid>")
     def session_main(sid):
         """Provide the per-session main page
@@ -67,7 +67,7 @@ def create_app():
         """
         sid = int(sid)
         assert(sid in data_manager.session_ids)
-        
+
         if 'json' in request.args.get('render', []):
             return jsonify({"tag": data_manager.get_tag_cnt(sid),
                             "label": data_manager.get_label_cnt(sid),
@@ -107,7 +107,7 @@ def create_app():
         :rtype: str
         """
         sid = int(sid)
-        if 'json' in request.args.get('render', []):   
+        if 'json' in request.args.get('render', []):
             out = list()
             infos = data_manager.get_token_content(sid, selection)
             for k, v in infos['__elems'].items():
@@ -116,7 +116,7 @@ def create_app():
                     "count": v['__metadata']['count']
                 })
             return jsonify(out)
-        
+
         return render_template('list_view.html', sid=sid, selection=selection)
 
     @app.route("/run/<sid>/<selection>/detail")
@@ -142,15 +142,14 @@ def create_app():
         if 'json' in request.args.get('render', []):
             infos = data_manager.get_token_content(sid, selection)
             if request_item in infos['__elems'].keys():
-                out = data_manager.extract_tests_under(infos['__elems'][request_item])
+                out = data_manager.extract_tests_under(
+                    infos['__elems'][request_item])
             return jsonify(out)
-        
-        return render_template("detailed_view.html",
-                                   sid=sid,
-                                   selection=selection,
-                                   sel_item=request_item)
 
-        
+        return render_template("detailed_view.html",
+                               sid=sid,
+                               selection=selection,
+                               sel_item=request_item)
 
     @app.route("/submit/session_init", methods=["POST"])
     def submit_new_session():
@@ -164,7 +163,7 @@ def create_app():
         data_manager.insert_session(sid, json_session)
 
         return "OK!", 200
-    
+
     @app.route("/submit/session_fini", methods=["POST"])
     def submit_end_session():
         """Entry point to request a session end.
@@ -175,7 +174,7 @@ def create_app():
         json_session = request.get_json()
         data_manager.close_session(json_session["sid"], json_session)
         return "OK!", 200
- 
+
     @app.route("/submit/test", methods=["POST"])
     def submit():
         """Entry point to receive test data.
@@ -184,19 +183,18 @@ def create_app():
         :rtype: HTTP request
         """
         json_str = request.get_json()
-        
+
         test_sid = json_str["metadata"]["sid"]
         test_obj = Test()
-        
+
         test_obj.from_json(json_str["test_data"])
-        
+
         ok = data_manager.insert_test(test_sid, test_obj)
-        
+
         if not ok:
             return "", 406
         else:
             return "OK!", 200
-    
 
     @app.errorhandler(404)
     def page_not_found(e):

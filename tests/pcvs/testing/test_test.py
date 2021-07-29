@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from pcvs.helpers import log, system, pm
+from pcvs.helpers import log, pm, system
 from pcvs.testing import test as tested
 
 

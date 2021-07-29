@@ -10,8 +10,8 @@ from ruamel.yaml.main import yaml_object
 from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
 from pcvs.helpers import log, utils
 
-
 yml = YAML()
+
 
 def unlock_session_file():
     """Release the lock after manipulating the session.yml file.
@@ -45,7 +45,7 @@ def store_session_to_file(c):
     all_sessions = None
     sid = -1
     global yml
-    
+
     lock_session_file()
     try:
         # to operate, PCVS needs to full-read and then full-write the whole file
@@ -59,14 +59,14 @@ def store_session_to_file(c):
         # explicitly does it
         if all_sessions is None:
             all_sessions = {"__metadata": {"next": 0}}
-        
+
         # Lookup for an available session id number
         sid = all_sessions["__metadata"]["next"]
         while sid in all_sessions.keys() or sid == -1:
             sid += 1
 
         all_sessions["__metadata"]["next"] = (sid + 1) % 1000000
-            
+
         assert(sid not in all_sessions.keys())
         all_sessions[sid] = c
 
@@ -218,7 +218,7 @@ class Session:
         IN_PROGRESS = 1
         COMPLETED = 2
         ERROR = 3
-                
+
         @classmethod
         def to_yaml(cls, representer, data):
             """Convert a Test.State to a valid YAML representation.
@@ -232,7 +232,7 @@ class Session:
             :rtype: Any
             """
             return representer.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
-        
+
         @classmethod
         def from_yaml(cls, constructor, node):
             """Construct a :class:`Session.State` from its YAML representation.

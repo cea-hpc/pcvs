@@ -280,7 +280,6 @@ def profile_alter(ctx, token, editor, edit_plugin):
             "\n".join([
                 "Profile '{}' not found!\n".format(label),
                 "Please check the 'list' command"]))
-                                     
 
 
 @profile.command(name="import",

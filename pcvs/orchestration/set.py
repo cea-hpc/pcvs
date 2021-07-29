@@ -37,11 +37,11 @@ class Set(threading.Thread):
         self._jobs: List[Test] = list()
         self._completed = False
         self._is_wrapped = False
-        
+
         if not self.comman:
             if MetaConfig.root.get_internal('comman') is not None:
                 self.comman = MetaConfig.root.get_internal('comman')
-                
+
         super().__init__()
 
     def enable_wrapping(self, wrap_cli):
@@ -155,7 +155,7 @@ class Set(threading.Thread):
                 raise
             job.save_final_result(time=final, rc=rc, out=stdout)
             job.display()
-            
+
             if self.comman:
                 self.comman.send(job)
 

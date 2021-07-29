@@ -5,13 +5,13 @@ from unittest.mock import Mock, patch
 
 import pygit2
 import pytest
-from ruamel.yaml import YAML
-from pcvs.helpers.system import MetaDict
 from click.testing import CliRunner
+from ruamel.yaml import YAML
 
 from pcvs import NAME_BUILD_RESDIR, NAME_BUILDIR
 from pcvs.backend import bank as tested
 from pcvs.helpers import utils
+from pcvs.helpers.system import MetaDict
 
 
 @pytest.fixture

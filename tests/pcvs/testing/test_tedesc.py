@@ -2,10 +2,10 @@ import os
 from unittest.mock import patch
 
 import pytest
-from pcvs.helpers.system import MetaDict
 
 import pcvs
 from pcvs.helpers import exceptions, pm, system
+from pcvs.helpers.system import MetaDict
 from pcvs.testing import tedesc as tested
 
 

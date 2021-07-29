@@ -6,8 +6,8 @@ import pytest
 from click.testing import CliRunner
 
 import pcvs
-from pcvs.helpers.system import MetaDict
 from pcvs.backend import run as tested
+from pcvs.helpers.system import MetaDict
 
 
 @pytest.fixture
