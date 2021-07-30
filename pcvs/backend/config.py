@@ -357,7 +357,7 @@ class ConfigurationBlock:
 from pcvs.plugins import Plugin
 
 class MyPlugin(Plugin):
-    target = Plugin.Step.TEST_EVAL
+    step = Plugin.Step.TEST_EVAL
     def run(self, *args, **kwargs):
     # this dict maps keys (it name) with values (it value)
     # returns True if the combination should be used

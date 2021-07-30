@@ -150,9 +150,10 @@ class Collection:
                 log.manager.debug(
                     "Loading {} ({})".format(class_name, step_str))
                 if self._plugins[the_class.step]:
-                    log.manager.info("{} overriden: {} -> {}".format(step_str,
+                    log.manager.debug("{} overriden: {} -> {}".format(step_str,
                                      type(self._plugins[the_class.step]).__name__, class_name))
 
+                log.manager.info("register {} (Step {}".format(the_class, the_class.step))
                 self._plugins[the_class.step] = the_class()
 
     def register_plugin_by_dir(self, pkgpath):

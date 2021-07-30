@@ -128,7 +128,6 @@ class Manager:
         :type chain: list
         """
         chain.append(job.name)
-
         for depname in job.job_depnames:
             hashed_dep = hash(depname)
             if hashed_dep not in self.job_hashes:
@@ -139,7 +138,6 @@ class Manager:
             if job_dep.name in chain:
                 raise OrchestratorException.CircularDependencyError(
                     job_dep.name)
-
             self.resolve_single_job_deps(job_dep, chain)
             job.resolve_a_dep(depname, job_dep)
 

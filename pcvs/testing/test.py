@@ -118,7 +118,7 @@ class Test:
         }
 
         self._mod_deps = kwargs.get("mod_deps", [])
-        self._depnames = kwargs.get('deps', [])
+        self._depnames = kwargs.get('job_deps', [])
         self._deps = []
 
     @property

@@ -446,8 +446,10 @@ def valid_combination(dic):
 
         pCollection.register_plugin_by_file(rt.pluginfile)
 
-    ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL, combination=dic)
-
+    ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL,
+                                     config=MetaConfig.root,
+                                     combination=dic)
+    
     # by default, no plugin = always true
     if ret is None:
         ret = True

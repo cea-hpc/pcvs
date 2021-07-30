@@ -412,7 +412,7 @@ class IOManager:
         """
         if icon is not None:
             icon = self.utf(icon)
-        self.__print_rawline(click.style("   {} {:8.2f}s{}{}{}{}".format(
+        self.__print_rawline(click.style("   {} {:8.2f}s{}{:7}{}{}".format(
             icon,
             time,
             self.utf("sep_v"),
