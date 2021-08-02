@@ -229,6 +229,11 @@ class Criterion:
         return self._values
 
     def __len__(self):
+        """Return the number of values this criterion holds.
+
+        :return: the value list count
+        :rtype: int
+        """
         return len(self._values)
 
     @property
@@ -307,6 +312,14 @@ class Criterion:
 
         # these must be integers
         def _convert_sequence_item_to_int(val):
+            """helper to convert a string-formated number to a valid repr.
+
+            :param val: the string-based number to convert
+            :type val: str
+            :raises CommonException.BadTokenError: val is not a number
+            :return: the number
+            :rtype: int() or float()
+            """
             if not isinstance(val, int) or not isinstance(val, float):
                 try:
                     n = float(val)
@@ -449,7 +462,7 @@ def valid_combination(dic):
     ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL,
                                      config=MetaConfig.root,
                                      combination=dic)
-    
+
     # by default, no plugin = always true
     if ret is None:
         ret = True

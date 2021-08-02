@@ -80,9 +80,7 @@ def build_job_deps(deps_node, pkg_label, pkg_prefix):
 
     :example:
         depends_on:
-            test: ["list_of_test_name"]
-            spack: ['list_of_specs']
-            module: ['list_of_rules']
+            ["list_of_test_name"]
 
     :param deps_node: the TE/job YAML node.
     :type deps_node: dict
@@ -102,6 +100,16 @@ def build_job_deps(deps_node, pkg_label, pkg_prefix):
 
 
 def build_pm_deps(deps_node):
+    """Build the dependency list from a given YAML node.
+
+    This only initialize package-manager oriented deps. For job deps, see
+    ``build_job_deps``
+
+    :param deps_node: contains package_manager YAML information
+    :type deps_node: str
+    :return: a list of PM objects, one for each entry
+    :rtype: List[:class:`PManager`]
+    """
     return pm.identify(deps_node.get('package_manager', {}))
 
 
@@ -469,11 +477,11 @@ class TEDescriptor:
         tags = ["compilation"] + self._tags
 
         command = self.__build_command()
-        
+
         test_name = self._te_name
         if self._run:
             test_name += "_cc"
-        
+
         # count number of built tests
         self._effective_cnt += 1
 

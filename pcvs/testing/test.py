@@ -206,17 +206,32 @@ class Test:
 
         The dependency struct is an array, where for each name (=key), the
         associated Job is stored (value)
-        :return: the dict, potentially not resolved yet
-        :rtype: dict
+        :return: the list of object-converted deps
+        :rtype: list
         """
         return self._deps
 
     @property
     def job_depnames(self):
+        """Getter to the list of deps, as an array of names.
+
+        This array is emptied when all deps are converted to objects.
+
+        :return: the array of dep names
+        :rtype: list
+        """
         return self._depnames
 
     @property
     def mod_deps(self):
+        """Getter to the list of pack-manager rules defined for this job.
+
+        There is no need for a ``_depnames`` version as these deps are provided
+        as PManager objects directly.
+
+        :return: the list of package-manager based deps.
+        :rtype: list
+        """
         return self._mod_deps
 
     def resolve_a_dep(self, name, obj):

@@ -75,7 +75,23 @@ class ValidationScheme:
 
 
 class MetaDict(addict.Dict):
+    """Helps with managing large configuration sets, based on dictionaries.
+
+    Once instanciated, an arbitraty subnode can be initialized like:
+
+        o = MetaDict()
+        o.field_a.subnode2 = 4
+
+    Currently, this class is just derived from addict.Dict. It is planned to
+    remove this adherence.
+    """
+
     def to_dict(self):
+        """Convert the object to a regular dict.
+
+        :return: a regular Python dict
+        :rtype: Dict
+        """
         return super().to_dict()
 
 

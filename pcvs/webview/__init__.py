@@ -208,6 +208,11 @@ def create_app():
         return render_template('404.html')
 
     def get_data_manager():
+        """Getter to the webview data manager.
+
+        :return: the data manager holding test-suite data.
+        :rtype: :class:`DataRepresentation`
+        """
         return data_manager
 
     return app

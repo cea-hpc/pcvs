@@ -5,8 +5,6 @@ from pcvs.orchestration.set import Set
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
 
-comman: communications.GenericServer = None
-
 
 class Manager:
     """Gather and manipulate Jobs under a hiararchical architecture.
@@ -129,6 +127,7 @@ class Manager:
         """
         chain.append(job.name)
         for depname in job.job_depnames:
+
             hashed_dep = hash(depname)
             if hashed_dep not in self.job_hashes:
                 raise OrchestratorException.UndefDependencyError(depname)

@@ -168,6 +168,13 @@ class TestFile:
             TestFile.val_scheme = system.ValidationScheme('te')
 
     def load_from_str(self, data):
+        """Fill a File object from stream.
+
+        This allows reusability (by loading only once).
+
+        :param data: the YAML-formatted input stream.
+        :type data: YAMl-formatted str
+        """
         self._raw = YAML(typ='safe').load(data)
 
     def process(self):
