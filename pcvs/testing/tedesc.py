@@ -469,15 +469,18 @@ class TEDescriptor:
         tags = ["compilation"] + self._tags
 
         command = self.__build_command()
-
+        
+        test_name = self._te_name
+        if self._run:
+            test_name += "_cc"
+        
         # count number of built tests
         self._effective_cnt += 1
 
         yield Test(
-            te_name=self._te_name,
+            te_name=test_name,
             label=self._te_label,
             subtree=self._te_subtree,
-            name=self._full_name,
             command=command,
             tags=tags,
             job_deps=job_deps,
@@ -487,7 +490,7 @@ class TEDescriptor:
             rc=self._validation.get("expect_exit", 0),
             artifacts=self._artifacts,
             resources=1,
-            chdir=chdir
+            wd=chdir
         )
 
     def __construct_runtime_tests(self):
@@ -499,10 +502,11 @@ class TEDescriptor:
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
             # clone deps as i"t may be updated by each test
-            te_job_deps = copy.deepcopy(te_job_deps)
+            job_deps = copy.deepcopy(te_job_deps)
             chdir = None
             if self._build:
-                te_job_deps.append(self._full_name)
+                # tricky case to disambiguate build & run from same decl.
+                job_deps.append(self._full_name + "_cc")
 
             # start to build the proper command, three parts:
             # the environment variables to export
@@ -538,9 +542,8 @@ class TEDescriptor:
                 te_name=self._te_name,
                 label=self._te_label,
                 subtree=self._te_subtree,
-                name="_".join([self._full_name, comb.translate_to_str()]),
                 command=command,
-                job_deps=te_job_deps,
+                job_deps=job_deps,
                 mod_deps=te_mod_deps,
                 tags=self._tags,
                 environment=env,
@@ -550,7 +553,7 @@ class TEDescriptor:
                 rc=self._validation.get("expect_exit", 0),
                 valscript=self._validation.script.get('path', None),
                 comb=comb,
-                chdir=chdir,
+                wd=chdir,
                 artifacts=self._artifacts,
                 matchers=self._validation.get('match', None)
             )
