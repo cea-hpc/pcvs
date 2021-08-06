@@ -4,6 +4,7 @@ import click
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR
 from pcvs.backend import report as pvReport
+from pcvs.helpers import log
 
 
 @click.command('report', short_help="Manage PCVS result reporting interface")
@@ -37,6 +38,10 @@ def report(ctx, path_list, static):
     else:
         # feed with prefixes
         for prefix in inputs:
-            pvReport.upload_buildir_results(prefix)
+            try:
+                pvReport.upload_buildir_results(prefix)
+            except Exception as e:
+                log.manager.warn("Unable to parse {}".format(prefix))
+                log.manager.debug("Caught {}".format(e))
         # create the app
         pvReport.start_server()

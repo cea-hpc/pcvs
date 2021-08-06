@@ -154,7 +154,7 @@ class Collection:
                                                                       type(self._plugins[the_class.step]).__name__, class_name))
 
                 log.manager.info(
-                    "register {} (Step {}".format(the_class, the_class.step))
+                    "register {} (Step {})".format(the_class, the_class.step))
                 self._plugins[the_class.step] = the_class()
 
     def register_plugin_by_dir(self, pkgpath):
