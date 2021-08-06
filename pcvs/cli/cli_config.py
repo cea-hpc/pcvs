@@ -293,7 +293,8 @@ def config_export(ctx, token, out_file):
 
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if obj.is_found():
-        out_file.write(YAML(typ='safe').dump(obj.dump()))
+        obj.load_from_disk()
+        YAML(typ='safe').dump(obj.dump(), out_file)
     else:
         raise click.BadArgumentUsage(
             "Config block not found: '{}'".format(token))

@@ -309,7 +309,8 @@ def profile_export(ctx, token, dest_file):
 
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
-        dest_file.write(YAML(typ='safe').dump(pf.dump()))
+        pf.load_from_disk()
+        YAML(typ='safe').dump(pf.dump(), dest_file)
 
 
 @profile.command(name="split",
