@@ -41,6 +41,7 @@ def list_profiles(scope=None):
         'scope' was set), containing, for each profile name, the filepath.
     :rtype: dict
     """
+    global PROFILE_EXISTING
     assert (scope in utils.STORAGES.keys() or scope is None)
     if scope is None:
         return PROFILE_EXISTING
