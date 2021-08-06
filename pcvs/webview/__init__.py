@@ -186,7 +186,6 @@ def create_app():
 
         test_sid = json_str["metadata"]["sid"]
         test_obj = Test()
-
         test_obj.from_json(json_str["test_data"])
 
         ok = data_manager.insert_test(test_sid, test_obj)

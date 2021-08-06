@@ -175,7 +175,7 @@ class Test:
         :rtype: dict
         """
 
-        return self._id["comb"]
+        return self._comb
 
     @property
     def command(self):

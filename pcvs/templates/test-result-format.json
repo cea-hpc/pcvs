@@ -3,7 +3,7 @@
         "te_name": "test_main",
         "label": "MPI-BENCHS",
         "subtree": "basics",
-        "full_name": "MPI-BENCHS/basics/test_main_N1_n2_arg=c",
+        "fq_name": "MPI-BENCHS/basics/test_main_N1_n2_arg=c",
         "comb": {
             "n_node": 1, "n_mpi": 2,
             "program": {"arg": "c"}
