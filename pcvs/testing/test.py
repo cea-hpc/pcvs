@@ -92,6 +92,7 @@ class Test:
             'te_name': kwargs.get('te_name', 'noname'),
             'label': kwargs.get('label', 'nolabel'),
             'subtree': kwargs.get('subtree', ''),
+            'comb': self._comb.translate_to_dict() if self._comb else {}
         }
         comb_str = self._comb.translate_to_str() if self._comb else None
 
@@ -417,14 +418,16 @@ class Test:
         assert(isinstance(test_json, dict))
         self.res_scheme.validate(test_json)
 
-        self._id = test_json["id"]
-        self._execmd = test_json["exec"]
-        self._data = test_json["data"]
+        self._id = test_json.get("id")
+        self._comb = test_json.get('comb')
+        self._execmd = test_json.get("exec")
+        self._data = test_json.get("data")
 
-        self._rc = test_json["result"]["rc"]
-        self._output = test_json["result"]["output"]
-        self._state = Test.State(test_json["result"]["state"])
-        self._exectime = test_json["result"]["time"]
+        res = test_json.get("result")
+        self._rc = res.get("rc")
+        self._output = res.get("output")
+        self._state = Test.State(res.get("state", Test.State.ERR_OTHER))
+        self._exectime = res.get("time")
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation.
