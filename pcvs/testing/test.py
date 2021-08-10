@@ -418,7 +418,7 @@ class Test:
         self.res_scheme.validate(test_json)
 
         self._id = test_json.get("id")
-        self._comb = test_json.get('comb')
+        self._comb = self._id.get('comb')
         self._execmd = test_json.get("exec")
         self._data = test_json.get("data")
 
