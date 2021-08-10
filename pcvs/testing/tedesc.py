@@ -95,7 +95,8 @@ def build_job_deps(deps_node, pkg_label, pkg_prefix):
     deps = list()
     for d in deps_node.get('depends_on', list()):
         deps.append(
-            d if '/' in d else "/".join(filter(None, [pkg_label, pkg_prefix, d])))
+            d if "/" in d else Test.compute_fq_name(pkg_label, pkg_prefix, d)
+        )
     return deps
 
 
@@ -193,8 +194,6 @@ class TEDescriptor:
         self._template = node.get('group', None)
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
-        self._full_name = "/".join(filter(None,
-                                   [self._te_label, self._te_subtree, self._te_name]))
         self._tags = node.get('tag', list())
 
         for elt_k, elt_v in self._artifacts.items():
@@ -478,15 +477,12 @@ class TEDescriptor:
 
         command = self.__build_command()
 
-        test_name = self._te_name
-        if self._run:
-            test_name += "_cc"
-
         # count number of built tests
         self._effective_cnt += 1
 
         yield Test(
-            te_name=test_name,
+            te_name=self._te_name,
+            user_suffix="cc" if self._run else None,
             label=self._te_label,
             subtree=self._te_subtree,
             command=command,
@@ -506,15 +502,20 @@ class TEDescriptor:
         te_job_deps = build_job_deps(
             self._run, self._te_label, self._te_subtree)
         te_mod_deps = build_pm_deps(self._run)
+        
+        if self._build:
+            fq_name = Test.compute_fq_name(
+                self._te_label,
+                self._te_subtree,
+                self._te_name,
+                'cc')
+            if fq_name not in te_job_deps:
+                te_job_deps.append(fq_name)
+            
 
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():
-            # clone deps as i"t may be updated by each test
-            job_deps = copy.deepcopy(te_job_deps)
             chdir = None
-            if self._build:
-                # tricky case to disambiguate build & run from same decl.
-                job_deps.append(self._full_name + "_cc")
 
             # start to build the proper command, three parts:
             # the environment variables to export
@@ -551,7 +552,7 @@ class TEDescriptor:
                 label=self._te_label,
                 subtree=self._te_subtree,
                 command=command,
-                job_deps=job_deps,
+                job_deps=te_job_deps,
                 mod_deps=te_mod_deps,
                 tags=self._tags,
                 environment=env,

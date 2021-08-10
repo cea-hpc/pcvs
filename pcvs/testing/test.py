@@ -96,13 +96,13 @@ class Test:
         }
         comb_str = self._comb.translate_to_str() if self._comb else None
 
-        self._id['fq_name'] = "_".join(filter(None, [
-            "/".join(filter(None, [
-                self._id['label'],
-                self._id['subtree'],
-                self._id['te_name']])),
-            comb_str]))
-
+        self._id['fq_name'] = Test.compute_fq_name(
+            self._id['label'],
+            self._id['subtree'],
+            self._id['te_name'],
+            comb_str,
+            suffix=kwargs.get('user_suffix'))
+        
         self._execmd = kwargs.get('command', '')
         self._data = {
             'metrics': None,
@@ -246,7 +246,6 @@ class Test:
         if name not in self._depnames:
             return
 
-        self._depnames.remove(name)
         self._deps.append(obj)
 
     def is_pickable(self):
@@ -509,3 +508,16 @@ class Test:
             post_code=post_code,
             name=self._id['fq_name']
         )
+            
+    @classmethod
+    def compute_fq_name(self, label, subtree, name, combination=None, suffix=None):
+
+        return "_".join(filter(None, [
+            "/".join(filter(None, [
+                label,
+                subtree,
+                name])),
+            suffix,
+            combination]))
+        
+        
