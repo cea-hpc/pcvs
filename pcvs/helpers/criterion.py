@@ -457,7 +457,7 @@ def valid_combination(dic):
         with open(rt.pluginfile, 'w') as fh:
             fh.write(base64.b64decode(rt.plugin).decode('ascii'))
 
-        pCollection.register_plugin_by_file(rt.pluginfile)
+        pCollection.register_plugin_by_file(rt.pluginfile, activate=True)
 
     ret = pCollection.invoke_plugins(Plugin.Step.TEST_EVAL,
                                      config=MetaConfig.root,

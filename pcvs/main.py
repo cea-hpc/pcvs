@@ -56,14 +56,13 @@ def print_version(ctx, param, value):
               is_flag=True, help="Display current version")
 @click.option("-w", "--width", "width", type=int, default=None,
               help="Terminal width (autodetection if omitted")
-@click.option("-P", "--plugin-path", "plugins", default=None,
+@click.option("-P", "--plugin-path", "plugin_path", multiple=True,
               type=click.Path(exists=True), show_envvar=True,
               help="Default Plugin path prefix")
-@click.option("-L", "--plugin-list", "list_plugins", is_flag=True, default=False,
-              help="List plugins to be used.")
+@click.option("-m", "--plugin", "select_plugins", multiple=True)
 @click.pass_context
 @log.manager.capture_exception(PluginException.NotFoundError)
-def cli(ctx, verbose, color, encoding, exec_path, width, plugins, list_plugins):
+def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins):
     """PCVS main program."""
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
@@ -85,13 +84,15 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugins, list_plugins):
     pcoll = Collection()
     ctx.obj['plugins'] = pcoll
 
-    pcoll.init_system_plugins()
-    if plugins:
-        pcoll.register_plugin_by_dir(plugins)
-
-    if list_plugins:
-        pcoll.show_plugins()
-        return
+    pcoll.register_default_plugins()
+    
+    if plugin_path:
+        for path in plugin_path:
+            pcoll.register_plugin_by_dir(path)
+    
+    for arg in select_plugins:
+        for select in arg.split(','):
+            pcoll.activate_plugin(select)
 
     pcoll.invoke_plugins(Plugin.Step.START_BEFORE)
 

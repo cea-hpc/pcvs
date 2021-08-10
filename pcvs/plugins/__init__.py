@@ -60,8 +60,7 @@ class Plugin:
     def __init__(self):
         """constructor method."""
         self._type = type(self)
-        pass
-
+    
     @abstractmethod
     def run(self, *args, **kwargs):
         """To-be-overriden method."""
@@ -77,12 +76,25 @@ class Collection:
 
     def __init__(self):
         """constructor method"""
-        self._plugins = {name: None for name in list(Plugin.Step)}
+        self._plugins = {name: [] for name in list(Plugin.Step)}
+        self._enabled = {name: None for name in list(Plugin.Step)}
+        
+    def register_default_plugins(self):
+        try:
+            self.register_plugin_by_package('pcvs-contrib')
+        except:
+            log.manager.info("No pcvs-contrib package found for plugin autoloading")
 
-    def init_system_plugins(self):
-        """Load plugins defined as ``pcvs-contrib`` module in current PYTHON env.
-        """
-        self.register_plugin_by_package("pcvs-contrib")
+    def activate_plugin(self, name):
+        for step, plugins in self._plugins.items():
+            for p in plugins:
+                if name == type(p).__name__:
+                    log.manager.debug("Activate {}".format(name))
+                    if self._enabled[p.step]:
+                        log.manager.debug(" -> overrides {}".format(self._enabled[p.step]))
+                    self._enabled[p.step] = p
+                    return
+        log.manager.warn("Unable to find a plugin named '{}'".format(name))
 
     def invoke_plugins(self, step, *args, **kwargs):
         """Load the appropriate plugin, given a step
@@ -96,22 +108,28 @@ class Collection:
         if step not in list(Plugin.Step):
             raise PluginException.BadStepError(step)
 
-        if self._plugins[step]:
-            return self._plugins[step].run(*args, **kwargs)
+        if self._enabled[step]:
+            return self._enabled[step].run(*args, **kwargs)
+        
         return None
 
-    def has_step(self, step):
-        """Check if a given pass is defined.
+    def nb_plugins_for(self, step):
+        if step not in self._plugins:
+            return -1
+
+        return len(self._plugins[step])
+    
+    def has_enabled_step(self, step):
+        """Check if a given pass is enabled.
 
         :param step: the pass
         :type step: :class:`Step`
         :return: True if defined, False otherwise
         :rtype: bool
         """
-        if step not in self._plugins:
+        if step not in self._enabled:
             return False
-
-        return self._plugins[step] is not None
+        return self._enabled[step] is not None
 
     def show_plugins(self):
         """Display plugin context to stdout."""
@@ -120,8 +138,19 @@ class Collection:
                 log.manager.print_section("Step {}:".format(str(step)))
                 for e in elements:
                     log.manager.print_item("{}".format(type(e).__name__))
+    
+    def show_enabled_plugins(self):
+        empty = True
+        for step, e in self._enabled.items():
+            if e:
+                empty = False
+                log.manager.print_item("{}: {}".format(str(step), type(e).__name__))
+                
+        if empty:
+            log.manager.print_item("None")
+    
 
-    def register_plugin_by_file(self, modpath):
+    def register_plugin_by_file(self, modpath, activate=False):
         """Based on a filepath (as a module dir), load plugins contained in it.
 
         :param modpath: valid python filepath
@@ -133,9 +162,9 @@ class Collection:
                                                       modpath)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        self.register_plugin_by_module(mod)
+        self.register_plugin_by_module(mod, activate)
 
-    def register_plugin_by_module(self, mod):
+    def register_plugin_by_module(self, mod, activate=False):
         """Based on a module name, load any defined plugin.
 
         mod must be a valid PYTHON module name.
@@ -148,16 +177,12 @@ class Collection:
                 step_str = str(the_class.step)
                 class_name = the_class.__name__
                 log.manager.debug(
-                    "Loading {} ({})".format(class_name, step_str))
-                if self._plugins[the_class.step]:
-                    log.manager.debug("{} overriden: {} -> {}".format(step_str,
-                                                                      type(self._plugins[the_class.step]).__name__, class_name))
+                    "Register {} ({})".format(class_name, step_str))
+                self._plugins[the_class.step].append(the_class())
+                if activate:
+                    self.activate_plugin(class_name)
 
-                log.manager.info(
-                    "register {} (Step {})".format(the_class, the_class.step))
-                self._plugins[the_class.step] = the_class()
-
-    def register_plugin_by_dir(self, pkgpath):
+    def register_plugin_by_dir(self, pkgpath, activate=False):
         """From a prefix directory, load any plugin defined in it.
 
         Mainly used to load any Plugin classes defined in a directory. The
@@ -170,10 +195,10 @@ class Collection:
         pkgname = os.path.basename(pkgpath)
 
         sys.path.insert(0, path)
-        self.register_plugin_by_package(pkgname)
-        sys.path.remove(pkgpath)
+        self.register_plugin_by_package(pkgname, activate)
+        sys.path.remove(path)
 
-    def register_plugin_by_package(self, pkgname):
+    def register_plugin_by_package(self, pkgname, activate=False):
         """Based on a package name, load any plugin defined into it.
 
         :param pkgname: package name, valid under current PYTHON env.
@@ -186,6 +211,6 @@ class Collection:
             if not ispkg:
                 try:
                     submod = importlib.import_module(name)
-                    self.register_plugin_by_module(submod)
+                    self.register_plugin_by_module(submod, activate)
                 except Exception as e:
                     raise PluginException.LoadError(name)

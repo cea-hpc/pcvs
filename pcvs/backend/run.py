@@ -61,6 +61,8 @@ def display_summary(the_session):
     log.manager.print_item("Criterion matrix size per job: {}".format(
         MetaConfig.root.get_internal("comb_cnt")
     ))
+    
+    
     if cfg.target_bank:
         log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
     log.manager.print_item("Verbosity: {}".format(
@@ -71,9 +73,11 @@ def display_summary(the_session):
         log.manager.print_item("{:<{width}}: {:<{width}}".format(
             k.upper(),
             v,
-            width=width),
-            depth=2)
-
+            width=width))
+        
+    log.manager.print_section("Globally loaded plugins:")
+    MetaConfig.root.get_internal("pColl").show_enabled_plugins()
+    
     log.manager.print_section("Orchestration infos")
     MetaConfig.root.get_internal("orchestrator").print_infos()
 

@@ -165,7 +165,7 @@ class Manager:
         the_set = None
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_BEFORE)
 
-        if self._plugin.has_step(Plugin.Step.SCHED_SET_EVAL):
+        if self._plugin.has_enabled_step(Plugin.Step.SCHED_SET_EVAL):
             the_set = self._plugin.invoke_plugins(
                 Plugin.Step.SCHED_SET_EVAL,
                 jobman=self,
