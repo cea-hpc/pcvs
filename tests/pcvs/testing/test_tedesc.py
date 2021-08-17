@@ -1,4 +1,6 @@
 import os
+from pcvs.helpers import criterion
+from pcvs.helpers.criterion import Criterion
 from unittest.mock import patch
 
 import pytest
@@ -79,47 +81,118 @@ def test_handle_job_deps(mock_id):
 @patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
     "__internal": {
-        "cc_pm": "test_cc_pm"
+        "cc_pm": pm.SpackManager("this_is_a_test"),
     },
     "validation": {
         "output": "test_output",
         "dirs": {
-            "keytestdir": "valuetestdir"
+            "label": "/this/directory"
         }
     },
     "group": {
         "GRPSERIAL": {}
     },
-    "criterion": {}
+    "criterion": {
+        "n_mpi": {"option": "-n ", "numeric": True, "values": [1, 2, 3, 4]}}
 }))
-def test_TEDescriptor():
+def test_tedesc_regular():
+    criterion.initialize_from_system()
     tested.TEDescriptor.init_system_wide("n_node")
     node = {
             "build":{
                 "cflags": "-DSYMB=MPI_2INT -DTYPE1='int' -DTYPE='int'",
-                "files": "'@SRCPATH@/constant.c'",
+                "files": "@SRCPATH@/constant.c",
                 "sources": {
                     "binary": "test_MPI_2INT"
                 }
             },
             "group": "GRPSERIAL",
             "run": {
-                "program": "test_MPI_2INT"
+                "program": "test_MPI_2INT",
+                "iterate": {
+                    "n_mpi": {
+                        "values": [1, 2, 3, 4]
+                    }
+                },
+                    
             },
             "tag": [
                 "std_1",
                 "constant"
             ]
         }
-    tedesc = tested.TEDescriptor("foo", 
+    tedesc = tested.TEDescriptor("te_name",
         node,
-        "keytestdir", 
-        "bar")
-    # for i in tedesc.construct_tests():
-    #     print(i)
-    # raise Exception
+        "label", 
+        "subtree")
+    
+    assert(tedesc.name == "te_name")
+    for i in tedesc.construct_tests():
+        print(i.command)
+
+    
     with pytest.raises(exceptions.TestException.TDFormatError):
-        tested.TEDescriptor("foo", 
-            "StrInsteadOfMetaDict",
-            "keytestdir", 
-            "bar")
+        tested.TEDescriptor("te_name", 
+            "bad_type",
+            "label", 
+            "subtree")
+        
+        tested.TEDescriptor("te_name", 
+            {"build": {"unknown_key": 2}},
+            "label", 
+            "subtree")
+
+@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
+@patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
+    "__internal": {
+        "cc_pm": pm.SpackManager("this_is_a_test"),
+    },
+    "validation": {
+        "output": "test_output",
+        "dirs": {
+            "label": "/this/directory"
+        }
+    },
+    "group": {
+        "GRPSERIAL": {}
+    },
+    "criterion": {"n_mpi": {"option": "-n ", "numeric": True, "values": [1, 2, 3, 4]}}
+}))
+def test_tedesc_compilation():
+    criterion.initialize_from_system()
+    tested.TEDescriptor.init_system_wide("n_node")
+    dict_of_tests = [
+        {"build": {
+            "files": ["a.c", "b.c"],
+            "sources": {
+                "binary": "a.out"
+            }
+        }},
+        {"build": {
+            "files": "@SRCPATH@/Makefile",
+            "make": {
+                "target": "all"
+            }
+        }},
+        {"build": {
+            "files": ["@BUIDLPATH@/configure"],
+            "autotools": {
+                "autogen": True,
+            }
+        }},
+        {"build": {
+            "files": "@SRCPATH@/CMakeLists.txt",
+            "cmake": {
+                "vars": ['CMAKE_VERBOSE_MAKEFILE=ON']
+            }
+        }}
+    ]
+    for node in dict_of_tests:
+        tedesc = tested.TEDescriptor("te_name",
+            node,
+            "label", 
+            "subtree")
+        
+        assert(tedesc.name == "te_name")
+        for i in tedesc.construct_tests():
+            print(i.command)
