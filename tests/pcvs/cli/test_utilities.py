@@ -31,7 +31,6 @@ def test_check_configs(mock_init):
     res = click_call('check', '--configs')
     print(res.stdout)
     assert("Valid" in res.stdout)
-    assert("MagicMock name='ConfigurationBlock().full_name'" in res.stdout)
     assert("Everything is OK!" in res.stdout)
     
 def test_check_directory():

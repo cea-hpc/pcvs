@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
+from ruamel.yaml import YAML
 from click.testing import CliRunner
 
 import pcvs
@@ -26,37 +27,43 @@ def test_session_init():
     obj = tested.Session(date)
     assert(str(obj.state) == "WAITING")
     assert(obj.property('started') == date)
-
+    
 
 def test_session_file():
-    return
     with CliRunner().isolated_filesystem():
-        with mock.patch('pcvs.backend.session.PATH_SESSION') as mock_pcvs:
-            mock_pcvs.PATH_SESSION = os.path.join(os.getcwd(), '.pcvs/session.yml')
-            print(pcvs.PATH_HOMEDIR)
-            test_dict = {
-                    'state': tested.Session.State.COMPLETED,
-                    'started': datetime.now()
-            }
-            
-            assert(pcvs.PATH_SESSION == os.path.join(os.getcwd(), '.pcvs', 'session.yml'))
-            tested.store_session_to_file(test_dict)
-            #assert(os.path.isfile(os.path.join(os.getcwd(), 'session.yml.lck')))
-            
-            with open(pcvs.PATH_SESSION, 'r') as fh:
-                content = yaml.safe_load(fh)
-                tested_content = tested.list_alive_sessions()
-                assert(content == tested_content)
-                assert(len(content.keys()) == 1)
-                assert(content['0'] == test_dict)
-            
-            tested.update_session_from_file(0, {'ended': datetime.now()})
-            
-            with open(pcvs.PATH_SESSION, 'r') as fh:
-                content = yaml.safe_load(fh)
-                assert(content.keys() == 1)
-                assert('ended' in content['0'])
-
-            tested.remove_session_from_file(0)
-            with open(pcvs.PATH_SESSION, 'r') as fh:
-                assert(yaml.safe_load(fh) == None)
+        s = os.path.join(os.getcwd(), "session.yml")
+        sl = s + ".lck"
+        with patch.object(tested, "PATH_SESSION", s) as mock_session:
+            with patch.object(tested, "PATH_SESSION_LOCKFILE", sl) as mock_lock:
+                id = tested.store_session_to_file({"key": 'value'})
+                with open(s, "r") as fh:
+                    data = YAML().load(fh)
+                    assert(len(data.keys()) == 2)
+                    assert('__metadata' in data)
+                    assert('next' in data['__metadata'])
+                    
+                    assert(id in data)
+                    assert('key' in data[id])
+                    assert('value' == data[id]['key'])
+                
+                tested.update_session_from_file(id, {
+                    "key": "new_value",
+                    "another_key": 'another_val'
+                    })
+                with open(s, 'r') as fh:
+                    data = YAML().load(fh)
+                    assert(len(data.keys()) == 2)
+                    assert(id in data)
+                    assert('key' in data[id])
+                    assert('new_value' == data[id]['key'])
+                    assert('another_key' in data[id])
+                    assert('another_val' in data[id]['another_key'])
+                
+                sessions = tested.list_alive_sessions()
+                assert(len(sessions) == 1)
+                assert(id in sessions)
+                
+                tested.remove_session_from_file(id)
+                with open(s, "r") as fh:
+                    data = YAML().load(fh)
+                    assert(id not in data)

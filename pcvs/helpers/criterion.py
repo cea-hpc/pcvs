@@ -339,27 +339,21 @@ class Criterion:
 
         op = node.get('op', 'seq').lower()
 
-        if op in ['seq', 'sequence']:
+        if op in ['seq', 'arithmetic', 'ari']:
             values = range(start, end+1, of)
-        elif op in ['mul', 'multiplication']:
-            cur = start if start > 0 else 1
-            while cur < end:
-                values.append(cur)
-                cur *= of
-        elif op in ['fact', 'factor']:
-            mult = 1
-            for i in range(start, start+of):
-                if i % of == 0:
-                    mult = i
-            values = range(mult, end+1, of)
-        elif op in ['pow', 'power']:
-            cur = start if start > 1 else 2
-            while cur < end:
-                values.append(cur)
-                cur = cur ** of
-        elif op in ['powerof']:
-            if start < 1:
-                start = 1
+        elif op in ['mul', 'geometric', 'geo']:
+            if start == 0:
+                values.append(0)
+            elif of in [-1, 0, 1]:
+                values.append(start ** of)
+            else:
+                cur = start
+                while cur <= end:
+                    values.append(cur)
+                    cur *= of
+        elif op in ['pow', 'powerof']:
+            if of == 0:
+                values.append()
             start = math.ceil(start**(1/of))
             end = math.floor(end**(1/of))
             for i in range(start, end+1):
