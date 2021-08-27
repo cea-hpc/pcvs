@@ -1,0 +1,36 @@
+---
+# List of programs to be used to compile
+# a wide variety of programs
+commands:
+    # C compiler
+    cc: mpicc
+    # C++ compiler
+    cxx: mpicxx
+    # Fortran compiler
+    fc: mpifc
+    # If a more-specific compiler is required:
+    f77: mpif77
+    f90: mpif90
+
+# Variants can add flavour to test requiring them.
+# For instance a test asking for the variant 'openmp'
+# will have its cflags extended with the content of
+# openmp.args here
+variants:
+    openmp:
+        args: "-fopenmp"
+    tbb:
+        args: "-ltbb -ltbbmalloc -ldl"
+    strict:
+        args: "-Werror -Wall -Wextra"
+
+# Manage the compiler through a package manager
+# Before any test to be run, the PM is invoked to load
+# everything required.
+# Note, only a single can be specified but both can be used
+# at the same time
+#package_manager:
+#    spack:
+#       - "openmpi"
+#    module:
+#       - "open"

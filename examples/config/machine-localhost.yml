@@ -1,0 +1,6 @@
+name: 'localhost'
+nodes: 1
+# time limit to allocate resources properly
+# Max number of allocation to be made concurrently
+concurrent_run: 4
+# Command to use when interacting with batch manager

@@ -1,0 +1,42 @@
+---
+name: 'login-node.hpcdomain.com'
+nodes: 100
+cores_per_node: 8
+# time limit to allocate resources properly
+# Max number of allocation to be made concurrently
+concurrent_run: 5
+# Command to use when interacting with batch manager
+job_manager:
+  # max time an allocation can be used before being autokilled
+  maxtime: 1500
+  # minimum amount of time an allocation should stay alive.
+  mintime: 10
+  # Allocation properties. These are used before running a
+  # set of tests. Launches are prefixed with programs specified here.
+  # It is up to wrappers to properly execute the command given as
+  # parameters. Each subnnodes contains 3 keys:
+  #     - program: the program to be used (as $CMD)
+  #     - args: list of extra args to invoke the program with
+  #     - wrapper: if specified, the program is overriden with the wrapper.
+  # resource allocation properties (jobs won't spawn by themself on a 
+  # remote node. Useful when batch managers is part of the test launching sequence
+  allocate:
+    program: "echo"
+    args: ""
+    wrapper: ""
+  # Resource alloc & exec properties. Jobs will be spawned on remote nodes).
+  run:
+    program: "echo"
+    args: ""
+    wrapper: ""
+# default partition to load (None by default). If specified, a partition will be
+# loaded and will override configuration above
+default_partition: null
+# defines partitions overring settings above
+partitions:
+  - name: 'knl'
+    nodes: 4
+    cores_per_node: 272
+  - name: 'arm'
+    nodes: 10
+    cores_per_node: 32

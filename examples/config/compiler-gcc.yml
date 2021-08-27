@@ -1,0 +1,22 @@
+---
+# List of programs to be used to compile
+# a wide variety of programs
+commands:
+    # C compiler
+    cc: gcc
+    # C++ compiler
+    cxx: g++
+    # Fortran compiler
+    fc: gfortran
+    # If a more-specific compiler is required:
+    f77: gfortran
+    f90: gfortran
+
+# Variants can add flavour to test requiring them.
+# For instance a test asking for the variant 'openmp'
+# will have its cflags extended with the content of
+# openmp.args here
+variants:
+    openmp:
+        args: "-fopenmp"
+
