@@ -132,12 +132,13 @@ def process_check_setup_file(filename, prefix, run_configuration):
     data = None
     env = os.environ
     env.update(run_configuration)
-
+    
     try:
         tdir = tempfile.mkdtemp()
         with utils.cwd(tdir):
-            env['pcvs_src'] = os.path.dirname(filename).replace(prefix, '')
+            env['pcvs_src'] = os.path.dirname(filename)
             env['pcvs_testbuild'] = tdir
+            
             if not os.path.isdir(os.path.join(tdir, prefix)):
                 os.makedirs(os.path.join(tdir, prefix))
             if not prefix:
@@ -172,7 +173,7 @@ def process_check_yaml_stream(data):
     """
     global scheme
     err_msg = None
-    nb_nodes = "----"
+    nb_nodes = 0
     try:
         stream = YAML(typ='safe').load(data)
         scheme.validate(stream)
@@ -251,10 +252,12 @@ def process_check_directory(dir, pf_name="default"):
                 data = fh.read()
 
         if not err:
-            err, nb_nodes = process_check_yaml_stream(data)
+            err, cnt = process_check_yaml_stream(data)
             yaml_ok = __set_token(err is None)
-            total_nodes += nb_nodes
-
+            if cnt > 0:
+                nb_nodes = cnt
+                total_nodes += nb_nodes
+            
         log.manager.print_item(' {}{}{}{}{}{}{}'.format(
             setup_ok,
             log.manager.utf('sep_v'),
