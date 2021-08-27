@@ -12,7 +12,7 @@ from pcvs.helpers import log
 from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.pm import PManager
 from pcvs.helpers.system import MetaConfig, ValidationScheme
-
+from pcvs.helpers.criterion import Combination
 
 class Test:
     """Smallest component of a validation process.
@@ -418,7 +418,7 @@ class Test:
         self.res_scheme.validate(test_json)
 
         self._id = test_json.get("id")
-        self._comb = self._id.get('comb')
+        self._comb = Combination({}, self._id.get('comb'))
         self._execmd = test_json.get("exec")
         self._data = test_json.get("data")
 
