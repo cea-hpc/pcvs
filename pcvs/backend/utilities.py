@@ -136,7 +136,7 @@ def process_check_setup_file(filename, prefix, run_configuration):
     try:
         tdir = tempfile.mkdtemp()
         with utils.cwd(tdir):
-            env['pcvs_src'] = os.path.dirname(filename)
+            env['pcvs_src'] = os.path.dirname(filename).replace(prefix, "")
             env['pcvs_testbuild'] = tdir
             
             if not os.path.isdir(os.path.join(tdir, prefix)):
