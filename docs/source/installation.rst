@@ -1,37 +1,18 @@
-############
-Installation
-############
+##################
+Installation Guide
+##################
 
-From sources
-============
+About
+=====
 
-PCVS does not have much dependencies to be built. The CLI is build upon
-Click>=7. As major user's input are managed through YAML, a proper YAML
-installation (currently PyYAML>=5.1) is required along with a validation support
-handled by JSON parsers (as jsonschema does).
+PCVS is a based on Setuptools to manage its installation process. It can be
+installed from sources and (soon) directly from PyPI.
 
-Finally, the only non-regular dependency is `Addict
-<https://github.com/mewwts/addict>`_, a Python module to manage dictionaries and
-specially its values using a full attribute path (i.e. `a.b.c.d`), convenient to
-manage complex configuration topologies.
+Installation from sources
+=========================
 
-.. note::
-	You may desire to deploy PCVS in a Python environment. To do so, first, here
-	are instructions to deploy malleable containers through `virtualenvwrapper
-	<https://virtualenvwrapper.readthedocs.io>`_:
-
-	.. code-block:: bash
-
-		$ python3 -m virtualenv ./build
-		$ source ./build/bin/activate
-		# OR through virtualenvwrapper
-		$ mkvirtualenv pcvs-env
-		$ workon pcvs-env
-
-Installing the tool
--------------------
-
-From within (or not) a virtualenv, one can now proceed to the installation as follows:
+After downloading the latest version from the `website
+<https://pcvs.io/download>`:
 
 .. code-block:: bash
 
@@ -40,41 +21,10 @@ From within (or not) a virtualenv, one can now proceed to the installation as fo
 	$ pip3 install .
 	# => Only runtime dependencies
 	$ pip3 install -rrequirements.txt
-	# => Developments deps (linters & co)
-	$ pip3 install -rrequirements-dev.txt
-	# => in-place installation
-	$ pip3 install -e .
-
-Find the documentation
-----------------------
-
-PCVS documentation is currently in active progress. Fell free to redistribute
-comments and/or notes to the dev team about what should be more covered.
-Multiple documentation can be generated from this repo:
-
-* the CLI is managed and documented through ``click``. The manpages can be
-  automatically built with the third-party tool ``click-man`` (not a dep,
-  should be installed manually). Note that these manpages may not contain more
-  information than the content of each `--help` command.
-* The general documentation (readthedocs.io-formatted) through `sphinx`, able to
-  generate multiple formats:
-  
-.. code-block:: bash
-
-	$ pip3 install click-man
-	$ click-man --target $TARGET_MAN pcvs
-	$ export MANPATH="$TARGET_MAN:$MANPATH"
-	
-	# be sure to have development deps installed first
-	$ pip3 install -r requirements-dev.txt
-	$ cd ./docs
-	$ make  # will list available doc formats
-	$ make man  # NOT the CLI man pages, but the general documentation
-	$ make html  # readthedocs-based
-
+	$ pcvs
 
 Dealing with offline networks
------------------------------
+=============================
 
 In some scenarios, it may not be possible to access PyPI mirrors to download
 dependencies. The following procedures will describe how to download deps
@@ -98,4 +48,32 @@ PCVS), we are still considering PCVS is cloned locally:
 	$ tar xf ./pcvs_deps.tar.gz
 	$ pip3 install . --find-links ./deps_dir --no-index
 	# or any installation variations (-e ...)
+
+
+A word about dependencies
+=========================
+
+PCVS does not have much dependencies to be built. The CLI is build upon
+Click>=7. As major user's input are managed through YAML, a proper YAML
+installation (currently PyYAML>=5.1) is required along with a validation support
+handled by JSON parsers (as jsonschema does).
+
+Finally, the only non-regular dependency is `Addict
+<https://github.com/mewwts/addict>`_, a Python module to manage dictionaries and
+specially its values using a full attribute path (i.e. ``a.b.c.d``), convenient to
+manage complex configuration topologies.
+
+.. note::
+	You may desire to deploy PCVS in a Python environment. To do so, first, here
+	are instructions to deploy malleable containers through `virtualenvwrapper
+	<https://virtualenvwrapper.readthedocs.io>`_:
+
+	.. code-block:: bash
+
+		$ python3 -m virtualenv ./build
+		$ source ./build/bin/activate
+		# OR through virtualenvwrapper
+		$ mkvirtualenv pcvs-env
+		$ workon pcvs-env
+
 

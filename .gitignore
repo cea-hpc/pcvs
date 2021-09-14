@@ -24,3 +24,6 @@ build/
 .pcvsrt/
 .pcvs-build/
 .tox/
+.coverage
+htmlcov/
+.python-version

@@ -1,0 +1,15 @@
+CHANGELOG
+=========
+
+All major changes to PCVS are documented here. Additional sections will help to
+track what changed from each release.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/)
+
+[0.5.0-dev] -- 2021-09-01
+---------------------
+
+### Added
+    * Initial releease
+    * Bank, config & profile support
+    * Complete Python3.5+ rewrite

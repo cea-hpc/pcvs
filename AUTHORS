@@ -1,0 +1,19 @@
+Please, do not contact people in this section directly to reports problems in
+PCVS. For generation information about the project, plese visit the following
+links:
+* https://pcvs.io/
+* https://pcvs.readthedocs.io/
+* https://github.com/cea-hpc/pcvs.git/
+
+To report a but or a problem with PCVS and/or its components, please send a
+email to the maintainers list below:
+
+* Julien JAEGER <jaegerj@cea.fr>
+
+### Contributors
+
+A special thanks to people actively contributing to this project (so far):
+
+* Julien ADAM <adamj@paratools.com>
+* Jean-Baptiste BESNARD <jbbesnard@paratools.com>
+* Paul CANAT <pcanat@paratools.com>

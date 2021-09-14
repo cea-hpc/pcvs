@@ -56,26 +56,34 @@ frameworks).
 
 .. toctree::
    :maxdepth: 2
-   :caption: Basics
+   :caption: Basic usage
 
    installation
    getting-started
+   troubleshoot
+   faq
 
 .. toctree::
    :maxdepth: 2
-   :caption: Customisation
+   :caption: Advanced concepts
 
    config
    profile
    settings
-
+   
 
 .. toctree::
    :maxdepth: 2
-   :caption: Reference
-
-   glossary
-   troubleshoot
-   faq
+   :caption: Development
+   
    overview
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API Documentation
+   
    api/pcvs
+
+   
+   
+   
