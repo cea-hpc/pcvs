@@ -1,18 +1,22 @@
 ##################
-Installation Guide
+ Getting Started
 ##################
 
-About
-=====
+System Prerequisites
+####################
+
+To use PCVS you must have :
+
+* Python 3.5+
+* PCVS requirements installed
+* PCVS installed (see PCVS installation
+
+Installation
+############
 
 PCVS is a based on Setuptools to manage its installation process. It can be
-installed from sources and (soon) directly from PyPI.
-
-Installation from sources
-=========================
-
-After downloading the latest version from the `website
-<https://pcvs.io/download>`:
+installed from sources and (soon) directly from PyPI. After downloading the
+latest version from the `website <https://pcvs.io/download>`:
 
 .. code-block:: bash
 
@@ -23,8 +27,8 @@ After downloading the latest version from the `website
 	$ pip3 install -rrequirements.txt
 	$ pcvs
 
-Dealing with offline networks
-=============================
+Dependencies & offline networks
+===============================
 
 In some scenarios, it may not be possible to access PyPI mirrors to download
 dependencies. The following procedures will describe how to download deps
@@ -59,7 +63,7 @@ installation (currently PyYAML>=5.1) is required along with a validation support
 handled by JSON parsers (as jsonschema does).
 
 Finally, the only non-regular dependency is `Addict
-<https://github.com/mewwts/addict>`_, a Python module to manage dictionaries and
+<https://github.com/mewwts/addi7ct>`_, a Python module to manage dictionaries and
 specially its values using a full attribute path (i.e. ``a.b.c.d``), convenient to
 manage complex configuration topologies.
 

@@ -38,7 +38,7 @@ validation plaform is strongly reduced, for instance:
 Splitting the effort will enforce reusability and flexibility. In many cases,
 multiple test bases share same compilers, runtimes, tools or even machine
 partition, it is then convenient (for administration purposes) to gather at a
-higher level this type of responsability.
+higher level this type of responsability.*
 
 Using PCVS may have a slight cost as test logic must be converted to a new
 semantics (not the tests themselves but the testing system behind it), without
@@ -56,32 +56,34 @@ frameworks).
 
 .. toctree::
    :maxdepth: 2
-   :caption: Basic usage
+   :caption: Basics
 
-   installation
-   getting-started
-   troubleshoot
-   faq
+   basics/features
+   basics/getting-started
+   basics/basic-use
+   basics/issues
+   basics/workflow
 
 .. toctree::
    :maxdepth: 2
-   :caption: Advanced concepts
+   :caption: Reference
 
-   config
-   profile
-   settings
-   
+   ref/run
+   ref/report
+   ref/test-file
+   ref/config
+   ref/profile
+   ref/bank
+   ref/session
+   ref/utils
+   ref/plugin
 
 .. toctree::
    :maxdepth: 2
    :caption: Development
    
-   overview
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Documentation
-   
+   dev/overview
+   dev/contribution
    api/pcvs
 
    

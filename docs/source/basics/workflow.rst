@@ -1,16 +1,12 @@
-***************
-Getting Started
-***************
+################
+Common workflow
+################
 
-Prerequisites
-=============
+Per-project test infrastructure
+###############################
 
-To use PCVS you must have :
-
-* Python 3.5+
-* PCVS requirements installed
-* PCVS installed (see PCVS installation)
-
+Dedicated benchmark repository
+##############################
 
 Benchmark decription
 ====================
