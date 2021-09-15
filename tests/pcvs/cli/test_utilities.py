@@ -17,7 +17,6 @@ def test_check_profiles(mock_init):
     res = click_call('check', '--profiles')
     
     assert("Valid" in res.stdout)
-    assert("MagicMock name='Profile().full_name'" in res.stdout)
     assert("Everything is OK!" in res.stdout)
 
 @patch('pcvs.backend.config.CONFIG_EXISTING', {k: {

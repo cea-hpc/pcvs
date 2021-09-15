@@ -9,6 +9,7 @@ import pkg_resources
 from ruamel.yaml import YAML
 
 import pcvs
+from pcvs import version
 from pcvs.helpers import log
 from pcvs.helpers.exceptions import CommonException
 
@@ -213,8 +214,8 @@ def print_version(ctx, param, value) -> None:
     """print converter version number, tied to PCVS version number """
     if not value or ctx.resilient_parsing:
         return
-    version = pkg_resources.require("pcvs")[0].version
-    click.echo('YAML Converter (Part of PCVS) -- version {}'.format(version))
+    click.echo(
+        'PCVS Dynamic Converter (pcvs) -- version {}'.format(version.__version__))
     ctx.exit()
 
 

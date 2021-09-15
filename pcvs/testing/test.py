@@ -53,8 +53,8 @@ class Test:
         """
         WAITING = 0
         IN_PROGRESS = 1
-        SUCCEED = 2
-        FAILED = 3
+        SUCCESS = 2
+        FAILURE = 3
         ERR_DEP = 4
         ERR_OTHER = 5
 
