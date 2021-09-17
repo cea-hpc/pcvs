@@ -21,6 +21,7 @@ from pcvs.helpers.system import MetaConfig
               help='List available tests (may take a while)')
 @click.option("-s", "--show", "display",
               type=click.Choice(['cmd', 'env', 'loads', 'all']), default=None,
+              is_flag=False, flag_value="all",
               help="Display information instead of executing the command")
 @click.argument("argument", type=str, required=False)
 @click.pass_context
@@ -38,6 +39,8 @@ def exec(ctx, output, argument, gen_list, display):
         argument = "--list"
         err = subprocess.DEVNULL
     else:
+        if not argument:
+            raise click.BadArgumentUsage("An argument is required")
         script_path = [
             pvUtils.compute_scriptpath_from_testname(argument, output)]
     try:
