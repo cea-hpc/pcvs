@@ -1,10 +1,11 @@
-recursive-include pcvs/schemes *.json
-recursive-include pcvs/templates *.yml
-
-include utils/get_version
-include .version
+recursive-include pcvs/schemes *.yml *.json
+recursive-include pcvs/templates *.yml *.json
+recursive-include pcvs/examples *.yml *.json
+recursive-include pcvs/webview *.html *.css *.js *.png *.svg *.ico
+recursive-include pcsv/webview *.eot *.etf *.ttf *.woff
 
 include CHANGES
 include COPYING
-include README
+include README.md
 include requirements.txt
+include requirements-dev.txt

@@ -24,13 +24,17 @@ setuptools.setup(
     maintainer="Julien Adam", 
     maintainer_email="adamj@paratools.com",
     keywords="validation hpc test-suite",
-    url="https://github.com/cea-hpc/pcvs.git",
+    url="https://pcvs.io/",
     long_description=desc,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        "pcvs": ["schemes/*.yml", "templates/*.yml", "webview"],
+        "pcvs": [
+            "schemes/*.yml",
+            "templates/*.yml", "templates/*.json",
+            "examples/*.yml", "examples/*.json"
+            ],
         },
 
     entry_points='''
@@ -39,6 +43,10 @@ setuptools.setup(
         pcvs_convert=pcvs.converter.yaml_converter:main
     ''',
 
+    project_urls={
+        "Source Code": "https://github.com/cea-hpc/pcvs.git/",
+        "Documentation": "https://pcvs.readthedocs.io/",
+        },
     classifiers=[
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing',
