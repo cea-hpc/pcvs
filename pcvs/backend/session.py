@@ -142,7 +142,8 @@ def list_alive_sessions():
     try:
         with open(PATH_SESSION, 'r') as fh:
             all_sessions = yml.load(fh)
-            del all_sessions["__metadata"]
+            if all_sessions:
+                del all_sessions["__metadata"]
     except FileNotFoundError as e:
         all_sessions = {}
     finally:
@@ -231,7 +232,7 @@ class Session:
             :return: the YAML representation
             :rtype: Any
             """
-            return representer.represent_scalar(u'!Session.State', u'{}||{}'.format(data.name, data.value))
+            return representer.represent_scalar(u'!State', u'{}||{}'.format(data.name, data.value))
 
         @classmethod
         def from_yaml(cls, constructor, node):

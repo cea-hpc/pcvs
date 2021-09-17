@@ -342,3 +342,7 @@ def trylock_file(f, reentrant=False):
             return True
 
         return False
+
+
+def is_locked(f):
+    return os.path.isfile(os.path.abspath(f))

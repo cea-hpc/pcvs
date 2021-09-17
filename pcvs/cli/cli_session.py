@@ -61,9 +61,9 @@ def session(ctx, ack, list, ack_all):
         for sk, sv in sessions.items():
             s = pvSession.Session()
             s.load_from(sk, sv)
-            status = "Error"
+            status = "Broken"
             duration = timedelta()
-
+            print(s.state)
             if s.state == pvSession.Session.State.IN_PROGRESS:
                 duration = datetime.now() - s.property('started')
                 status = "In Progress -- {:4.2f}%".format(
@@ -71,6 +71,9 @@ def session(ctx, ack, list, ack_all):
             elif s.state == pvSession.Session.State.COMPLETED:
                 duration = s.property('ended') - s.property('started')
                 status = "Completed"
+            elif s.state == pvSession.Session.State.WAITING:
+                duration = datetime.now() - s.property('started')
+                status = "Waiting"
 
             log.manager.print_item("SID #{:0>6s}: {} ({})".format(
                 str(s.id),
