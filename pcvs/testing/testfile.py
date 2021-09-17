@@ -3,6 +3,7 @@ import operator
 import os
 import pathlib
 import subprocess
+import getpass
 
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
@@ -70,7 +71,7 @@ def replace_special_token(stream, src, build, prefix):
         '@BROOTPATH@': build,
         '@SPACKPATH@': "TBD",
         '@HOME@': str(pathlib.Path.home()),
-        '@USER@': os.environ['USER']
+        '@USER@': getpass.getuser()
     }
     for k, v in tokens.items():
         stream = stream.replace(k, v)
