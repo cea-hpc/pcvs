@@ -200,16 +200,17 @@ def profile_build(ctx, token, interactive, blocks, clone):
         pf.fill(pf_blocks)
     else:
         if len(blocks) > 0:
-            for block in blocks:
-                (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
-                cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
-                if not cur.is_found():
-                    raise click.BadOptionUsage(
-                        "--block", "'{}' config block does not exist".format(block))
-                elif b_kind in pf_blocks.keys():
-                    raise click.BadOptionUsage(
-                        "--block", "'{}' config block set twice".format(b_kind))
-                pf_blocks[b_kind] = cur
+            for blocklist in blocks:
+                for block in blocklist.split(','):
+                    (b_sc, b_kind, b_label) = utils.extract_infos_from_token(block)
+                    cur = pvConfig.ConfigurationBlock(b_kind, b_label, b_sc)
+                    if not cur.is_found():
+                        raise click.BadOptionUsage(
+                            "--block", "'{}' config block does not exist".format(block))
+                    elif b_kind in pf_blocks.keys():
+                        raise click.BadOptionUsage(
+                            "--block", "'{}' config block set twice".format(b_kind))
+                    pf_blocks[b_kind] = cur
             pf.fill(pf_blocks)
         else:
             base = pvProfile.Profile('default', None)
