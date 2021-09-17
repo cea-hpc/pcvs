@@ -1,0 +1,33 @@
+compiler:
+  commands: {cc: gcc, cxx: g++, f77: gfortran, f90: gfortran, fc: gfortran}
+criterion:
+  iterators:
+    n_omp:
+      subtitle: o
+      values: [1, 2, 4, 8]
+group:
+  GRPMPI:
+    run:
+      iterate:
+        n_omp: {values: null}
+machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
+runtime:
+  iterators:
+    n_omp: {numeric: true, option: OMP_NUM_THREADS=, type: environment}
+  plugin: !!binary |
+    YVcxd2IzSjBJRzFoZEdnS1puSnZiU0J3WTNaekxuQnNkV2RwYm5NZ2FXMXdiM0owSUZCc2RXZHBi
+    Z29LWTJ4aGMzTWdUM0JsYmsxUVVHeDFaMmx1S0ZCc2RXZHBiaWs2Q2lBZ0lDQnpkR1Z3SUQwZ1VH
+    eDFaMmx1TGxOMFpYQXVWRVZUVkY5RlZrRk1DaUFnSUNBS0lDQWdJR1JsWmlCeWRXNG9jMlZzWml3
+    Z0ttRnlaM01zSUNvcWEzZGhjbWR6S1RvS0lDQWdJQ0FnSUNBaklISmxkSFZ5Ym5NZ1ZISjFaU0Jw
+    WmlCMGFHVWdZMjl0WW1sdVlYUnBiMjRnYzJodmRXeGtJR0psSUhWelpXUUtJQ0FnSUNBZ0lDQmpi
+    MjVtYVdjZ1BTQnJkMkZ5WjNOYkoyTnZibVpwWnlkZENpQWdJQ0FnSUNBZ2JtSmZibTlrWlhNZ1BT
+    QmpiMjVtYVdjdWJXRmphR2x1WlM1blpYUW9KMjV2WkdWekp5d2dNU2tLSUNBZ0lDQWdJQ0J1WWw5
+    amIzSmxjeUE5SUdOdmJtWnBaeTV0WVdOb2FXNWxMbWRsZENnblkyOXlaWE5mY0dWeVgyNXZaR1Vu
+    TENBeEtRb0tJQ0FnSUNBZ0lDQmpiMjFpSUQwZ2EzZGhjbWR6V3lkamIyMWlhVzVoZEdsdmJpZGRD
+    aUFnSUNBZ0lDQWdibDl2YlhBZ1BTQmpiMjFpTG1kbGRDZ25ibDl2YlhBbkxDQXdLUW9nSUNBZ0lD
+    QWdJRzVmYm05a1pTQTlJR052YldJdVoyVjBLQ2R1WDI1dlpHVW5MQ0F4S1FvS0lDQWdJQ0FnSUNC
+    cFppQmNDaUFnSUNBZ0lDQWdJQ0FnSUNodVgyOXRjQ0ErSUc1aVgyTnZjbVZ6S1NCdmNpQmNDaUFn
+    SUNBZ0lDQWdJQ0FnSUNodVgyNXZaR1VnUGlCdVlsOXViMlJsY3lrNkNpQWdJQ0FnSUNBZ0lDQWdJ
+    Q0FnSUNCeVpYUjFjbTRnUm1Gc2MyVUtJQ0FnSUNBZ0lDQmxiSE5sT2dvZ0lDQWdJQ0FnSUNBZ0lD
+    QnlaWFIxY200Z1ZISjFaUW89
+  program: ''
