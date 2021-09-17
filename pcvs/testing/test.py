@@ -53,8 +53,8 @@ class Test:
         """
         WAITING = 0
         IN_PROGRESS = 1
-        SUCCEED = 2
-        FAILED = 3
+        SUCCESS = 2
+        FAILURE = 3
         ERR_DEP = 4
         ERR_OTHER = 5
 
@@ -263,10 +263,10 @@ class Test:
         """Check if at least one dep is blocking this job from ever be
         scheduled.
 
-        :return: True if at least one dep is shown a `Test.State.FAILED` state.
+        :return: True if at least one dep is shown a `Test.State.FAILURE` state.
         :rtype: bool
         """
-        return len([d for d in self._deps if d.state == Test.State.FAILED]) > 0
+        return len([d for d in self._deps if d.state == Test.State.FAILURE]) > 0
 
     def first_valid_dep(self):
         """Retrive the first ready-for-schedule dep.
@@ -324,7 +324,7 @@ class Test:
         :type state: :class:`Test.State`, optional
         """
         if state is None:
-            state = Test.State.SUCCEED if self._validation['expect_rc'] == rc else Test.State.FAILED
+            state = Test.State.SUCCESS if self._validation['expect_rc'] == rc else Test.State.FAILURE
         self.executed(state)
         self._rc = rc
         self._output = base64.b64encode(out).decode('ascii')
@@ -341,10 +341,10 @@ class Test:
         colorname = "yellow"
         icon = ""
         label = str(self._state)
-        if self._state == Test.State.SUCCEED:
+        if self._state == Test.State.SUCCESS:
             colorname = "green"
             icon = "succ"
-        elif self._state == Test.State.FAILED:
+        elif self._state == Test.State.FAILURE:
             colorname = "red"
             icon = "fail"
         elif self._state == Test.State.ERR_DEP:
@@ -354,7 +354,7 @@ class Test:
         log.manager.print_job(label, self._exectime, self.name,
                               colorname=colorname, icon=icon)
         if self._output:
-            if (log.manager.has_verb_level("info") and self.state == Test.State.FAILED) or log.manager.has_verb_level("debug"):
+            if (log.manager.has_verb_level("info") and self.state == Test.State.FAILURE) or log.manager.has_verb_level("debug"):
                 log.manager.print(base64.b64decode(self._output))
 
     def executed(self, state=None):
@@ -363,7 +363,7 @@ class Test:
         :param state: give a special state to the test, defaults to FAILED
         :param state: :class:`Test.State`, optional
         """
-        self._state = state if type(state) == Test.State else Test.State.FAILED
+        self._state = state if type(state) == Test.State else Test.State.FAILURE
 
     def been_executed(self):
         """Cehck if job has been executed (not waiting or in progress).
