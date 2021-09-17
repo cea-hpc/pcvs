@@ -26,10 +26,10 @@ def compl_session_token(ctx, args, incomplete) -> list:
 
 
 @click.command(name="session", short_help="Manage multiple validations")
-@click.option('-c', '--ack', 'ack', type=int, default=None,
-              help="acknowledge a 'completed' session, for removing from logs")
-@click.option('-C', '--ack-all', 'ack_all', is_flag=True, default=False,
-              help="Ack all completed sessions, for removing from logs")
+@click.option('-c', '--clear', 'ack', type=int, default=None,
+              help="Clear a 'completed' remote session, for removing from logs")
+@click.option('-C', '--clear-all', 'ack_all', is_flag=True, default=False,
+              help="Clear all completed sessions, for removing from logs")
 @click.option('-l', '--list', is_flag=True,
               help="List detached sessions")
 @click.pass_context
@@ -63,7 +63,7 @@ def session(ctx, ack, list, ack_all):
             s.load_from(sk, sv)
             status = "Broken"
             duration = timedelta()
-            print(s.state)
+            
             if s.state == pvSession.Session.State.IN_PROGRESS:
                 duration = datetime.now() - s.property('started')
                 status = "In Progress -- {:4.2f}%".format(

@@ -260,6 +260,7 @@ class Profile:
         :type clone: :class:`Profile`
         """
         self._retrieve_file()
+        
         log.manager.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details

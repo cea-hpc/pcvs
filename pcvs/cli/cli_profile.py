@@ -1,4 +1,5 @@
 import click
+import sys
 from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
@@ -143,7 +144,7 @@ def profile_interactive_select():
     return composition
 
 
-@profile.command(name="build",
+@profile.command(name="create",
                  short_help="Build/copy a profile from basic conf blocks")
 @click.option("-i", "--interactive", "interactive", show_envvar=True,
               default=False, is_flag=True,
@@ -159,7 +160,7 @@ def profile_interactive_select():
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.pass_context
-def profile_build(ctx, token, interactive, blocks, clone):
+def profile_create(ctx, token, interactive, blocks, clone):
     """
     Creates a new profile based on basic configuration blocks (see the 'config'
     command). The newly created profile is built from basic configuration
@@ -193,6 +194,7 @@ def profile_build(ctx, token, interactive, blocks, clone):
     if clone is not None:
         (c_scope, _, c_label) = utils.extract_infos_from_token(clone, maxsplit=2)
         base = pvProfile.Profile(c_label, c_scope)
+        base.load_from_disk()
         pf.clone(base)
     elif interactive:
         log.manager.print_header("profile view (build)")
@@ -254,7 +256,7 @@ def profile_destroy(ctx, token):
             "Profile '{}' not found! Please check the 'list' command".format(label),)
 
 
-@profile.command(name="alter",
+@profile.command(name="edit",
                  short_help="Edit an existing profile")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
@@ -265,7 +267,7 @@ def profile_destroy(ctx, token):
               help="Open file with EDITOR")
 @click.pass_context
 @log.manager.capture_exception(ValidationException.FormatError)
-def profile_alter(ctx, token, editor, edit_plugin):
+def profile_edit(ctx, token, editor, edit_plugin):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
@@ -287,7 +289,7 @@ def profile_alter(ctx, token, editor, edit_plugin):
                  short_help="Import a file as a profile")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
-@click.argument("src_file", type=click.File('r'))
+@click.option("-s", "--source", "src_file", type=click.File('r'), default=sys.stdin)
 @click.pass_context
 def profile_import(ctx, token, src_file):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
@@ -303,7 +305,7 @@ def profile_import(ctx, token, src_file):
                  short_help="Export a profile to a file")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
-@click.argument("dest_file", type=click.File('w'))
+@click.option("-o", "--output", "dest_file", type=click.File('w'), default=sys.stdout)
 @click.pass_context
 def profile_export(ctx, token, dest_file):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)

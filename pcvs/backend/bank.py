@@ -334,7 +334,7 @@ class Bank:
         :rtype: :class:`Pygit2.Oid`
         """
         assert('validation' in self._config)
-        test_track = jtest['id']['full_name'].split("/")
+        test_track = jtest['id']['fq_name'].split("/")
         oid = self.insert(self._rootree, test_track, jtest.to_dict())
         return oid
 

@@ -110,9 +110,9 @@ def handle_build_lockfile(exc=None):
 @click.option("-o", "--output", "output", default=None, show_envvar=True,
               type=click.Path(exists=False, file_okay=False),
               help="F directory where PCVS is allowed to store data")
-@click.option("-s", '--settings', "settings_file",
-              default=None, show_envvar=True, type=str,
-              help="Define which setting file to use (~/.pcvs/validation.cfg)")
+@click.option("-c", '--settings-file', "settings_file",
+              default=None, show_envvar=True, type=click.File('r'),
+              help="Invoke file gathering validation options")
 @click.option("--detach", "detach",
               default=None, is_flag=True, show_envvar=True,
               help="Run the validation asynchronously (WIP)")
@@ -133,7 +133,7 @@ def handle_build_lockfile(exc=None):
 @click.option("-r", "--report", "enable_report", show_envvar=True,
               is_flag=True, default=False,
               help="Attach a webview server to the current session run.")
-@click.option("--report-uri", "report_addr", default=None,
+@click.option("--report-uri", "report_addr", default=None, type=str,
               help="Override default Server address")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)

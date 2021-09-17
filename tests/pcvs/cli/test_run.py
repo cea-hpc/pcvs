@@ -24,7 +24,7 @@ def test_no_userdirs(mock_sys, mock_bank, mock_pf, mock_session):
 @patch("pcvs.backend.session.remove_session_from_file", return_value={})
 def test_big_integation(rs, us, ss, unlock, lock):
     with isolated_fs():
-        res = click_call('profile', 'build', 'local.default')
+        res = click_call('profile', 'create', 'local.default')
         assert(res.exit_code == 0)
         res = click_call('run')       
         assert(res.exit_code == 0)

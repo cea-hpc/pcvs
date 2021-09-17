@@ -1,4 +1,6 @@
+from genericpath import exists
 import click
+import sys
 from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
@@ -256,7 +258,7 @@ def config_edit(ctx, token, editor, edit_plugin) -> None:
 @config.command(name="import", short_help="Import config from a file")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
-@click.argument("in_file", type=click.File('r'))
+@click.option("-s", "--source", "in_file", type=click.File('r'), default=sys.stdin)
 @click.pass_context
 def config_import(ctx, token, in_file) -> None:
     """
@@ -267,7 +269,7 @@ def config_import(ctx, token, in_file) -> None:
     through the `pcvs config --help` command.
     """
     (scope, kind, label) = utils.extract_infos_from_token(token)
-
+    
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found():
         obj.fill(YAML(typ='safe').load(in_file.read()))
@@ -280,7 +282,7 @@ def config_import(ctx, token, in_file) -> None:
 @config.command(name="export", short_help="Export config into a file")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
-@click.argument("out_file", type=click.File('w'))
+@click.option("-o", "--output", "out_file", type=click.File('w'), default=sys.stdout)
 @click.pass_context
 def config_export(ctx, token, out_file):
     """

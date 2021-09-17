@@ -77,9 +77,9 @@ def bank_show(ctx, name):
         b.show()
 
 
-@bank.command(name="create", short_help="Register a new bank")
-@click.argument("name", nargs=1, required=True, type=str, autocompletion=compl_list_banks)
-@click.argument("path", nargs=1, type=click.Path(exists=False, file_okay=False), required=True)
+@bank.command(name="init", short_help="Register a bank & create a repo if needed")
+@click.argument("name", type=str, autocompletion=compl_list_banks)
+@click.argument("path", required=False, type=click.Path(exists=False, file_okay=False))
 @click.pass_context
 def bank_create(ctx, name, path):
     """Create a new bank, named NAME, data will be stored under PATH."""

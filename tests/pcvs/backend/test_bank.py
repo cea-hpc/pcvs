@@ -37,7 +37,8 @@ def dummy_run():
                         "te_name": "test_main",
                         "label": "TBD",
                         "subtree": "tmp",
-                        "full_name": "tmp/test_main_c4_n4_N1_o4"
+                        "fq_name": "tmp/test_main_c4_n4_N1_o4",
+                        "comb": "TBD"
                     },
                     "exec": "mpirun --share-node --clean -c=4 -n=4 -N=1 /tmp/my_program ",
                     "result": {
@@ -48,7 +49,7 @@ def dummy_run():
                         "tags": "TBD",
                         "metrics": "TBD",
                         "artifacts": "TBD",
-                        "comb": "TBD"}}, 
+                        }}, 
                 ]
             }
             json.dump(content, fh)

@@ -3,6 +3,7 @@ import copy
 import os
 import subprocess
 import sys
+import shutil
 from datetime import datetime
 
 import click
@@ -64,16 +65,16 @@ def exec(ctx, output, argument, gen_list, display):
 @click.command(name="check", short_help="Ensure future input will be conformant to standards")
 @click.option("--encoding", "-E", "encoding", default=False, is_flag=True,
               help="Check capability to print utf-8 characters properly")
-@click.option("--colouring", "-x", "color", default=False, is_flag=True,
+@click.option("--colouring", "-X", "color", default=False, is_flag=True,
               help="Check capability to print coloured characters properly")
-@click.option("--directory", "-d", "dir", default=None,
+@click.option("--directory", "-D", "dir", default=None,
               type=click.Path(exists=True, file_okay=False),
               help="Check correctness for pcvs.* files")
-@click.option("--configs", "-c", "configs", default=False, is_flag=True,
+@click.option("--configs", "-C", "configs", default=False, is_flag=True,
               help="Check correctness for all registered configuation block")
-@click.option("--profiles", "-p", "profiles", default=False, is_flag=True,
+@click.option("--profiles", "-P", "profiles", default=False, is_flag=True,
               help="Check correctness for all registered profiles")
-@click.option("--profile-model", "-m", "pf_name", default="default",
+@click.option("--profile-model", "-p", "pf_name", default="default",
               help="Custom profile to use when checking pcvs.setup scripts")
 @click.pass_context
 def check(ctx, dir, encoding, color, configs, profiles, pf_name):
@@ -147,9 +148,10 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
 @click.option('-i', '--interactive', 'interactive',
               is_flag=True, default=False,
               help="Manage cleanup process interactively")
+@click.option("--remove-dirs", "remove_build_dir", is_flag=True, default=False)
 @click.argument("paths", required=False, type=click.Path(exists=True), nargs=-1)
 @click.pass_context
-def clean(ctx, force, fake, paths, interactive):
+def clean(ctx, force, fake, paths, remove_build_dir, interactive):
     if not fake and not force:
         log.manager.warn(["IMPORTANT NOTICE:",
                           "This command will delete files from previous run(s) and",
@@ -169,31 +171,41 @@ def clean(ctx, force, fake, paths, interactive):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
                 log.manager.print_section("Found build: {}".format(root))
-                for f in files:
-                    if f.startswith('pcvsrun_') and f.endswith('.tar.gz'):
+                archives = [x for x in sorted(files) if x.startswith('pcvsrun_') and x.endswith('.tar.gz')]
+                if len(archives) == 0 and fake:
+                    log.manager.print_item("No archive found.")
+                else:
+                    for f in archives:
                         arch_date = datetime.strptime(
                             f.replace('pcvsrun_', '').replace('.tar.gz', ''),
                             "%Y%m%d%H%M%S"
                         )
                         delta = datetime.now() - arch_date
                         if fake:
-                            log.manager.print_item('Age: {} day{:<1}: {}'.format(
-                                delta.days,
-                                "s" if delta.days > 1 else '',
-                                f))
+                            log.manager.print_item('Age: {:>3} day(s): {}'.format(
+                                delta.days, f))
                             continue
                         elif interactive:
                             if not click.confirm('{}: ({} days ago) ?'.format(f, delta.days)):
                                 continue
                         os.remove(os.path.join(root, f))
-                        log.manager.print_item('deleted {}'.format(f))
+                        log.manager.print_item('Deleting {}'.format(f))
+                if remove_build_dir:
+                    if not fake:
+                        if interactive:
+                            if not click.confirm('{}: ?'.format(root)):
+                                continue
+                        shutil.rmtree(root)
+                        log.manager.print_item('Deleted {}'.format(root))
+                        
+                # stop the walk down to this top directory
                 dirs[:] = []
 
 
 @click.command(name="scan",
                short_help="Analyze directories to build up test conf. files")
 @click.argument("paths", default=None, nargs=-1)
-@click.option("-s/-c", "--set/--check", "set", is_flag=True, default=False)
+@click.option("-c/-l", "--create/--list", "set", is_flag=True, default=False)
 @click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
 def discover(ctx, paths, set, force):

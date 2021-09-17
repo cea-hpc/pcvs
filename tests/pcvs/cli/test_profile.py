@@ -59,10 +59,10 @@ def test_show(mock_pf):
 
 
 @patch('pcvs.backend.profile.Profile')
-def test_build(mock_pf):
+def test_create(mock_pf):
     instance = mock_pf.return_value
     instance.is_found.return_value = False
-    res = click_call('profile', 'build', 'local.default')
+    res = click_call('profile', 'create', 'local.default')
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once_with()
     #instance.clone.assert_called_once_with()
@@ -70,7 +70,7 @@ def test_build(mock_pf):
 
     instance.reset_mock()
     instance.is_found.return_value = True
-    res = click_call('profile', 'build', 'local.default')
+    res = click_call('profile', 'create', 'local.default')
     assert(res.exit_code != 0)
     instance.is_found.assert_called_once_with()
     instance.flush_to_disk.assert_not_called()
