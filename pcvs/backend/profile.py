@@ -49,6 +49,13 @@ def list_profiles(scope=None):
         return PROFILE_EXISTING[scope]
 
 
+def list_templates():
+    array = list()
+    for f in os.listdir(os.path.join(PATH_INSTDIR, "examples", "profile")):
+        array.append((os.path.splitext(f)[0], f))
+    return array
+
+
 class Profile:
     """ A profile represents the most complete object the user can provide.
 
@@ -210,18 +217,20 @@ class Profile:
         with open(self._file) as f:
             self._details = MetaDict(YAML(typ='safe').load(f))
 
-    def load_template(self):
+    def load_template(self, name="default"):
         """Populate the profile from templates of 5 basic config. blocks.
 
         Filepath still need to be determined via `retrieve_file()` call.
         """
         self._exists = True
         self._file = None
-        for kind in config.CONFIG_BLOCKS:
-            filepath = os.path.join(
-                PATH_INSTDIR, "templates", "{}-format.yml".format(kind))
-            with open(filepath, "r") as fh:
-                self.fill({kind: YAML(typ='safe').load(fh)})
+        filepath = os.path.join(PATH_INSTDIR, "examples", "profile", name)+".yml"
+        if not os.path.isfile(filepath):
+            raise ProfileException.NotFoundError(
+                "{} is not a valid base name.\nPlease use pcvs profile list --all".format(name))
+        
+        with open(filepath, "r") as fh:
+            self.fill(YAML(typ='safe').load(fh))
 
     def check(self):
         """Ensure profile meets scheme requirements, as a concatenation of 5

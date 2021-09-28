@@ -4,7 +4,7 @@ criterion:
   iterators:
     n_mpi:
       subtitle: n
-      values: [2, 8]
+      values: [1, 2, 3, 4]
 group:
   GRPMPI:
     run:

@@ -1,4 +1,6 @@
+from pcvs import PATH_INSTDIR
 import click
+import os
 import sys
 from ruamel.yaml import YAML
 
@@ -28,6 +30,10 @@ def compl_list_token(ctx, args, incomplete):  # pragma: no cover
     return [elt for elt in flat_array if incomplete in elt]
 
 
+def compl_list_templates(ctx, args, incomplete):  # pragma: no cover
+    return [name for name, path in pvProfile.list_templates() if incomplete in name]
+
+
 @click.group(name="profile", short_help="Manage Profiles")
 @click.pass_context
 def profile(ctx):
@@ -48,8 +54,10 @@ def profile(ctx):
 @profile.command(name="list", short_help="List available profiles")
 @click.argument("token", nargs=1, required=False,
                 type=click.STRING, autocompletion=compl_list_token)
+@click.option("-a", "--all", "all", is_flag=True, default=False,
+              help="Include any extra resources for profile (templates, etc.)")
 @click.pass_context
-def profile_list(ctx, token):
+def profile_list(ctx, token, all):
     """
     List all known profiles to be used as part of a validation process. The
     list can be filtered out depending on the '--scope' option to only print
@@ -86,6 +94,10 @@ def profile_list(ctx, token):
         names = sorted([x[0] for x in profiles])
         log.manager.print_item("{: <6s}: {}".format(
             scope.upper(), ", ".join(names)))
+    
+    if all:
+        log.manager.print_section("Available templates to create from (--base option):")
+        log.manager.print_item(", ".join([x[0] for x in pvProfile.list_templates()]))
 
     # in case verbosity is enabled, add scope paths
     log.manager.info("Scopes are ordered as follows:")
@@ -153,14 +165,17 @@ def profile_interactive_select():
               default=None, show_envvar=True,
               autocompletion=cli_config.compl_list_token,
               help="non-interactive option to build a profile")
-@click.option("-f", "--from", "clone", show_envvar=True,
+@click.option("-c", "--clone", "clone", show_envvar=True,
               default=None, type=click.STRING,
               autocompletion=compl_list_token,
               help="Another profile to herit from.")
+@click.option("-t", "--base", "base", type=str, default=None,
+              autocompletion=compl_list_templates,
+              help="Select a template profile to herit from")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.pass_context
-def profile_create(ctx, token, interactive, blocks, clone):
+def profile_create(ctx, token, interactive, blocks, clone, base):
     """
     Creates a new profile based on basic configuration blocks (see the 'config'
     command). The newly created profile is built from basic configuration
@@ -182,6 +197,9 @@ def profile_create(ctx, token, interactive, blocks, clone):
     and end with an alphanumeric but no more restrictions are applied
     (e.g. 'mpi-srun-stampede-large' is allowed)
     """
+    if clone and base:
+        raise click.BadOptionUsage("--base/--clone", "Cannot use --base & --clone simultaneously.")
+    
     (p_scope, _, p_label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(p_label, p_scope)
@@ -196,6 +214,8 @@ def profile_create(ctx, token, interactive, blocks, clone):
         base = pvProfile.Profile(c_label, c_scope)
         base.load_from_disk()
         pf.clone(base)
+    elif base:
+        pf.load_template(base)
     elif interactive:
         log.manager.print_header("profile view (build)")
         pf_blocks = profile_interactive_select()
