@@ -284,9 +284,8 @@ def unlock_file(f):
     :type f: os.path
     """
     if os.path.exists(f) and os.path.isfile(f):
-        with open(f, "w+") as fh:
-            os.remove(f)
-            log.manager.debug("Unlock {}".format(f))
+        os.remove(f)
+        log.manager.debug("Unlock {}".format(f))
 
 
 def lock_file(f, reentrant=False, timeout=None):
@@ -334,12 +333,15 @@ def trylock_file(f, reentrant=False):
         log.manager.debug("Lock {}".format(f))
         return True
     else:
-        with open(f, 'r') as fh:
-            pid = int(fh.read().strip())
+        try:
+            with open(f, 'r') as fh:
+                pid = int(fh.read().strip())
 
-        if pid == os.getpid() and reentrant:
-            log.manager.debug("Lock {}".format(f))
-            return True
+            if pid == os.getpid() and reentrant:
+                log.manager.debug("Lock {}".format(f))
+                return True
+        except ValueError as e:
+            pass # return False
 
         return False
 
