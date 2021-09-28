@@ -68,7 +68,7 @@ class ValidationScheme:
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             raise ValidationException.FormatError(
-                "{}:\n{}".format(filepath, e))
+                "{}\nMessage: {}".format(filepath, e.message))
         except jsonschema.exceptions.SchemaError as e:
             raise ValidationException.SchemeError(
                 "{}: {}".format(self._name, e))

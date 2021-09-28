@@ -2,6 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
+import getpass, pathlib
 from click.testing import CliRunner
 from ruamel.yaml import YAML
 
@@ -12,7 +13,6 @@ from pcvs.plugins import Collection
 from pcvs.testing import testfile as tested
 
 
-@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_replace_tokens():
     build = "/path/to/build"
     prefix = "dir1/dir2"
@@ -41,15 +41,14 @@ def test_replace_tokens():
     assert(tested.replace_special_token(
                 'HOME is @HOME@',
                 src, build, prefix
-    ) == 'HOME is {}'.format("/home/user"))
+    ) == 'HOME is {}'.format(pathlib.Path.home()))
 
     assert(tested.replace_special_token(
                 'USER is @USER@',
                 src, build, prefix
-    ) == 'USER is {}'.format("superuser"))
+    ) == 'USER is {}'.format(getpass.getuser()))
 
 
-@patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 def test_load_yaml_file():
     tested.load_yaml_file(os.path.join(PATH_INSTDIR, "schemes/criterion-scheme.yml"), 
         os.path.join(PATH_INSTDIR, "schemes"), 
