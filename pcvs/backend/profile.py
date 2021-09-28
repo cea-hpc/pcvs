@@ -234,7 +234,7 @@ class Profile:
             if kind not in self._details:
                 raise ValidationException.FormatError(
                     "Missing '{}' in profile".format(kind))
-            system.ValidationScheme(kind).validate(self._details[kind])
+            system.ValidationScheme(kind).validate(self._details[kind], filepath=self._name)
 
     def flush_to_disk(self):
         """Write down profile to disk.

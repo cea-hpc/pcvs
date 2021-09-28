@@ -1,4 +1,5 @@
 from genericpath import exists
+from pcvs.helpers.exceptions import ConfigException
 import click
 import sys
 from ruamel.yaml import YAML
@@ -259,8 +260,10 @@ def config_edit(ctx, token, editor, edit_plugin) -> None:
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.option("-s", "--source", "in_file", type=click.File('r'), default=sys.stdin)
+@click.option("-f", "--force", "force", is_flag=True, default=False,
+              help="Erase any previously existing config.")
 @click.pass_context
-def config_import(ctx, token, in_file) -> None:
+def config_import(ctx, token, in_file, force) -> None:
     """
     Import a new configuration block from a YAML file named IN_FILE.
     The configuration is then validated to ensure consistency.
@@ -271,12 +274,11 @@ def config_import(ctx, token, in_file) -> None:
     (scope, kind, label) = utils.extract_infos_from_token(token)
     
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
-    if not obj.is_found():
+    if not obj.is_found() or force:
         obj.fill(YAML(typ='safe').load(in_file.read()))
         obj.flush_to_disk()
     else:
-        raise click.BadArgumentUsage(
-            "Cannot import into an already created conf. block!")
+        raise ConfigException.AlreadyExistError("{}".format(obj.full_name))
 
 
 @config.command(name="export", short_help="Export config into a file")

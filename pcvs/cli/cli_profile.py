@@ -290,16 +290,17 @@ def profile_edit(ctx, token, editor, edit_plugin):
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
 @click.option("-s", "--source", "src_file", type=click.File('r'), default=sys.stdin)
+@click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
-def profile_import(ctx, token, src_file):
+def profile_import(ctx, token, src_file, force):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
-    if not pf.is_found():
+    if not pf.is_found() or force:
         pf.fill(YAML(typ='safe').load(src_file.read()))
         pf.flush_to_disk()
     else:
-        ProfileException.AlreadyExistError(token)
-
+        raise ProfileException.AlreadyExistError("{}".format(pf.full_name))
+        
 
 @profile.command(name="export",
                  short_help="Export a profile to a file")

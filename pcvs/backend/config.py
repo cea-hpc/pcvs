@@ -215,7 +215,7 @@ class ConfigurationBlock:
 
     def check(self) -> None:
         """Validate a single configuration block according to its scheme."""
-        system.ValidationScheme(self._kind).validate(self._details)
+        system.ValidationScheme(self._kind).validate(self._details, filepath=self.full_name)
 
     def load_from_disk(self) -> None:
         """load the configuration file to populate the current object.
