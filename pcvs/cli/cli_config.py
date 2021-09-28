@@ -1,4 +1,5 @@
 from genericpath import exists
+from pcvs.backend.profile import list_templates
 from pcvs.helpers.exceptions import ConfigException
 import click
 import sys
@@ -27,7 +28,9 @@ def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
 
     return [elt for elt in flat_array if incomplete in elt]
 
-
+def compl_list_templates(ctx, args, incomplete) -> list:  # pragma: no cover
+    return [elt for elt in pvConfig.list_templates() if incomplete in elt]
+    
 @click.group(name="config", short_help="Manage Configuration blocks")
 @click.pass_context
 def config(ctx) -> None:
@@ -85,8 +88,10 @@ def config_list_single_kind(kind, scope) -> None:
 @config.command(name="list", short_help="List available configuration blocks")
 @click.argument("token", nargs=1, required=False,
                 type=click.STRING, autocompletion=compl_list_token)
+@click.option("-a", "--all", "all", is_flag=True, default=False,
+              help="Display extra resources (templates, etc.)")
 @click.pass_context
-def config_list(ctx, token) -> None:
+def config_list(ctx, token, all) -> None:
     """List available configurations on the system. The list can be
     filtered by applying a KIND. Possible values for KIND are documented
     through the `pcvs config --help` command.
@@ -118,6 +123,11 @@ def config_list(ctx, token) -> None:
     for k in kinds:
         log.manager.print_section("Kind '{}'".format(k.upper()))
         config_list_single_kind(k, scope)
+
+    if all:
+        log.manager.print_section("Available templates to create from (--base option):")
+        log.manager.print_item(", ".join([x for x in sorted(pvConfig.list_templates())]))
+
 
     # in case verbosity is enabled, add scope paths
     log.manager.info("Scopes are ordered as follows:")
@@ -154,14 +164,16 @@ def config_show(ctx, token) -> None:
 @config.command(name="create", short_help="Create/Clone a configuration block")
 @click.argument("token", nargs=1, type=click.STRING,
                 autocompletion=compl_list_token)
-@click.option("-f", "--from", "clone",
+@click.option("-c", "--clone", "clone",
               default=None, type=str, show_envvar=True,
               help="Valid name to copy (may use scope, e.g. global.label)")
+@click.option("-T", "--base", "base", type=str, default=None, autocompletion=compl_list_templates,
+              help="Specify a template to bootstrap the configuration.")
 @click.option("-i/-I", "--interactive/--no-interactive", "interactive",
               default=False, is_flag=True,
               help="Directly open the created config block in $EDITOR")
 @click.pass_context
-def config_create(ctx, token, clone, interactive) -> None:
+def config_create(ctx, token, clone, base, interactive) -> None:
     """Create a new configuration block for the given KIND. The newly created
     block will be labeled NAME. It is inherited from a default template. This
     can be overriden by spefifying a CLONE argument.
@@ -174,33 +186,40 @@ def config_create(ctx, token, clone, interactive) -> None:
     Possible values for KIND are documented
     through the `pcvs config --help` command.
     """
+    if clone and base:
+        raise click.BadOptionUsage("--clone/--base", "--clone & --base cannot be used simultaneously.")
+    
     (scope, kind, label) = utils.extract_infos_from_token(token)
+    
+    copy = pvConfig.ConfigurationBlock(kind, label, scope)
+    if copy.is_found():
+        raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
+            copy.full_name))
+    
     if clone is not None:
         (c_scope, c_kind, c_label) = utils.extract_infos_from_token(
             clone, pair='span')
         if c_kind is not None and c_kind != kind:
             raise click.BadArgumentUsage(
                 "Can only clone from a conf. blocks with the same KIND!")
-        base = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
-        if not base.is_found():
+        cfg = pvConfig.ConfigurationBlock(kind, c_label, c_scope)
+        if not cfg.is_found():
             raise click.BadArgumentUsage(
                 "There is no such conf.block named '{}'".format(clone)
             )
-        base.load_from_disk()
+        cfg.load_from_disk()
+        copy.clone(cfg)
     else:
-        base = pvConfig.ConfigurationBlock(kind, 'default', None)
-        base.load_template()
+        copy.load_template(base)
+        
+    copy.check()
+    
+    copy.flush_to_disk()
+    if interactive:
+        copy.edit()
+        
 
-    copy = pvConfig.ConfigurationBlock(kind, label, scope)
-    if not copy.is_found():
-        copy.clone(base)
-        copy.flush_to_disk()
-        if interactive:
-            copy.edit()
-    else:
-        raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
-            copy.full_name))
-
+    
 
 @config.command(name="destroy", short_help="Remove a config block")
 @click.argument("token", nargs=1, type=click.STRING,

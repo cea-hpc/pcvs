@@ -54,7 +54,14 @@ def list_blocks(kind, scope=None):
     else:
         return CONFIG_EXISTING[kind][scope]
 
+def list_templates():
+    array = list()
+    for f in os.listdir(os.path.join(PATH_INSTDIR, "templates/config")):
+        array.append(os.path.splitext(f)[0])
+        
+    return array
 
+    
 def check_valid_kind(s):
     """Assert the parameter is a valid kind.
 
@@ -237,11 +244,18 @@ class ConfigurationBlock:
         with open(self._file) as f:
             self._details = MetaDict(YAML(typ='safe').load(f))
 
-    def load_template(self) -> None:
+    def load_template(self, name=None) -> None:
         """load from the specific template, to create a new config block"""
         self._exists = True
-        with open(os.path.join(PATH_INSTDIR,
-                               'templates/{}-format.yml'.format(self._kind)), 'r') as fh:
+        if not name:
+            name = self._kind + ".default"
+        filepath = os.path.join(PATH_INSTDIR,
+                               'templates/config/{}.yml'.format(name))
+
+        if not os.path.isfile(filepath):
+            raise ConfigException.NotFoundError("{}".format(name))
+        
+        with open(filepath, 'r') as fh:
             self.fill(YAML(typ='safe').load(fh))
 
     def flush_to_disk(self) -> None:

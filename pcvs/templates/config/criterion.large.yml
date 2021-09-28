@@ -6,18 +6,21 @@ iterators:
   # a criterion name
   n_node:
     # the range of values it can take (any type)
-    values: [1, 2]
+    values: [1, 2, 3, 4]
     # the prefix to use when labelling test name for this IT
     subtitle: "N"
   n_mpi:
-    values: [2, 32]
+    values: [2, 4, 8, 16, 32]
     subtitle: "n"
   n_omp:
-    values: [4, 8]
+    values: [1, 2, 4, 8]
     subtitle: "o"
   n_core:
-    values: [1, 2]
+    values: [1, 2, 4, 8]
     subtitle: "c"
+  net:
+    values: ['tcp', 'shmem', 'ib']
+    subtitle: ''
 
 # As a combinatorial scheme, the desc above will generate the following
 # 16 test combinations (for each program defined):

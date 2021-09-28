@@ -66,7 +66,7 @@ def test_config_load_template(kind, capsys):
     
     with open(os.path.join(
                     pcvs.PATH_INSTDIR,
-                    "templates/{}-format.yml".format(kind)), 'r') as fh:
+                    "templates/config/{}.default.yml".format(kind)), 'r') as fh:
         ref = MetaDict(YAML(typ='safe').load(fh))
         assert(res == ref)
     

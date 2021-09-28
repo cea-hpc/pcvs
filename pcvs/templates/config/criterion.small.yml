@@ -1,0 +1,60 @@
+---
+# Defines criterion values to be used during the validation
+# Iterators are only valid if they have been declared
+# previously by the runtime
+iterators:
+  # a criterion name
+  n_node:
+    # the range of values it can take (any type)
+    values: [1] 
+    # the prefix to use when labelling test name for this IT
+    subtitle: "N"
+  n_mpi:
+    values: [1, 2, 4]
+    subtitle: "n"
+  n_omp:
+    values: [2, 4]
+    subtitle: "o"
+
+# As a combinatorial scheme, the desc above will generate the following
+# 16 test combinations (for each program defined):
+# (node:1, mpi:2, omp:4, core:1)
+# (node:1, mpi:2, omp:4, core:2)
+# (node:1, mpi:2, omp:8, core:1)
+# (node:1, mpi:2, omp:8, core:2)
+# (node:1, mpi:32, omp:4, core:1)
+# (node:1, mpi:32, omp:4, core:2)
+# (node:1, mpi:32, omp:8, core:1)
+# (node:1, mpi:32, omp:8, core:2)
+# (node:2, mpi:2, omp:4, core:1)
+# (node:2, mpi:2, omp:4, core:2)
+# (node:2, mpi:2, omp:8, core:1)
+# (node:2, mpi:2, omp:8, core:2)
+# (node:2, mpi:32, omp:4, core:1)
+# (node:2, mpi:32, omp:4, core:2)
+# (node:2, mpi:32, omp:8, core:1)
+# (node:2, mpi:32, omp:8, core:2)
+
+# When iterators are declared as 'numeric' by the runtime,
+# special syntaxes have been introduced to ease the definition
+# of complex series of number. These are called sequences and
+# can be used as a replacement of a single value. They map as
+# dict instead of a single value. Three types of sequences:
+# - sequence | arithmeric: to create an arithmetic sequence: U(n+1) = U(n) + k
+# - multiplication | geometric : to create a geometric sequence: U(n+1) U(n) ^ k
+# - powerof: to create a list withing a range where values are power of k
+#
+# Each operation comes with three parameters:
+# - from: lowerbound (inclusive)
+# - to: upperbound (inclusive)
+# - of: the 'stride/factor/power' to apply
+# - op: type of operation: 
+#            - "seq" | "ari" | "arithmetic"
+#            - "mul" | "geo" | "geometric"
+#            - "pow" | "powerof"
+#
+# Examples:
+# - {op: seq, from: 2, to: 10,  of: 2} --> [2, 4, 6, 8, 10]
+# - {op: mul, from: 1, to: 100, of: 2} --> [1, 2, 4, 8, 16, 32, 64]
+# - {op: pow, from: 2, to: 10,  of: 2} --> [4, 9]
+# - {op, pow, from: 1, to: 100, of 3}  --> [1, 8, 27, 64]

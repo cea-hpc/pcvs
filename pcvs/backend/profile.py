@@ -51,7 +51,7 @@ def list_profiles(scope=None):
 
 def list_templates():
     array = list()
-    for f in os.listdir(os.path.join(PATH_INSTDIR, "examples", "profile")):
+    for f in os.listdir(os.path.join(PATH_INSTDIR, "templates", "profile")):
         array.append((os.path.splitext(f)[0], f))
     return array
 
@@ -224,7 +224,7 @@ class Profile:
         """
         self._exists = True
         self._file = None
-        filepath = os.path.join(PATH_INSTDIR, "examples", "profile", name)+".yml"
+        filepath = os.path.join(PATH_INSTDIR, "templates", "profile", name)+".yml"
         if not os.path.isfile(filepath):
             raise ProfileException.NotFoundError(
                 "{} is not a valid base name.\nPlease use pcvs profile list --all".format(name))
