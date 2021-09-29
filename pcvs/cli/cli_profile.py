@@ -53,7 +53,7 @@ def profile(ctx):
 
 @profile.command(name="list", short_help="List available profiles")
 @click.argument("token", nargs=1, required=False,
-                type=click.STRING, autocompletion=compl_list_token)
+                type=click.STRING, shell_complete=compl_list_token)
 @click.option("-a", "--all", "all", is_flag=True, default=False,
               help="Include any extra resources for profile (templates, etc.)")
 @click.pass_context
@@ -109,7 +109,7 @@ def profile_list(ctx, token, all):
 @profile.command(name="show",
                  short_help="Prints single profile details")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.pass_context
 def profile_show(ctx, token):
     """Prints a detailed view of the NAME profile."""
@@ -163,17 +163,17 @@ def profile_interactive_select():
               help="Build the profile by interactively selecting conf. blocks")
 @click.option("-b", "--block", "blocks", multiple=True,
               default=None, show_envvar=True,
-              autocompletion=cli_config.compl_list_token,
+              shell_complete=cli_config.compl_list_token,
               help="non-interactive option to build a profile")
 @click.option("-c", "--clone", "clone", show_envvar=True,
               default=None, type=click.STRING,
-              autocompletion=compl_list_token,
+              shell_complete=compl_list_token,
               help="Another profile to herit from.")
 @click.option("-t", "--base", "base", type=str, default=None,
-              autocompletion=compl_list_templates,
+              shell_complete=compl_list_templates,
               help="Select a template profile to herit from")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.pass_context
 def profile_create(ctx, token, interactive, blocks, clone, base):
     """
@@ -257,7 +257,7 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
     prompt="Are you sure you want to delete this profile ?",
     help="Do not ask for confirmation")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.pass_context
 def profile_destroy(ctx, token):
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
@@ -279,7 +279,7 @@ def profile_destroy(ctx, token):
 @profile.command(name="edit",
                  short_help="Edit an existing profile")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
               help="Only edit the plugin code ('runtime')")
 @click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
@@ -308,7 +308,7 @@ def profile_edit(ctx, token, editor, edit_plugin):
 @profile.command(name="import",
                  short_help="Import a file as a profile")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-s", "--source", "src_file", type=click.File('r'), default=sys.stdin)
 @click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
@@ -325,7 +325,7 @@ def profile_import(ctx, token, src_file, force):
 @profile.command(name="export",
                  short_help="Export a profile to a file")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-o", "--output", "dest_file", type=click.File('w'), default=sys.stdout)
 @click.pass_context
 def profile_export(ctx, token, dest_file):
@@ -340,7 +340,7 @@ def profile_export(ctx, token, dest_file):
 @profile.command(name="split",
                  short_help="Recreate conf. blocks based on a profile")
 @click.argument("token", nargs=1, type=click.STRING,
-                autocompletion=compl_list_token)
+                shell_complete=compl_list_token)
 @click.option("-n", "--name", "name", default="default",
               help="name of the basic block to create (should not exist!)"
               )
