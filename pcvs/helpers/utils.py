@@ -277,15 +277,26 @@ def find_buildir_from_prefix(path):
     return path
 
 
+def get_lockfile_name(f):
+    path = os.path.dirname(f)
+    filename = os.path.basename(f)
+    
+    # hide lock file if original file isn't
+    if not filename.startswith("."):
+        filename = "." + filename
+        
+    return os.path.join(path, filename + ".lck")
+
 def unlock_file(f):
     """Remove lock from a directory.
 
     :param f: file locking the directory
     :type f: os.path
     """
-    if os.path.exists(f) and os.path.isfile(f):
-        os.remove(f)
-        log.manager.debug("Unlock {}".format(f))
+    lf_name = get_lockfile_name(f)
+    if os.path.exists(lf_name) and os.path.isfile(lf_name):
+        os.remove(lf_name)
+        log.manager.debug("Unlock {}".format(lf_name))
 
 
 def lock_file(f, reentrant=False, timeout=None):
@@ -327,18 +338,17 @@ def trylock_file(f, reentrant=False):
     :return: True if the file is reached, False otherwise
     :rtype: bool
     """
-    if not os.path.exists(f):
-        with open(f, 'w') as fh:
+    lockfile_name = get_lockfile_name(f)
+    if not os.path.exists(lockfile_name):
+        with open(lockfile_name, 'w') as fh:
             fh.write("{}".format(os.getpid()))
-        log.manager.debug("Lock {}".format(f))
+        log.manager.debug("Lock {}".format(lockfile_name))
         return True
     else:
         try:
-            with open(f, 'r') as fh:
-                pid = int(fh.read().strip())
-
+            pid = get_lock_owner(f)
             if pid == os.getpid() and reentrant:
-                log.manager.debug("Lock {}".format(f))
+                log.manager.debug("Lock {}".format(lockfile_name))
                 return True
         except ValueError as e:
             pass # return False
@@ -347,4 +357,11 @@ def trylock_file(f, reentrant=False):
 
 
 def is_locked(f):
-    return os.path.isfile(os.path.abspath(f))
+    lf_name = get_lockfile_name(f)
+    return os.path.isfile(os.path.abspath(lf_name))
+
+
+def get_lock_owner(f):
+    lf_name = get_lockfile_name(f)
+    with open(lf_name, 'r') as fh:
+        return int(fh.read().strip())

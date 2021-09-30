@@ -1,9 +1,9 @@
 import os
 from datetime import datetime, timedelta
+from pcvs import NAME_BUILDFILE
 
 import click
 
-from pcvs import NAME_BUILDIR_LOCKFILE
 from pcvs.backend import session as pvSession
 from pcvs.helpers import log, utils
 
@@ -43,7 +43,7 @@ def session(ctx, ack, list, ack_all):
             if sessions[session_id]['state'] != pvSession.Session.State.IN_PROGRESS:
                 pvSession.remove_session_from_file(session_id)
                 lockfile = os.path.join(
-                    sessions[session_id]['path'], NAME_BUILDIR_LOCKFILE)
+                    sessions[session_id]['path'], NAME_BUILDFILE)
                 utils.unlock_file(lockfile)
     elif ack is not None:
         if ack not in sessions.keys():
@@ -54,7 +54,7 @@ def session(ctx, ack, list, ack_all):
                 '--ack', "This session is not completed yet")
 
         pvSession.remove_session_from_file(ack)
-        lockfile = os.path.join(sessions[ack]['path'], NAME_BUILDIR_LOCKFILE)
+        lockfile = os.path.join(sessions[ack]['path'], NAME_BUILDFILE)
         utils.unlock_file(lockfile)
     else:  # listing is the defualt
         log.manager.print_header("Session View")

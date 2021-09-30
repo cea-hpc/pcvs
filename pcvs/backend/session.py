@@ -7,7 +7,7 @@ from multiprocessing import Process
 from ruamel.yaml import YAML
 from ruamel.yaml.main import yaml_object
 
-from pcvs import PATH_SESSION, PATH_SESSION_LOCKFILE
+from pcvs import PATH_SESSION
 from pcvs.helpers import log, utils
 
 yml = YAML()
@@ -18,7 +18,7 @@ def unlock_session_file():
 
     The call won't fail if the lockfile is not taken before unlocking.
     """
-    utils.unlock_file(PATH_SESSION_LOCKFILE)
+    utils.unlock_file(PATH_SESSION)
 
 
 def lock_session_file(timeout=None):
@@ -31,7 +31,7 @@ def lock_session_file(timeout=None):
         TimeoutError)
     :type timeout: int
     """
-    utils.lock_file(PATH_SESSION_LOCKFILE, timeout=timeout)
+    utils.lock_file(PATH_SESSION, timeout=timeout)
 
 
 def store_session_to_file(c):

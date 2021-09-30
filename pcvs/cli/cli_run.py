@@ -3,7 +3,7 @@ from datetime import datetime
 
 import click
 
-from pcvs import NAME_BUILDIR_LOCKFILE
+from pcvs import NAME_BUILDFILE
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
@@ -91,13 +91,12 @@ def handle_build_lockfile(exc=None):
     :type exc: Exception
     """
     if system.MetaConfig.root:
-        lock = os.path.join(
-            system.MetaConfig.root.validation.output, NAME_BUILDIR_LOCKFILE)
-        if os.path.exists(lock):
-            with open(lock, 'r') as fh:
-                if int(fh.read()) == os.getpid():
-                    utils.unlock_file(lock)
-
+        prefix = os.path.join(
+            system.MetaConfig.root.validation.output, NAME_BUILDFILE)
+        if utils.is_locked(prefix):
+            if utils.get_lock_owner(prefix) == os.getpid():
+                utils.unlock_file(prefix)
+                
     if exc:
         raise exc
 
@@ -196,13 +195,14 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
                 "--bank", "'{}' bank does not exist".format(obj.name))
 
     # BEFORE the build dir still does not exist !
-    lockfile = os.path.join(val_cfg.output, NAME_BUILDIR_LOCKFILE)
+    buildfile = os.path.join(val_cfg.output, NAME_BUILDFILE)
     if os.path.exists(val_cfg.output):
         if not val_cfg.override:
-            raise click.BadOptionUsage(
-                "--output", "target build directory already exist")
-        if not utils.trylock_file(lockfile):
-            raise RunException.InProgressError(val_cfg.output)
+            raise exceptions.RunException.OverrideError("Build directory already exist: {}".format(val_cfg.output))
+        if not utils.trylock_file(buildfile):
+            raise exceptions.RunException.InProgressError(path=val_cfg.output,
+                                               lockfile=buildfile,
+                                               owner_pid=utils.get_lock_owner(buildfile))
 
     elif not os.path.exists(val_cfg.output):
         log.manager.debug(
@@ -256,4 +256,4 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
             "Session successfully started, ID {}".format(sid))
     else:
         the_session.run(the_session)
-        utils.unlock_file(lockfile)
+        utils.unlock_file(buildfile)

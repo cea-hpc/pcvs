@@ -9,7 +9,7 @@ from subprocess import CalledProcessError
 from ruamel.yaml import YAML
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
-                  NAME_BUILDIR, NAME_SRCDIR, NAME_BUILDIR_LOCKFILE)
+                  NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import communications, criterion, log, utils
 from pcvs.helpers.exceptions import RunException
@@ -144,9 +144,9 @@ def process_main_workflow(the_session=None):
                 os.path.join(valcfg.output)
             )
             
-    lockfile = os.path.join(valcfg.output, NAME_BUILDIR_LOCKFILE)
-    if utils.is_locked(lockfile):
-        utils.unlock_file(lockfile)
+    buildfile = os.path.join(valcfg.output, NAME_BUILDFILE)
+    if utils.is_locked(buildfile):
+        utils.unlock_file(buildfile)
     
 
 
