@@ -8,6 +8,12 @@ import traceback
 import click
 
 from pcvs.helpers.exceptions import CommonException
+from pcvs.helpers import exceptions
+
+def pretty_print_exception(e: exceptions.GenericError):
+    global manager
+    manager.err([e.err, e.help])
+    manager.info("Extra infos:\n{}".format(e.dbg_str))
 
 
 class IOManager:
@@ -279,8 +285,8 @@ class IOManager:
                 except e_type as e:
                     #raise e
                     if user_func is None:
-                        manager.err("{}: {}".format(type(e).__name__, e))
-                        manager.info(
+                        pretty_print_exception(e)
+                        manager.debug(
                             traceback.format_exception(*sys.exc_info()))
                         sys.exit(1)
                     else:

@@ -9,8 +9,8 @@ from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
 from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
-from pcvs.helpers import communications, log, system, utils
-from pcvs.helpers.exceptions import RunException
+from pcvs.helpers import log, system, utils
+from pcvs.helpers import exceptions
 
 
 def iterate_dirs(ctx, param, value) -> dict:

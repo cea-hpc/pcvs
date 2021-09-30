@@ -1,16 +1,47 @@
+
 class GenericError(Exception):
     """Generic error (custom errors will inherit of this)."""
 
-    def __init__(self, msg, **kwargs):
+    def __init__(self, err_msg="Unkown error",
+                 help_msg="Please check pcvs --help for more information.",
+                 dbg_info={}):
         """Constructor for generic errors.
         :param *args: unused
         :param **kwargs: messages for the error.
         """
-        message = "{}".format(msg)
-        for k, v in kwargs.items():
-            message += "\n- {}: {}".format(k, v)
-
-        super().__init__(message)
+        self._err_msg = "{} - {}".format(type(self).__name__, err_msg)
+        self._help_msg = help_msg
+        self._dbg_info = dbg_info
+        
+    def __str__(self):
+        dbg_str = ""
+        if self._dbg_info:
+            dbg_str = "\n\nExtra infos:\n" + self.dbg_str
+        return "{}\n{}{}".format(
+            self._err_msg,
+            self._help_msg,
+            dbg_str
+        )
+        
+    @property
+    def err(self):
+        return self._err_msg
+    
+    @property
+    def help(self):
+        return self._help_msg
+    
+    @property
+    def dbg(self):
+        return self._dbg_info
+    
+    @property
+    def dbg_str(self):
+        if not self._dbg_info:
+            return " - None"
+        w = max([len(k) for k in self._dbg_info.keys()])
+        return "\n".join([" - {:<{w}}: {}".format(k, v, w=w) for k, v in self._dbg_info.items()])
+        
 
 
 class CommonException:
@@ -18,12 +49,10 @@ class CommonException:
 
     class AlreadyExistError(GenericError):
         """The content already exist as it should."""
-
         pass
 
     class UnclassifiableError(GenericError):
         """Unable to classify this common error."""
-
         pass
 
     class NotFoundError(GenericError):
@@ -77,37 +106,64 @@ class ValidationException(CommonException):
 
     class FormatError(GenericError):
         """The content does not comply the required format (schemes)."""
-
-        pass
-
+        def __init__(self, msg="Invalid format", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Note configuration, profiles & pcvs.* files can be ",
+                                 "verified through `pcvs check [-c|-p|-D <path>]`"]),
+                             dbg_info=kwargs)
+        
+        
     class SchemeError(GenericError):
         """The content is not a valid format (scheme)."""
-
-        pass
-
+        def __init__(self, msg="Invalid Scheme provided", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Provided schemes should be static. If code haven't be",
+                                 "changed, please report this error."]),
+                             dbg_info=kwargs)
+        
 
 class RunException(CommonException):
     """Run-specific exceptions."""
 
     class OverrideError(GenericError):
         """A previous run exist and the override permission haven't be given."""
-
-        pass
-
+        def __init__(self, msg="Duplicate path", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Please use -f/--override to overwrite or change",
+                                 "default build directory with -o/--output"]),
+                             dbg_info=kwargs)
+        
     class InProgressError(GenericError):
         """A run is currently occuring in the given dir."""
-
-        pass
-
+        def __init__(self, msg="Execution in progress in build directory", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                "Please wait for completion from previous builds (`pcvs session`)",
+                                "or remove $BUILD/.pcvs-isbuilddir.lck if necessary."]),
+                             dbg_info=kwargs)
+        
+        
     class ProgramError(GenericError):
         """The given program cannot be found."""
-
-        pass
-
+        def __init__(self, msg="Program cannot be found", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                "A program/binary defined in loaded profile cannot",
+                                "be found in $PATH or spack/module. Please report",
+                                "if this is a false warning."]),
+                             dbg_info=kwargs)
+        
     class TestUnfoldError(GenericError):
         """Issue raised during processing test files."""
-
-        pass
+        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                "Test directories can be checked beforehand with `pcvs check -D <path>`",
+                                "See pcvs check --help for more information."]),
+                             dbg_info=kwargs)
 
 
 class TestException(CommonException):

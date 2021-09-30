@@ -68,10 +68,13 @@ class ValidationScheme:
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             raise ValidationException.FormatError(
-                "{}\nMessage: {}".format(filepath, e.message))
+                "Scheme '{}' failed to verify the following file:\n{}".format(self._name, filepath),
+                reason=e.message)
         except jsonschema.exceptions.SchemaError as e:
             raise ValidationException.SchemeError(
-                "{}: {}".format(self._name, e))
+                name=self._name,
+                content=self._scheme,
+                error=e)
 
 
 class MetaDict(addict.Dict):
