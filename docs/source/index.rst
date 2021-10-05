@@ -60,6 +60,7 @@ frameworks).
 
    basics/features
    basics/getting-started
+   basics/installation
    basics/basic-use
    basics/issues
    basics/workflow
@@ -77,6 +78,7 @@ frameworks).
    ref/session
    ref/utils
    ref/plugin
+   ref/examples
 
 .. toctree::
    :maxdepth: 2
@@ -86,6 +88,3 @@ frameworks).
    dev/contribution
    api/pcvs
 
-   
-   
-   

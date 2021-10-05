@@ -19,6 +19,8 @@ This configuration is separated in 5 nodes :
 each node is separated in subnodes and can be defined separately in multiple
 ways. As files, profiles are written with the yml syntax. 
 
+.. _profile-scope:
+
 Scope
 -----
 
