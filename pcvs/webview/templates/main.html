@@ -35,9 +35,9 @@ function init_the_table(){
 					return "<a href='/run/"+d+"'>"+d+"</a>"
 			}},
 				{"responsivePriority": 2, "title": "State", "class": "center", "data": 'state'},
-				{"responsivePriority": 5, "title": "Successes", "data": 'count', "render": function(d, t, s){return d["2"];}},
-				{"responsivePriority": 3, "title": "Failures", "data": 'count', "render": function(d, t, s){return d["3"];}},
-				{"responsivePriority": 6, "title": "Other", "data": 'count', "render": function(d, t, s){return d["0"]+d["1"]+d["4"]+d["5"];}},
+				{"responsivePriority": 5, "title": "Successes", "data": 'count', "render": function(d, t, s){return d["SUCCESS"];}},
+				{"responsivePriority": 3, "title": "Failures", "data": 'count', "render": function(d, t, s){return d["FAILURE"];}},
+				{"responsivePriority": 6, "title": "Other", "data": 'count', "render": function(d, t, s){return d["WAITING"]+d["IN_PROGRESS"]+d["ERR_DEP"]+d["ERR_OTHER"];}},
 				{"responsivePriority": 4, "title": "Build path", "data": 'path'},
 			]
 			});

@@ -386,7 +386,7 @@ class Test:
         """
         return self._state
 
-    def to_json(self):
+    def to_json(self, strstate=False):
         """Serialize the whole Test as a JSON object.
 
         :return: a JSON object mapping the test
@@ -397,7 +397,7 @@ class Test:
             "exec": self._execmd,
             "result": {
                 "rc": self._rc,
-                "state": self._state,
+                "state": str(self._state) if strstate else self._state,
                 "time": self._exectime,
                 "output": self._output,
             },

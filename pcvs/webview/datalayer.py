@@ -62,7 +62,7 @@ class DataRepresentation:
         """
         assert('__metadata' in node.keys())
 
-        node["__metadata"]["count"][int(test.state)] += 1
+        node["__metadata"]["count"][str(test.state)] += 1
 
         # if targeted node is reached, insert the test
         if len(depth) == 0:
@@ -75,7 +75,7 @@ class DataRepresentation:
             node["__elems"].setdefault(depth[0],
                                        {
                 "__metadata": {
-                    "count": {k: 0 for k in list(map(int, Test.State))}
+                    "count": {k: 0 for k in list(map(str, Test.State))}
                 }
             })
             self.__insert_in_tree(test, node["__elems"][depth[0]], depth[1:])
@@ -99,22 +99,22 @@ class DataRepresentation:
         self.rootree.setdefault(sid, {
             "fs-tree": {
                 "__metadata": {
-                    "count": {k: 0 for k in list(map(int, Test.State))}
+                    "count": {k: 0 for k in list(map(str, Test.State))}
                 }
             },
             "tags": {
                 "__metadata": {
-                    "count": {k: 0 for k in list(map(int, Test.State))}
+                    "count": {k: 0 for k in list(map(str, Test.State))}
                 }
             },
             "iterators": {
                 "__metadata": {
-                    "count": {k: 0 for k in list(map(int, Test.State))}
+                    "count": {k: 0 for k in list(map(str, Test.State))}
                 }
             },
             "failures": {
                 "__metadata": {
-                    "count": {k: 0 for k in list(map(int, Test.State))}
+                    "count": {k: 0 for k in list(map(str, Test.State))}
                 }
             },
             "state": Session.State(session_data["state"]),
@@ -163,8 +163,8 @@ class DataRepresentation:
             for iter_k, iter_v in test.combination.items():
                 self.__insert_in_tree(
                     test, sid_tree["iterators"], [iter_k, iter_v])
-
-        if test.state != Test.State.SUCCEED:
+        
+        if test.state != Test.State.SUCCESS:
             # if failed, save it
             self.__insert_in_tree(test, sid_tree["failures"], [])
         return True
@@ -243,7 +243,7 @@ class DataRepresentation:
         """
         assert('__elems' in node.keys())
         if isinstance(node['__elems'], list):
-            return [x.to_json() for x in node['__elems'] if isinstance(x, Test)]
+            return [x.to_json(strstate=True) for x in node['__elems'] if isinstance(x, Test)]
 
         ret = list()
         for elt in node['__elems'].values():

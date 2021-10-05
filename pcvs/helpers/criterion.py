@@ -42,6 +42,9 @@ class Combination:
             return dflt
         return self._combination[k]
 
+    def items(self):
+        return self._combination.items()
+
     def translate_to_str(self):
         """Translate the actual combination in a pretty-format string.
         This is mainly used to generate actual test names

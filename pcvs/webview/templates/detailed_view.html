@@ -3,19 +3,19 @@
 <script type="text/javascript">
 	function createRow(row, data, index)
 				{
-					if(data['result']['state'] == "0")
+					if(data['result']['state'] == "WAITING")
 					{
 						$(row).addClass("text-secondary")
 					}
-					else if(data['result']['state'] == "1")
+					else if(data['result']['state'] == "IN_PROGRESS")
 					{
 						$(row).addClass("text-primary")
 					}
-					else if(data['result']['state'] == "2")
+					else if(data['result']['state'] == "SUCCESS")
 					{
 						$(row).addClass("text-success")
 					}
-					else if (data['result']['state'] == "4")
+					else if (data['result']['state'] == "ERR_DEP")
 					{
 						$(row).addClass("text-warning font-weight-bold")
 					}
@@ -43,7 +43,7 @@
 					"className": 'detail-control text-center',
 					"render": function(d,t,s){return '<span class="oi oi-plus"></span>';}
 				},
-				{"responsivePriority": 2, "data": 'id.full_name'},
+				{"responsivePriority": 2, "data": 'id.fq_name'},
 				{"responsivePriority": 4, "data": 'result', "render": function(d, t, s){return d.state;}},
 				{"responsivePriority": 3, "data": 'result', "render": function(d, t, s){return d.time.toFixed(2)+" s";}}
 			]
@@ -54,7 +54,7 @@
 			var raw_log = "";
 			if(data.result['output'])
 			{
-				raw_log = "<pre>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</pre>";
+				raw_log = "<pre><code>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</code></pre>";
 			}
 			return '<pre>'+
 				data['exec']+

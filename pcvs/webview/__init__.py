@@ -71,15 +71,15 @@ def create_app():
         if 'json' in request.args.get('render', []):
             return jsonify({"tag": data_manager.get_tag_cnt(sid),
                             "label": data_manager.get_label_cnt(sid),
-                            "test": data_manager.get_test_cnt(sid),
-                            "files": -1})
+                            "test": data_manager.get_test_cnt(sid)
+                            })
         return render_template('session_main.html',
                                sid=sid,
                                rootdir=data_manager.get_root_path(sid),
                                nb_tests=data_manager.get_test_cnt(sid),
                                nb_labels=data_manager.get_label_cnt(sid),
-                               nb_tags=data_manager.get_tag_cnt(sid),
-                               nb_files=-1)
+                               nb_tags=data_manager.get_tag_cnt(sid)
+                               )
 
     @app.route('/compare')
     def compare():
@@ -110,11 +110,12 @@ def create_app():
         if 'json' in request.args.get('render', []):
             out = list()
             infos = data_manager.get_token_content(sid, selection)
-            for k, v in infos['__elems'].items():
-                out.append({
-                    "name": k,
-                    "count": v['__metadata']['count']
-                })
+            if '__elems' in infos:
+                for k, v in infos['__elems'].items():
+                    out.append({
+                        "name": k,
+                        "count": v['__metadata']['count']
+                    })
             return jsonify(out)
 
         return render_template('list_view.html', sid=sid, selection=selection)

@@ -9,7 +9,6 @@
 			document.getElementById("labelnumber").textContent = resp.label
 			document.getElementById("tagnumber").textContent = resp.tag
 			document.getElementById("testnumber").textContent = resp.test
-			document.getElementById("filenumber").textContent = resp.files
 		}).done(function(){
 			page_ready()
 		})
@@ -33,24 +32,19 @@ The content of this main page is still in progress. Here a short list of pages a
 </p>
 
 <div id="stat_cards" class="row">
-<div class="col-sm-3"><div class="card text-center"><div class="card-body">
+<div class="col-sm-4"><div class="card text-center"><div class="card-body">
 <h4 id="testnumber" class="card-title">{{"{:,}".format(nb_tests)}}</h4>
 <p class="card-text">Tests in Total</p>
 </div></div></div>
 
-<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
+<div class="col-sm-4"><div class=" card text-center"><div class="card-body">
 <h4 id="tagnumber" class="card-title">{{"{:,}".format(nb_tags)}}</h4>
 <p class="card-text">Unique Tags</p>
 </div></div></div>
 
-<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
+<div class="col-sm-4"><div class=" card text-center"><div class="card-body">
 <h4 id="labelnumber" class="card-title">{{"{:,}".format(nb_labels)}}</h4>
 <p class="card-text">Distinct Labels</p>
-</div></div></div>
-
-<div class="col-sm-3"><div class=" card text-center"><div class="card-body">
-<h4 id="filenumber" class="card-title">{{"{:,}".format(nb_files)}}</h4>
-<p class="card-text">Processed Files</p>
 </div></div></div>
 </div>
 

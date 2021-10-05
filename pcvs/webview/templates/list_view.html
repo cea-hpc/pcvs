@@ -22,11 +22,11 @@
 					} else {
 						total = Object.values(d).reduce(function(a, b) { return a+b;}, 0)
 					return '<div class="progress" data-order="'+d.failure+'">' +
-					'<div class="progress-bar bg-danger" style="width: '+(100 * d[3]/total)+'%"></div>' +
-					'<div class="progress-bar bg-warning" style="width: '+(100 * d[1]/total)+'%"></div>' +
-					'<div class="progress-bar bg-success" style="width: '+(100 * d[2]/total)+'%"></div>' +
-					'<div class="progress-bar bg-secondary" style="width: '+(100 * d[4]/total)+'%"></div>' +
-					'<div class="progress-bar bg-primary" style="width: '+(100 * d[5]/total)+'%"></div>' +
+					'<div class="progress-bar bg-danger" style="width: '+(100 * (d["FAILURE"]+d["ERR_OTHER"])/total)+'%"></div>' +
+					'<div class="progress-bar bg-warning" style="width: '+(100 * d["ERR_DEP"]/total)+'%"></div>' +
+					'<div class="progress-bar bg-success" style="width: '+(100 * d["SUCCESS"]/total)+'%"></div>' +
+					'<div class="progress-bar bg-secondary" style="width: '+(100 * d["IN_PROGRESS"]/total)+'%"></div>' +
+					'<div class="progress-bar bg-primary" style="width: '+(100 * d["WAITING"]/total)+'%"></div>' +
 					'</div>';
 					}
 					}
