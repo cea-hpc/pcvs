@@ -12,8 +12,12 @@ from pcvs.helpers import exceptions
 
 def pretty_print_exception(e: exceptions.GenericError):
     global manager
-    manager.err([e.err, e.help])
-    manager.info("Extra infos:\n{}".format(e.dbg_str))
+    if isinstance(e, exceptions.GenericError):
+        manager.err([e.err, e.help])
+        manager.info("Extra infos:\n{}".format(e.dbg_str))
+    else:
+        manager.err(str(e))
+
 
 
 class IOManager:
@@ -136,24 +140,19 @@ class IOManager:
     def set_logfile(self, enable, logfile=None):
         """setter for logfile path
 
-        :param enable: true if logging with files is enabled
-        :type enable: bool
         :param logfile: logfile name, defaults to None
         :type logfile: str, optional
         """
-        self._logs = enable
-        if logfile is not None and os.path.abspath(logfile) != self.log_filename:
-            self._logfile = open(os.path.abspath(logfile), 'w+')
 
-    def enable_logfile(self):
-        """enables logging on file
-        """
-        self.set_logfile(enable=True)
+        if logfile is not None:
+            if not os.access(os.path.dirname(logfile), os.W_OK):
+                raise CommonException.IOError("{} is not writable !".format(logfile))
 
-    def disable_logfile(self):
-        """disables logging on file
-        """
-        self.set_logfile(enable=False)
+            if os.path.abspath(logfile) != self.log_filename:
+                self._logfile = open(os.path.abspath(logfile), 'w+')
+            self._logenabled = enable
+
+    
 
     def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
         """constructor for IOManager object
@@ -178,9 +177,10 @@ class IOManager:
         self._wrapper = None
         self._tty = tty
         self._logfile = None
-        self._logs = False
         self._verbose = verbose
         self._unicode = enable_unicode
+        self._logbuffer = ""
+        self._logenabled = False
 
         self.enable_unicode(self._unicode)
 
@@ -190,17 +190,21 @@ class IOManager:
         self._wrapper = textwrap.TextWrapper(width=self._linelength)
 
         if logfile is not None:
+            logfile = os.path.abspath(logfile)
             if os.path.isfile(logfile):
                 raise CommonException.AlreadyExistError(logfile)
-            self._logs = True
-            self._logfile = open(os.path.abspath(logfile), "w")
+            
+            self.set_logfile(True, logfile)
 
     def __del__(self):
         """desctuctor for IOManager (closes streams)
         """
 
-        if self._logs:
-            self._logfile.close()
+        if self._logfile:
+            if not os.path.isfile(self._logfile.name):
+                manager.warn("{} does not exist anymore !".format(self._logfile.name))
+            else:
+                self._logfile.close()
 
     def __print_rawline(self, msg, err=False):
         """print a line as text
@@ -212,10 +216,15 @@ class IOManager:
         """
         if self._tty:
             click.echo(msg, err=err)
-        if self._logs:
-            self._logfile.write('{}{}'.format(
-                msg, '\n' if msg[-1] != "\n" else ""))
+
+        content ='{}{}'.format(msg, '\n' if msg[-1] != "\n" else "")
+        if self._logenabled and self._logfile:
+            self._logfile.write(self._logbuffer)
+            self._logfile.write(content)
             self._logfile.flush()
+            self._logbuffer = ""
+        else:
+            self._logbuffer += content
 
     def has_verb_level(self, match):
         """ returns true if the verbosity level is activated.

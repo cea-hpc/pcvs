@@ -177,6 +177,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('target_bank', bank)
     val_cfg.set_ifdef('enable_report', enable_report)
     val_cfg.set_ifdef('report_addr', report_addr)
+    val_cfg.set_ifdef('runlog', os.path.join(val_cfg.output, 'out.log'))
+    val_cfg.set_ifdef('buildcache', os.path.join(val_cfg.output, 'cache'))
 
     # if dirs not set by config file nor CLI
     if not dirs and not val_cfg.dirs:
@@ -209,8 +211,6 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
             "PRE-RUN: Prepare output directory: {}".format(val_cfg.output))
         os.makedirs(val_cfg.output)
 
-    # DO NOT move the logger init before the build dir exist (above)
-    log.manager.set_logfile(val_cfg.runlog is not None, val_cfg.runlog)
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if val_cfg.reused_build is not None:
