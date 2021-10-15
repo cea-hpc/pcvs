@@ -134,13 +134,15 @@ def handle_build_lockfile(exc=None):
               help="Attach a webview server to the current session run.")
 @click.option("--report-uri", "report_addr", default=None, type=str,
               help="Override default Server address")
+@click.option("-g", "--generate-only", "generate_only", is_flag=True, default=None,
+              help="Rebuild the test-base, populating resources for `pcvs exec`")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
 @log.manager.capture_exception(Exception)
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
-def run(ctx, profilename, output, detach, override, anon, settings_file,
+def run(ctx, profilename, output, detach, override, anon, settings_file, generate_only,
         simulated, bank, dup, dirs, enable_report, report_addr) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -171,6 +173,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('background', detach)
     val_cfg.set_ifdef('override', override)
     val_cfg.set_ifdef('simulated', simulated)
+    val_cfg.set_ifdef('onlygen', generate_only)
     val_cfg.set_ifdef('anonymize', anon)
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)

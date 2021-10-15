@@ -121,6 +121,16 @@ def process_main_workflow(the_session=None):
 
     log.manager.print_header("Summary")
     display_summary(the_session)
+    
+    if valcfg.onlygen:
+        log.manager.warn(
+            ["====================================================",
+             "Tests won't be run. This program will now stop.",
+             "You may list runnable tests with `pcvs exec --list`",
+             "or execute one with `pcvs exec <testname>`",
+             "===================================================="
+            ])
+        return
 
     log.manager.print_header("Execution")
     MetaConfig.root.get_internal('orchestrator').run(the_session)

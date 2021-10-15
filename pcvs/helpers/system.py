@@ -327,6 +327,7 @@ class MetaConfig(MetaDict):
         subtree.set_nosquash('runlog', os.path.join(subtree.output, 'out.log'))
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)
+        subtree.set_nosquash('onlygen', False)
         subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
         subtree.set_nosquash('webreport', None)
