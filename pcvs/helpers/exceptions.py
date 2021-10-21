@@ -92,7 +92,10 @@ class CommonException:
 
     class WIPError(GenericError):
         """Work in Progress, not a real error."""
-
+        pass
+    
+    class TimeoutError(GenericError):
+        """The parent class timeout error."""
         pass
 
     class NotImplementedError(GenericError):

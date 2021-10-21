@@ -1,4 +1,5 @@
 import fileinput
+import signal
 import os
 import pprint
 import shutil
@@ -61,7 +62,6 @@ def display_summary(the_session):
     log.manager.print_item("Criterion matrix size per job: {}".format(
         MetaConfig.root.get_internal("comb_cnt")
     ))
-    
     
     if cfg.target_bank:
         log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
@@ -133,8 +133,9 @@ def process_main_workflow(the_session=None):
         return
 
     log.manager.print_header("Execution")
+    
     MetaConfig.root.get_internal('orchestrator').run(the_session)
-
+    
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
@@ -196,7 +197,10 @@ def prepare():
     """
     log.manager.print_section("Prepare environment")
     valcfg = MetaConfig.root.validation
+    
+    utils.start_autokill(valcfg.timeout)
 
+    
     log.manager.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
     if not os.path.exists(buildir):

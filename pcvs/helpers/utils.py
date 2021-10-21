@@ -1,3 +1,5 @@
+import time
+import signal
 import os
 import shutil
 import time
@@ -386,3 +388,17 @@ def get_lock_owner(f):
     lf_name = get_lockfile_name(f)
     with open(lf_name, 'r') as fh:
         return int(fh.read().strip())
+
+
+def program_timeout(sig, frame):
+    print("luuu")
+    assert(sig == signal.SIGALRM)
+    raise CommonException.TimeoutError("Timeout reached")
+
+def start_autokill(timeout=None):
+    if isinstance(timeout, int):
+        log.manager.print_item("Setting timeout to {} second(s)".format(timeout))
+        signal.signal(signal.SIGALRM, program_timeout)
+        
+        signal.alarm(timeout)
+    

@@ -135,6 +135,8 @@ def handle_build_lockfile(exc=None):
               help="Override default Server address")
 @click.option("-g", "--generate-only", "generate_only", is_flag=True, default=None,
               help="Rebuild the test-base, populating resources for `pcvs exec`")
+@click.option('-t', "--timeout", "timeout", show_envvar=True, type=int,
+              help="PCVS process timeout")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
@@ -142,7 +144,7 @@ def handle_build_lockfile(exc=None):
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file, generate_only,
-        simulated, bank, dup, dirs, enable_report, report_addr) -> None:
+        simulated, bank, dup, dirs, enable_report, report_addr, timeout) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -179,6 +181,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
     val_cfg.set_ifdef('target_bank', bank)
     val_cfg.set_ifdef('enable_report', enable_report)
     val_cfg.set_ifdef('report_addr', report_addr)
+    val_cfg.set_ifdef('timeout', timeout)
     val_cfg.set_ifdef('runlog', os.path.join(val_cfg.output, 'out.log'))
     val_cfg.set_ifdef('buildcache', os.path.join(val_cfg.output, 'cache'))
 
