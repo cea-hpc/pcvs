@@ -29,6 +29,14 @@ def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
     return [elt for elt in flat_array if incomplete in elt]
 
 def compl_list_templates(ctx, args, incomplete) -> list:  # pragma: no cover
+    """Config template completion.
+    
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str"""
     return [elt for elt in pvConfig.list_templates() if incomplete in elt]
     
 @click.group(name="config", short_help="Manage Configuration blocks")

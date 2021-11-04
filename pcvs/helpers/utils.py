@@ -278,6 +278,13 @@ def find_buildir_from_prefix(path):
 
 
 def get_lockfile_name(f):
+    """From a file to mutex, return the file lock name associated with it.
+    
+    For instance for /a/b.yml, the lock file name will be /a/.b.yml.lck
+    
+    :param f: the file to mutex
+    :type f: str
+    """
     path = os.path.dirname(f)
     filename = os.path.basename(f)
     
@@ -357,11 +364,26 @@ def trylock_file(f, reentrant=False):
 
 
 def is_locked(f):
+    """Is the given file locked somewhere else ?
+    
+    :param f: the file to test
+    :type f: str
+    :return: a boolean indicating wether the lock is hold or not.
+    :rtype: bool
+    """
     lf_name = get_lockfile_name(f)
     return os.path.isfile(os.path.abspath(lf_name))
 
 
 def get_lock_owner(f):
+    """The lock file will contain the process ID owning the lock. This function
+    returns it.
+    
+    :param f: the original file to mutex
+    :type f: str
+    :return: the process ID
+    :rtype: int
+    """
     lf_name = get_lockfile_name(f)
     with open(lf_name, 'r') as fh:
         return int(fh.read().strip())

@@ -50,6 +50,10 @@ def list_profiles(scope=None):
 
 
 def list_templates():
+    """List available templates to be used for boostraping profiles.
+    
+    :return: a list of valid templates.
+    :rtype: list"""
     array = list()
     for f in os.listdir(os.path.join(PATH_INSTDIR, "templates", "profile")):
         array.append((os.path.splitext(f)[0], f))

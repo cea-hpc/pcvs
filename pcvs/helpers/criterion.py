@@ -43,6 +43,11 @@ class Combination:
         return self._combination[k]
 
     def items(self):
+        """Get the combination dict.
+        
+        :return: the whole combination dict.
+        :rtype: dict
+        """
         return self._combination.items()
 
     def translate_to_str(self):

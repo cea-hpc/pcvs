@@ -511,7 +511,11 @@ class Test:
             
     @classmethod
     def compute_fq_name(self, label, subtree, name, combination=None, suffix=None):
-
+        """Generate the fully-qualified (dq) name for a test, based on :
+            - the label & subtree (original FS tree)
+            - the name (the TE name it is originated)
+            - a potential extra suffix
+            - the combination PCVS computed for this iteration."""
         return "_".join(filter(None, [
             "/".join(filter(None, [
                 label,

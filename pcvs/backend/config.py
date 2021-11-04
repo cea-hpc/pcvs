@@ -54,7 +54,12 @@ def list_blocks(kind, scope=None):
     else:
         return CONFIG_EXISTING[kind][scope]
 
+
 def list_templates():
+    """List available templates to be used for boostraping config. blocks.
+    
+    :return: a list of valid templates.
+    :rtype: list"""
     array = list()
     for f in os.listdir(os.path.join(PATH_INSTDIR, "templates/config")):
         array.append(os.path.splitext(f)[0])

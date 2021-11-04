@@ -27,7 +27,8 @@ from pcvs.helpers.system import MetaConfig
 @click.argument("argument", type=str, required=False)
 @click.pass_context
 def exec(ctx, output, argument, gen_list, display):
-    """ This is a doc about exec subcommand """
+    """ Run a unit test as it would have been through the whole engine (for
+    reproducing purposes) from the command line."""
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
@@ -78,6 +79,8 @@ def exec(ctx, output, argument, gen_list, display):
               help="Custom profile to use when checking pcvs.setup scripts")
 @click.pass_context
 def check(ctx, dir, encoding, color, configs, profiles, pf_name):
+    """Global input/output analyzer, validating configuration, profiles &
+    terminal supports."""
     log.manager.print_banner()
     errors = dict()
     if color:
@@ -152,6 +155,7 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
 @click.argument("paths", required=False, type=click.Path(exists=True), nargs=-1)
 @click.pass_context
 def clean(ctx, force, fake, paths, remove_build_dir, interactive):
+    """Find & clean workspaces from PCVS artifacts (build & archives)"""
     if not fake and not force:
         log.manager.warn(["IMPORTANT NOTICE:",
                           "This command will delete files from previous run(s) and",
@@ -209,7 +213,7 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
 @click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
 def discover(ctx, paths, set, force):
-
+    """Discover & integrate new benchmarks to PCVS format."""
     if not paths:
         paths = [os.getcwd()]
 

@@ -126,15 +126,17 @@ def bank_destroy(ctx, name, symlink):
 @bank.command(name="save", short_help="Save a new run to the datastore")
 @click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.argument("path", nargs=1, required=True, type=click.Path(exists=True))
-@click.argument("project", nargs=1, required=False, type=str, default=None)
 @click.pass_context
-def bank_save_run(ctx, name, path, project):
+def bank_save_run(ctx, name, path):
+    """Create a backup from a previously generated build directory. NAME will be
+    the target bank name, PATH the build directory"""
 
     b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
 
     path = os.path.abspath(path)
+    project = b.preferred_proj
 
     b.connect_repository()
     if os.path.isfile(path):

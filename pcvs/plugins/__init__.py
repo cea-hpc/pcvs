@@ -80,12 +80,18 @@ class Collection:
         self._enabled = {name: None for name in list(Plugin.Step)}
         
     def register_default_plugins(self):
+        """Detect plugins stored in default places."""
         try:
             self.register_plugin_by_package('pcvs-contrib')
         except:
             log.manager.info("No pcvs-contrib package found for plugin autoloading")
 
     def activate_plugin(self, name):
+        """Flag a plugin as active, meaning it will be called when the pass is
+        reached.
+        
+        :param name: the plugin name.
+        :type name: str"""
         for step, plugins in self._plugins.items():
             for p in plugins:
                 if name == type(p).__name__:
@@ -114,6 +120,13 @@ class Collection:
         return None
 
     def nb_plugins_for(self, step):
+        """Count the number of possible plugins for a given step.
+        
+        :param step: the step to check
+        :type step: str
+        
+        :return: the number of plugins
+        :rtype: int"""
         if step not in self._plugins:
             return -1
 
@@ -140,6 +153,7 @@ class Collection:
                     log.manager.print_item("{}".format(type(e).__name__))
     
     def show_enabled_plugins(self):
+        """Display the list of loaded plugins."""
         empty = True
         for step, e in self._enabled.items():
             if e:

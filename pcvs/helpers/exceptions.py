@@ -14,6 +14,10 @@ class GenericError(Exception):
         self._dbg_info = dbg_info
         
     def __str__(self):
+        """Stringify an exception for pretty-printing.
+        
+        :return: the string.
+        :type: str"""
         dbg_str = ""
         if self._dbg_info:
             dbg_str = "\n\nExtra infos:\n" + self.dbg_str
@@ -25,18 +29,35 @@ class GenericError(Exception):
         
     @property
     def err(self):
+        """returns the error part of the exceptions.
+        
+        :return: only the error part
+        :rtype: str"""
         return self._err_msg
     
     @property
     def help(self):
+        """returns the help part of the exceptions.
+        
+        :return: only the help part
+        :rtype: str"""
         return self._help_msg
     
     @property
     def dbg(self):
+        """returns the extra infos of the exceptions (if any).
+        
+        :return: only the debug infos.
+        :rtype: str"""
         return self._dbg_info
     
     @property
     def dbg_str(self):
+        """Stringify the debug infos. These infos are stored as a dict
+initially.
+        
+        :return: a itemized string.
+        :rtype: str"""
         if not self._dbg_info:
             return " - None"
         w = max([len(k) for k in self._dbg_info.keys()])
@@ -107,6 +128,7 @@ class ValidationException(CommonException):
     class FormatError(GenericError):
         """The content does not comply the required format (schemes)."""
         def __init__(self, msg="Invalid format", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                  "Note configuration, profiles & pcvs.* files can be ",
@@ -117,6 +139,7 @@ class ValidationException(CommonException):
     class SchemeError(GenericError):
         """The content is not a valid format (scheme)."""
         def __init__(self, msg="Invalid Scheme provided", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                  "Provided schemes should be static. If code haven't be",
@@ -130,6 +153,7 @@ class RunException(CommonException):
     class OverrideError(GenericError):
         """A previous run exist and the override permission haven't be given."""
         def __init__(self, msg="Duplicate path", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                  "Please use -f/--override to overwrite or change",
@@ -139,6 +163,7 @@ class RunException(CommonException):
     class InProgressError(GenericError):
         """A run is currently occuring in the given dir."""
         def __init__(self, msg="Execution in progress in build directory", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                 "Please wait for completion from previous builds (`pcvs session`)",
@@ -149,6 +174,7 @@ class RunException(CommonException):
     class ProgramError(GenericError):
         """The given program cannot be found."""
         def __init__(self, msg="Program cannot be found", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                 "A program/binary defined in loaded profile cannot",
@@ -159,6 +185,7 @@ class RunException(CommonException):
     class TestUnfoldError(GenericError):
         """Issue raised during processing test files."""
         def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
+            """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",

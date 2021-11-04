@@ -31,6 +31,15 @@ def compl_list_token(ctx, args, incomplete):  # pragma: no cover
 
 
 def compl_list_templates(ctx, args, incomplete):  # pragma: no cover
+    """ the profile template completion. 
+    
+    :param ctx: Click context
+    :type ctx: :class:`Click.Context`
+    :param args: the option/argument requesting completion.
+    :type args: str
+    :param incomplete: the user input
+    :type incomplete: str
+    """
     return [name for name, path in pvProfile.list_templates() if incomplete in name]
 
 
@@ -260,6 +269,10 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
                 shell_complete=compl_list_token)
 @click.pass_context
 def profile_destroy(ctx, token):
+    """Delete an existing profile named TOKEN.
+    
+    Use with caution, this action is irreversible !
+    """
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     # tricky case, avoid users to use reserved word for scopes as
@@ -288,6 +301,14 @@ def profile_destroy(ctx, token):
 @click.pass_context
 @log.manager.capture_exception(ValidationException.FormatError)
 def profile_edit(ctx, token, editor, edit_plugin):
+    """Edit an existing profile with the given EDITOR. The '-p' option will open
+    the decoded runtime plugin code stored as a base64 string into the profile
+    for edition.
+    
+    After edition, the result will be validated to ensure
+    coherency. If the test failed a rej*.yml will be created with the edited
+    content.
+    """
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if pf.is_found():
@@ -313,6 +334,9 @@ def profile_edit(ctx, token, editor, edit_plugin):
 @click.option("-f", "--force", "force", is_flag=True, default=False)
 @click.pass_context
 def profile_import(ctx, token, src_file, force):
+    """Create a profile from a file. If the profile name is already used, it
+    will not be overwritten unless '--force' is used.
+    """
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
     pf = pvProfile.Profile(label, scope)
     if not pf.is_found() or force:
@@ -329,6 +353,8 @@ def profile_import(ctx, token, src_file, force):
 @click.option("-o", "--output", "dest_file", type=click.File('w'), default=sys.stdout)
 @click.pass_context
 def profile_export(ctx, token, dest_file):
+    """Export a profile to a YAML. If '--output' is omitted, the standard output
+    is used to print the profile."""
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(label, scope)
@@ -351,6 +377,9 @@ def profile_export(ctx, token, dest_file):
               help="Default scope to store the split (default: same as profile)")
 @click.pass_context
 def profile_decompose_profile(ctx, token, name, block_opt, scope):
+    """Build basic configuration blocks from a given profile. Every block name will
+    be prefixed with the '-n' option (set to 'default')
+    """
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     blocks = [e.strip() for e in block_opt.split(',')]

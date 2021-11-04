@@ -11,6 +11,11 @@ from pcvs.helpers.exceptions import CommonException
 from pcvs.helpers import exceptions
 
 def pretty_print_exception(e: exceptions.GenericError):
+    """Display exceptions in a fancy way.
+    
+    :param e: the execption to print
+    :type e: exceptions.GenericError.
+    """
     global manager
     if isinstance(e, exceptions.GenericError):
         manager.err([e.err, e.help])
