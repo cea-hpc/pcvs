@@ -1,5 +1,7 @@
 import math
+
 from pcvs.plugins import Plugin
+
 
 class MyPlugin(Plugin):
     step = Plugin.Step.TEST_EVAL

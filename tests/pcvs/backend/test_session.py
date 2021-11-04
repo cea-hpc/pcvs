@@ -4,8 +4,8 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
-from ruamel.yaml import YAML
 from click.testing import CliRunner
+from ruamel.yaml import YAML
 
 import pcvs
 from pcvs.backend import session as tested

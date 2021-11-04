@@ -3,7 +3,6 @@ import os
 import addict
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
-from ruamel.yaml.main import yaml_object
 
 import pcvs
 from pcvs import NAME_BUILDIR, PATH_INSTDIR

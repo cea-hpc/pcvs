@@ -1,9 +1,6 @@
-import json
 from abc import abstractmethod
-from io import DEFAULT_BUFFER_SIZE
 
 import requests
-from flask import Flask, render_template, request
 
 from pcvs.backend.session import Session
 from pcvs.helpers.system import MetaConfig

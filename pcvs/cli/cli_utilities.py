@@ -1,9 +1,9 @@
 import base64
 import copy
 import os
+import shutil
 import subprocess
 import sys
-import shutil
 from datetime import datetime
 
 import click

@@ -1,8 +1,9 @@
+import getpass
 import os
+import pathlib
 from unittest.mock import patch
 
 import pytest
-import getpass, pathlib
 from click.testing import CliRunner
 from ruamel.yaml import YAML
 

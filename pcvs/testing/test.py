@@ -3,16 +3,11 @@ import json
 import os
 import shlex
 from enum import IntEnum
-from itertools import combinations
 
-from jsonschema import exceptions
-
-from pcvs import PATH_INSTDIR
 from pcvs.helpers import log
-from pcvs.helpers.exceptions import ValidationException
-from pcvs.helpers.pm import PManager
-from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.helpers.criterion import Combination
+from pcvs.helpers.system import ValidationScheme
+
 
 class Test:
     """Smallest component of a validation process.

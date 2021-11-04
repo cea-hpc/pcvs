@@ -1,12 +1,11 @@
-from genericpath import exists
-from pcvs.backend.profile import list_templates
-from pcvs.helpers.exceptions import ConfigException
-import click
 import sys
+
+import click
 from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
 from pcvs.helpers import log, utils
+from pcvs.helpers.exceptions import ConfigException
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover

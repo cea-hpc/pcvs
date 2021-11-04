@@ -1,4 +1,3 @@
-
 class GenericError(Exception):
     """Generic error (custom errors will inherit of this)."""
 

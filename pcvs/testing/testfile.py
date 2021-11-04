@@ -1,9 +1,9 @@
 import functools
+import getpass
 import operator
 import os
 import pathlib
 import subprocess
-import getpass
 
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
@@ -14,7 +14,6 @@ from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
 from pcvs.testing import tedesc
-from pcvs.testing.test import Test
 
 
 def __load_yaml_file_legacy(f):

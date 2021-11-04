@@ -1,7 +1,10 @@
 import os
+
 import pytest
 from ruamel.yaml import YAML
+
 from .conftest import click_call, isolated_fs
+
 
 def test_exec():
     ret = click_call("--help")

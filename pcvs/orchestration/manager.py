@@ -1,4 +1,3 @@
-from pcvs.helpers import communications, log
 from pcvs.helpers.exceptions import OrchestratorException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration.set import Set

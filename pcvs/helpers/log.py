@@ -7,8 +7,9 @@ import traceback
 
 import click
 
-from pcvs.helpers.exceptions import CommonException
 from pcvs.helpers import exceptions
+from pcvs.helpers.exceptions import CommonException
+
 
 def pretty_print_exception(e: exceptions.GenericError):
     """Display exceptions in a fancy way.

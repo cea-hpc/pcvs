@@ -1,10 +1,8 @@
 import copy
 import os
 import re
-from xml.sax.saxutils import escape
 
-from pcvs import PATH_INSTDIR
-from pcvs.helpers import log, pm, utils
+from pcvs.helpers import pm, utils
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig, MetaDict

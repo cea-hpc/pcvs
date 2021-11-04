@@ -1,9 +1,10 @@
-from pcvs import PATH_INSTDIR
-import click
 import os
 import sys
+
+import click
 from ruamel.yaml import YAML
 
+from pcvs import PATH_INSTDIR
 from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config

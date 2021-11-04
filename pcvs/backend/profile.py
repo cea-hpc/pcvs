@@ -4,7 +4,6 @@ import os
 import random
 
 import click
-import jsonschema
 from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR

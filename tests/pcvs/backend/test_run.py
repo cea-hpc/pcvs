@@ -1,4 +1,5 @@
-import os, stat
+import os
+import stat
 from datetime import datetime
 from unittest.mock import patch
 
@@ -7,9 +8,9 @@ from click.testing import CliRunner
 
 import pcvs
 from pcvs.backend import run as tested
+from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.plugins import Collection
-from pcvs.helpers.exceptions import ValidationException
 
 good_content = """#!/bin/sh
 echo 'test_node:'

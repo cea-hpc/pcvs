@@ -3,7 +3,7 @@ import threading
 import time
 from typing import List
 
-from pcvs.helpers import communications, log
+from pcvs.helpers import communications
 from pcvs.helpers.system import MetaConfig
 from pcvs.testing.test import Test
 

@@ -2,7 +2,6 @@ import os
 
 import click
 
-from pcvs import NAME_BUILD_CONF_FN, NAME_BUILDFILE, NAME_BUILDIR
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import BankException
