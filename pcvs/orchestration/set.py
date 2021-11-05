@@ -1,5 +1,5 @@
 import subprocess
-import threading
+import threading, queue
 import time
 from typing import List
 
@@ -8,7 +8,7 @@ from pcvs.helpers.system import MetaConfig
 from pcvs.testing.test import Test
 
 
-class Set(threading.Thread):
+class Set:
     """Gather multiple jobs to be scheduled.
 
     Created by the manager to manipulate a subset, these jobs are removed from
@@ -41,9 +41,7 @@ class Set(threading.Thread):
         if not self.comman:
             if MetaConfig.root.get_internal('comman') is not None:
                 self.comman = MetaConfig.root.get_internal('comman')
-
-        super().__init__()
-
+    
     def enable_wrapping(self, wrap_cli):
         """Make this Set manipulate multiple jobs evolving together in a
         dedicated environment.
@@ -123,16 +121,46 @@ class Set(threading.Thread):
         for j in self._jobs:
             yield j
 
+    def is_complete(self):
+        self._completed = True
+
+
+class Runner(threading.Thread):
+    
+    sched_in_progress = True
+    
+    def __init__(self, ready, complete):
+        super().__init__()
+        
+        self._rq = ready
+        self._cq = complete
+    
     def run(self):
+        while True:
+            try:
+                if self.sched_in_progress:
+                    item = self._rq.get(block=False, timeout=5)
+                    self.process_item(item)
+                    self._cq.put(item)
+                else:
+                    break
+            except queue.Empty:
+                continue
+            except Exception:
+                print("end thread")
+                return
+                
+            
+    def process_item(self, set):
         """Execute the Set and jobs within it.
 
         :raises Exception: Something occured while running a test"""
-        for job in self._jobs:
+        for job in set.content:
             try:
                 p = subprocess.Popen('{}'.format(job.invocation_command),
-                                     shell=True,
-                                     stderr=subprocess.STDOUT,
-                                     stdout=subprocess.PIPE)
+                                    shell=True,
+                                    stderr=subprocess.STDOUT,
+                                    stdout=subprocess.PIPE)
                 start = time.time()
                 stdout, _ = p.communicate(timeout=job.timeout)
                 final = time.time() - start
@@ -156,7 +184,7 @@ class Set(threading.Thread):
             job.save_final_result(time=final, rc=rc, out=stdout)
             job.display()
 
-            if self.comman:
-                self.comman.send(job)
+            if set.comman:
+                set.comman.send(job)
 
-        self._completed = True
+        set.is_complete()

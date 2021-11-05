@@ -87,7 +87,12 @@ def display_summary(the_session):
             ">>>> DRY-RUN : TEST EXECUTION IS EMULATED <<<<",
             "=============================================="])
 
+def stop_pending_jobs(exc=None):
+    orch = MetaConfig.root.get_internal('orchestrator')
+    if orch:
+        orch.stop()
 
+@log.manager.capture_exception(Exception, stop_pending_jobs)
 def process_main_workflow(the_session=None):
     """Main run.py entry point, triggering a PCVS validation run.
 

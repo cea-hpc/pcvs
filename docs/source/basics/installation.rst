@@ -127,7 +127,7 @@ failed if not provided) or ``--no-deps`` to exclude any dependencies to be
 downloade (and should be taken care manually):
 
 .. code-block:: bash
-    
+
     $ pip3 download -r ... -d ... --platform x86_64 --python-version 3.5.4 [--only-binary=:all:|--no-deps]
 
 
@@ -138,7 +138,7 @@ Important note
   support completion) not backward compatible. Furthermore, Flask also have a
   dep to Click>7.1. 
 * To manage dict-based configuration object, PCVS relies on `Addict
-  <https://github.com/mewwts/addi7ct>`_. Not common, planned to be replaced but
+  <https://github.com/mewwts/addict>`_. Not common, planned to be replaced but
   still required to ease configuration management process through PCVS. 
 * Banks are managed through Git repositories. Thus, PCVS relies on `pygit2
   <https://www.pygit2.org/>`_. One major issue is when pygit2 deployement requires

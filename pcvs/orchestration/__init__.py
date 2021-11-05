@@ -3,9 +3,13 @@ from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.manager import Manager
 from pcvs.orchestration.publishers import Publisher
-from pcvs.orchestration.set import Set
+from pcvs.orchestration.set import Set, Runner
 from pcvs.plugins import Plugin
+import queue
 
+
+def global_stop():
+    Orchestrator.stop()
 
 class Orchestrator:
     """The job orchestrator, managing test processing through the whole test base.
@@ -29,11 +33,13 @@ class Orchestrator:
         """constructor method"""
         config_tree = MetaConfig.root
         self._conf = config_tree
-        self._pending_sets = dict()
+        self._runners = list()
         self._max_res = config_tree.machine.get('nodes', 1)
         self._publisher = Publisher(config_tree.validation.output)
         self._manager = Manager(self._max_res, publisher=self._publisher)
-        self._maxconcurrent = config_tree.machine.concurrent_run
+        self._maxconcurrent = config_tree.machine.get('concurrent_run', 1)
+        self._complete_q = queue.Queue()
+        self._ready_q = queue.Queue()
 
     def print_infos(self):
         """display pre-run infos."""
@@ -52,6 +58,7 @@ class Orchestrator:
         """
         self._manager.add_job(job)
 
+    @log.manager.capture_exception(KeyboardInterrupt, global_stop)
     def start_run(self, the_session=None, restart=False):
         """Start the orchestrator.
 
@@ -63,34 +70,31 @@ class Orchestrator:
 
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_BEFORE)
+        
+        for i in range(0, self._maxconcurrent):
+            self.start_new_runner()
 
         self._manager.resolve_deps()
 
         nb_nodes = self._max_res
         last_progress = 0
         # While some jobs are available to run
-        while self._manager.get_leftjob_count() > 0 or len(self._pending_sets) > 0:
+        while self._manager.get_leftjob_count() > 0 or not self._ready_q.empty():
             # dummy init value
             new_set: Set = not None
             while new_set is not None:
                 # create a new set, if not possible, returns None
                 new_set = self._manager.create_subset(nb_nodes)
                 if new_set is not None:
-
                     # schedule the set asynchronously
                     nb_nodes -= new_set.dim
-                    self._pending_sets[new_set.id] = new_set
-                    new_set.run()
-
+                    self._ready_q.put(new_set)
+                    
+                
             # Now, look for a completion
-            set = None
-            for s in self._pending_sets.values():
-                if s.been_completed():
-                    set = s
-                    break
+            set = self._complete_q.get()
             if set is not None:
                 nb_nodes += set.dim
-                del(self._pending_sets[set.id])
                 self._manager.merge_subset(set)
             else:
                 pass
@@ -119,6 +123,23 @@ class Orchestrator:
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_AFTER)
 
+        self.stop_runners()
+
+    def start_new_runner(self):
+        Runner.sched_in_progress = True
+        r = Runner(ready=self._ready_q, complete=self._complete_q)
+        r.start()
+        self._runners.append(r)
+    
+    def stop_runners(self):
+        self.stop()
+        for t in self._runners:
+            t.join()
+
+    @classmethod
+    def stop(cls):
+        Runner.sched_in_progress = False
+        
     def run(self, session):
         """Start the orchestrator.
 

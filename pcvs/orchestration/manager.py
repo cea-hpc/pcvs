@@ -172,13 +172,17 @@ class Manager:
             )
         else:
             for k in sorted(self._dims.keys(), reverse=True):
-                if len(self._dims[k]) <= 0:
+                if len(self._dims[k]) <= 0 or max_dim < k:
                     continue
                 else:
                     # assert(self._builder.job_grabber)
                     job: Test = self._dims[k].pop()
-
+                    
+                    # if there is still a job available for this dimention
                     if job:
+                        #but this job won't be run because:
+                        # - already run
+                        # - at least one dep run & failed
                         if job.been_executed() or job.has_failed_dep():
                             # jobs can be picked up outside of this pop() call
                             # if tagged executed, they have been fully handled
@@ -199,19 +203,26 @@ class Manager:
                                 self._publisher.add(job.to_json())
                             # sad to break, should retry
                             break
-                        elif not job.is_pickable():
+                        #If this job has at least one dep no executed yet
+                        # -> run it instead
+                        elif not job.has_completed_deps():
                             self._dims[k].append(job)
-
+                        
                             # careful: it means jobs are picked up
                             # but not popped from
-                            while job and not job.is_pickable():
-                                job = job.first_valid_dep()
+                            while job and not job.has_completed_deps():
+                                job = job.first_incomplete_dep()
 
+                    #if a job has been elected
                     if job:
-                        job.pick()
-                        the_set = Set()
-                        the_set.add(job)
-                        break
+                        # the job shouldn't be running (scenario where a dep is 
+                        # popped out & run but the Set didn't complete yet)
+                        # OR th job dim exceeds remaining resources
+                        if job.state != Test.State.IN_PROGRESS and job.get_dim() <= max_dim:
+                            job.pick()
+                            the_set = Set()
+                            the_set.add(job)
+                            break
 
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
 

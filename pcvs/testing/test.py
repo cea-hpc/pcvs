@@ -243,7 +243,7 @@ class Test:
 
         self._deps.append(obj)
 
-    def is_pickable(self):
+    def has_completed_deps(self):
         """Check if the test can be scheduled.
 
         It ensures it hasn't been executed yet (or currently running) and all
@@ -263,7 +263,7 @@ class Test:
         """
         return len([d for d in self._deps if d.state == Test.State.FAILURE]) > 0
 
-    def first_valid_dep(self):
+    def first_incomplete_dep(self):
         """Retrive the first ready-for-schedule dep.
 
         This is mainly used to ease the scheduling process by following the job
@@ -273,7 +273,7 @@ class Test:
         :rtype: :class:`Test` or NoneType
         """
         for d in self._deps:
-            if d.is_pickable():
+            if d.has_completed_deps() and d.state == Test.State.WAITING:
                 return d
         return None
 

@@ -60,8 +60,7 @@ sources. It contains the following subndoes :
         files: path/to/the/file/to/build
         sources:
             binary: name of the binary to be built (if necessary)
-        depends_on:
-            test: [list of test names it depends on]
+        depends_on: ["list of test names it depends on"]
         
         cflags: extra cflags 
         ldflags: extra ldflags 
