@@ -151,25 +151,16 @@ class ValidationException(CommonException):
 
 class RunException(CommonException):
     """Run-specific exceptions."""
-
-    class OverrideError(GenericError):
-        """A previous run exist and the override permission haven't be given."""
-        def __init__(self, msg="Duplicate path", **kwargs):
-            """Updated constructor"""
-            super().__init__(err_msg=msg,
-                             help_msg="\n".join([
-                                 "Please use -f/--override to overwrite or change",
-                                 "default build directory with -o/--output"]),
-                             dbg_info=kwargs)
         
     class InProgressError(GenericError):
         """A run is currently occuring in the given dir."""
-        def __init__(self, msg="Execution in progress in build directory", **kwargs):
+        def __init__(self, msg="Execution in progress in this build directory", **kwargs):
             """Updated constructor"""
             super().__init__(err_msg=msg,
                              help_msg="\n".join([
-                                "Please wait for completion from previous builds (`pcvs session`)",
-                                "or remove $BUILD/.pcvs-isbuilddir.lck if necessary."]),
+                                "Please Wait for previous executions to complete.",
+                                "You may also use --override or --output to change",
+                                "the default build directory path"]),
                              dbg_info=kwargs)
         
         

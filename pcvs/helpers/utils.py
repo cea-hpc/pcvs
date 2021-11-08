@@ -307,7 +307,7 @@ def unlock_file(f):
         log.manager.debug("Unlock {}".format(lf_name))
 
 
-def lock_file(f, reentrant=False, timeout=None):
+def lock_file(f, reentrant=False, timeout=None, force=True):
     """Try to lock a directory.
 
     :param f: name of lock
@@ -324,6 +324,8 @@ def lock_file(f, reentrant=False, timeout=None):
     """
 
     log.manager.debug("Attempt locking {}".format(f))
+    if force:
+        unlock_file(f)
     locked = trylock_file(f, reentrant)
     count = 0
     while not locked:

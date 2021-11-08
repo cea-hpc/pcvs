@@ -204,12 +204,14 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
     # BEFORE the build dir still does not exist !
     buildfile = os.path.join(val_cfg.output, NAME_BUILDFILE)
     if os.path.exists(val_cfg.output):
-        if not val_cfg.override:
-            raise exceptions.RunException.OverrideError("Build directory already exist: {}".format(val_cfg.output))
         if not utils.trylock_file(buildfile):
-            raise exceptions.RunException.InProgressError(path=val_cfg.output,
+            if val_cfg.override:
+                utils.lock_file(buildfile, force=True)
+            else:
+                raise exceptions.RunException.InProgressError(path=val_cfg.output,
                                                lockfile=buildfile,
                                                owner_pid=utils.get_lock_owner(buildfile))
+                
 
     elif not os.path.exists(val_cfg.output):
         log.manager.debug(
