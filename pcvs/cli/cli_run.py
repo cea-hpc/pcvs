@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 
 import click
@@ -262,5 +263,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
         log.manager.print_item(
             "Session successfully started, ID {}".format(sid))
     else:
-        the_session.run(the_session)
+        sid = the_session.run(the_session)
         utils.unlock_file(buildfile)
+
+    sys.exit(the_session.rc)

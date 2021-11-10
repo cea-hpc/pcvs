@@ -97,8 +97,7 @@ class Manager:
         :return: a count
         :rtype: int
         """
-        assert(tag in self._count.keys())
-        return self._count[tag]
+        return self._count[tag] if tag in self._count else 0
 
     def resolve_deps(self):
         """Resolve the whole dependency graph.
@@ -200,6 +199,7 @@ class Manager:
                                 if self._comman:
                                     self._comman.send(job)
                                 self._count.executed += 1
+                                self._count[job.state] += 1
                                 self._publisher.add(job.to_json())
                             # sad to break, should retry
                             break
@@ -238,6 +238,7 @@ class Manager:
         for job in set.content:
             if job.been_executed():
                 self._count.executed += 1
+                self._count[job.state] += 1
                 self._publisher.add(job.to_json())
             else:
                 self.add_job(job)

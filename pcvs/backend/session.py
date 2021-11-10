@@ -280,6 +280,15 @@ class Session:
         return self._sid
 
     @property
+    def rc(self):
+        """Gett to final RC.
+
+        :return: rc
+        :rtype: int
+        """
+        return self._rc 
+
+    @property
     def infos(self):
         """Getter to session infos.
 
@@ -308,6 +317,7 @@ class Session:
         :type path: str
         """
         self._func = None
+        self._rc = -1
         self._sid = -1
         # this dict is then flushed to the session.yml
         self._session_infos = {
@@ -419,8 +429,10 @@ class Session:
             log.manager.set_tty(enable=True)
             # run the code
             try:
-                self._func(*args, **kwargs)
+                self._rc = self._func(*args, **kwargs)
             finally:
                 # in that mode, no information is left to users once the session
                 # is complete.
                 remove_session_from_file(self._sid)
+
+        return self._sid

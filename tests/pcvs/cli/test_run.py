@@ -7,16 +7,6 @@ from pcvs.backend import run as tested
 from .conftest import click_call, isolated_fs
 
 
-@patch('pcvs.backend.session.Session', autospec=True)
-@patch('pcvs.backend.profile.Profile')
-@patch('pcvs.backend.bank')
-@patch('pcvs.helpers.system')
-def test_no_userdirs(mock_sys, mock_bank, mock_pf, mock_session):
-    with isolated_fs():
-        res = click_call('run')
-        assert(res.exit_code == 0)
-
-
 @patch("pcvs.backend.session.lock_session_file", return_value={})
 @patch("pcvs.backend.session.unlock_session_file", return_value={})
 @patch("pcvs.backend.session.store_session_to_file", return_value={})

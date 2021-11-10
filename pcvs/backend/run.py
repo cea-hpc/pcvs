@@ -107,6 +107,7 @@ def process_main_workflow(the_session=None):
     log.manager.info("RUN: Session start")
     global_config = MetaConfig.root
     valcfg = global_config.validation
+    rc = 0
 
     log.manager.set_logfile(valcfg.runlog is not None, valcfg.runlog)
     valcfg.sid = the_session.id
@@ -137,11 +138,10 @@ def process_main_workflow(the_session=None):
              "or execute one with `pcvs exec <testname>`",
              "===================================================="
             ])
-        return
+        return 0
 
     log.manager.print_header("Execution")
-    
-    MetaConfig.root.get_internal('orchestrator').run(the_session)
+    rc += MetaConfig.root.get_internal('orchestrator').run(the_session)
     
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
@@ -166,6 +166,7 @@ def process_main_workflow(the_session=None):
     if utils.is_locked(buildfile):
         utils.unlock_file(buildfile)
     
+    return rc
 
 
 def __check_defined_program_validity():

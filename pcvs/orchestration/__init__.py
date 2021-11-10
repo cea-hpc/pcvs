@@ -1,6 +1,7 @@
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
+from pcvs.testing.test import Test
 from pcvs.orchestration.manager import Manager
 from pcvs.orchestration.publishers import Publisher
 from pcvs.orchestration.set import Set, Runner
@@ -125,6 +126,8 @@ class Orchestrator:
 
         self.stop_runners()
 
+        return 0 if self._manager.get_count('total') - self._manager.get_count(Test.State.SUCCESS) == 0 else 1
+
     def start_new_runner(self):
         Runner.sched_in_progress = True
         r = Runner(ready=self._ready_q, complete=self._complete_q)
@@ -147,5 +150,4 @@ class Orchestrator:
         :type session: :class:`Session`
         """
         # pre-actions done only once
-        self.start_run(session, restart=False)
-        pass
+        return self.start_run(session, restart=False)
