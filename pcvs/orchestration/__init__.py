@@ -92,11 +92,11 @@ class Orchestrator:
                     
                 
             # Now, look for a completion
-            set = self._complete_q.get()
-            if set is not None:
+            try:
+                set = self._complete_q.get(block=False, timeout=2)
                 nb_nodes += set.dim
                 self._manager.merge_subset(set)
-            else:
+            except queue.Empty:
                 pass
                 # TODO: create backup to allow start/stop
 
