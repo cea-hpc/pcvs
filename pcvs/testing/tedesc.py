@@ -309,11 +309,6 @@ class TEDescriptor:
             binary = self._run.program
         self._build.sources.binary = binary
 
-        for i in range(0, len(self._build.files)):
-            if not os.path.isabs(self._build.files[i]):
-                self._build.files[i] = os.path.join(
-                    self._srcdir, self._build.files[i])
-
         command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
             cc=MetaConfig.root.compiler.commands.get(lang, 'echo'),
             var=prepare_cmd_build_variants(self._build.variants),
@@ -459,8 +454,14 @@ class TEDescriptor:
 
         # ensure consistency when 'files' node is used
         # can be a list or a single value
-        if 'files' in self._build and not isinstance(self._build.files, list):
-            self._build.files = [self._build.files]
+        if 'files' in self._build:
+                if not isinstance(self._build.files, list):
+                        self._build.files = [self._build.files]
+                
+                for i in range(0, len(self._build.files)):
+                        if not os.path.isabs(self._build.files[i]):
+                                self._build.files[i] = os.path.join(self._srcdir, self._build.files[i])
+            
 
         # manage deps (tests, package_managers...)
         job_deps = build_job_deps(
