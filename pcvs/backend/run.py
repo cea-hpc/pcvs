@@ -91,6 +91,8 @@ def stop_pending_jobs(exc=None):
     orch = MetaConfig.root.get_internal('orchestrator')
     if orch:
         orch.stop()
+    if exc:
+        raise exc
 
 @log.manager.capture_exception(Exception, stop_pending_jobs)
 def process_main_workflow(the_session=None):
