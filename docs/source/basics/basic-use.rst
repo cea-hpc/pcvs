@@ -2,13 +2,118 @@
  Basic usage
 ##############
 
-System Prerequisites
-####################
-Run a test-suite based on a directory
-#####################################
+Once PCVS is installed through the :ref:`Installation Guide`, the ``pcvs`` is
+available in ``PATH``. This program is the only entry point to PCVS:
 
+.. code-block:: sh
 
-Build a profile based on a template
-###################################
+    $ pcvs
+    Usage: pcvs [OPTIONS] COMMAND [ARGS]...
 
-List available
+    PCVS main program.
+
+    Options:
+    -v, --verbose              Verbosity (cumulative)  [env var: PCVS_VERBOSE]
+    -c, --color / --no-color   Use colors to beautify the output  [env var:
+                                PCVS_COLOR]
+    -g, --glyph / --no-glyph   enable/disable Unicode glyphs  [env var:
+                                PCVS_ENCODING]
+    -C, --exec-path DIRECTORY  [env var: PCVS_EXEC_PATH]
+    -V, --version              Display current version
+    -w, --width INTEGER        Terminal width (autodetection if omitted
+    -P, --plugin-path PATH     Default Plugin path prefix  [env var:
+                                PCVS_PLUGIN_PATH]
+    -m, --plugin TEXT
+    -help, -h, --help          Show this message and exit.
+
+    Commands:
+    bank     Persistent data repository management
+    check    Ensure future input will be conformant to standards
+    clean    Remove artifacts generated from PCVS
+    config   Manage Configuration blocks
+    exec     Running a specific test
+    profile  Manage Profiles
+    report   Manage PCVS result reporting interface
+    run      Run a validation
+    scan     Analyze directories to build up test conf. files
+    session  Manage multiple validations
+
+Build a profile
+###############
+
+A profile contains the whole PCVS configuration in a single component. While
+this approach allow deeply complex approaches, we'll target a simple MPI
+implementatino for this example. To create the most basic profile able to run
+MPI programs, we may herit ours from pre-generated called a template:
+
+.. code-block:: sh
+
+    $ pcvs profile create -t mpi user.newprofile
+
+A new profile is created and stored in the user space and will be
+available for any further ``pcvs`` invocations. It is also possible to set this
+profile as ``local`` (only for the current directory) or ``global`` (anyone able
+to use this PCVS installation. You may replace ``newprofile`` by a name of your 
+choice. For a complete list of available templates, please check ``pcvs profile list --all``.
+
+A profile can be edited if necessary with ``pcvs profile edit newprofile``. It
+will open an ``$EDITOR``. When exiting, the profile is validated to ensure
+coherency. In case it does not fulfill a proper format, a rejection file is
+crated in the current directory. Once fixed, the profile can be saved as a
+replacement with:
+
+.. code-block:: sh
+
+    $ pcvs profile import newprofile --force --source file.yml
+
+.. warning::
+    The ``--force`` option will overwrite any profile with the same name, if it
+    exists. Please use this option with care. In case of a rejection, the import
+    needs to be forced in order to replace the old one.
+
+Implement test descriptions
+###########################
+
+For a short example of implementing test descriptions, please refer to the
+:ref:`Test-suite Layout` shown in the :ref:`Getting-Started` guide. A more
+detailed presentation of test description capabilities is available in its
+own documentation page.
+
+The most basic ``pcvs.yml`` file may look like this:
+
+.. code-block:: yaml
+
+    my_program:
+        build:
+            files: ['main.c']
+        run:
+            program: ['a.out']
+
+PCVS also support building programs through Make, CMake & Autotools, each system
+having its own set of keys to configure:
+
+* ``build.make.target``: allow to configure a Make target to invoke.
+* ``build.cmake.vars``: variables to forward to cmake (to be prefixed w/ ``-D``)
+* ``build.autotools.params``: configure script flags
+* ``build.autotools.autogen``: boolean whether to execute autogen.sh first.
+
+Proper YAML formats can be checked before running a test-suite with:
+
+.. code-block:: sh
+
+    $ pcvs check --directory /path/to/dir
+    $ pcvs check --profiles
+
+Run a test-suite
+################
+
+Start a run from the local directory with our profile is as simple as:
+
+.. code-block:: sh
+
+    $ pcvs run --profile newprofile
+
+A list of directories can also be given. Once started, the validation process is
+logged under ``$PWD/.pcvs-build`` directory. If the directory already exists, it
+is cleaned up and reused. A lock is put in that directory to protect against
+concurrent PCVS execution in the same directory.
