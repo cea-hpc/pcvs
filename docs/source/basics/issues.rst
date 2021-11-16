@@ -26,12 +26,14 @@ might be raised:
     installation.</p>
     <p>Still, we recommend to rely on wheel packages to avoid
     installing extra third-party tools. <code>pip3</code> is the best solution.
-    An important note: some <code>pip3</code> versions have issues when dealing
-    with wheels, please ensure to update it before opening any ticket.
+    An important note: Only Python3.7+ wheel packages are available from PyPI
+    for <code>pygit2</code>. The only solution for older Python versions is to
+    build manually libgit2 & export the installation prefix into the current
+    encvironment.
     </p></details></p>
 
 Solution / Workaround
 *********************
 
 - Manually install libgit2, version >= 1.0.0
-- Use wheel package to install third-party tools
+- Use wheel package to install third-party tools (only Python3.7+)

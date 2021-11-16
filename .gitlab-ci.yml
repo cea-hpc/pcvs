@@ -1,4 +1,4 @@
-image: 'python:3.6'
+image: 'python:3.7'
 
 before_script:
 - pip3 install -rrequirements-dev.txt
@@ -83,13 +83,15 @@ pip:
     - pip3 install .
     - pcvs
 
-Python3.6:
-    extends: .pytest
-    image: "python:3.6"
 Python3.7:
     extends: .pytest
     image: "python:3.7"
 Python3.8:
     extends: .pytest
     image: "python:3.8"
-
+Python3.9:
+    extends: .pytest
+    image: "python:3.9"
+Python3.10:
+    extends: .pytest
+    image: "python:3.10"
