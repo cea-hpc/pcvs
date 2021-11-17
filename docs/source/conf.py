@@ -21,9 +21,8 @@ import os
 import sys
 from datetime import datetime
 
-sys.path.insert(0, os.path.abspath('../../pcvs/'))
-
-from pcvs.version import __version_full__, __version_short__
+sys.path.append(os.path.abspath('../../'))
+from pcvs.version import __version_short__, __version_full__
 
 # -- General configuration ------------------------------------------------
 

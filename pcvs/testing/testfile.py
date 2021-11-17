@@ -175,7 +175,8 @@ class TestFile:
         :param data: the YAML-formatted input stream.
         :type data: YAMl-formatted str
         """
-        source, _, build, _ = utils.generate_local_variables(self._label, self._prefix)
+        source, _, build, _ = utils.generate_local_variables(
+            self._label, self._prefix)
         stream = replace_special_token(data, source, build, self._prefix)
         self._raw = YAML(typ='safe').load(stream)
 

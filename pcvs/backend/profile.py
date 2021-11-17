@@ -50,7 +50,7 @@ def list_profiles(scope=None):
 
 def list_templates():
     """List available templates to be used for boostraping profiles.
-    
+
     :return: a list of valid templates.
     :rtype: list"""
     array = list()
@@ -227,11 +227,12 @@ class Profile:
         """
         self._exists = True
         self._file = None
-        filepath = os.path.join(PATH_INSTDIR, "templates", "profile", name)+".yml"
+        filepath = os.path.join(
+            PATH_INSTDIR, "templates", "profile", name)+".yml"
         if not os.path.isfile(filepath):
             raise ProfileException.NotFoundError(
                 "{} is not a valid base name.\nPlease use pcvs profile list --all".format(name))
-        
+
         with open(filepath, "r") as fh:
             self.fill(YAML(typ='safe').load(fh))
 
@@ -246,7 +247,8 @@ class Profile:
             if kind not in self._details:
                 raise ValidationException.FormatError(
                     "Missing '{}' in profile".format(kind))
-            system.ValidationScheme(kind).validate(self._details[kind], filepath=self._name)
+            system.ValidationScheme(kind).validate(
+                self._details[kind], filepath=self._name)
 
     def flush_to_disk(self):
         """Write down profile to disk.
@@ -272,7 +274,7 @@ class Profile:
         :type clone: :class:`Profile`
         """
         self._retrieve_file()
-        
+
         log.manager.info("Compute target prefix: {}".format(self._file))
         assert(not os.path.isfile(self._file))
         self._details = clone._details

@@ -33,7 +33,7 @@ def compl_list_token(ctx, args, incomplete):  # pragma: no cover
 
 def compl_list_templates(ctx, args, incomplete):  # pragma: no cover
     """ the profile template completion. 
-    
+
     :param ctx: Click context
     :type ctx: :class:`Click.Context`
     :param args: the option/argument requesting completion.
@@ -104,10 +104,12 @@ def profile_list(ctx, token, all):
         names = sorted([x[0] for x in profiles])
         log.manager.print_item("{: <6s}: {}".format(
             scope.upper(), ", ".join(names)))
-    
+
     if all:
-        log.manager.print_section("Available templates to create from (--base option):")
-        log.manager.print_item(", ".join([x[0] for x in pvProfile.list_templates()]))
+        log.manager.print_section(
+            "Available templates to create from (--base option):")
+        log.manager.print_item(
+            ", ".join([x[0] for x in pvProfile.list_templates()]))
 
     # in case verbosity is enabled, add scope paths
     log.manager.info("Scopes are ordered as follows:")
@@ -208,8 +210,9 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
     (e.g. 'mpi-srun-stampede-large' is allowed)
     """
     if clone and base:
-        raise click.BadOptionUsage("--base/--clone", "Cannot use --base & --clone simultaneously.")
-    
+        raise click.BadOptionUsage(
+            "--base/--clone", "Cannot use --base & --clone simultaneously.")
+
     (p_scope, _, p_label) = utils.extract_infos_from_token(token, maxsplit=2)
 
     pf = pvProfile.Profile(p_label, p_scope)
@@ -271,7 +274,7 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
 @click.pass_context
 def profile_destroy(ctx, token):
     """Delete an existing profile named TOKEN.
-    
+
     Use with caution, this action is irreversible !
     """
     (scope, _, label) = utils.extract_infos_from_token(token, maxsplit=2)
@@ -305,7 +308,7 @@ def profile_edit(ctx, token, editor, edit_plugin):
     """Edit an existing profile with the given EDITOR. The '-p' option will open
     the decoded runtime plugin code stored as a base64 string into the profile
     for edition.
-    
+
     After edition, the result will be validated to ensure
     coherency. If the test failed a rej*.yml will be created with the edited
     content.
@@ -345,7 +348,7 @@ def profile_import(ctx, token, src_file, force):
         pf.flush_to_disk()
     else:
         raise ProfileException.AlreadyExistError("{}".format(pf.full_name))
-        
+
 
 @profile.command(name="export",
                  short_help="Export a profile to a file")

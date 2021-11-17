@@ -13,7 +13,7 @@ from pcvs.helpers.exceptions import CommonException
 
 def pretty_print_exception(e: exceptions.GenericError):
     """Display exceptions in a fancy way.
-    
+
     :param e: the execption to print
     :type e: exceptions.GenericError.
     """
@@ -23,7 +23,6 @@ def pretty_print_exception(e: exceptions.GenericError):
         manager.info("Extra infos:\n{}".format(e.dbg_str))
     else:
         manager.err(str(e))
-
 
 
 class IOManager:
@@ -152,13 +151,12 @@ class IOManager:
 
         if logfile is not None:
             if not os.access(os.path.dirname(logfile), os.W_OK):
-                raise CommonException.IOError("{} is not writable !".format(logfile))
+                raise CommonException.IOError(
+                    "{} is not writable !".format(logfile))
 
             if os.path.abspath(logfile) != self.log_filename:
                 self._logfile = open(os.path.abspath(logfile), 'w+')
             self._logenabled = enable
-
-    
 
     def __init__(self, verbose=0, enable_unicode=True, length=80, logfile=None, tty=True):
         """constructor for IOManager object
@@ -199,7 +197,7 @@ class IOManager:
             logfile = os.path.abspath(logfile)
             if os.path.isfile(logfile):
                 raise CommonException.AlreadyExistError(logfile)
-            
+
             self.set_logfile(True, logfile)
 
     def __del__(self):
@@ -208,7 +206,8 @@ class IOManager:
 
         if self._logfile:
             if not os.path.isfile(self._logfile.name):
-                manager.warn("{} does not exist anymore !".format(self._logfile.name))
+                manager.warn("{} does not exist anymore !".format(
+                    self._logfile.name))
             else:
                 self._logfile.close()
 
@@ -223,7 +222,7 @@ class IOManager:
         if self._tty:
             click.echo(msg, err=err)
 
-        content ='{}{}'.format(msg, '\n' if msg[-1] != "\n" else "")
+        content = '{}{}'.format(msg, '\n' if msg[-1] != "\n" else "")
         if self._logenabled and self._logfile:
             self._logfile.write(self._logbuffer)
             self._logfile.write(content)

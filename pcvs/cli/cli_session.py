@@ -64,7 +64,7 @@ def session(ctx, ack, list, ack_all):
             s.load_from(sk, sv)
             status = "Broken"
             duration = timedelta()
-            
+
             if s.state == pvSession.Session.State.IN_PROGRESS:
                 duration = datetime.now() - s.property('started')
                 status = "In Progress -- {:4.2f}%".format(

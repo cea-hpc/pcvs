@@ -286,7 +286,7 @@ class Session:
         :return: rc
         :rtype: int
         """
-        return self._rc 
+        return self._rc
 
     @property
     def infos(self):

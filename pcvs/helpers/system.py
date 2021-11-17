@@ -67,7 +67,8 @@ class ValidationScheme:
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             raise ValidationException.FormatError(
-                "Scheme '{}' failed to verify the following file:\n{}".format(self._name, filepath),
+                "Scheme '{}' failed to verify the following file:\n{}".format(
+                    self._name, filepath),
                 reason=e.message)
         except jsonschema.exceptions.SchemaError as e:
             raise ValidationException.SchemeError(

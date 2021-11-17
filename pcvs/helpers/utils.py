@@ -1,7 +1,6 @@
-import time
-import signal
 import os
 import shutil
+import signal
 import time
 from contextlib import contextmanager
 from shutil import SameFileError
@@ -280,20 +279,21 @@ def find_buildir_from_prefix(path):
 
 def get_lockfile_name(f):
     """From a file to mutex, return the file lock name associated with it.
-    
+
     For instance for /a/b.yml, the lock file name will be /a/.b.yml.lck
-    
+
     :param f: the file to mutex
     :type f: str
     """
     path = os.path.dirname(f)
     filename = os.path.basename(f)
-    
+
     # hide lock file if original file isn't
     if not filename.startswith("."):
         filename = "." + filename
-        
+
     return os.path.join(path, filename + ".lck")
+
 
 def unlock_file(f):
     """Remove lock from a directory.
@@ -361,14 +361,14 @@ def trylock_file(f, reentrant=False):
                 log.manager.debug("Lock {}".format(lockfile_name))
                 return True
         except ValueError as e:
-            pass # return False
+            pass  # return False
 
         return False
 
 
 def is_locked(f):
     """Is the given file locked somewhere else ?
-    
+
     :param f: the file to test
     :type f: str
     :return: a boolean indicating wether the lock is hold or not.
@@ -381,7 +381,7 @@ def is_locked(f):
 def get_lock_owner(f):
     """The lock file will contain the process ID owning the lock. This function
     returns it.
-    
+
     :param f: the original file to mutex
     :type f: str
     :return: the process ID
@@ -397,10 +397,11 @@ def program_timeout(sig, frame):
     assert(sig == signal.SIGALRM)
     raise CommonException.TimeoutError("Timeout reached")
 
+
 def start_autokill(timeout=None):
     if isinstance(timeout, int):
-        log.manager.print_item("Setting timeout to {} second(s)".format(timeout))
+        log.manager.print_item(
+            "Setting timeout to {} second(s)".format(timeout))
         signal.signal(signal.SIGALRM, program_timeout)
-        
+
         signal.alarm(timeout)
-    

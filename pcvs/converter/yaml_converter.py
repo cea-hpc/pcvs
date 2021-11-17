@@ -315,7 +315,8 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
         pprint.pformat(invalid_nodes))])
     [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
 
-    log.manager.info(["Final layout:", "{}".format(pprint.pformat(final_data))])
+    log.manager.info(
+        ["Final layout:", "{}".format(pprint.pformat(final_data))])
 
     if stdout:
         f = sys.stdout

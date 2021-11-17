@@ -1,8 +1,8 @@
 import fileinput
-import signal
 import os
 import pprint
 import shutil
+import signal
 import subprocess
 import time
 from subprocess import CalledProcessError
@@ -62,7 +62,7 @@ def display_summary(the_session):
     log.manager.print_item("Criterion matrix size per job: {}".format(
         MetaConfig.root.get_internal("comb_cnt")
     ))
-    
+
     if cfg.target_bank:
         log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
     log.manager.print_item("Verbosity: {}".format(
@@ -74,10 +74,10 @@ def display_summary(the_session):
             k.upper(),
             v,
             width=width))
-        
+
     log.manager.print_section("Globally loaded plugins:")
     MetaConfig.root.get_internal("pColl").show_enabled_plugins()
-    
+
     log.manager.print_section("Orchestration infos")
     MetaConfig.root.get_internal("orchestrator").print_infos()
 
@@ -87,12 +87,14 @@ def display_summary(the_session):
             ">>>> DRY-RUN : TEST EXECUTION IS EMULATED <<<<",
             "=============================================="])
 
+
 def stop_pending_jobs(exc=None):
     orch = MetaConfig.root.get_internal('orchestrator')
     if orch:
         orch.stop()
     if exc:
         raise exc
+
 
 @log.manager.capture_exception(Exception, stop_pending_jobs)
 def process_main_workflow(the_session=None):
@@ -129,7 +131,7 @@ def process_main_workflow(the_session=None):
 
     log.manager.print_header("Summary")
     display_summary(the_session)
-    
+
     if valcfg.onlygen:
         log.manager.warn(
             ["====================================================",
@@ -137,12 +139,12 @@ def process_main_workflow(the_session=None):
              "You may list runnable tests with `pcvs exec --list`",
              "or execute one with `pcvs exec <testname>`",
              "===================================================="
-            ])
+             ])
         return 0
 
     log.manager.print_header("Execution")
     rc += MetaConfig.root.get_internal('orchestrator').run(the_session)
-    
+
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
@@ -161,11 +163,11 @@ def process_main_workflow(the_session=None):
                 None,
                 os.path.join(valcfg.output)
             )
-            
+
     buildfile = os.path.join(valcfg.output, NAME_BUILDFILE)
     if utils.is_locked(buildfile):
         utils.unlock_file(buildfile)
-    
+
     return rc
 
 
@@ -205,10 +207,9 @@ def prepare():
     """
     log.manager.print_section("Prepare environment")
     valcfg = MetaConfig.root.validation
-    
+
     utils.start_autokill(valcfg.timeout)
 
-    
     log.manager.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
     if not os.path.exists(buildir):

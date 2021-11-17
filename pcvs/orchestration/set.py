@@ -1,5 +1,6 @@
+import queue
 import subprocess
-import threading, queue
+import threading
 import time
 from typing import List
 
@@ -41,7 +42,7 @@ class Set:
         if not self.comman:
             if MetaConfig.root.get_internal('comman') is not None:
                 self.comman = MetaConfig.root.get_internal('comman')
-    
+
     def enable_wrapping(self, wrap_cli):
         """Make this Set manipulate multiple jobs evolving together in a
         dedicated environment.
@@ -126,15 +127,15 @@ class Set:
 
 
 class Runner(threading.Thread):
-    
+
     sched_in_progress = True
-    
+
     def __init__(self, ready, complete):
         super().__init__()
-        
+
         self._rq = ready
         self._cq = complete
-    
+
     def run(self):
         while True:
             try:
@@ -149,8 +150,7 @@ class Runner(threading.Thread):
             except Exception:
                 print("end thread")
                 return
-                
-            
+
     def process_item(self, set):
         """Execute the Set and jobs within it.
 
@@ -158,9 +158,9 @@ class Runner(threading.Thread):
         for job in set.content:
             try:
                 p = subprocess.Popen('{}'.format(job.invocation_command),
-                                    shell=True,
-                                    stderr=subprocess.STDOUT,
-                                    stdout=subprocess.PIPE)
+                                     shell=True,
+                                     stderr=subprocess.STDOUT,
+                                     stdout=subprocess.PIPE)
                 start = time.time()
                 stdout, _ = p.communicate(timeout=job.timeout)
                 final = time.time() - start

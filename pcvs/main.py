@@ -85,11 +85,11 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
     ctx.obj['plugins'] = pcoll
 
     pcoll.register_default_plugins()
-    
+
     if plugin_path:
         for path in plugin_path:
             pcoll.register_plugin_by_dir(path)
-    
+
     for arg in select_plugins:
         for select in arg.split(','):
             pcoll.activate_plugin(select)

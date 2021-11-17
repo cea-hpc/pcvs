@@ -175,7 +175,8 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
                 log.manager.print_section("Found build: {}".format(root))
-                archives = [x for x in sorted(files) if x.startswith('pcvsrun_') and x.endswith('.tar.gz')]
+                archives = [x for x in sorted(files) if x.startswith(
+                    'pcvsrun_') and x.endswith('.tar.gz')]
                 if len(archives) == 0 and fake:
                     log.manager.print_item("No archive found.")
                 else:
@@ -201,7 +202,7 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
                                 continue
                         shutil.rmtree(root)
                         log.manager.print_item('Deleted {}'.format(root))
-                        
+
                 # stop the walk down to this top directory
                 dirs[:] = []
 

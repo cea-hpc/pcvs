@@ -27,9 +27,10 @@ def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
 
     return [elt for elt in flat_array if incomplete in elt]
 
+
 def compl_list_templates(ctx, args, incomplete) -> list:  # pragma: no cover
     """Config template completion.
-    
+
     :param ctx: Click context
     :type ctx: :class:`Click.Context`
     :param args: the option/argument requesting completion.
@@ -37,7 +38,8 @@ def compl_list_templates(ctx, args, incomplete) -> list:  # pragma: no cover
     :param incomplete: the user input
     :type incomplete: str"""
     return [elt for elt in pvConfig.list_templates() if incomplete in elt]
-    
+
+
 @click.group(name="config", short_help="Manage Configuration blocks")
 @click.pass_context
 def config(ctx) -> None:
@@ -132,9 +134,10 @@ def config_list(ctx, token, all) -> None:
         config_list_single_kind(k, scope)
 
     if all:
-        log.manager.print_section("Available templates to create from (--base option):")
-        log.manager.print_item(", ".join([x for x in sorted(pvConfig.list_templates())]))
-
+        log.manager.print_section(
+            "Available templates to create from (--base option):")
+        log.manager.print_item(
+            ", ".join([x for x in sorted(pvConfig.list_templates())]))
 
     # in case verbosity is enabled, add scope paths
     log.manager.info("Scopes are ordered as follows:")
@@ -194,15 +197,16 @@ def config_create(ctx, token, clone, base, interactive) -> None:
     through the `pcvs config --help` command.
     """
     if clone and base:
-        raise click.BadOptionUsage("--clone/--base", "--clone & --base cannot be used simultaneously.")
-    
+        raise click.BadOptionUsage(
+            "--clone/--base", "--clone & --base cannot be used simultaneously.")
+
     (scope, kind, label) = utils.extract_infos_from_token(token)
-    
+
     copy = pvConfig.ConfigurationBlock(kind, label, scope)
     if copy.is_found():
         raise click.BadArgumentUsage("Configuration '{}' already exists!".format(
             copy.full_name))
-    
+
     if clone is not None:
         (c_scope, c_kind, c_label) = utils.extract_infos_from_token(
             clone, pair='span')
@@ -218,15 +222,13 @@ def config_create(ctx, token, clone, base, interactive) -> None:
         copy.clone(cfg)
     else:
         copy.load_template(base)
-        
+
     copy.check()
-    
+
     copy.flush_to_disk()
     if interactive:
         copy.edit()
-        
 
-    
 
 @config.command(name="destroy", short_help="Remove a config block")
 @click.argument("token", nargs=1, type=click.STRING,
@@ -298,7 +300,7 @@ def config_import(ctx, token, in_file, force) -> None:
     through the `pcvs config --help` command.
     """
     (scope, kind, label) = utils.extract_infos_from_token(token)
-    
+
     obj = pvConfig.ConfigurationBlock(kind, label, scope)
     if not obj.is_found() or force:
         obj.fill(YAML(typ='safe').load(in_file.read()))

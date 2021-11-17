@@ -13,7 +13,7 @@ from pcvs.helpers import log
 @click.pass_context
 def report(ctx, path_list, static):
     """Start a webserver to browse result during or after execution.
-    
+
     Listens by default to http://localhost:5000/"""
     inputs = list()
     # sanity check

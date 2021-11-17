@@ -176,10 +176,10 @@ class Manager:
                 else:
                     # assert(self._builder.job_grabber)
                     job: Test = self._dims[k].pop()
-                    
+
                     # if there is still a job available for this dimention
                     if job:
-                        #but this job won't be run because:
+                        # but this job won't be run because:
                         # - already run
                         # - at least one dep run & failed
                         if job.been_executed() or job.has_failed_dep():
@@ -203,19 +203,19 @@ class Manager:
                                 self._publisher.add(job.to_json())
                             # sad to break, should retry
                             break
-                        #If this job has at least one dep no executed yet
+                        # If this job has at least one dep no executed yet
                         # -> run it instead
                         elif not job.has_completed_deps():
                             self._dims[k].append(job)
-                        
+
                             # careful: it means jobs are picked up
                             # but not popped from
                             while job and not job.has_completed_deps():
                                 job = job.first_incomplete_dep()
 
-                    #if a job has been elected
+                    # if a job has been elected
                     if job:
-                        # the job shouldn't be running (scenario where a dep is 
+                        # the job shouldn't be running (scenario where a dep is
                         # popped out & run but the Set didn't complete yet)
                         # OR th job dim exceeds remaining resources
                         if job.state != Test.State.IN_PROGRESS and job.get_dim() <= max_dim:

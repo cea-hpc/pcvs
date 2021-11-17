@@ -455,13 +455,13 @@ class TEDescriptor:
         # ensure consistency when 'files' node is used
         # can be a list or a single value
         if 'files' in self._build:
-                if not isinstance(self._build.files, list):
-                        self._build.files = [self._build.files]
-                
-                for i in range(0, len(self._build.files)):
-                        if not os.path.isabs(self._build.files[i]):
-                                self._build.files[i] = os.path.join(self._srcdir, self._build.files[i])
-            
+            if not isinstance(self._build.files, list):
+                self._build.files = [self._build.files]
+
+            for i in range(0, len(self._build.files)):
+                if not os.path.isabs(self._build.files[i]):
+                    self._build.files[i] = os.path.join(
+                        self._srcdir, self._build.files[i])
 
         # manage deps (tests, package_managers...)
         job_deps = build_job_deps(
@@ -501,7 +501,7 @@ class TEDescriptor:
         te_job_deps = build_job_deps(
             self._run, self._te_label, self._te_subtree)
         te_mod_deps = build_pm_deps(self._run)
-        
+
         if self._build:
             fq_name = Test.compute_fq_name(
                 self._te_label,
@@ -510,7 +510,6 @@ class TEDescriptor:
                 'cc')
             if fq_name not in te_job_deps:
                 te_job_deps.append(fq_name)
-            
 
         # for each combination generated from the collection of criterions
         for comb in self._serie.generate():

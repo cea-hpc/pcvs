@@ -1,16 +1,18 @@
+import queue
+
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
-from pcvs.testing.test import Test
 from pcvs.orchestration.manager import Manager
 from pcvs.orchestration.publishers import Publisher
-from pcvs.orchestration.set import Set, Runner
+from pcvs.orchestration.set import Runner, Set
 from pcvs.plugins import Plugin
-import queue
+from pcvs.testing.test import Test
 
 
 def global_stop():
     Orchestrator.stop()
+
 
 class Orchestrator:
     """The job orchestrator, managing test processing through the whole test base.
@@ -71,7 +73,7 @@ class Orchestrator:
 
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_BEFORE)
-        
+
         for i in range(0, self._maxconcurrent):
             self.start_new_runner()
 
@@ -90,8 +92,7 @@ class Orchestrator:
                     # schedule the set asynchronously
                     nb_nodes -= new_set.dim
                     self._ready_q.put(new_set)
-                    
-                
+
             # Now, look for a completion
             try:
                 set = self._complete_q.get(block=False, timeout=2)
@@ -129,20 +130,25 @@ class Orchestrator:
         return 0 if self._manager.get_count('total') - self._manager.get_count(Test.State.SUCCESS) == 0 else 1
 
     def start_new_runner(self):
+        """Start a new Runner thread & register comm queues."""
         Runner.sched_in_progress = True
         r = Runner(ready=self._ready_q, complete=self._complete_q)
         r.start()
         self._runners.append(r)
-    
+
     def stop_runners(self):
+        """Stop all previously started runners.
+
+        Wait for their completion."""
         self.stop()
         for t in self._runners:
             t.join()
 
     @classmethod
     def stop(cls):
+        """Request runner threads to stop."""
         Runner.sched_in_progress = False
-        
+
     def run(self, session):
         """Start the orchestrator.
 

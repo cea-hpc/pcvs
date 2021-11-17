@@ -96,7 +96,7 @@ def handle_build_lockfile(exc=None):
         if utils.is_locked(prefix):
             if utils.get_lock_owner(prefix) == os.getpid():
                 utils.unlock_file(prefix)
-                
+
     if exc:
         raise exc
 
@@ -210,9 +210,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
                 utils.lock_file(buildfile, force=True)
             else:
                 raise exceptions.RunException.InProgressError(path=val_cfg.output,
-                                               lockfile=buildfile,
-                                               owner_pid=utils.get_lock_owner(buildfile))
-                
+                                                              lockfile=buildfile,
+                                                              owner_pid=utils.get_lock_owner(buildfile))
 
     elif not os.path.exists(val_cfg.output):
         log.manager.debug(

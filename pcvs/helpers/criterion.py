@@ -44,7 +44,7 @@ class Combination:
 
     def items(self):
         """Get the combination dict.
-        
+
         :return: the whole combination dict.
         :rtype: dict
         """

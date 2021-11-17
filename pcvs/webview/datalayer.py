@@ -163,7 +163,7 @@ class DataRepresentation:
             for iter_k, iter_v in test.combination.items():
                 self.__insert_in_tree(
                     test, sid_tree["iterators"], [iter_k, iter_v])
-        
+
         if test.state != Test.State.SUCCESS:
             # if failed, save it
             self.__insert_in_tree(test, sid_tree["failures"], [])

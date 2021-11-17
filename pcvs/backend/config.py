@@ -57,16 +57,16 @@ def list_blocks(kind, scope=None):
 
 def list_templates():
     """List available templates to be used for boostraping config. blocks.
-    
+
     :return: a list of valid templates.
     :rtype: list"""
     array = list()
     for f in os.listdir(os.path.join(PATH_INSTDIR, "templates/config")):
         array.append(os.path.splitext(f)[0])
-        
+
     return array
 
-    
+
 def check_valid_kind(s):
     """Assert the parameter is a valid kind.
 
@@ -227,7 +227,8 @@ class ConfigurationBlock:
 
     def check(self) -> None:
         """Validate a single configuration block according to its scheme."""
-        system.ValidationScheme(self._kind).validate(self._details, filepath=self.full_name)
+        system.ValidationScheme(self._kind).validate(
+            self._details, filepath=self.full_name)
 
     def load_from_disk(self) -> None:
         """load the configuration file to populate the current object.
@@ -255,11 +256,11 @@ class ConfigurationBlock:
         if not name:
             name = self._kind + ".default"
         filepath = os.path.join(PATH_INSTDIR,
-                               'templates/config/{}.yml'.format(name))
+                                'templates/config/{}.yml'.format(name))
 
         if not os.path.isfile(filepath):
             raise ConfigException.NotFoundError("{}".format(name))
-        
+
         with open(filepath, 'r') as fh:
             self.fill(YAML(typ='safe').load(fh))
 

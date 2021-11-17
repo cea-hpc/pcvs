@@ -60,7 +60,7 @@ class Plugin:
     def __init__(self):
         """constructor method."""
         self._type = type(self)
-    
+
     @abstractmethod
     def run(self, *args, **kwargs):
         """To-be-overriden method."""
@@ -78,18 +78,19 @@ class Collection:
         """constructor method"""
         self._plugins = {name: [] for name in list(Plugin.Step)}
         self._enabled = {name: None for name in list(Plugin.Step)}
-        
+
     def register_default_plugins(self):
         """Detect plugins stored in default places."""
         try:
             self.register_plugin_by_package('pcvs-contrib')
         except:
-            log.manager.info("No pcvs-contrib package found for plugin autoloading")
+            log.manager.info(
+                "No pcvs-contrib package found for plugin autoloading")
 
     def activate_plugin(self, name):
         """Flag a plugin as active, meaning it will be called when the pass is
         reached.
-        
+
         :param name: the plugin name.
         :type name: str"""
         for step, plugins in self._plugins.items():
@@ -97,7 +98,8 @@ class Collection:
                 if name == type(p).__name__:
                     log.manager.debug("Activate {}".format(name))
                     if self._enabled[p.step]:
-                        log.manager.debug(" -> overrides {}".format(self._enabled[p.step]))
+                        log.manager.debug(
+                            " -> overrides {}".format(self._enabled[p.step]))
                     self._enabled[p.step] = p
                     return
         log.manager.warn("Unable to find a plugin named '{}'".format(name))
@@ -116,22 +118,22 @@ class Collection:
 
         if self._enabled[step]:
             return self._enabled[step].run(*args, **kwargs)
-        
+
         return None
 
     def nb_plugins_for(self, step):
         """Count the number of possible plugins for a given step.
-        
+
         :param step: the step to check
         :type step: str
-        
+
         :return: the number of plugins
         :rtype: int"""
         if step not in self._plugins:
             return -1
 
         return len(self._plugins[step])
-    
+
     def has_enabled_step(self, step):
         """Check if a given pass is enabled.
 
@@ -151,18 +153,18 @@ class Collection:
                 log.manager.print_section("Step {}:".format(str(step)))
                 for e in elements:
                     log.manager.print_item("{}".format(type(e).__name__))
-    
+
     def show_enabled_plugins(self):
         """Display the list of loaded plugins."""
         empty = True
         for step, e in self._enabled.items():
             if e:
                 empty = False
-                log.manager.print_item("{}: {}".format(str(step), type(e).__name__))
-                
+                log.manager.print_item(
+                    "{}: {}".format(str(step), type(e).__name__))
+
         if empty:
             log.manager.print_item("None")
-    
 
     def register_plugin_by_file(self, modpath, activate=False):
         """Based on a filepath (as a module dir), load plugins contained in it.
