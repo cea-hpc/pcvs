@@ -52,7 +52,7 @@ function togglePause()
 	//trigger the refresh again
 	pause = !pause
 	if(!pause)
-		refresh_the_table();
+		init_the_table();
 }
 
 function refresh_the_table()
@@ -80,7 +80,7 @@ function refresh_the_table()
 $(document).ready(function(){
 	page_waiting();
 	init_the_table();
-	setTimeout(refresh_the_table, 5000);
+	setTimeout(init_the_table, 5000);
 });
 </script>
 

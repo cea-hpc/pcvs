@@ -2,6 +2,7 @@ import json
 import os
 
 from ruamel.yaml import YAML
+from pcvs import NAME_BUILD_RESDIR
 
 from pcvs.backend.session import Session
 from pcvs.helpers import log
@@ -52,14 +53,16 @@ def upload_buildir_results(buildir):
     :param buildir: the build directory
     :type buildir: str
     """
+    
     # first, need to determine the session ID -> conf.yml
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
         conf_yml = MetaDict(YAML().load(fh))
 
     sid = conf_yml.validation.sid
     dataman = data_manager
+    print(sid)
 
-    result_dir = os.path.join(buildir, 'rawdata')
+    result_dir = os.path.join(buildir, NAME_BUILD_RESDIR)
     dataman.insert_session(sid, {
         'buildpath': buildir,
         'state': Session.State.COMPLETED,
@@ -67,6 +70,7 @@ def upload_buildir_results(buildir):
     })
 
     for f in os.listdir(result_dir):
+        print("wtf {}".format(f))
         assert(f.endswith(".json"))
         log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
 
