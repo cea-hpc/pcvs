@@ -9,7 +9,7 @@ from pcvs.helpers import log
 
 @click.command('report', short_help="Manage PCVS result reporting interface")
 @click.option("-s", "--static-pages", "static", flag_value=".", default=None)
-@click.argument("path_list", nargs=-1, required=False)
+@click.argument("path_list", nargs=-1, required=False, type=click.Path(exists=True))
 @click.pass_context
 def report(ctx, path_list, static):
     """Start a webserver to browse result during or after execution.
@@ -18,8 +18,12 @@ def report(ctx, path_list, static):
     inputs = list()
     # sanity check
     for prefix in path_list:
-        # if given prefix does not point to a valid build directory
-        if not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
+        # if a dir is given BU does not point to a valid build dir,
+        # attempt to resolve it.
+        # Note that files are always kept, it ensure to the user to 
+        # provide a valid archive-formatted file
+        if not os.path.isfile(prefix) and \
+            not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
             # if the 'builddir' default name was missing for resolution, add it
             if os.path.isfile(os.path.join(prefix, NAME_BUILDIR, NAME_BUILDFILE)):
                 prefix = os.path.join(prefix, NAME_BUILDIR)
@@ -42,9 +46,13 @@ def report(ctx, path_list, static):
         # feed with prefixes
         for prefix in inputs:
             try:
-                pvReport.upload_buildir_results(prefix)
+                if os.path.isfile(prefix):
+                    pvReport.upload_buildir_results_from_archive(prefix)
+                else:
+                    pvReport.upload_buildir_results(prefix)
             except Exception as e:
                 log.manager.warn("Unable to parse {}".format(prefix))
                 log.manager.debug("Caught {}".format(e))
+                raise e
         # create the app
         pvReport.start_server()

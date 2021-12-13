@@ -1,5 +1,7 @@
 import json
 import os
+import tempfile
+import tarfile
 
 from ruamel.yaml import YAML
 from pcvs import NAME_BUILD_RESDIR
@@ -60,8 +62,7 @@ def upload_buildir_results(buildir):
 
     sid = conf_yml.validation.sid
     dataman = data_manager
-    print(sid)
-
+    
     result_dir = os.path.join(buildir, NAME_BUILD_RESDIR)
     dataman.insert_session(sid, {
         'buildpath': buildir,
@@ -70,7 +71,6 @@ def upload_buildir_results(buildir):
     })
 
     for f in os.listdir(result_dir):
-        print("wtf {}".format(f))
         assert(f.endswith(".json"))
         log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
 
@@ -83,6 +83,13 @@ def upload_buildir_results(buildir):
 
     dataman.close_session(sid, {'state': Session.State.COMPLETED})
 
+
+def upload_buildir_results_from_archive(archive):
+    with tempfile.TemporaryDirectory() as tempdir:
+        archive = os.path.abspath(archive)
+        tarfile.open(archive).extractall(tempdir)
+        upload_buildir_results(os.path.join(tempdir, "save_for_export"))
+        
 
 def build_static_pages(buildir):
     """From a given build directory, generate static pages.
