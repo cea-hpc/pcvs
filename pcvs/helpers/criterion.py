@@ -132,9 +132,9 @@ class Serie:
         """Generator to build each combination"""
         for combination in list(itertools.product(*self._values)):
             d = {self._keys[i]: val for i, val in enumerate(combination)}
-
-            if not valid_combination(d):
-                continue
+    
+            #if not valid_combination(d):
+            #    continue
             yield Combination(
                 self._dict,
                 d

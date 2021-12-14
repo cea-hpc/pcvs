@@ -238,3 +238,6 @@ class PluginException(CommonException):
     class LoadError(GenericError):
         """Unable to load plugin directory."""
         pass
+
+class SpackException(CommonException):
+    pass

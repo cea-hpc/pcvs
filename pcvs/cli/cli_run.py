@@ -138,13 +138,15 @@ def handle_build_lockfile(exc=None):
               help="Rebuild the test-base, populating resources for `pcvs exec`")
 @click.option('-t', "--timeout", "timeout", show_envvar=True, type=int,
               help="PCVS process timeout")
+@click.option("-s", "--spack-recipe", "spack_recipe", type=str, multiple=True,
+              help="Build test-suites based on Spack recipes")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
 @log.manager.capture_exception(Exception)
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
-def run(ctx, profilename, output, detach, override, anon, settings_file, generate_only,
+def run(ctx, profilename, output, detach, override, anon, settings_file, generate_only, spack_recipe,
         simulated, bank, dup, dirs, enable_report, report_addr, timeout) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -157,7 +159,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
-
+        
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config
     global_config.set_internal("pColl", ctx.obj['plugins'])
@@ -183,6 +185,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
     val_cfg.set_ifdef('enable_report', enable_report)
     val_cfg.set_ifdef('report_addr', report_addr)
     val_cfg.set_ifdef('timeout', timeout)
+    val_cfg.set_ifdef('spack_recipe', spack_recipe)
     val_cfg.set_ifdef('runlog', os.path.join(val_cfg.output, 'out.log'))
     val_cfg.set_ifdef('buildcache', os.path.join(val_cfg.output, 'cache'))
 

@@ -12,6 +12,7 @@ from ruamel.yaml import YAML
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_SRCDIR)
 from pcvs.backend import bank as pvBank
+from pcvs.backend import spack as pvSpack
 from pcvs.helpers import communications, criterion, log, utils
 from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
@@ -124,7 +125,8 @@ def process_main_workflow(the_session=None):
     else:
         log.manager.print_section("Load Test Suites")
         start = time.time()
-        process()
+        process_files()
+        process_spack()
         end = time.time()
         log.manager.print_section(
             "===> Processing done in {:<.3f} sec(s)".format(end-start))
@@ -316,7 +318,7 @@ def find_files_to_process(path_dict):
     return (setup_files, yaml_files)
 
 
-def process():
+def process_files():
     """Process the test-suite generation.
 
     It includes walking through user directories to find definitions AND
@@ -346,6 +348,12 @@ def process():
                         )
         raise RunException.TestUnfoldError("See previous errors above.")
 
+def process_spack():
+    log.manager.print_item("Build test-bases from Spack recipes")
+    orch = MetaConfig.root.get_internal('orchestrator')
+    for spec in MetaConfig.root.validation.spack_recipe:
+        for job in pvSpack.generate_from_variants(spec):
+            orch.add_new_job(job)
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
     """create a flat dict of variables mapping to the actual configuration.

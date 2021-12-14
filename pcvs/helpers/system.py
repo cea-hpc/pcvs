@@ -324,6 +324,7 @@ class MetaConfig(MetaDict):
         subtree.set_nosquash('background', False)
         subtree.set_nosquash('override', False)
         subtree.set_nosquash('dirs', None)
+        subtree.set_nosquash("spack_recipe", None)
         subtree.set_nosquash('runlog', os.path.join(subtree.output, 'out.log'))
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)

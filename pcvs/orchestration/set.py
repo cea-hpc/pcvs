@@ -147,9 +147,8 @@ class Runner(threading.Thread):
                     break
             except queue.Empty:
                 continue
-            except Exception:
-                print("end thread")
-                return
+            except Exception as e:
+                raise e
 
     def process_item(self, set):
         """Execute the Set and jobs within it.

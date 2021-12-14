@@ -392,7 +392,6 @@ class Bank:
 
         with tempfile.TemporaryDirectory() as tarpath:
             tarfile.open(os.path.join(archivepath)).extractall(tarpath)
-            os
             self.save_from_buildir(
                 tag, os.path.join(tarpath, "save_for_export"))
 

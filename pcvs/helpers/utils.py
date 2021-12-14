@@ -393,7 +393,6 @@ def get_lock_owner(f):
 
 
 def program_timeout(sig, frame):
-    print("luuu")
     assert(sig == signal.SIGALRM)
     raise CommonException.TimeoutError("Timeout reached")
 

@@ -31,7 +31,7 @@ class Publisher:
     increment = 0
     fn_fmt = "pcvs_rawdat{:>04d}.json"
 
-    def __init__(self, prefix="."):
+    def __init__(self, prefix=None):
         """constructor method.
 
         :param prefix: where result file will be stored in
@@ -41,6 +41,9 @@ class Publisher:
         self._layout = {
             "tests": []
         }
+        
+        if not prefix:
+            prefix = "."
         self._destpath = os.path.join(prefix, NAME_BUILD_RESDIR)
         assert(os.path.isdir(self._destpath))
 
