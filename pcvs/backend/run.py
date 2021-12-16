@@ -69,7 +69,7 @@ def display_summary(the_session):
     log.manager.print_item("Verbosity: {}".format(
         log.manager.get_verbosity_str().capitalize()))
     log.manager.print_section("User directories:")
-    width = max([len(i) for i in cfg.dirs])
+    width = max([0] + [len(i) for i in cfg.dirs])
     for k, v in cfg.dirs.items():
         log.manager.print_item("{:<{width}}: {:<{width}}".format(
             k.upper(),
@@ -349,11 +349,16 @@ def process_files():
         raise RunException.TestUnfoldError("See previous errors above.")
 
 def process_spack():
+    
+    if not shutil.which('spack'):
+        log.manager.warn("Unable to parse Spack recipes without having Spack in $PATH")
+        return
     log.manager.print_item("Build test-bases from Spack recipes")
     orch = MetaConfig.root.get_internal('orchestrator')
-    for spec in MetaConfig.root.validation.spack_recipe:
-        for job in pvSpack.generate_from_variants(spec):
-            orch.add_new_job(job)
+    with log.progbar(MetaConfig.root.validation.spack_recipe) as itbar:
+        for spec in itbar:
+            for job in pvSpack.generate_from_variants(spec):
+                orch.add_new_job(job)
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
     """create a flat dict of variables mapping to the actual configuration.

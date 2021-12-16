@@ -194,9 +194,13 @@ class TEDescriptor:
         self._effective_cnt = 0
         self._tags = node.get('tag', list())
 
+        path_prefix = self._buildir
+        if self.get_run_attr('path_resolution', True) is False:
+            path_prefix = ""
+            
         for elt_k, elt_v in self._artifacts.items():
             if not os.path.isabs(elt_v):
-                self._artifacts[elt_k] = os.path.join(self._buildir, elt_v)
+                self._artifacts[elt_k] = os.path.join(path_prefix, elt_v)
 
         # allow tags to be given as array OR a single string
         if not isinstance(self._tags, list):
@@ -215,6 +219,20 @@ class TEDescriptor:
         self._configure_criterions()
         # apply retro-compatibility w/ old syntax
         self._compatibility_support(node.get('_compat', None))
+
+    @staticmethod
+    def get_attr(node, name, dflt=None):
+        if 'attributes' in node and name in node['attributes'].keys():
+            return node['attributes'][name]
+        else:
+            return dflt
+
+    def get_run_attr(self, name, default=None):
+        return TEDescriptor.get_attr(self._run, name, default)
+
+    def get_build_attr(self, name, default=None):
+        return TEDescriptor.get_attr(self._build, name, default)
+    
 
     def _compatibility_support(self, compat):
         """Convert tricky keywords from old syntax too complex to be handled
@@ -530,18 +548,26 @@ class TEDescriptor:
 
             # attempt to determine test working directory
             chdir = self._run.cwd if self._run.cwd else self._buildir
+            
+                
             if not os.path.isabs(chdir):
                 chdir = os.path.abspath(os.path.join(self._buildir, chdir))
 
-            program = os.path.abspath(os.path.join(chdir, program))
+            # keep the original value if user disabled prefix resolution
+            if self.get_run_attr('path_resolution', True) is True:
+                program = os.path.abspath(os.path.join(chdir, program))
 
-            command = "{runtime} {runtime_args} {args} {program} {params}".format(
-                runtime=MetaConfig.root.runtime.program,
-                runtime_args=MetaConfig.root.runtime.get('args', ''),
-                args=" ".join(args),
-                program=program,
-                params=" ".join(params)
-            )
+            command = "{program} {params}".format(
+                    program=program,
+                    params=" ".join(params)
+                )
+            if self.get_run_attr('command_wrap', True) is True:
+                command = "{runtime} {runtime_args} {args} {cmd}".format(
+                    runtime=MetaConfig.root.runtime.program,
+                    runtime_args=MetaConfig.root.runtime.get('args', ''),
+                    args=" ".join(args),
+                    cmd=command
+                )
 
             self._effective_cnt += 1
 
@@ -578,7 +604,14 @@ class TEDescriptor:
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
-            self._serie = Serie({**self._criterion, **self._program_criterion})
+            print(self._run.attributes['command_wrap'] is False)
+            print(self.get_run_attr('command_wrap',"Gnarf"))
+                
+            if self.get_run_attr('command_wrap', True) is False:
+                self._serie = Serie({**self._program_criterion})
+            else:
+                self._serie = Serie({**self._criterion, **self._program_criterion})
+                
             yield from self.__construct_runtime_tests()
             del self._serie
 

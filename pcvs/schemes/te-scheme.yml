@@ -13,6 +13,11 @@ patternProperties:
       build:
         type: object
         properties:
+          attributes:
+            type: object
+            properties:
+              command_wrap:
+                type: boolean
           files:
             OneOf:
               - type: string
@@ -79,6 +84,13 @@ patternProperties:
       run:
         type: object
         properties:
+          attributes:
+            type: object
+            properties:
+              command_wrap:
+                type: boolean
+              path_resolution:
+                type: boolean
           program:
             type: string
           cwd:
