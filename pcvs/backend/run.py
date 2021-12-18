@@ -125,8 +125,10 @@ def process_main_workflow(the_session=None):
     else:
         log.manager.print_section("Load Test Suites")
         start = time.time()
-        process_files()
-        process_spack()
+        if MetaConfig.root.validation.dirs:
+            process_files()
+        if MetaConfig.root.validation.spack_recipe:
+            process_spack()
         end = time.time()
         log.manager.print_section(
             "===> Processing done in {:<.3f} sec(s)".format(end-start))
@@ -354,11 +356,18 @@ def process_spack():
         log.manager.warn("Unable to parse Spack recipes without having Spack in $PATH")
         return
     log.manager.print_item("Build test-bases from Spack recipes")
-    orch = MetaConfig.root.get_internal('orchestrator')
+    label = "spack"
+    path = "/spack"
+    MetaConfig.root.validation.dirs[label] = path
+    
+    _, _, rbuild, _ = utils.generate_local_variables(label, '')
+    utils.create_or_clean_path(rbuild, dir=True)
+
     with log.progbar(MetaConfig.root.validation.spack_recipe) as itbar:
         for spec in itbar:
-            for job in pvSpack.generate_from_variants(spec):
-                orch.add_new_job(job)
+            _, _, _, cbuild = utils.generate_local_variables(label, spec)
+            utils.create_or_clean_path(cbuild, dir=True)
+            pvSpack.generate_from_variants(spec, label, spec)
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
     """create a flat dict of variables mapping to the actual configuration.

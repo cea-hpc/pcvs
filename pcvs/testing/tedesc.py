@@ -604,8 +604,6 @@ class TEDescriptor:
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
-            print(self._run.attributes['command_wrap'] is False)
-            print(self.get_run_attr('command_wrap',"Gnarf"))
                 
             if self.get_run_attr('command_wrap', True) is False:
                 self._serie = Serie({**self._program_criterion})

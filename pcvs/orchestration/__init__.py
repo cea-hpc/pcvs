@@ -10,8 +10,9 @@ from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
 
 
-def global_stop():
+def global_stop(e):
     Orchestrator.stop()
+    raise e
 
 
 class Orchestrator:

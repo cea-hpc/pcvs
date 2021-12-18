@@ -1,8 +1,9 @@
 import pcvs
 import subprocess
-from pcvs.helpers.criterion import Combination, Criterion, Serie
-from pcvs.testing.test import Test
-from pcvs.orchestration import Orchestrator
+from pcvs.testing.testfile import TestFile
+from pcvs.helpers.system import MetaDict
+from pcvs.helpers import utils
+
 
 def parse_spec_variants(specname):
     d = dict()
@@ -13,26 +14,28 @@ def parse_spec_variants(specname):
         name, val_raw = line.split(':')
         values = val_raw.split(', ')
         
-        d[name] = Criterion(name, {
+        d[name] = {
             "option": "{}=".format(name),
             "position": "after",
             "type": "argument",
             "subtitle": "{}=".format(name),
             "values": values
-        }, local=True)
-        
-        d[name].concretize_value()
+        }
     return d
 
-def generate_from_variants(package):
-    tests = list()
-    for c in Serie(parse_spec_variants(package)).generate():
-        tests.append(Test(
-                comb=c,
-                te_name=package,
-                label="SPACK",
-                subtree="",
-                command="spack install {} {}".format(package, " ".join(c.translate_to_command()[2])),
-        ))
+def generate_from_variants(package, label, prefix):
+    data = MetaDict()
+    dict_of_variants = parse_spec_variants(package)
 
-    return tests
+    data[package].run.program = "spack install {} ".format(package)
+    data[package].run.iterate.program = dict_of_variants
+    data[package].run.attributes = {
+            "command_wrap": False,
+            "path_resolution": False,
+            }
+
+    _, src, _, build = utils.generate_local_variables(label, prefix)
+
+    t = TestFile(file_in=src, path_out=build, data=data, label=label, prefix=prefix)
+    t.process()
+    t.flush_sh_file()
