@@ -230,7 +230,13 @@ class Test:
         :rtype: list
         """
         return self._mod_deps
-
+    
+    def get_dep_graph(self):
+        res = {}
+        for d in self._deps:
+            res[d.name] = d.get_dep_graph()
+        return res
+        
     def resolve_a_dep(self, name, obj):
         """Resolve the dep object for a given dep name.
 
@@ -274,7 +280,7 @@ class Test:
         :rtype: :class:`Test` or NoneType
         """
         for d in self._deps:
-            if d.has_completed_deps() and d.state == Test.State.WAITING:
+            if d.state == Test.State.WAITING:
                 return d
         return None
 
