@@ -147,8 +147,9 @@ def process_main_workflow(the_session=None):
         return 0
 
     log.manager.print_header("Execution")
-    rc += MetaConfig.root.get_internal('orchestrator').run(the_session)
-
+    run_rc = MetaConfig.root.get_internal('orchestrator').run(the_session)
+    rc += run_rc if isinstance(run_rc, int) else 1
+    
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
