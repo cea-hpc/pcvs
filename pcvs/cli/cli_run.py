@@ -140,14 +140,17 @@ def handle_build_lockfile(exc=None):
               help="PCVS process timeout")
 @click.option("-s", "--spack-recipe", "spack_recipe", type=str, multiple=True,
               help="Build test-suites based on Spack recipes")
+@click.option("--print", "print_level", type=click.Choice(['none', 'errors', 'all']),
+              help="Enable test output to be printed depending on its status")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
 @log.manager.capture_exception(Exception)
 @log.manager.capture_exception(Exception, handle_build_lockfile)
 @log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
-def run(ctx, profilename, output, detach, override, anon, settings_file, generate_only, spack_recipe,
-        simulated, bank, dup, dirs, enable_report, report_addr, timeout) -> None:
+def run(ctx, profilename, output, detach, override, anon, settings_file,
+        generate_only, spack_recipe, print_level, simulated, bank, dup,
+        dirs, enable_report, report_addr, timeout) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -172,6 +175,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file, generat
     # save 'run' parameters into global configuration
     val_cfg.set_ifdef('datetime', datetime.now())
     val_cfg.set_ifdef('verbose', ctx.obj['verbose'])
+    val_cfg.set_ifdef('print_level', print_level)
     val_cfg.set_ifdef('color', ctx.obj['color'])
     val_cfg.set_ifdef('output', output)
     val_cfg.set_ifdef('background', detach)

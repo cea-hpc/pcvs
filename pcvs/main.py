@@ -42,7 +42,7 @@ def print_version(ctx, param, value):
 @click.group(context_settings=CONTEXT_SETTINGS, name="cli")
 @click.option("-v", "--verbose", "verbose", show_envvar=True,
               count=True, default=0,
-              help="Verbosity (cumulative)")
+              help="Enable PCVS debug verbosity (cumulative)")
 @click.option("-c", "--color/--no-color", "color",
               default=True, is_flag=True, show_envvar=True,
               help="Use colors to beautify the output")

@@ -6,7 +6,7 @@ from enum import IntEnum
 
 from pcvs.helpers import log
 from pcvs.helpers.criterion import Combination
-from pcvs.helpers.system import ValidationScheme
+from pcvs.helpers.system import MetaConfig, ValidationScheme
 
 
 class Test:
@@ -350,7 +350,8 @@ class Test:
         log.manager.print_job(label, self._exectime, self.name,
                               colorname=colorname, icon=icon)
         if self._output:
-            if (log.manager.has_verb_level("info") and self.state == Test.State.FAILURE) or log.manager.has_verb_level("debug"):
+            if (MetaConfig.root.validation.print_level == 'all' or \
+                (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
                 log.manager.print(base64.b64decode(self._output))
 
     def executed(self, state=None):
@@ -414,16 +415,16 @@ class Test:
         assert(isinstance(test_json, dict))
         self.res_scheme.validate(test_json)
 
-        self._id = test_json.get("id")
-        self._comb = Combination({}, self._id.get('comb'))
-        self._execmd = test_json.get("exec")
-        self._data = test_json.get("data")
+        self._id = test_json.get("id", -1)
+        self._comb = Combination({}, self._id.get('comb', {}))
+        self._execmd = test_json.get("exec", "")
+        self._data = test_json.get("data", "")
 
-        res = test_json.get("result")
-        self._rc = res.get("rc")
-        self._output = res.get("output")
+        res = test_json.get("result", {})
+        self._rc = res.get("rc", -1)
+        self._output = res.get("output", "")
         self._state = Test.State(res.get("state", Test.State.ERR_OTHER))
-        self._exectime = res.get("time")
+        self._exectime = res.get("time", 0)
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation.
