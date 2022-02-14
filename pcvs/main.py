@@ -50,7 +50,7 @@ def print_version(ctx, param, value):
               default=True, is_flag=True, show_envvar=True,
               help="enable/disable Unicode glyphs")
 @click.option("-C", "--exec-path", "exec_path", show_envvar=True,
-              default=".", type=click.Path(exists=True, file_okay=False))
+              default=None, type=click.Path(exists=True, file_okay=False))
 @click.option("-V", "--version",
               expose_value=False, is_eager=True, callback=print_version,
               is_flag=True, help="Display current version")
@@ -68,7 +68,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
-    ctx.obj['exec'] = os.path.abspath(exec_path)
+    ctx.obj['exec'] = exec_path
 
     # Click specific-related
     ctx.color = color

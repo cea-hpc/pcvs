@@ -18,7 +18,7 @@ from pcvs.helpers.system import MetaConfig
 STORAGES = {
     'global': PATH_INSTDIR,
     'user': PATH_HOMEDIR,
-    'local': os.path.join(os.getcwd(), NAME_SRCDIR)
+    'local': os.path.realpath(os.path.join(os.getcwd(), NAME_SRCDIR))
 }
 
 
@@ -97,7 +97,7 @@ def __determine_local_prefix(path, prefix):
     :return: complete path to ``local`` storage
     :rtype: os.path, str
     """
-    cur = path
+    cur = os.path.relpath(path)
     parent = "/"
     while not os.path.isdir(os.path.join(cur, prefix)):
         parent = os.path.dirname(cur)
@@ -108,7 +108,7 @@ def __determine_local_prefix(path, prefix):
         # else, look for parent
         cur = parent
 
-    return os.path.join(cur, prefix)
+    return os.path.relpath(os.path.join(cur, prefix))
 
 
 def set_local_path(path):
@@ -117,6 +117,11 @@ def set_local_path(path):
     :param path: path of the ``local`` storage
     :type path: os.path
     """
+
+    # no update is required, do not touch defaults
+    if path is None:
+        return
+
     assert (os.path.isdir(path))
     found = __determine_local_prefix(path, NAME_SRCDIR)
 
