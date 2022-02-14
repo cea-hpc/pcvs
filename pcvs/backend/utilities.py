@@ -266,7 +266,7 @@ def process_check_directory(dir, pf_name="default"):
             log.manager.style("{:>4}".format(nb_nodes),
                               fg="yellow", bold=True),
             log.manager.utf('sep_v'),
-            subprefix), with_bullet=False)
+            "./" if not subprefix else subprefix), with_bullet=False)
 
         if err:
             log.manager.info("FAILED: {}".format(
