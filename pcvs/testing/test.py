@@ -449,7 +449,7 @@ class Test:
         cmd_code = ""
         post_code = ""
 
-        self._invocation_cmd = 'sh {} {}'.format(srcfile, self._id['fq_name'])
+        self._invocation_cmd = 'bash {} {}'.format(srcfile, self._id['fq_name'])
 
         # if changing directory is required by the test
         if self._cwd is not None:

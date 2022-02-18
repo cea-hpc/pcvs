@@ -51,7 +51,7 @@ def exec(ctx, output, argument, gen_list, display):
                 raise click.BadArgumentUsage(
                     "Launch script for '{}' not found".format(argument))
             fds = subprocess.Popen(
-                ['sh', f, argument],
+                ['bash', f, argument],
                 env=env,
                 stderr=err)
             fds.communicate()
