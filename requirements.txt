@@ -5,4 +5,5 @@ requests
 jsonschema
 PrettyTable
 flask
-pygit2
+pygit2; python_version >= '3.7'
+sh; python_version < '3.7'

@@ -5,7 +5,6 @@ import tempfile
 import time
 from typing import Dict, List, Optional
 
-import pygit2
 from ruamel.yaml import YAML
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
@@ -60,10 +59,10 @@ class Bank:
         :type token: str
         """
         self._root: Optional[str] = path
-        self._repo: Optional[pygit2.Repository] = None
+        self._repo = None
         self._config: Optional[MetaDict] = None
-        self._rootree: Optional[pygit2.TreeBuilder] = None
-        self._locked: bool = False
+        #self._rootree: Optional[pygit2.TreeBuilder] = None
+        #self._locked: bool = False
         self._preferred_proj: Optional[str] = None
 
         # split name & default-proj from token
@@ -81,6 +80,9 @@ class Bank:
                     if v == self._root:
                         self._name = k
                         break
+        
+        if self._root:
+            self._repo = git.elect_handler(self._root)
 
     @property
     def prefix(self) -> Optional[str]:
@@ -144,9 +146,8 @@ class Bank:
         :return: A list of available projects
         :rtype: list of str
         """
-        INVALID_REFS = ["refs/heads/master"]
-        # a ref is under the form: 'refs/<bla>/NAME/<hash>
-        return [elt.split('/')[2] for elt in self._repo.references if elt not in INVALID_REFS]
+        INVALID_REFS = ["master"]
+        return [elt.split('/')[2] for elt in self._repo.branches if elt not in INVALID_REFS]
 
     def __str__(self) -> str:
         """Stringification of a bank.
@@ -165,8 +166,8 @@ class Bank:
         projects = dict()
         s = ["Projects contained in bank '{}':".format(self._root)]
         # browse references
-        for b in self._repo.references:
-            if b == 'refs/heads/master':
+        for b in self._repo.branches:
+            if b == 'master':
                 continue
             name = b.split("/")[2]
             projects.setdefault(name, list())
@@ -192,10 +193,8 @@ class Bank:
 
     def disconnect_repository(self) -> None:
         """Free the bank repo, to be reused by other instance."""
-        if self._locked:
-            self._locked = False
-            fcntl.flock(self._lockfile, fcntl.LOCK_UN)
-
+        self._repo.close()
+        
     def connect_repository(self) -> None:
         """Connect to the bank repo, making it exclusive to the current process.
 
@@ -209,42 +208,7 @@ class Bank:
         :raises NotFoundError: the given path does not contain a
             Git directory.
         """
-        if self._repo is None:
-            if not os.path.isfile(os.path.join(self._root, 'HEAD')):
-                try:
-                    self._repo = pygit2.init_repository(
-                        self._root,
-                        flags=(pygit2.GIT_REPOSITORY_INIT_MKPATH |
-                               pygit2.GIT_REPOSITORY_INIT_BARE |
-                               pygit2.GIT_REPOSITORY_INIT_NO_REINIT),
-                        mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP,
-                        bare=True
-                    )
-                except Exception:
-                    raise BankException.AlreadyExistError()
-                # can't be moved before as self._root may not exist yet
-                self._lockfile = open(os.path.join(
-                    self._root, ".pcvs.lock"), 'w+')
-            else:
-                rep = pygit2.discover_repository(self._root)
-                if rep:
-                    # need to lock, to ensure safety
-                    self._root = rep.rstrip("/")
-                    self._lockfile = open(os.path.join(
-                        self._root, ".pcvs.lock"), 'w+')
-                    locked = False
-                    while not locked:
-                        try:
-                            fcntl.flock(self._lockfile,
-                                        fcntl.LOCK_EX | fcntl.LOCK_NB)
-                            locked = True
-                        except BlockingIOError:
-                            time.sleep(1)
-
-                    self._repo = pygit2.Repository(rep)
-                else:
-                    raise BankException.NotFoundError()
-            self._locked = True
+        self._repo.open()
 
     def save_to_global(self) -> None:
         """Store the current bank into ``PATH_BANK`` file."""
@@ -253,76 +217,7 @@ class Bank:
             self._name = os.path.basename(self._root).lower()
         add_banklink(self._name, self._root)
 
-    def create_test_blob(self, data: str) -> pygit2.Object:
-        """Create a small hashed object, to be stored into a bank.
-
-        :param data: any type of data to be stored. In PCVS context, it is
-            mainly json-formatted strings.
-        :param data: str
-
-        :return: the pygit2-hashed representation id
-        :rtype: :class:`pygit2.Object`
-        """
-        assert(isinstance(self._repo, pygit2.Repository))
-
-        data_hash = pygit2.hash(str(data))
-        if data_hash in self._repo:
-            return self._repo[data_hash].oid
-        else:
-            return self._repo.create_blob(str(data))
-
-    def insert(self, treebuild: pygit2.TreeBuilder, path: List[str], obj: any) -> pygit2.Object:
-        """Associate an object to a given tag (=path).
-
-        The result is stored into the parent subtree (treebuild). The path is an
-        array of subrefixes, identifying the subtree where the object will
-        be stored under the bank. This function associates the path & the object
-        together, write the result in the parent and returns its Oid.
-
-        This function is called recursively to build the whole tree. The stop
-        condition is when the function reaches the file (=basename), which
-        create the real blob object.
-
-        :param treebuild: the parent Oid where this association will be stored
-        :type treebuild: :class:`Pygit2.TreeBuilder`
-        :param path: the subpath where to store the object
-        :type path: list of str
-        :param obj: the actual data to store
-        :type obj: any
-        :return: the actual parent id
-        :rtype: :class:`Pygit2.Oid`
-        """
-        repo = self._repo
-
-        # the basename is reached -> generate the blob and return the parend oid
-        if len(path) == 1:
-            blob_obj = self.create_test_blob(obj)
-            treebuild.insert(path[0], blob_obj, pygit2.GIT_FILEMODE_BLOB)
-            return treebuild.write()
-
-        # otherwise, determine where the current subdir is going
-        subtree_name = path[0]
-        tree = repo.get(treebuild.write())
-
-        try:
-            # check if the subdir already exist in this bank subtree
-            entry = tree[subtree_name]
-            assert(entry.filemode == pygit2.GIT_FILEMODE_TREE)
-            subtree = repo.get(entry.hex)
-            # YES it is found -> reuse this subtree
-            sub_treebuild = repo.TreeBuilder(subtree)
-        except KeyError:
-            # NOPE: first time adding a resource to this subtree
-            # create a new one
-            sub_treebuild = repo.TreeBuilder()
-
-        # recursive call, as we didn't reach the subtree bottom
-        subtree_oid = self.insert(sub_treebuild, path[1:], obj)
-        # Pygit2 insert, to build the actual intemediate node
-        treebuild.insert(subtree_name, subtree_oid, pygit2.GIT_FILEMODE_TREE)
-        return treebuild.write()
-
-    def save_test_from_json(self, jtest: str) -> pygit2.Object:
+    def save_test_from_json(self, jtest: str):
         """Store data to a bank directly from JSON representation.
 
         This is mainly used when a bank is directly connected to a run instance,
@@ -334,10 +229,8 @@ class Bank:
         :rtype: :class:`Pygit2.Oid`
         """
         assert('validation' in self._config)
-        test_track = jtest['id']['fq_name'].split("/")
-        oid = self.insert(self._rootree, test_track, jtest.to_dict())
-        return oid
-
+        self._repo.insert_tree(jtest['id']['fq_name'], jtest.to_dict())
+        
     def load_config_from_str(self, s: str) -> None:
         """Load the configuration data associated with the archive to process.
 
@@ -364,9 +257,8 @@ class Bank:
         :type buildpath: str
         """
         self.load_config_from_file(buildpath)
-        self._rootree = self._repo.TreeBuilder()
-
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
+        
         for result_file in os.listdir(rawdata_dir):
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
                 data = MetaDict(YAML(typ='safe').load(fh))
@@ -374,7 +266,7 @@ class Bank:
 
             for elt in data['tests']:
                 self.save_test_from_json(elt)
-        self._rootree.write()
+
         self.finalize_snapshot(tag)
 
     def save_from_archive(self, tag: str, archivepath: str) -> None:
@@ -404,46 +296,16 @@ class Bank:
         :param tag: overridable default project (if different)
         :type tag: str
         """
-        # Setup commit metadata:
-        # 1. The author is the one who ran the test-suite
-        # 2. The committer is submitting the archive to the bank
-        # 3. the commit message is not relevant for now
-        # 4. Timezone is not (yet) handled in author signature
-        author = pygit2.Signature(
-            name=self._config.validation.author.name,
-            email=self._config.validation.author.email,
-            time=int(self._config.validation.datetime.timestamp())
+        self._repo.set_identity(
+            authname=self._config.validation.author.name,
+            authmail=self._config.validation.author.email,
+            commname=git.get_current_username(),
+            commmail=git.get_current_usermail()
         )
-        committer = pygit2.Signature(
-            name=git.get_current_username(),
-            email=git.get_current_usermail())
-        commit_msg = "Commit message is not used (yet)"
 
         refname = self.__build_target_branch_name(tag)
-
-        # check if the current reference already exist.
-        # if so, retrieve the parent commit to be linked
-        if refname in self._repo.references:
-            parent_commit, ref = self._repo.resolve_refish(refname)
-            parent_coid = [parent_commit.oid]
-        else:
-            # otherwise the commit to be created will be the first
-            # and won't have any parent
-            parent_coid = []
-            ref = MetaDict({"name": None})
-
-        # create the commit
-        # ref.name may be None
-        # parent_coid may be []
-        coid = self._repo.create_commit(
-            ref.name, author, committer, commit_msg,
-            self._rootree.write(), parent_coid
-        )
-
-        # in case this is the first time the test-suite is added
-        # --> create the reference to track history
-        if ref.name is None:
-            self._repo.references.create(refname, coid)
+        
+        self._repo.commit(refname, timestamp=int(self._config.validation.datetime.timestamp()))
 
     def __build_target_branch_name(self, tag: str) -> str:
         """Compute the target branch to store data.
@@ -465,7 +327,7 @@ class Bank:
 
             if tag is None:
                 tag = "unknown"
-        return "refs/heads/{}/{}".format(tag, self._config.validation.pf_hash)
+        return "{}/{}".format(tag, self._config.validation.pf_hash)
 
     def extract_data(self, key, start, end, format):
         """Extract information from the bank given specifications.
@@ -485,9 +347,11 @@ class Bank:
         """
         refname = self.__build_target_branch_name(None)
 
-        if refname not in self._repo.references:
+        if refname not in self._repo.branches:
             raise BankException.ProjectNameError()
 
+        return self._repo.get_tree()
+    
         head, _ = self._repo.resolve_refish(refname)
         for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
             print(commit.message, commit.author.date)
@@ -501,7 +365,7 @@ class Bank:
         return {
             'rootpath': self._root,
             'name': self._name,
-            'locked': self._locked
+            'locked': self._repo._is_locked()
         }
 
 

@@ -22,6 +22,7 @@ def report(ctx, path_list, static):
         # attempt to resolve it.
         # Note that files are always kept, it ensure to the user to 
         # provide a valid archive-formatted file
+        print(prefix)
         if not os.path.isfile(prefix) and \
             not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
             # if the 'builddir' default name was missing for resolution, add it

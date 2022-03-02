@@ -241,3 +241,6 @@ class PluginException(CommonException):
 
 class SpackException(CommonException):
     pass
+
+class GitException(CommonException):
+    pass
