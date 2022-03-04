@@ -74,7 +74,8 @@ class SpackManager(PManager):
         """
         s = list()
         if install:
-            s.append("spack install {}".format(self.spec))
+            s.append("spack location -i {} > /dev/null 2>&1".format(self.spec))
+            s.append("test \"$?\" != \"0\" && spack install {}".format(self.spec))
         if load:
             s.append("eval `spack load --sh {}`".format(self.spec))
         return "\n".join(s)
