@@ -22,7 +22,7 @@ def elect_handler(prefix=None):
     return git_handle
     
 class GitByGeneric:
-    def __init__(self, prefix=None):
+    def __init__(self, prefix=None, head="HEAD"):
         self._path = None
         self._lck = False
         self._lockname = ""
@@ -31,6 +31,8 @@ class GitByGeneric:
         self._authmail = None
         self._commmail = None
         self._commname = None
+        
+        self.set_head(head)
         
         if prefix:        
             self.set_path(prefix)
@@ -74,6 +76,12 @@ class GitByGeneric:
         self._commname = commname if commname else get_current_username()
         self._commmail = commmail if commmail else get_current_usermail()
     
+    def get_head(self, prefix):
+        return self._head
+    
+    def set_head(self, new_head):
+        self._head = new_head
+    
     @property
     def refs(self): pass
     @property
@@ -82,8 +90,6 @@ class GitByGeneric:
     def is_open(self): pass
     def close(self): pass
     def get_tree(self, prefix): pass
-    def get_head(self, prefix): pass
-    def change_branch(self, branchname): pass
     def insert_tree(self, prefix, data): pass
     def commit(self, id): pass
 
@@ -133,18 +139,12 @@ class GitByAPI(GitByGeneric):
     def get_tree(self, prefix):
         pass
 
-    def get_head(self, prefix):
-        pass
-
-    def change_branch(self, branchname):
-        pass
-
     def insert_tree(self, prefix, data):
         if not self._rootree:
             self._rootree = self._repo.TreeBuilder()
         self.__insert_path(self._rootree, prefix.split('/'), data)
 
-    def commit(self, head_name, msg="No data", timestamp=None):
+    def commit(self, msg="No data", timestamp=None):
         assert(self._repo)
         
         if not timestamp:
@@ -167,8 +167,8 @@ class GitByAPI(GitByGeneric):
         parent_ref = MetaDict({'name': None})
         parent = []
         
-        if head_name in self._repo.branches:
-            parent, parent_ref = self._repo.resolve_refish(head_name)
+        if self._head in self._repo.branches:
+            parent, parent_ref = self._repo.resolve_refish(self._head)
             parent = [parent.oid]
             
         coid = self._repo.create_commit(
@@ -181,7 +181,7 @@ class GitByAPI(GitByGeneric):
         )
         
         if parent_ref.name is None:
-            self._repo.branches.local.create(head_name, self._repo.get(coid))
+            self._repo.branches.local.create(self._head, self._repo.get(coid))
             
         self._rootree = None
             
@@ -247,12 +247,15 @@ class GitByCLI(GitByGeneric):
     def __init__(self, prefix=""):
         super().__init__(prefix)
         self._git = None
+        self._rootree = None
         
     
     @property
     def refs(self): pass
     @property
     def branches(self): pass
+    
+    
     def open(self):
         if not os.path.isdir(self._path):
             os.makedirs(self._path)
@@ -272,11 +275,55 @@ class GitByCLI(GitByGeneric):
         self._unlock()
         
     def get_tree(self, prefix): pass
-    def get_head(self, prefix): pass
-    def change_branch(self, branchname): pass
-    def insert_tree(self, prefix, data): pass
-        self._git
-    def commit(self, id): pass
+        
+    def _create_blob(self, name, data):
+        oid = ""
+        oid = self._git('hash-object', "--stdin", "-w", _in=str(data)).strip()
+        return (oid, "100644 blob {}\t{}".format(oid, name))
+    
+    def _create_tree(self, name, children):
+        array = []
+        for k, v in children.items():
+            if isinstance(v, dict):
+                array.append(self._create_tree(k, v)[1])
+            else:
+                array.append(self._create_blob(k, v)[1])
+
+        oid = self._git.mktree(_in="\n".join(array)).strip()
+        return (oid, "040000 tree {}\t{}".format(oid, name))
+        
+    def insert_tree(self, prefix, data):
+        if not self._rootree:
+            self._rootree = dict()
+            
+        self._insert_path(self._rootree, prefix.split("/"), data)
+
+    def probe_tree(self, prefix):
+        oid=None
+        try:
+            self._git("rev-parse", "{}:{}".format(self._head, prefix), _out=oid)
+        except sh.ErrorReturnCode:
+            oid = None
+        return oid
+
+    def _insert_path(self, subtree, subprefix, data):
+        if len(subprefix) == 1:
+            subtree[subprefix[0]] = data
+        else:
+            current = subprefix[0]
+            subtree.setdefault(current, {})
+            self._insert_path(subtree[current], subprefix[1:], data)
+        
+    def commit(self, msg="VOID", timestamp=None):
+        
+        oid, _ = self._create_tree("root", self._rootree)
+        self._git("commit-tree", oid, 
+                  "-m '{}'".format(msg),
+                  "-p {}".format(self._head))
+        
+        self._git.push(".", "{}:refs/heads/{}".format(oid, self._head))
+        
+        self._rootree = None
 
     
 
