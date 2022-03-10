@@ -205,6 +205,7 @@ class IOManager:
         """
 
         if self._logfile:
+            import os.path
             if not os.path.isfile(self._logfile.name):
                 manager.warn("{} does not exist anymore !".format(
                     self._logfile.name))

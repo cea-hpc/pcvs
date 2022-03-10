@@ -26,9 +26,14 @@
     variants:
       - openmp
       - accel
+    attributes:
+      command_wrap: true
 
   run: &run_part
     program: "./a.out"
+    attributes:
+      command_wrap: true
+      path_resolution: false
     iterate:
       # runtime iterators
       n_mpi:

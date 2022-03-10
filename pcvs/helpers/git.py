@@ -3,7 +3,6 @@ import socket
 import os
 import time
 import fcntl
-import sh
 from datetime import datetime
 from pcvs.helpers.system import MetaDict
 
@@ -11,6 +10,7 @@ try:
     import pygit2
     has_pygit2 = True
 except ModuleNotFoundError as e:
+    import sh
     has_pygit2 = False
 
 def elect_handler(prefix=None):
