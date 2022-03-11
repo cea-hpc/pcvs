@@ -204,13 +204,8 @@ class IOManager:
         """desctuctor for IOManager (closes streams)
         """
 
-        if self._logfile:
-            import os.path
-            if not os.path.isfile(self._logfile.name):
-                manager.warn("{} does not exist anymore !".format(
-                    self._logfile.name))
-            else:
-                self._logfile.close()
+        if self._logfile and self._logfile.name:
+            self._logfile.close()
 
     def __print_rawline(self, msg, err=False):
         """print a line as text
