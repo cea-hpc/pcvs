@@ -68,7 +68,13 @@ class CommonException:
 
     class AlreadyExistError(GenericError):
         """The content already exist as it should."""
-        pass
+        def __init__(self, msg="Invalid format", **kwargs):
+            """Updated constructor"""
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Note configuration, profiles & pcvs.* files can be ",
+                                 "verified through `pcvs check [-c|-p|-D <path>]`"]),
+                             dbg_info=kwargs)
 
     class UnclassifiableError(GenericError):
         """Unable to classify this common error."""

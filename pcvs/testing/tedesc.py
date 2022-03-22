@@ -609,7 +609,7 @@ class TEDescriptor:
                 self._serie = Serie({**self._program_criterion})
             else:
                 self._serie = Serie({**self._criterion, **self._program_criterion})
-                
+            
             yield from self.__construct_runtime_tests()
             del self._serie
 

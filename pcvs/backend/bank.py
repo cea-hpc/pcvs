@@ -3,6 +3,7 @@ import os
 import tarfile
 import tempfile
 import time
+import json
 from typing import Dict, List, Optional
 
 from ruamel.yaml import YAML
@@ -35,8 +36,8 @@ class Bank:
     :type rootree: :class:`Pygit2.Object`
     :param locked: Serialize Bank manipulation among multiple processes
     :type locked: bool
-    :param preferred_proj: extracted default-proj from initial token
-    :type preferred_proj: str
+    :param proj_name: extracted default-proj from initial token
+    :type proj_name: str
     """
 
     def __init__(self, path: Optional[str] = None, token: str = "") -> None:
@@ -63,12 +64,12 @@ class Bank:
         self._config: Optional[MetaDict] = None
         #self._rootree: Optional[pygit2.TreeBuilder] = None
         #self._locked: bool = False
-        self._preferred_proj: Optional[str] = None
+        self._proj_name: Optional[str] = None
 
         # split name & default-proj from token
         array: List[str] = token.split('@', 1)
         if len(array) > 1:
-            self._preferred_proj = array[1]
+            self._proj_name = array[1]
         self._name = array[0]
 
         global BANKS
@@ -103,13 +104,17 @@ class Bank:
         return self._name
 
     @property
-    def preferred_proj(self) -> Optional[str]:
+    def proj(self) -> Optional[str]:
         """Get default-project tag.
 
         :return: the exact project (without bank label prefix)
         :rtype: str
         """
-        return self._preferred_proj
+        return self._proj_name
+
+    @property
+    def repo(self):
+        return self._repo
 
     def exists(self) -> bool:
         """Check if the bank is stored in ``PATH_BANK`` file.
@@ -147,8 +152,9 @@ class Bank:
         :rtype: list of str
         """
         INVALID_REFS = ["master"]
-        return [elt.split('/')[2] for elt in self._repo.branches if elt not in INVALID_REFS]
-
+        projects = [elt.split('/')[0] for elt in self._repo.branches if elt not in INVALID_REFS]
+        return list(set(projects))
+        
     def __str__(self) -> str:
         """Stringification of a bank.
 
@@ -164,28 +170,15 @@ class Bank:
             This function does not use :class:`log.IOManager`
         """
         projects = dict()
-        s = ["Projects contained in bank '{}':".format(self._root)]
+        string = ["Projects contained in bank '{}':".format(self._root)]
         # browse references
-        for b in self._repo.branches:
-            if b == 'master':
-                continue
-            name = b.split("/")[2]
-            projects.setdefault(name, list())
-            projects[name].append(b.split("/")[3])
+        for project, series in self.list_all().items():
+            string.append("- {:<8}: {} distinct testsuite(s)".format(project, len(series)))
+            for s in series:
+                cur = self._repo.revparse(s)
+                string.append("  * {}: {} run(s)".format(s, len(self._repo.iterate_over(cur))))
 
-        # for each project, list 'run variants', each having a different hash
-        for pk, pv in projects.items():
-            s.append("- {:<8}: {} distinct testsuite(s)".format(pk, len(pv)))
-            for v in pv:
-                nb_parents = 1
-                cur, _ = self._repo.resolve_refish("{}/{}".format(pk, v))
-                while len(cur.parents) > 0:
-                    nb_parents += 1
-                    cur = cur.parents[0]
-
-                s.append("  * {}: {} run(s)".format(v, nb_parents))
-
-        print("\n".join(s))
+        print("\n".join(string))
 
     def __del__(self) -> None:
         """Close the bank."""
@@ -193,7 +186,9 @@ class Bank:
 
     def disconnect_repository(self) -> None:
         """Free the bank repo, to be reused by other instance."""
-        self._repo.close()
+        if self._repo:
+            self._repo.close()
+            self._repo = None
         
     def connect_repository(self) -> None:
         """Connect to the bank repo, making it exclusive to the current process.
@@ -229,7 +224,7 @@ class Bank:
         :rtype: :class:`Pygit2.Oid`
         """
         assert('validation' in self._config)
-        self._repo.insert_tree(jtest['id']['fq_name'], jtest.to_dict())
+        self._repo.insert_tree(jtest['id']['fq_name'], json.dumps(jtest))
         
     def load_config_from_str(self, s: str) -> None:
         """Load the configuration data associated with the archive to process.
@@ -261,7 +256,7 @@ class Bank:
         
         for result_file in os.listdir(rawdata_dir):
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
-                data = MetaDict(YAML(typ='safe').load(fh))
+                data = MetaDict(json.load(fh))
                 # TODO: validate
 
             for elt in data['tests']:
@@ -304,8 +299,8 @@ class Bank:
         )
 
         refname = self.__build_target_branch_name(tag)
-        
-        self._repo.commit(refname, timestamp=int(self._config.validation.datetime.timestamp()))
+        self._repo.set_head(refname)
+        self._repo.commit("nothing for now", timestamp=int(self._config.validation.datetime.timestamp()))
 
     def __build_target_branch_name(self, tag: str) -> str:
         """Compute the target branch to store data.
@@ -323,7 +318,7 @@ class Bank:
         # history, there are managed directly
         # TODO: compute the proper name for the current test-suite
         if tag is None:
-            tag = self._preferred_proj
+            tag = self._proj_name
 
             if tag is None:
                 tag = "unknown"
@@ -367,6 +362,35 @@ class Bank:
             'name': self._name,
             'locked': self._repo._is_locked()
         }
+        
+    def list_series(self, project=None):
+        """TODO:
+        """
+        if not project:
+            project = self._proj_name
+        INVALID_REFS = ["master"]
+        res = []
+        for elt in self._repo.branches:
+            if elt in INVALID_REFS:
+                continue
+            p, serie = elt.split('/')
+            if p.lower() == project.lower():
+                res.append("{}/{}".format(project, serie))
+                
+        return res
+
+    def list_all(self):
+        """TODO:
+        """
+        res = {}
+        for project in self.list_projects():
+            res[project] = self.list_series(project)
+        return res
+        
+    def get_count(self):
+        """TODO:
+        """
+        return len(self.list_projects())
 
 
 def init() -> None:

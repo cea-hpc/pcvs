@@ -3,14 +3,13 @@ import os
 from datetime import datetime
 from unittest.mock import Mock, patch
 
-import pygit2
 import pytest
 from click.testing import CliRunner
 from ruamel.yaml import YAML
 
 from pcvs import NAME_BUILD_RESDIR, NAME_BUILDIR
 from pcvs.backend import bank as tested
-from pcvs.helpers import utils
+from pcvs.helpers import utils, git
 from pcvs.helpers.system import MetaDict
 
 
@@ -83,7 +82,7 @@ def test_bank_init():
     print(obj.prefix, obj2.prefix)
     assert(obj.prefix == obj2.prefix == "/other/random/path")
     assert(obj.name == obj2.name == "other")
-    assert(obj.preferred_proj == "dummy-project")
+    assert(obj.proj == "dummy-project")
 
     obj = tested.Bank(token="not-created")
     assert(not obj.exists())
@@ -113,21 +112,22 @@ def test_save_run(mock_repo_fs, dummy_run, capsys):
     prefix = utils.find_buildir_from_prefix(dummy_run)
     obj.save_from_buildir("override-tag", prefix)
     obj.save_from_buildir(None, prefix)
-    
-    repo = pygit2.Repository(mock_repo_fs)
-
-    assert(len(list(repo.branches)) == 2)
-
-    head, ref = repo.resolve_refish("original-tag/profile_hash")
-    assert(ref.name == "refs/heads/original-tag/profile_hash")
-    assert(len(head.parents) == 0)  #first commit
-
-    head, ref = repo.resolve_refish("override-tag/profile_hash")
-    assert(ref.name == "refs/heads/override-tag/profile_hash")
-    assert(len(head.parents) == 0)  #first commit
-
+    assert(len(obj.list_projects()) == 2)
+    assert(len(obj.list_series("override-tag")) == 1)
+    assert(len(obj.list_series("original-tag")) == 1)
     obj.show()
     capture = capsys.readouterr()
     assert('original-tag: 1 distinct testsuite(s)' in capture.out)
     assert('override-tag: 1 distinct testsuite(s)' in capture.out)
     obj.disconnect_repository()
+    
+    repo = git.elect_handler(mock_repo_fs)
+    repo.open()
+    assert(len(list(repo.branches)) == 2)
+    repo.set_head("original-tag/profile_hash")
+    assert(len(repo.parents) == 0)  #first commit
+
+    repo.set_head("override-tag/profile_hash")
+    assert(len(repo.parents) == 0)  #first commit
+
+

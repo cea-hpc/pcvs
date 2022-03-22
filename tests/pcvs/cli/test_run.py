@@ -15,8 +15,8 @@ from .conftest import click_call, isolated_fs
 def test_big_integation(rs, us, ss, unlock, lock):
     with isolated_fs():
         res = click_call('profile', 'create', 'local.default')
-        assert(res.exit_code == 0)
-        res = click_call('run')       
+        res = click_call('run')
+        print(res.stderr)
         assert(res.exit_code == 0)
 
 

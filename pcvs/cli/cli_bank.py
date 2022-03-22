@@ -135,7 +135,7 @@ def bank_save_run(ctx, name, path):
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
 
     path = os.path.abspath(path)
-    project = b.preferred_proj
+    project = b.proj
 
     b.connect_repository()
     if os.path.isfile(path):

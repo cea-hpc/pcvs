@@ -100,7 +100,7 @@ class Test:
 
         self._execmd = kwargs.get('command', '')
         self._data = {
-            'metrics': None,
+            'metrics': {},
             'tags': kwargs.get('tags', []),
             'artifacts': kwargs.get('artifacts', {}),
 

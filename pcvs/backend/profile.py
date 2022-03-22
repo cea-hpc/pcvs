@@ -244,9 +244,9 @@ class Profile:
             profile OR incorrect profile.
         """
         for kind in config.CONFIG_BLOCKS:
-            if kind not in self._details:
-                raise ValidationException.FormatError(
-                    "Missing '{}' in profile".format(kind))
+            #if kind not in self._details:
+            #    raise ValidationException.FormatError(
+            #        "Missing '{}' in profile".format(kind))
             system.ValidationScheme(kind).validate(
                 self._details[kind], filepath=self._name)
 

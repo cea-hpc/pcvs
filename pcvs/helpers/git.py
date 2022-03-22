@@ -4,7 +4,6 @@ import os
 import time
 import fcntl
 from datetime import datetime
-from pcvs.helpers.system import MetaDict
 
 try:
     import pygit2
@@ -22,7 +21,7 @@ def elect_handler(prefix=None):
     return git_handle
     
 class GitByGeneric:
-    def __init__(self, prefix=None, head="HEAD"):
+    def __init__(self, prefix=None, head="unknown/00000000"):
         self._path = None
         self._lck = False
         self._lockname = ""
@@ -86,12 +85,19 @@ class GitByGeneric:
     def refs(self): pass
     @property
     def branches(self): pass
+    
+    @property
+    def parents(self):
+        return self.iterate_over(self._head)[1:]
+    
     def open(self): pass
     def is_open(self): pass
     def close(self): pass
     def get_tree(self, prefix): pass
     def insert_tree(self, prefix, data): pass
     def commit(self, id): pass
+    def revparse(self, rev): pass
+    def iterate_over(self, ref): pass
 
     
 class GitByAPI(GitByGeneric):
@@ -101,7 +107,7 @@ class GitByAPI(GitByGeneric):
             
     def open(self, bare=True):
         assert(not os.path.isfile(self._path))
-        if not os.path.isdir(self._path):
+        if not os.path.isdir(self._path) or len(os.listdir(self._path)) == 0:
             if not self._is_locked():
                 self._repo = pygit2.init_repository(
                             self._path,
@@ -121,7 +127,7 @@ class GitByAPI(GitByGeneric):
             
     
     def is_open(self):
-        return self._repo is True
+        return self._repo is not None
 
     def close(self):
         self._unlock()
@@ -135,15 +141,71 @@ class GitByAPI(GitByGeneric):
     def branches(self):
         assert(self._repo)
         return self._repo.branches.local
+    
+    def history(self, ref):
+        
+        if isinstance(ref, str):
+            ref = self.revparse(ref)
+            
+        assert(isinstance(ref, pygit2.Object))
+        return self.iterate_over(ref)
+    
+    def revparse(self, name):
+        assert(self._repo)
+        if isinstance(name, str):
+            return self._repo.resolve_refish(name)[0]
+        elif isinstance(name, pygit2.Branch):
+            return name.peel()
 
     def get_tree(self, prefix):
-        pass
+        tree = self._repo.revparse_single(self._head).tree
+        if prefix:
+            return self._get_tree(prefix.split("/"), tree)
+        else:
+            return tree
+        
+    def _get_tree(self, chain, tree=None):        
+        if len(chain) <= 0:
+            return tree
+        else:
+            subtree = None
+            for i in tree:
+                if chain[0] == i.name:
+                    subtree = i
+                    break
+            return self._get_tree(chain[1:], subtree)
 
+    def get_info(self, obj):
+        if isinstance(obj, str):
+            obj = self.revparse(obj)
+        
+        assert(isinstance(obj, pygit2.Object))
+        
+        return {
+            'date': datetime.fromtimestamp(obj.author.time),
+            'author': obj.author.name,
+            'authmail': obj.author.email,
+            'metadata': [],
+        }
+
+    def iterate_over(self, tree):
+        if isinstance(tree, str):
+            tree = self.revparse(tree)
+        assert(isinstance(tree, pygit2.Object))
+        
+        res = []
+        for elt in self._repo.walk(tree.oid, pygit2.GIT_SORT_REVERSE):
+            res.append(elt)
+        return res
+        
     def insert_tree(self, prefix, data):
         if not self._rootree:
             self._rootree = self._repo.TreeBuilder()
         self.__insert_path(self._rootree, prefix.split('/'), data)
 
+    def file_list(self, prefix):
+        pass
+    
     def commit(self, msg="No data", timestamp=None):
         assert(self._repo)
         
@@ -164,15 +226,16 @@ class GitByAPI(GitByGeneric):
         else:
             committer = self._repo.default_signature
 
-        parent_ref = MetaDict({'name': None})
+        parent_ref = None
         parent = []
         
         if self._head in self._repo.branches:
-            parent, parent_ref = self._repo.resolve_refish(self._head)
+            parent, ref = self._repo.resolve_refish(self._head)
             parent = [parent.oid]
+            parent_ref = ref.name
             
         coid = self._repo.create_commit(
-            parent_ref.name,
+            parent_ref,
             author,
             committer,
             msg,
@@ -180,13 +243,13 @@ class GitByAPI(GitByGeneric):
             parent
         )
         
-        if parent_ref.name is None:
+        if parent_ref is None:
             self._repo.branches.local.create(self._head, self._repo.get(coid))
             
         self._rootree = None
             
                     
-    def __insert_path(self, treebuild, path, data: any) -> pygit2.Object:
+    def __insert_path(self, treebuild, path, data: any):
         """Associate an object to a given tag (=path).
 
         The result is stored into the parent subtree (treebuild). The path is an
@@ -251,11 +314,21 @@ class GitByCLI(GitByGeneric):
         
     
     @property
-    def refs(self): pass
+    def refs(self):
+        array = self._git('for-each-ref').strip().split("\n")
+        return [elt.split('\t')[-1].replace("refs/", "") for elt in array]
+    
     @property
-    def branches(self): pass
+    def branches(self):
+        array = self._git('for-each-ref', 'refs/heads/').strip().split("\n")
+        return [elt.split('\t')[-1].replace("refs/heads/", "") for elt in array]
     
-    
+    def iterate_over(self, ref):
+        res = []
+        for elt in self._git('rev-list', '--reverse', ref).strip().split("\n"):
+            res.append(elt)
+        return res
+        
     def open(self):
         if not os.path.isdir(self._path):
             os.makedirs(self._path)
@@ -266,7 +339,6 @@ class GitByCLI(GitByGeneric):
         if not os.path.isfile(os.path.join(self._path, "HEAD")):
             self._git.init("--bare")
         
-        
     def is_open(self):
         return self._is_locked()
 
@@ -274,7 +346,11 @@ class GitByCLI(GitByGeneric):
         self._git = None
         self._unlock()
         
-    def get_tree(self, prefix): pass
+    def revparse(self, name):
+        return self._git("rev-parse", name).strip()
+    
+    def str_commit(self, commit):
+        raise NotImplementedError()
         
     def _create_blob(self, name, data):
         oid = ""
@@ -298,7 +374,12 @@ class GitByCLI(GitByGeneric):
             
         self._insert_path(self._rootree, prefix.split("/"), data)
 
-    def probe_tree(self, prefix):
+    def file_list(self, prefix):
+        if not prefix:
+            prefix = ""
+        return [self._git('ls-files', prefix).strip().split("\n")]
+        
+    def get_tree(self, prefix):
         oid=None
         try:
             self._git("rev-parse", "{}:{}".format(self._head, prefix), _out=oid)
@@ -317,11 +398,18 @@ class GitByCLI(GitByGeneric):
     def commit(self, msg="VOID", timestamp=None):
         
         oid, _ = self._create_tree("root", self._rootree)
-        self._git("commit-tree", oid, 
+        parent = ""
+        if self._head in self.branches:
+            commit_id = self._git("commit-tree", oid, 
                   "-m '{}'".format(msg),
-                  "-p {}".format(self._head))
-        
-        self._git.push(".", "{}:refs/heads/{}".format(oid, self._head))
+                  "-p {}".format(self._head)
+            ).strip()
+        else:
+            commit_id = self._git("commit-tree", oid, 
+                  "-m '{}'".format(msg),
+            ).strip()
+
+        self._git.push(".", "{}:refs/heads/{}".format(commit_id, self._head))
         
         self._rootree = None
 
@@ -337,8 +425,12 @@ def request_git_attr(k) -> str:
     :rtype: str
     """
     try:
+        git_conf = dict()
         # TODO: not only look for user config
-        git_conf = pygit2.Config.get_global_config()
+        if has_pygit2:
+            git_conf = pygit2.Config.get_global_config()
+        else:
+            git_conf[k] = sh.git.config('--get', k).strip()
         if k in git_conf:
             return git_conf[k]
     except IOError:
@@ -355,7 +447,10 @@ def generate_data_hash(data) -> str:
     :return: hashed data
     :rtype: str
     """
-    return str(pygit2.hash(data))
+    if has_pygit2:
+        return str(pygit2.hash(data))
+    else:
+        return hash(data)
 
 
 def get_current_username() -> str:
