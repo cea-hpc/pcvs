@@ -224,6 +224,22 @@ class Manager:
                             the_set = Set()
                             the_set.add(job)
                             break
+                        else:
+                            # Ok, this could be rewritten...
+                            # packed with the 'same' code above ?
+                            job.not_picked()
+                            if job.pick_count() > Test.SCHED_MAX_ATTEMPTS:
+                                job.save_final_result(rc=-1, time=0.0,
+                                                      out=Test.MAXATTEMPTS_STR,
+                                                      state=Test.State.ERR_OTHER)
+                                job.display()
+                                if self._comman:
+                                    self._comman.send(job)
+                                self._count.executed += 1
+                                self._count[job.state] += 1
+                                self._publisher.add(job.to_json())
+                            else:
+                                self._dims[k].append(job)
 
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
 

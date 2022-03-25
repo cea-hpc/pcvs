@@ -25,9 +25,11 @@ class Test:
     :cvar str NOSTART_STR: constant, setting default output when job cannot be run.
     """
     Timeout_RC = 127
+    SCHED_MAX_ATTEMPTS = 50
     res_scheme = ValidationScheme("test-result")
 
     NOSTART_STR = b"This test cannot be started."
+    MAXATTEMPTS_STR = b"This test has failed to be scheduled too many times. Discarded."
 
     class State(IntEnum):
         """Provide Status management, specifically for tests/jobs.
@@ -117,6 +119,7 @@ class Test:
         self._depnames = kwargs.get('job_deps', [])
         self._deps = []
         self._invocation_cmd = self._execmd
+        self._sched_cnt = 0
 
     @property
     def tags(self):
@@ -349,7 +352,7 @@ class Test:
         elif self._state == Test.State.FAILURE:
             colorname = "red"
             icon = "fail"
-        elif self._state == Test.State.ERR_DEP:
+        elif self._state in [Test.State.ERR_DEP, Test.State.ERR_OTHER]:
             colorname = "yellow"
             icon = "fail"
 
@@ -380,6 +383,12 @@ class Test:
     def pick(self):
         """Flag the job as picked up for scheduling."""
         self._state = Test.State.IN_PROGRESS
+
+    def not_picked(self):
+        self._sched_cnt += 1
+
+    def pick_count(self):
+        return self._sched_cnt
 
     @property
     def state(self):
