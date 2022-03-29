@@ -48,7 +48,7 @@ class Run:
     @property
     def tests(self):
         res = {}
-        for elt_path in self._repo.file_list():
+        for elt_path in self._repo.file_list(head=self._id, prefix=None):
             with open(elt_path, "r") as fh:
                 job = Job(json.load(fh))
             res[job.name] = job
@@ -67,6 +67,7 @@ class Serie:
         """TODO:
         """
         REGRESSIONS = 0
+        RUNS = 1,
         
     
     """Depicts an history of runs for a given project/profile.
@@ -91,10 +92,23 @@ class Serie:
             res += "* {}\n".format(Run(self._repo, run).oneline)
         return res
     
-    def get(self, op: Finder, since=None, until=None):
-        res = {}
-        return Run(self._repo, self._repo.revparse(self._root)).tests
-        raise NotImplementedError()
+    def get(self, op: Finder, since=None, until=None, tree=None):
+        res = None
+        
+        if op == self.Finder.REGRESSIONS:
+            job = Test()
+            res = []
+            for raw_job in self._repo.diff_tree(tree=tree, src=self._root,
+                                                dst=None, since=since,
+                                                until=until):
+                job.from_json(raw_job)
+                if job.state != Test.State.SUCCESS:
+                    res.append(job)
+                    
+        elif op == self.Finder.RUNS:
+            res = []
+            for run_id in self._repo.list_commits(src=self._root, since=since, until=until):
+                res.append(Run(self._repo, run_id))
         return res
     
     def set(self, batch):

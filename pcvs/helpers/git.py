@@ -88,13 +88,15 @@ class GitByGeneric:
     
     @property
     def parents(self):
-        return self.iterate_over(self._head)[1:]
+        return list(self.iterate_over(self._head))[1:]
     
     def open(self): pass
     def is_open(self): pass
     def close(self): pass
-    def get_tree(self, prefix): pass
+    def get_tree(self, tree, prefix): pass
     def insert_tree(self, prefix, data): pass
+    def diff_tree(self, prefix, since, until): pass
+    def list_commits(self, since, until): pass
     def commit(self, id): pass
     def revparse(self, rev): pass
     def iterate_over(self, ref): pass
@@ -193,19 +195,54 @@ class GitByAPI(GitByGeneric):
             tree = self.revparse(tree)
         assert(isinstance(tree, pygit2.Object))
         
-        res = []
         for elt in self._repo.walk(tree.oid, pygit2.GIT_SORT_REVERSE):
-            res.append(elt)
-        return res
-        
+            yield elt
+
     def insert_tree(self, prefix, data):
         if not self._rootree:
             self._rootree = self._repo.TreeBuilder()
         self.__insert_path(self._rootree, prefix.split('/'), data)
 
-    def file_list(self, prefix):
-        pass
+    def file_list(self, head=None, prefix=None):
+        if not prefix:
+            prefix = ""
+        
+        if head is None:
+            head = self.revparse(self._head)
+        
+        assert(isinstance(head, pygit2.Commit))
+        tree = head.tree
+        
+        return [e.old_file_path for e in tree.diff_to_tree()]
     
+    def diff_tree(self, tree=None, src=None, dst=None, since=None, until=None):
+        if not src:
+            src = self.revparse(self._head)
+        
+        assert(isinstance(src, pygit2.Object))
+        if dst:
+            assert(isinstance(dst, pygit2.Object))
+            diff = src.diff_to_tree(dst)
+        else:
+            diff = src.diff_to_tree()
+        
+    
+    def list_commits(self, src=None, since=None, until=None):
+        res = []
+        if src is None:
+            src = self._head
+        
+        if since is None:
+            since = datetime.now().timestamp()
+            
+        if until is None:
+            until = 0
+        for c in self.iterate_over(src):
+            if c.commit_time <= since and c.commit_time >= until:
+                res.append(c.short_id)
+                
+        return res
+        
     def commit(self, msg="No data", timestamp=None):
         assert(self._repo)
         
@@ -379,10 +416,12 @@ class GitByCLI(GitByGeneric):
             prefix = ""
         return [self._git('ls-files', prefix).strip().split("\n")]
         
-    def get_tree(self, prefix):
+    def get_tree(self, tree=None, prefix=""):
         oid=None
+        if not tree:
+            tree = self._head
         try:
-            self._git("rev-parse", "{}:{}".format(self._head, prefix), _out=oid)
+            self._git("rev-parse", "{}:{}".format(tree, prefix), _out=oid)
         except sh.ErrorReturnCode:
             oid = None
         return oid

@@ -176,7 +176,7 @@ class Bank:
             string.append("- {:<8}: {} distinct testsuite(s)".format(project, len(series)))
             for s in series:
                 cur = self._repo.revparse(s)
-                string.append("  * {}: {} run(s)".format(s, len(self._repo.iterate_over(cur))))
+                string.append("  * {}: {} run(s)".format(s, len(list(self._repo.iterate_over(cur)))))
 
         print("\n".join(string))
 
