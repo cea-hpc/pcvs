@@ -21,7 +21,7 @@ from pcvs.helpers.system import MetaConfig
 @click.option('-l', '--list', 'gen_list', is_flag=True,
               help='List available tests (may take a while)')
 @click.option("-s", "--show", "display",
-              type=click.Choice(['cmd', 'env', 'loads', 'all']), default=None,
+              type=click.Choice(['cmd', 'env', 'loads', 'all', 'out']), default=None,
               is_flag=False, flag_value="all",
               help="Display information instead of executing the command")
 @click.argument("argument", type=str, required=False)
@@ -32,6 +32,11 @@ def exec(ctx, output, argument, gen_list, display):
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
+
+    if display == 'out':
+        # special case
+        print(pvUtils.get_logged_output(output, argument))
+        return
 
     if display:
         env.update({'PCVS_SHOW': str(display)})

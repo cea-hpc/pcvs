@@ -4,9 +4,11 @@ import subprocess
 import tempfile
 
 import jsonschema
+import json
 from prettytable import PrettyTable
 from ruamel.yaml import YAML, YAMLError
 
+import pcvs
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException
@@ -54,6 +56,23 @@ def compute_scriptpath_from_testname(testname, output=None):
         "list_of_tests.sh"
     )
 
+def get_logged_output(prefix, testname):
+    if prefix is None:
+        prefix = os.getcwd()
+    resdir = os.path.join(
+                    utils.find_buildir_from_prefix(prefix),
+                    pcvs.NAME_BUILD_RESDIR)
+    if os.path.isdir(resdir):
+        for f in os.listdir(resdir):
+            
+            with open(os.path.join(resdir, f), 'r') as fh:
+                
+                data = json.load(fh)
+                for job in data['tests']:
+                    if job['id']['fq_name'].startswith(testname):
+                        return base64.b64decode(job['result']['output']).decode('ascii')
+    return "No test named '{}' found here.".format(testname)
+    
 
 def process_check_configs():
     """Analyse available configurations to ensure their correctness relatively
