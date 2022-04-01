@@ -140,7 +140,7 @@ def handle_build_lockfile(exc=None):
               help="PCVS process timeout")
 @click.option("-s", "--spack-recipe", "spack_recipe", type=str, multiple=True,
               help="Build test-suites based on Spack recipes")
-@click.option("--print", "print_level", type=click.Choice(['none', 'errors', 'all']),
+@click.option("-P", "--print", "print_level", type=click.Choice(['none', 'errors', 'all']),
               help="Enable test output to be printed depending on its status")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)

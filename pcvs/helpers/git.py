@@ -4,7 +4,7 @@ import os
 import time
 import fcntl
 from datetime import datetime
-
+from abc import ABC, abstractmethod, abstractproperty
 try:
     import pygit2
     has_pygit2 = True
@@ -19,8 +19,12 @@ def elect_handler(prefix=None):
         git_handle = GitByCLI(prefix)
 
     return git_handle
-    
-class GitByGeneric:
+
+
+class GitByGeneric(ABC):
+    """
+    Create a Git endpoint able to discuss efficiently with repositories.
+    """
     def __init__(self, prefix=None, head="unknown/00000000"):
         self._path = None
         self._lck = False
@@ -36,15 +40,21 @@ class GitByGeneric:
         if prefix:        
             self.set_path(prefix)
 
-    
     def set_path(self, prefix):
+        """
+        Associate a new directory to this bank.
+        
+        (implies locking the directory).
+        """
         assert(not self._lck)
         self._path = prefix
         self._lck = False
         self._lockname = os.path.join(prefix, ".pcvs.lock")
         
     def _trylock(self):
-        
+        """
+        Lock the current repository (NON-BLOCKING)
+        """
         if not self._lockfd:
             self._lockfd = open(self._lockname, "w+")
             self._lck = False
@@ -57,56 +67,108 @@ class GitByGeneric:
         return self._lck
         
     def _lock(self):
+        """
+        Lock the current reposiotry (BLOCKING)
+        """
         while not self._lck:
             if not self._trylock():
                 time.sleep(1)
     
     def _unlock(self):
+        """
+        Unlock the current repository.
+        """
         if self._lck:
             self._lck = False
             fcntl.flock(self._lockfd, fcntl.LOCK_UN)
     
     def _is_locked(self):
+        """Locked repo checker"""
         return self._lck is True
             
     def set_identity(self, authname, authmail, commname, commmail):
+        """Identities to be used if a commit is created."""
         self._authname = authname if authname else get_current_username()
         self._authmail = authmail if authmail else get_current_usermail()
         self._commname = commname if commname else get_current_username()
         self._commmail = commmail if commmail else get_current_usermail()
     
     def get_head(self, prefix):
+        """Get the current HEAD (used when no default)"""
         return self._head
     
     def set_head(self, new_head):
+        """Move the repo HEAD (used when no default ref is provided)"""
         self._head = new_head
+   
+    @abstractproperty
+    def branches(self):
+        """
+        Returns the list of available local branche names from this repo.
+        """
+        pass
     
-    @property
-    def refs(self): pass
-    @property
-    def branches(self): pass
+    @abstractmethod
+    def open(self):
+        """Open a new directory. Also lock to avoid races."""
+        pass
+    @abstractmethod
+    def is_open(self):
+        """Is the directory currently open ?"""
+        pass
+    @abstractmethod
+    def close(self):
+        """Unlock the repository."""
+        pass
+    @abstractmethod
+    def get_tree(self, tree, prefix):
+        """Retrieve data associated with a given prefix. A tree can used
+        to set which ref should be used.
+        
+        :param[in] tree: the ref from where get the data
+        :param[in] prefix: the unique prefix associated with data
+        """
+        pass
     
-    @property
-    def parents(self):
-        return list(self.iterate_over(self._head))[1:]
-    
-    def open(self): pass
-    def is_open(self): pass
-    def close(self): pass
-    def get_tree(self, tree, prefix): pass
-    def insert_tree(self, prefix, data): pass
-    def diff_tree(self, prefix, since, until): pass
-    def list_commits(self, since, until): pass
+    @abstractmethod
+    def insert_tree(self, prefix, data):
+        """Create a new tree mapping a prefix filled with 'data'.
+        
+        :param[in] prefix: the prefix under Git tree.
+        :param[in] data: the data to store.
+        """
+        pass
+    @abstractmethod
+    def diff_tree(self, prefix, src_rev, dst_rev):
+        """
+        Compare & return the list of patches 
+        """
+        pass
+    @abstractmethod
+    def list_commits(self, rev, since, until): pass
+    @abstractmethod
     def commit(self, id): pass
+    @abstractmethod
     def revparse(self, rev): pass
+    @abstractmethod
     def iterate_over(self, ref): pass
-
+    @abstractmethod
+    def list_files(self, rev): pass
     
+    def _set_or_head(self, rev):
+        return rev if rev else self._head
+
+
 class GitByAPI(GitByGeneric):
+    """
+    Manage repository through a third-party Python module.
+    
+    Currently, this work is based on pygit2.
+    """
     def __init__(self, prefix=None):
         super().__init__(prefix)
         self._repo = None
-            
+
     def open(self, bare=True):
         assert(not os.path.isfile(self._path))
         if not os.path.isdir(self._path) or len(os.listdir(self._path)) == 0:
@@ -126,8 +188,7 @@ class GitByAPI(GitByGeneric):
                 self._lock()
         
         self._rootree = None
-            
-    
+
     def is_open(self):
         return self._repo is not None
 
@@ -135,22 +196,9 @@ class GitByAPI(GitByGeneric):
         self._unlock()
 
     @property
-    def refs(self):
-        assert(self._repo)
-        return self._repo.references
-    
-    @property
     def branches(self):
         assert(self._repo)
         return self._repo.branches.local
-    
-    def history(self, ref):
-        
-        if isinstance(ref, str):
-            ref = self.revparse(ref)
-            
-        assert(isinstance(ref, pygit2.Object))
-        return self.iterate_over(ref)
     
     def revparse(self, name):
         assert(self._repo)
@@ -158,15 +206,26 @@ class GitByAPI(GitByGeneric):
             return self._repo.resolve_refish(name)[0]
         elif isinstance(name, pygit2.Branch):
             return name.peel()
+        return name
+    
+    def get_blob(self, rev=None, prefix=""):
+        tree = self.get_tree(rev, prefix)
+        if not isinstance(tree, pygit2.Blob):
+            assert(0)
+        
+        return tree.data.decode()
+        
 
-    def get_tree(self, prefix):
-        tree = self._repo.revparse_single(self._head).tree
+    def get_tree(self, rev=None, prefix=""):
+        rev = self._set_or_head(rev)
+        tree = self._repo.revparse_single(rev).tree
+        
         if prefix:
             return self._get_tree(prefix.split("/"), tree)
         else:
             return tree
         
-    def _get_tree(self, chain, tree=None):        
+    def _get_tree(self, chain, tree=None):
         if len(chain) <= 0:
             return tree
         else:
@@ -178,9 +237,7 @@ class GitByAPI(GitByGeneric):
             return self._get_tree(chain[1:], subtree)
 
     def get_info(self, obj):
-        if isinstance(obj, str):
-            obj = self.revparse(obj)
-        
+        obj = self.revparse(obj)
         assert(isinstance(obj, pygit2.Object))
         
         return {
@@ -190,12 +247,12 @@ class GitByAPI(GitByGeneric):
             'metadata': [],
         }
 
-    def iterate_over(self, tree):
-        if isinstance(tree, str):
-            tree = self.revparse(tree)
-        assert(isinstance(tree, pygit2.Object))
+    def iterate_over(self, rev=None):
+        rev = self._set_or_head(rev)
+        rev = self.revparse(rev)
+        assert(isinstance(rev, pygit2.Object))
         
-        for elt in self._repo.walk(tree.oid, pygit2.GIT_SORT_REVERSE):
+        for elt in self._repo.walk(rev.oid, pygit2.GIT_SORT_REVERSE):
             yield elt
 
     def insert_tree(self, prefix, data):
@@ -203,44 +260,44 @@ class GitByAPI(GitByGeneric):
             self._rootree = self._repo.TreeBuilder()
         self.__insert_path(self._rootree, prefix.split('/'), data)
 
-    def file_list(self, head=None, prefix=None):
+    def list_files(self, rev=None, prefix=None):
         if not prefix:
             prefix = ""
         
-        if head is None:
-            head = self.revparse(self._head)
+        rev = self._set_or_head(rev)
+        rev = self.revparse(rev)
+        assert(isinstance(rev, pygit2.Commit))
         
-        assert(isinstance(head, pygit2.Commit))
-        tree = head.tree
-        
-        return [e.old_file_path for e in tree.diff_to_tree()]
+        tree = rev.tree
+        return [e.old_file.path for e in tree.diff_to_tree().deltas]
     
-    def diff_tree(self, tree=None, src=None, dst=None, since=None, until=None):
-        if not src:
-            src = self.revparse(self._head)
+    def diff_tree(self, prefix=None, src_rev=None, dst_rev=None):
+        src_rev = self._set_or_head(src_rev)
+        src_rev = self.revparse(src_rev)
         
-        assert(isinstance(src, pygit2.Object))
-        if dst:
-            assert(isinstance(dst, pygit2.Object))
-            diff = src.diff_to_tree(dst)
+        assert(isinstance(src_rev, pygit2.Object))
+        if dst_rev:
+            dst_rev = self._set_or_head(dst_rev)
+            dst_rev = self.revparse(dst_rev)
+            assert(isinstance(dst_rev, pygit2.Object))
+            
+            diff = src_rev.diff_to_tree(dst_rev)
         else:
-            diff = src.diff_to_tree()
-        
+            diff = src_rev.diff_to_tree()
     
-    def list_commits(self, src=None, since=None, until=None):
+    def list_commits(self, rev=None, since=None, until=None):
         res = []
-        if src is None:
-            src = self._head
+        rev = self._set_or_head(rev)
+        rev = self.revparse(rev)
         
         if since is None:
             since = datetime.now().timestamp()
             
         if until is None:
             until = 0
-        for c in self.iterate_over(src):
+        for c in self.iterate_over(rev):
             if c.commit_time <= since and c.commit_time >= until:
                 res.append(c.short_id)
-                
         return res
         
     def commit(self, msg="No data", timestamp=None):
@@ -343,18 +400,16 @@ class GitByAPI(GitByGeneric):
         
 
 class GitByCLI(GitByGeneric):
+    """
+    Git endpoint ot manipulate a repository through basic CLI.
     
+    Currently relying on the `sh` module.
+    """
     def __init__(self, prefix=""):
         super().__init__(prefix)
         self._git = None
         self._rootree = None
         
-    
-    @property
-    def refs(self):
-        array = self._git('for-each-ref').strip().split("\n")
-        return [elt.split('\t')[-1].replace("refs/", "") for elt in array]
-    
     @property
     def branches(self):
         array = self._git('for-each-ref', 'refs/heads/').strip().split("\n")
@@ -386,9 +441,6 @@ class GitByCLI(GitByGeneric):
     def revparse(self, name):
         return self._git("rev-parse", name).strip()
     
-    def str_commit(self, commit):
-        raise NotImplementedError()
-        
     def _create_blob(self, name, data):
         oid = ""
         oid = self._git('hash-object', "--stdin", "-w", _in=str(data)).strip()
@@ -410,12 +462,7 @@ class GitByCLI(GitByGeneric):
             self._rootree = dict()
             
         self._insert_path(self._rootree, prefix.split("/"), data)
-
-    def file_list(self, prefix):
-        if not prefix:
-            prefix = ""
-        return [self._git('ls-files', prefix).strip().split("\n")]
-        
+    
     def get_tree(self, tree=None, prefix=""):
         oid=None
         if not tree:
@@ -452,8 +499,30 @@ class GitByCLI(GitByGeneric):
         
         self._rootree = None
 
-    
+    def list_files(self, prefix):
+        if not prefix:
+            prefix = ""
+        return [self._git('ls-files', prefix).strip().split("\n")]
 
+    def list_commits(self, rev=None, since="", until=""):
+        rev = self._set_or_head(rev)
+        if since:
+            since = "--since={}".format(since)
+        if until:
+            until = "--until={}".format(until)
+        
+        return [self._git("log", "--no-pager", rev, since, until, "--pretty=format:'%H'").strip()]
+
+    def diff_tree(self, prefix=None, src_rev=None, dst_rev=None):
+        
+        if not dst_rev:
+            return None
+        
+        src_rev = self._set_or_head(src_rev)
+        src_rev = self.revparse(src_rev)
+        
+        return self._git('diff-tree', src_rev, dst_rev).strip()
+ 
 
 def request_git_attr(k) -> str:
     """Get a git configuration.

@@ -425,7 +425,7 @@ class Test:
         """
 
         if isinstance(test_json, str):
-            test_json = json.load(test_json)
+            test_json = json.loads(test_json)
 
         assert(isinstance(test_json, dict))
         self.res_scheme.validate(test_json)

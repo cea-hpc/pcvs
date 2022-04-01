@@ -48,12 +48,17 @@ class Run:
     @property
     def tests(self):
         res = {}
-        for elt_path in self._repo.file_list(head=self._id, prefix=None):
-            with open(elt_path, "r") as fh:
-                job = Job(json.load(fh))
+        for file in self._repo.list_files(rev=self._id, prefix=None):
+            data = self._repo.get_blob(rev=self._id, prefix=file)
+            job = Job(json.loads(data))
             res[job.name] = job
         return res
 
+    def get_data(self, jobname):
+        res = Job()
+        res.from_json(self._repo.get_blob(rev=self._id, prefix=jobname))
+        return res
+        
     def __str__(self):
         d = self._repo.get_info(self._id)
         return """Date: {date}
@@ -84,7 +89,7 @@ class Serie:
     def last(self):
         """Return the last run for this serie.
         """
-        return Run(self._repo, self._repo.revparse(self._root))
+        return Run(self._repo, self._root.peel().short_id)
 
     def __str__(self):
         res = ""
@@ -107,7 +112,7 @@ class Serie:
                     
         elif op == self.Finder.RUNS:
             res = []
-            for run_id in self._repo.list_commits(src=self._root, since=since, until=until):
+            for run_id in self._repo.list_commits(rev=self._root, since=since, until=until):
                 res.append(Run(self._repo, run_id))
         return res
     
@@ -128,25 +133,12 @@ class Bank(bank.Bank):
         super().__init__(path, name)
         self.connect_repository()
     
-    @property
-    def current_tree(self):
-        """Get active project"""
-        return self._proj_name
-    
-    def get_current_tree(self):
-        """Get active project"""
-        return JobTree(self._proj_name)
-    
-    def get_tree_from(self, proj):
+    def load_serie(self, serie_name=None):
         """TODO
         """
-        if proj not in self.list_projects():
-            raise exceptions.BankException.ProjectNameError(proj)
-        return proj
-    
-    def load_serie(self, serie_name):
-        """TODO
-        """
+        if not serie_name:
+            serie_name = self._proj_name
+            
         if serie_name not in self._repo.branches:
             raise exceptions.BankException.ProjectNameError(serie_name)
         

@@ -125,9 +125,5 @@ def test_save_run(mock_repo_fs, dummy_run, capsys):
     repo.open()
     assert(len(list(repo.branches)) == 2)
     repo.set_head("original-tag/profile_hash")
-    assert(len(repo.parents) == 0)  #first commit
-
     repo.set_head("override-tag/profile_hash")
-    assert(len(repo.parents) == 0)  #first commit
-
 

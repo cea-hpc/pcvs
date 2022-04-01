@@ -157,14 +157,8 @@ def bank_save_run(ctx, name, path):
               help="Request a set of values from a given key")
 @click.pass_context
 def bank_load(ctx, name, key, format, start, end):
-
-    b = pvBank.Bank(token=name)
-    raise BankException.WIPError("bank load")
-    try:
-        b.connect_repository()
-        b.extract_data(key, start, end, format)
-    except NotExist:
-        raise click.BadArgumentUsage("'{}' does not exist".format(name))
-    except KeyError:
-        raise click.BadArgumentUsage(
-            "The key \'{}\' is not valid within {} scope".format(key, name))
+    from pcvs import dsl
+    b = dsl.Bank(name=name)
+    serie = b.load_serie()
+    run = serie.last
+    print(run.get_data(key).to_json())
