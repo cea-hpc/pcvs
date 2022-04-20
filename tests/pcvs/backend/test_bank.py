@@ -64,66 +64,40 @@ def dummy_run():
 
         yield path
 
-
-@patch("pcvs.backend.bank.BANKS", {
-    "default": "/random/path",
-    "other": "/other/random/path"
-})
-def test_bank_init():
-    obj = tested.Bank(token="default")
-    obj2 = tested.Bank(path="/random/path")
-    assert(obj.exists() and obj2.exists())
-    assert(obj.name == obj2.name == "default")
-    assert(obj.prefix == obj2.prefix == "/random/path")
-    
-    obj = tested.Bank(token="other@dummy-project")
-    obj2 = tested.Bank(path="/other/random/path")
-    assert(obj.exists() and obj2.exists())
-    print(obj.prefix, obj2.prefix)
-    assert(obj.prefix == obj2.prefix == "/other/random/path")
-    assert(obj.name == obj2.name == "other")
-    assert(obj.proj == "dummy-project")
-
-    obj = tested.Bank(token="not-created")
-    assert(not obj.exists())
-
-
 def test_bank_connect(mock_repo_fs):
     # first test with a specific dir to create the Git repo
     obj = tested.Bank(path=mock_repo_fs)
     assert(not obj.exists())
-    obj.connect_repository()
+    obj.connect()
     assert(os.path.isfile(os.path.join(mock_repo_fs, "HEAD")))
-    obj.disconnect_repository()
+    obj.disconnect()
 
     # Then use the recursive research to let pygit2 detect the Git repo
     obj = tested.Bank(path=mock_repo_fs)
     assert(not obj.exists())
-    obj.connect_repository()
+    obj.connect()
     assert(obj.prefix == mock_repo_fs)  # pygit2 should detect the old repo
     assert(os.path.isfile(os.path.join(mock_repo_fs, "HEAD")))
-    obj.connect_repository()  # ensure multiple connection are safe
-    obj.disconnect_repository()
+    obj.connect()  # ensure multiple connection are safe
+    obj.disconnect()
 
 def test_save_run(mock_repo_fs, dummy_run, capsys):
     obj = tested.Bank(path=mock_repo_fs, token="dummy@original-tag")
     assert(not obj.exists())
-    obj.connect_repository()
+    obj.connect()
     prefix = utils.find_buildir_from_prefix(dummy_run)
     obj.save_from_buildir("override-tag", prefix)
     obj.save_from_buildir(None, prefix)
-    assert(len(obj.list_projects()) == 2)
+    assert(len(obj.list_projects()) == 3)
     assert(len(obj.list_series("override-tag")) == 1)
     assert(len(obj.list_series("original-tag")) == 1)
     obj.show()
     capture = capsys.readouterr()
     assert('original-tag: 1 distinct testsuite(s)' in capture.out)
     assert('override-tag: 1 distinct testsuite(s)' in capture.out)
-    obj.disconnect_repository()
+    obj.disconnect()
     
     repo = git.elect_handler(mock_repo_fs)
     repo.open()
-    assert(len(list(repo.branches)) == 2)
-    repo.set_head("original-tag/profile_hash")
-    repo.set_head("override-tag/profile_hash")
+    assert(len(list(repo.branches)) == 3)
 

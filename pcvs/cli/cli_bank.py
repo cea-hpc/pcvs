@@ -4,7 +4,6 @@ import click
 
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import log, utils
-from pcvs.helpers.exceptions import BankException
 
 
 def compl_list_banks(ctx, args, incomplete):
@@ -38,7 +37,7 @@ def compl_bank_projects(ctx, args, incomplete):
     array = list()
     for bankname, bankpath in compl_list_banks(None, None, ''):
         bank = pvBank.Bank(token=bankname)
-        bank.connect_repository()
+        bank.connect()
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
 
@@ -72,7 +71,7 @@ def bank_show(ctx, name):
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
-        b.connect_repository()
+        b.connect()
         b.show()
 
 
@@ -92,7 +91,7 @@ def bank_create(ctx, name, path):
     if b.exists():
         raise click.BadArgumentUsage("'{}' already exist".format(name))
     else:
-        b.connect_repository()
+        b.connect()
         b.save_to_global()
 
 
@@ -135,9 +134,9 @@ def bank_save_run(ctx, name, path):
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
 
     path = os.path.abspath(path)
-    project = b.proj
+    project = b.default_project
 
-    b.connect_repository()
+    b.connect()
     if os.path.isfile(path):
         b.save_from_archive(project, path)
     elif os.path.isdir(path):

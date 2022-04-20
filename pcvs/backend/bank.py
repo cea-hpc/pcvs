@@ -12,13 +12,14 @@ from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 from pcvs.helpers.system import MetaDict
+from pcvs import dsl
 
 #: :var BANKS: list of available banks when PCVS starts up
 #: :type BANKS: dict, keys are bank names, values are file path
 BANKS: Dict[str, str] = dict()
 
 
-class Bank:
+class Bank(dsl.Bank):
     """Representation of a PCVS result datastore.
 
     Stored as a Git repo, a bank hold multiple results to be scanned and used to
@@ -59,31 +60,32 @@ class Bank:
         :param token: name & default project to manipulate, defaults to ""
         :type token: str
         """
-        self._root: Optional[str] = path
-        self._repo = None
+        self._dflt_proj = None
+        self._name = None
         self._config: Optional[MetaDict] = None
-        #self._rootree: Optional[pygit2.TreeBuilder] = None
-        #self._locked: bool = False
-        self._proj_name: Optional[str] = None
-
+        
         # split name & default-proj from token
         array: List[str] = token.split('@', 1)
         if len(array) > 1:
-            self._proj_name = array[1]
+            self._dflt_proj  = array[1]
         self._name = array[0]
 
         global BANKS
+        self._path = path
         if self.exists():
             if self.name_exist():
-                self._root = BANKS[self._name.lower()]
+                path = BANKS[self._name.lower()]
             else:
                 for k, v in BANKS.items():
-                    if v == self._root:
+                    if v == path:
                         self._name = k
                         break
         
-        if self._root:
-            self._repo = git.elect_handler(self._root)
+        super().__init__(path, self._dflt_proj )
+    
+    @property
+    def default_project(self):
+        return "unkwown" if not self._dflt_proj else self._dflt_proj
 
     @property
     def prefix(self) -> Optional[str]:
@@ -92,7 +94,7 @@ class Bank:
         :return: absolute path to directory
         :rtype: str
         """
-        return self._root
+        return self._path
 
     @property
     def name(self) -> str:
@@ -102,19 +104,6 @@ class Bank:
         :rtype: str
         """
         return self._name
-
-    @property
-    def proj(self) -> Optional[str]:
-        """Get default-project tag.
-
-        :return: the exact project (without bank label prefix)
-        :rtype: str
-        """
-        return self._proj_name
-
-    @property
-    def repo(self):
-        return self._repo
 
     def exists(self) -> bool:
         """Check if the bank is stored in ``PATH_BANK`` file.
@@ -140,20 +129,7 @@ class Bank:
         :return: True if the path is known.
         :rtype: bool
         """
-        return self._root in BANKS.values()
-
-    def list_projects(self) -> List[str]:
-        """Given the bank, list projects with at least one run.
-
-        In a bank, each branch is a project, just list available branches.
-        `master` branch is not a valid project.
-
-        :return: A list of available projects
-        :rtype: list of str
-        """
-        INVALID_REFS = ["master"]
-        projects = [elt.split('/')[0] for elt in self._repo.branches if elt not in INVALID_REFS]
-        return list(set(projects))
+        return self._path in BANKS.values()
         
     def __str__(self) -> str:
         """Stringification of a bank.
@@ -161,7 +137,7 @@ class Bank:
         :return: a combination of name & path
         :rtype: str
         """
-        return str({self._name: self._root})
+        return str({self._name: self._path})
 
     def show(self) -> None:
         """Print the bank on stdout.
@@ -169,62 +145,25 @@ class Bank:
         .. note::
             This function does not use :class:`log.IOManager`
         """
-        projects = dict()
-        string = ["Projects contained in bank '{}':".format(self._root)]
+        string = ["Projects contained in bank '{}':".format(self._path)]
         # browse references
         for project, series in self.list_all().items():
             string.append("- {:<8}: {} distinct testsuite(s)".format(project, len(series)))
             for s in series:
-                cur = self._repo.revparse(s)
-                string.append("  * {}: {} run(s)".format(s, len(list(self._repo.iterate_over(cur)))))
+                string.append("  * {}: {} run(s)".format(s.name, len(s)))
 
         print("\n".join(string))
 
     def __del__(self) -> None:
         """Close the bank."""
-        self.disconnect_repository()
-
-    def disconnect_repository(self) -> None:
-        """Free the bank repo, to be reused by other instance."""
-        if self._repo:
-            self._repo.close()
-            self._repo = None
-        
-    def connect_repository(self) -> None:
-        """Connect to the bank repo, making it exclusive to the current process.
-
-        Two scenarios:
-            * the path is empty -> create a new bank
-            * the path is not empty -> detect a bank repo.
-
-        In any cases, lock the directory to prevent multiple accesses.
-
-        :raises AlreadyExistError: A bank is already built
-        :raises NotFoundError: the given path does not contain a
-            Git directory.
-        """
-        self._repo.open()
+        self.disconnect()
 
     def save_to_global(self) -> None:
         """Store the current bank into ``PATH_BANK`` file."""
         global BANKS
         if self._name in BANKS:
-            self._name = os.path.basename(self._root).lower()
-        add_banklink(self._name, self._root)
-
-    def save_test_from_json(self, jtest: str):
-        """Store data to a bank directly from JSON representation.
-
-        This is mainly used when a bank is directly connected to a run instance,
-        not intermediate file is required.
-
-        :param jtest: the JSON-formatted test result
-        :type jtest: str
-        :return: the blob object id
-        :rtype: :class:`Pygit2.Oid`
-        """
-        assert('validation' in self._config)
-        self._repo.insert_tree(jtest['id']['fq_name'], json.dumps(jtest))
+            self._name = os.path.basename(self._path).lower()
+        add_banklink(self._name, self._path)
         
     def load_config_from_str(self, s: str) -> None:
         """Load the configuration data associated with the archive to process.
@@ -254,15 +193,37 @@ class Bank:
         self.load_config_from_file(buildpath)
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
         
+        seriename = self.__build_target_branch_name(tag)
+        serie = self.get_serie(seriename)
+        
+        if not serie:
+            serie = self.new_serie(seriename)
+            
+        run = dsl.Run(from_serie=serie)
+        metadata = {'cnt': {}}
+        
         for result_file in os.listdir(rawdata_dir):
+            d = {}
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
                 data = MetaDict(json.load(fh))
                 # TODO: validate
-
             for elt in data['tests']:
-                self.save_test_from_json(elt)
+                name = elt['id']['fq_name']
+                state = str(elt['result']['state'])
+                metadata['cnt'].setdefault(state, 0)
+                metadata['cnt'][state] += 1
+                d[name] = elt
+                
+            run.update_flatdict(d)
+        
+        self.set_id(
+            an=self._config.validation.author.name,
+            am=self._config.validation.author.email,
+            cn=git.get_current_username(),
+            cm=git.get_current_usermail()
+        )
 
-        self.finalize_snapshot(tag)
+        serie.commit(run, metadata=metadata, timestamp=int(self._config.validation.datetime.timestamp()))
 
     def save_from_archive(self, tag: str, archivepath: str) -> None:
         """Extract results from the archive, if used to export results.
@@ -282,27 +243,7 @@ class Bank:
             self.save_from_buildir(
                 tag, os.path.join(tarpath, "save_for_export"))
 
-    def finalize_snapshot(self, tag: str) -> None:
-        """Finalize result submission into the bank.
-
-        After walking through build directory, finalize the Git tree to insert a
-        commit on top of the created tree.
-
-        :param tag: overridable default project (if different)
-        :type tag: str
-        """
-        self._repo.set_identity(
-            authname=self._config.validation.author.name,
-            authmail=self._config.validation.author.email,
-            commname=git.get_current_username(),
-            commmail=git.get_current_usermail()
-        )
-
-        refname = self.__build_target_branch_name(tag)
-        self._repo.set_head(refname)
-        self._repo.commit("nothing for now", timestamp=int(self._config.validation.datetime.timestamp()))
-
-    def __build_target_branch_name(self, tag: str) -> str:
+    def __build_target_branch_name(self, tag: str, hash: str=None) -> str:
         """Compute the target branch to store data.
 
         This is used to build the exact Git branch name based on:
@@ -318,38 +259,10 @@ class Bank:
         # history, there are managed directly
         # TODO: compute the proper name for the current test-suite
         if tag is None:
-            tag = self._proj_name
-
-            if tag is None:
-                tag = "unknown"
-        return "{}/{}".format(tag, self._config.validation.pf_hash)
-
-    def extract_data(self, key, start, end, format):
-        """Extract information from the bank given specifications.
-
-        .. note::
-            This function is still WIP.
-
-        :param key: the requested key
-        :type key: str
-        :param start: start time
-        :type start: date
-        :param end: end time
-        :type end: date
-        :param format: Not relevant yet
-        :type format: Not relevant yet
-        :raises ProjectNameError: Targeted project does not exist
-        """
-        refname = self.__build_target_branch_name(None)
-
-        if refname not in self._repo.branches:
-            raise BankException.ProjectNameError()
-
-        return self._repo.get_tree()
-    
-        head, _ = self._repo.resolve_refish(refname)
-        for commit in self._repo.walk(head, pygit2.GIT_SORT_TIME | pygit2.GIT_SORT_REVERSE):
-            print(commit.message, commit.author.date)
+            tag = self.default_project
+        if hash is None:
+            hash = self._config.validation.pf_hash
+        return "{}/{}".format(tag, hash)
 
     def __repr__(self) -> dict:
         """Bank representation.
@@ -358,40 +271,14 @@ class Bank:
         :rtype: dict
         """
         return {
-            'rootpath': self._root,
-            'name': self._name,
-            'locked': self._repo._is_locked()
+            'rootpath': self._path,
+            'name': self._name
         }
-        
-    def list_series(self, project=None):
-        """TODO:
-        """
-        if not project:
-            project = self._proj_name
-        INVALID_REFS = ["master"]
-        res = []
-        for elt in self._repo.branches:
-            if elt in INVALID_REFS:
-                continue
-            p, serie = elt.split('/')
-            if p.lower() == project.lower():
-                res.append("{}/{}".format(project, serie))
-                
-        return res
-
-    def list_all(self):
-        """TODO:
-        """
-        res = {}
-        for project in self.list_projects():
-            res[project] = self.list_series(project)
-        return res
         
     def get_count(self):
         """TODO:
         """
         return len(self.list_projects())
-
 
 def init() -> None:
     """Bank interface detection.
