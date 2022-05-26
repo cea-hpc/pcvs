@@ -37,15 +37,9 @@ def start_server():
     :return: the application handler
     :rtype: class:`Flask`
     """
-    app = None
-    for port in [5000, 0]:
-        try:
-            app = create_app()
-            app.run(host='0.0.0.0', port=port)
-            break
-        except OSError as e:
-            print("Fail to run on port {}. Try automatically-defined".format(port))
-            continue
+    app = create_app()
+    ret = app.run(host='0.0.0.0', port=int(os.getenv("PCVS_REPORT_PORT", 5000)))
+        
     return app
 
 

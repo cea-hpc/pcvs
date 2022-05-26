@@ -156,8 +156,9 @@ def bank_save_run(ctx, name, path):
               help="Request a set of values from a given key")
 @click.pass_context
 def bank_load(ctx, name, key, format, start, end):
-    from pcvs import dsl
-    b = dsl.Bank(name=name)
-    serie = b.load_serie()
+    print(name)
+    b = pvBank.Bank(name)
+    print(b.default_project)
+    serie = b.get_serie(b.default_project)
     run = serie.last
     print(run.get_data(key).to_json())

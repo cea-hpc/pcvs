@@ -88,6 +88,8 @@ class GitByGeneric(ABC):
         if prefix:        
             self.set_path(prefix)
 
+        self.set_identity(None, None, None, None)
+
     def set_path(self, prefix):
         """
         Associate a new directory to this bank.
@@ -617,7 +619,7 @@ class GitByCLI(GitByGeneric):
 
     def commit(self, tree, msg="VOID", timestamp=None, parent=None, orphan=False):
         assert(not parent or isinstance(parent, Reference))
-        assert(isinstance, tree, Tree)
+        assert(isinstance(tree, Tree))
         # if this commit should have parents
         if not orphan:
             
@@ -738,13 +740,15 @@ def get_current_username() -> str:
     :return: git username
     :rtype: str
     """
-    u = "anonymous"
     try:
         u = request_git_attr('user.name')
         if u is None:
             u = getpass.getuser()
     except Exception as e:
         pass
+    finally:
+        if u is None:
+            u = "anonymous"
 
     return u
         
@@ -756,12 +760,14 @@ def get_current_usermail():
     :return: git user mail
     :rtype: str
     """
-    m = "anonymous@notset"
     try:
         m = request_git_attr('user.email')
-        if m is None:
-            m = "{}@{}".format(get_current_username(), socket.getfqdn())
+        #if m is None:
+        #    m = "{}@{}".format(get_current_username(), socket.getfqdn())
     except Exception as e:
         pass
+    finally:
+        if m is None:
+            m = "anonymous@notset"
 
     return m

@@ -210,6 +210,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         if not obj.exists():
             raise click.BadOptionUsage(
                 "--bank", "'{}' bank does not exist".format(obj.name))
+        obj.disconnect()
 
     # BEFORE the build dir still does not exist !
     buildfile = os.path.join(val_cfg.output, NAME_BUILDFILE)

@@ -157,13 +157,12 @@ def process_main_workflow(the_session=None):
     bank_token = valcfg.target_bank
     if bank_token is not None:
         bank = pvBank.Bank(token=bank_token)
-        pref_proj = bank.preferred_proj
+        pref_proj = bank.default_project
         if bank.exists():
             log.manager.print_item("Upload results to bank: '{}{}'".format(
                 bank.name.upper(),
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
-            bank.connect_repository()
             bank.save_from_buildir(
                 None,
                 os.path.join(valcfg.output)

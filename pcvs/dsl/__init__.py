@@ -254,8 +254,9 @@ class Bank:
         """TODO
         """
         if not serie_name:
-            serie_name = self._hdl.get_head()
+            serie_name = self._repo.get_head()
         
+        print(serie_name)
         branch = self._repo.get_branch_from_str(serie_name)
         if not branch:
             return None

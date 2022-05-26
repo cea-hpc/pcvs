@@ -7,7 +7,7 @@ from pcvs.helpers import utils
 
 def parse_spec_variants(specname):
     d = dict()
-    cmd = 'spack python -c \'import spack.repo; print("\\n".join(["{}:{}".format(v[0].name, v[0].allowed_values) for v in spack.repo.get("'+ specname +'").variants.values()]))\''
+    cmd = 'spack python -c \'import spack.repo; print("\\n".join(["{}:{}".format(v.name, v.allowed_values) for v in spack.repo.get("'+ specname +'").variants.values()]))\''
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     fds = p.communicate()
     for line in fds[0].decode().rstrip().split("\n"):
