@@ -181,10 +181,7 @@ class Runner(threading.Thread):
                 rc = Test.Timeout_RC  # nah, to be changed
             except Exception:
                 raise
-            job.save_final_result(time=final, rc=rc, out=stdout)
-            job.display()
-
-            if set.comman:
-                set.comman.send(job)
+            job.save_raw_run(time=final, rc=rc, out=stdout)
+            job.save_status(Test.State.EXECUTED)
 
         set.is_complete()

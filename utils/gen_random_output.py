@@ -49,7 +49,7 @@ for f in range(0, file_count):
             status = 2
         
         time = random.randrange(0, 5000) / 1000
-        output = base64.b64encode(("Test Sample {}".format(t)).encode('ascii')).decode('ascii')
+        output = base64.b64encode(("Test Sample {}".format(t)).encode('utf-8')).decode('utf-8')
         
         json_node['tests'].append({
             "id": {

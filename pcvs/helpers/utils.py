@@ -1,3 +1,4 @@
+import subprocess
 import os
 import shutil
 import signal
@@ -409,3 +410,33 @@ def start_autokill(timeout=None):
         signal.signal(signal.SIGALRM, program_timeout)
 
         signal.alarm(timeout)
+
+
+class Program:
+    def __init__(self, cmd=None):
+        self._cmd = cmd
+        self._out = None
+        self._rc = None
+        self._except = None
+
+    def run(self, input="", shell=False, timeout=0):
+        try:
+            s = subprocess.Popen(self._cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self._out = s.communicate(input=input)
+            self._rc = s.returncode
+        except Exception as e:
+            self._except = e
+            return 1
+        return 0
+
+    @property
+    def out(self):
+        return self._out
+
+    @property
+    def rc(self):
+        return self._rc
+
+    @property
+    def exception(self):
+        return self._except

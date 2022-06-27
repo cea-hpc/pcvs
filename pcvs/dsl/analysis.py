@@ -57,3 +57,18 @@ class SimpleAnalysis(BaseAnalysis):
                 weight += 1
             stats[div][testname] = weight
         return stats
+
+
+class ResolverAnalysis(BaseAnalysis):
+    """TODO:
+    """
+    
+    def __init__(self, bank):
+        super().__init__(bank)
+        self._data = None
+        
+    def fill(self, data):
+        """TODO:
+        """
+        assert(isinstance(data, dict))
+        self._data = data

@@ -70,7 +70,7 @@ def get_logged_output(prefix, testname):
                 data = json.load(fh)
                 for job in data['tests']:
                     if job['id']['fq_name'].startswith(testname):
-                        return base64.b64decode(job['result']['output']).decode('ascii')
+                        return base64.b64decode(job['result']['output']).decode('utf-8')
     return "No test named '{}' found here.".format(testname)
     
 

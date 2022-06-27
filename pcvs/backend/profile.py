@@ -356,7 +356,7 @@ class Profile:
 
         if 'plugin' in self._details['runtime'].keys():
             plugin_code = base64.b64decode(
-                self._details['runtime']['plugin']).decode('ascii')
+                self._details['runtime']['plugin']).decode('utf-8')
         else:
             plugin_code = """import math
 from pcvs.plugins import Plugin
@@ -374,7 +374,7 @@ class MyPlugin(Plugin):
                 plugin_code, editor=e, extension=".py", require_save=True)
             if edited_code is not None:
                 self._details['runtime']['plugin'] = base64.b64encode(
-                    edited_code.encode('ascii'))
+                    edited_code.encode('utf-8'))
                 self.flush_to_disk()
         except Exception as e:
             fname = "./rej{}-{}-plugin.yml".format(

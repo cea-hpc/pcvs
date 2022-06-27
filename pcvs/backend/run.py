@@ -523,6 +523,7 @@ def process_static_yaml_files(yaml_files):
                 obj.process()
                 obj.flush_sh_file()
             except Exception as e:
+                raise e
                 err.append((f, e))
                 log.manager.info("{} (failed to parse): {}".format(f, e))
     return err

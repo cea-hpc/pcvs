@@ -202,5 +202,12 @@ patternProperties:
         patternProperties:
           "^.*$":
             type: string
+      metric:
+        type: object
+        patternProperties:
+          "^.*$":
+            type: object
+            properties:
+              key: {type: string}
       additionalProperties: false
     additionalProperties: false

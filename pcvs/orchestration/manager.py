@@ -254,8 +254,11 @@ class Manager:
         final = list()
         for job in set.content:
             if job.been_executed():
+                job.evaluate()
+                job.display()
                 self._count.executed += 1
                 self._count[job.state] += 1
+                job.extract_metrics()
                 self._publisher.add(job.to_json())
             else:
                 self.add_job(job)

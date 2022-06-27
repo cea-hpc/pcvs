@@ -371,7 +371,7 @@ class ConfigurationBlock:
 
         if 'plugin' in stream_yaml.keys():
             plugin_code = base64.b64decode(
-                stream_yaml['plugin']).decode('ascii')
+                stream_yaml['plugin']).decode('utf-')
         else:
             plugin_code = """import math
 from pcvs.plugins import Plugin
@@ -388,6 +388,6 @@ class MyPlugin(Plugin):
             plugin_code, editor=e, extension=".py", require_save=True)
         if edited_code is not None:
             stream_yaml['plugin'] = base64.b64encode(
-                edited_code.encode('ascii'))
+                edited_code.encode('utf-8'))
             with open(self._file, 'w') as fh:
                 YAML(typ='safe').dump(stream_yaml, fh)

@@ -71,14 +71,13 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
     """
     abspath = os.path.abspath(incomplete)
 
-    if ':' in incomplete:
-        pass
-    else:
-        pass
-    d = os.path.dirname(abspath)
-    base = os.path.basename(abspath)
-    return ['a' for p in next(os.walk(d))[1] if p.startswith(base)]
-
+    if ":" in incomplete:
+        label, path = incomplete.split(":", 1)
+        label += ":"
+    obj = click.Path(exists=True, dir_okay=True, file_okay=False)
+    obj.shell_complete(ctx, args, incomplete)
+        
+    
 
 def handle_build_lockfile(exc=None):
     """Remove the file lock in build dir if the application stops abrubtly.

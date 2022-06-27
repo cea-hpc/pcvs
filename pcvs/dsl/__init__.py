@@ -212,7 +212,7 @@ class Serie:
             root_tree = self._repo.insert_tree(k, v, root_tree)
         self._repo.commit(tree=root_tree, msg=commit_msg, 
                           parent=self._hdl, timestamp=timestamp, orphan=False)
-        self._repo.gc()
+        #self._repo.gc()
 
 
 class Bank:
@@ -226,12 +226,12 @@ class Bank:
 
         if head:
             self._repo.set_head(head)
-        
+
         if not self._repo.get_branch_from_str('master'):
             t = self._repo.insert_tree('README', "This file is intended to be used as a branch bootstrap.")
             c = self._repo.commit(t, "INIT", orphan=True)
             self._repo.set_branch(git.Branch(self._repo, 'master'), c)
-        
+
     @property
     def path(self):
         return self._path
@@ -256,7 +256,6 @@ class Bank:
         if not serie_name:
             serie_name = self._repo.get_head()
         
-        print(serie_name)
         branch = self._repo.get_branch_from_str(serie_name)
         if not branch:
             return None

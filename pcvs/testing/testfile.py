@@ -234,14 +234,16 @@ class TestFile:
             fh_sh.write("""#!/bin/sh
 test -n '{simulated}' && PCVS_SHOW='all'
 if test -n "$PCVS_SHOW"; then
-    test "$PCVS_SHOW" = "all" -o "$PCVS_SHOW" = "loads" && echo '{pm_string}'
-else
-    {pm_string}
-    :
+    test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo_env="echo " || echo_env="#"
+    test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo_load="echo " ||_echo_load="#"
+    test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo_cmd="echo " || echo_cmd="#"
 fi
+    
+eval "${{echo_load}}{pm_string}"
+
 for arg in "$@"; do case $arg in
 """.format(simulated="sim" if MetaConfig.root.validation.simulated is True else "",
-                pm_string="#Package-manager set by profile: \n"+"\n".join([
+                pm_string="\n".join([
                         TestFile.cc_pm_string,
                         TestFile.rt_pm_string
                         ])))
@@ -250,16 +252,16 @@ for arg in "$@"; do case $arg in
                 fh_sh.write(test.generate_script(fn_sh))
                 MetaConfig.root.get_internal('orchestrator').add_new_job(test)
 
-            fh_sh.write(
-                '   --list)\n'
-                '       printf "{list_of_tests}\\n"\n'
-                '       ;;\n'
-                '   *)\n'
-                '       printf "Invalid test-name \'$arg\'\\n"\n'
-                '       exit 1\n'
-                '   esac\n'
-                'done\n'
-                'exit $ret\n'.format(list_of_tests="\n".join([
+            fh_sh.write("""
+        --list) printf "{list_of_tests}\\n"; exit 0;;
+        *) printf "Invalid test-name \'$arg\'\\n"; exit 1;;
+        esac
+    done
+    
+    eval "${{echo_load}}${{pcvs_load}}"
+    eval "${{echo_env}}${{pcvs_env}}"
+    eval "${{echo_cmd}}${{pcvs_cmd}}"
+    exit $?\n""".format(list_of_tests="\n".join([
                     t.name
                     for t in self._tests
                 ])))

@@ -2,6 +2,7 @@ import os
 from datetime import datetime, timedelta
 
 import click
+from click.shell_completion import CompletionItem
 
 from pcvs import NAME_BUILDFILE
 from pcvs.backend import session as pvSession
@@ -22,7 +23,7 @@ def compl_session_token(ctx, args, incomplete) -> list:
     sessions = pvSession.list_alive_sessions()
     if sessions is None:
         return []
-    return [(k, str(pvSession.Session.State(v['state']))) for k, v in sessions.items() if incomplete in str(k)]
+    return [CompletionItem(k, help=str(pvSession.Session.State(v['state']))) for k, v in sessions.items() if incomplete in str(k)]
 
 
 @click.command(name="session", short_help="Manage multiple validations")

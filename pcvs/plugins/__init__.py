@@ -41,11 +41,13 @@ class Plugin:
         SCHED_SET_BEFORE = enum.auto(),
         SCHED_SET_EVAL = enum.auto(),
         SCHED_SET_AFTER = enum.auto(),
+        TEST_RESULT_EVAL = enum.auto(),
         SCHED_PUBLISH_BEFORE = enum.auto(),
         SCHED_PUBLISH_AFTER = enum.auto(),
         SCHED_AFTER = enum.auto(),
         END_BEFORE = enum.auto(),
         END_AFTER = enum.auto()
+        
 
         def __str__(self):
             """Stringify a Step as a printable string

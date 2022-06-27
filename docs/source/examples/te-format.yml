@@ -63,6 +63,12 @@
     obj1: "./path/1"
     obj2: "./path/2"
 
+  metrics:
+    metric1:
+      key: "regex"
+    metric2:
+      key: "regex"
+
   # this is a copy/paste from pav2
   validate:
     expect_exit: 0
@@ -74,8 +80,9 @@
       label:
         expr: '^\d+(\.\d+) received$'
         expect: true|false
-
       label2: 'Total Elapsed: \d+\.\d+ sec.$'
+    analysis:
+      method: "<method>"
     script:
       path: "/path/to/script"
 

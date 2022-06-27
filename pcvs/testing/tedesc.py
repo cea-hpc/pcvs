@@ -189,6 +189,7 @@ class TEDescriptor:
         self._run = MetaDict(node.get('run', None))
         self._validation = MetaDict(node.get('validate', None))
         self._artifacts = MetaDict(node.get('artifact', None))
+        self._metrics = MetaDict(node.get('metric', None))
         self._template = node.get('group', None)
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
@@ -510,6 +511,7 @@ class TEDescriptor:
             delta=self._validation.time.get("tolerance", 0),
             rc=self._validation.get("expect_exit", 0),
             artifacts=self._artifacts,
+            analysis=self._validation.get("analysis", {}),
             resources=1,
             wd=chdir
         )
@@ -579,12 +581,14 @@ class TEDescriptor:
                 job_deps=te_job_deps,
                 mod_deps=te_mod_deps,
                 tags=self._tags,
+                metrics=self._metrics,
                 environment=env,
                 dim=comb.get('n_node', 1),
                 time=self._validation.time.get("mean", 0),
                 delta=self._validation.time.get("tolerance", 0),
                 rc=self._validation.get("expect_exit", 0),
                 valscript=self._validation.script.get('path', None),
+                analysis=self._validation.get("analysis", {}),
                 comb=comb,
                 wd=chdir,
                 artifacts=self._artifacts,

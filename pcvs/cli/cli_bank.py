@@ -1,6 +1,7 @@
 import os
 
 import click
+from click.shell_completion import CompletionItem
 
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import log, utils
@@ -20,7 +21,7 @@ def compl_list_banks(ctx, args, incomplete):
     array = list()
     for k, v in pvBank.BANKS.items():
         array.append((k, v))
-    return [elt for elt in array if incomplete in elt[0]]
+    return [CompletionItem(elt[0], help=elt[1]) for elt in array if incomplete in elt[0]]
 
 
 def compl_bank_projects(ctx, args, incomplete):
@@ -40,8 +41,9 @@ def compl_bank_projects(ctx, args, incomplete):
         bank.connect()
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
-
-    return [elt for elt in array if incomplete in elt[0]]
+        bank.disconnect()
+    
+    return [CompletionItem(elt[0], help=elt[1]) for elt in array if incomplete in elt[0]]
 
 
 @click.group(name="bank", short_help="Persistent data repository management")

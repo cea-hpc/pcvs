@@ -8,7 +8,7 @@ import click
 from pcvs import version
 from pcvs.backend import bank, config, profile, session
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
-                      cli_session, cli_utilities)
+                      cli_session, cli_utilities, cli_plumbing)
 from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import PluginException
 from pcvs.plugins import Collection, Plugin
@@ -115,6 +115,7 @@ cli.add_command(cli_utilities.clean)
 cli.add_command(cli_utilities.discover)
 # cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
+#cli.add_command(cli_plumbing.resolve)
 
 if __name__ == "__main__":
     cli()

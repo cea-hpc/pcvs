@@ -2,11 +2,14 @@ import base64
 import json
 import os
 import shlex
+import re
 from enum import IntEnum
 
 from pcvs.helpers import log
 from pcvs.helpers.criterion import Combination
 from pcvs.helpers.system import MetaConfig, ValidationScheme
+from pcvs.helpers.utils import Program
+from pcvs.plugins import Plugin
 
 
 class Test:
@@ -54,6 +57,7 @@ class Test:
         FAILURE = 3
         ERR_DEP = 4
         ERR_OTHER = 5
+        EXECUTED = 6
 
         def __str__(self):
             """Stringify to return the label.
@@ -101,14 +105,16 @@ class Test:
             suffix=kwargs.get('user_suffix'))
 
         self._execmd = kwargs.get('command', '')
+    
         self._data = {
-            'metrics': {},
+            'metrics': kwargs.get('metrics', {}),
             'tags': kwargs.get('tags', []),
             'artifacts': kwargs.get('artifacts', {}),
-
         }
+
         self._validation = {
             'matchers': kwargs.get('matchers'),
+            'analysis': kwargs.get('analysis'),
             'script': kwargs.get('valscript'),
             'expect_rc': kwargs.get('rc', 0),
             'time': kwargs.get('time', 0),
@@ -330,17 +336,65 @@ class Test:
         """
         if state is None:
             state = Test.State.SUCCESS if self._validation['expect_rc'] == rc else Test.State.FAILURE
-        self.executed(state)
-        self._rc = rc
-        self._output = base64.b64encode(out).decode('ascii')
-        self._exectime = time
-
+        
+        self.save_raw_run(rc=rc, out=out, time=time)
+        self.save_status(state)
+        
         for elt_k, elt_v in self._data['artifacts'].items():
             if os.path.isfile(elt_v):
                 with open(elt_v, 'rb') as fh:
                     self._data['artifacts'][elt_k] = base64.b64encode(
-                        fh.read()).decode("ascii")
+                        fh.read()).decode("utf-8")
 
+    def save_raw_run(self, out=None, rc=None, time=None):
+        if rc is not None:
+            self._rc = rc
+        if out is not None:
+            self._output = base64.b64encode(out).decode('utf-8')
+        if time is not None:
+            self._exectime = time
+
+    def extract_metrics(self):
+        raw_output = base64.b64decode(self._output).decode("utf-8")
+        for metric in self._data['metrics']:
+            node = self._data['metrics'][metric]
+            node['values'] = list(re.findall(node['key'], raw_output))
+
+    def evaluate(self):
+        """TODO:
+        """
+        state = Test.State.SUCCESS
+        
+        if self._validation['expect_rc'] != self._rc:
+            state = Test.State.FAILURE
+        
+        raw_output = base64.b64decode(self._output).decode('utf-8')
+        
+        # if test should be validated through a matching regex
+        if state == Test.State.SUCCESS and self._validation['matchers'] is not None :
+            for k, v in self._validation['matchers'].items():
+                expected = (v.get('expect', True) is True)
+                found = re.search(v['expr'], raw_output)
+                if (found and not expected) or (not found and expected):
+                    state = Test.State.FAILURE
+                    break
+
+        if state == Test.State.SUCCESS and self._validation['analysis'] is not None:
+            analysis_name = self._validation['analysis']
+            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TEST_RESULT_EVAL)
+            
+
+        # if a custom script is provided
+        if state == Test.State.SUCCESS and self._validation['script'] is not None:
+            p = Program(self._validation['script'])
+            p.run()
+            if self._validation['expect_rc'] != p.rc:
+                state = Test.State.FAILURE
+        self._state = state
+        
+    def save_status(self, state):
+        self.executed(state)
+        
     def display(self):
         """Print the Test into stdout (through the manager)."""
         colorname = "yellow"
@@ -462,7 +516,7 @@ class Test:
 
         # if changing directory is required by the test
         if self._cwd is not None:
-            cd_code += "cd '{}'\n".format(shlex.quote(self._cwd))
+            cd_code += "cd '{}'".format(shlex.quote(self._cwd))
 
         # manage package-manager deps
         for elt in self._mod_deps:
@@ -470,55 +524,25 @@ class Test:
 
         # manage environment variables defined in TE
         if self._testenv is not None:
-            for e in self._testenv:
-                env_code += "{}; export {}\n".format(
-                    shlex.quote(e), shlex.quote(e.split('=')[0]))
-
-        # if test should be validated through a matching regex
-        if self._validation['matchers'] is not None:
-            for k, v in self._validation['matchers'].items():
-                expr = v['expr']
-                required = (v.get('expect', True) is True)
-                # if match is required set 'ret' to 1 when grep fails
-                post_code += "{echo} | {grep} '{expr}' {fail} ret=1\n".format(
-                    echo='echo "$output"',
-                    grep='grep -qP',
-                    expr=shlex.quote(expr),
-                    fail='||' if required else "&&")
-
-        # if a custom script is provided (in addition or not to matchers)
-        if self._validation['script'] is not None:
-            post_code += "{echo} | {script}; ret=$?".format(
-                echo='echo "$output"',
-                script=shlex.quote(self._validation['script'])
-            )
+            env_code = "\n".join([
+                "{}; export {}".format(shlex.quote(e),
+                                        shlex.quote(e.split('=')[0]))
+                for e in self._testenv
+                ])
 
         cmd_code = self._execmd
 
         return """
         "{name}")
-            if test -n "$PCVS_SHOW"; then
-                test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo '{p_env}'
-                test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo '{p_pm}'
-                test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo {p_cmd}
-                exit 0
-            fi
             {cd_code}
-            {pm_code}
-            {env_code}
-            output=$({cmd_code} 2>&1)
-            ret=$?
-            test -n "$output" && echo "$output"
-            {post_code}
+            pcvs_load={pm_code}
+            pcvs_env={env_code}
+            pcvs_cmd={cmd_code}
             ;;""".format(
-            p_cmd="{}".format(shlex.quote(cmd_code)),
-            p_env="{}".format(env_code),
-            p_pm="{}".format(pm_code),
+            cmd_code="{}".format(shlex.quote(cmd_code)),
+            env_code="{}".format(shlex.quote(env_code)),
+            pm_code="{}".format(shlex.quote(pm_code)),
             cd_code=cd_code,
-            pm_code=pm_code,
-            env_code=env_code,
-            cmd_code=cmd_code,
-            post_code=post_code,
             name=self._id['fq_name']
         )
 

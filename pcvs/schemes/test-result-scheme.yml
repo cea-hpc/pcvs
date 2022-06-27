@@ -39,5 +39,13 @@ properties:
           - type: object
             patternProperties:
               "^.*$": {type: "string"}
+      metrics:
+        type: object
+        patternProperties:
+          "^.*$":
+            type: object
+            properties:
+              key: {type: "string"}
+              values: {type: "array"}
     additionalProperties: true
 additionalProperties: false
