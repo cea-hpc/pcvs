@@ -1,5 +1,6 @@
 import subprocess
 import os
+import socket
 import shutil
 import signal
 import time
@@ -357,13 +358,13 @@ def trylock_file(f, reentrant=False):
     lockfile_name = get_lockfile_name(f)
     if not os.path.exists(lockfile_name):
         with open(lockfile_name, 'w') as fh:
-            fh.write("{}".format(os.getpid()))
+            fh.write("{}||{}".format(socket.gethostname(), os.getpid()))
         log.manager.debug("Lock {}".format(lockfile_name))
         return True
     else:
         try:
-            pid = get_lock_owner(f)
-            if pid == os.getpid() and reentrant:
+            hostname, pid = get_lock_owner(f)
+            if pid == os.getpid() and hostname == socket.gethostname() and reentrant:
                 log.manager.debug("Lock {}".format(lockfile_name))
                 return True
         except ValueError as e:
@@ -395,7 +396,8 @@ def get_lock_owner(f):
     """
     lf_name = get_lockfile_name(f)
     with open(lf_name, 'r') as fh:
-        return int(fh.read().strip())
+        s = fh.read().strip().split('||')
+        return s[0], int(s[1])
 
 
 def program_timeout(sig, frame):

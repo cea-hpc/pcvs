@@ -172,6 +172,11 @@ class Bank(dsl.Bank):
         :type s: str
         """
         self._config = MetaDict(YAML(typ='safe').load(s))
+        
+    def load_config_from_dict(self, s: dict) -> None:
+        """TODO:
+        """
+        self._config = MetaDict(s)
 
     def load_config_from_file(self, path: str) -> None:
         """Load the configuration file associated with the archive to process.
@@ -193,7 +198,7 @@ class Bank(dsl.Bank):
         self.load_config_from_file(buildpath)
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
         
-        seriename = self.__build_target_branch_name(tag)
+        seriename = self.build_target_branch_name(tag)
         serie = self.get_serie(seriename)
         
         if not serie:
@@ -243,7 +248,7 @@ class Bank(dsl.Bank):
             self.save_from_buildir(
                 tag, os.path.join(tarpath, "save_for_export"))
 
-    def __build_target_branch_name(self, tag: str, hash: str=None) -> str:
+    def build_target_branch_name(self, tag: str=None, hash: str=None) -> str:
         """Compute the target branch to store data.
 
         This is used to build the exact Git branch name based on:

@@ -62,11 +62,10 @@ class Run:
     @property
     def previous(self):
         l = self._repo.get_parents(self._cid)
-        if len(l) >= 1:
-            return Run(repo=self._repo, cid=l[0])
-        else:
+        if l[0].get_info()['message'] == "INIT" or len(l) < 1:
             return None
-        
+        return Run(repo=self._repo, cid=l[0])
+
     @property
     def oneline(self):
         """TODO:
@@ -254,7 +253,7 @@ class Bank:
         """TODO
         """
         if not serie_name:
-            serie_name = self._repo.get_head()
+            serie_name = self._repo.get_head().name
         
         branch = self._repo.get_branch_from_str(serie_name)
         if not branch:

@@ -85,7 +85,11 @@ class Collection:
         """Detect plugins stored in default places."""
         try:
             self.register_plugin_by_package('pcvs-contrib')
+            pkg = importlib.import_module("pcvs.plugins.default")
+            for mod in pkg.__all__:
+                self.register_plugin_by_module(mod, activate=True)
         except:
+            raise
             log.manager.info(
                 "No pcvs-contrib package found for plugin autoloading")
 

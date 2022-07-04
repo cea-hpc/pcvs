@@ -347,6 +347,8 @@ class Test:
                         fh.read()).decode("utf-8")
 
     def save_raw_run(self, out=None, rc=None, time=None):
+        """TODO:
+        """
         if rc is not None:
             self._rc = rc
         if out is not None:
@@ -355,10 +357,18 @@ class Test:
             self._exectime = time
 
     def extract_metrics(self):
+        """TODO:
+        """
         raw_output = base64.b64decode(self._output).decode("utf-8")
-        for metric in self._data['metrics']:
-            node = self._data['metrics'][metric]
-            node['values'] = list(re.findall(node['key'], raw_output))
+        for name in self._data['metrics'].keys():
+            node = self._data['metrics'][name]
+            
+            try:
+                ens = set if node['attributes']['unique'] else list
+            except KeyError:
+                ens = list
+            
+            self._data['metrics'][name]['values'] = list(ens(re.findall(node['key'], raw_output)))
 
     def evaluate(self):
         """TODO:
@@ -380,8 +390,12 @@ class Test:
                     break
 
         if state == Test.State.SUCCESS and self._validation['analysis'] is not None:
-            analysis_name = self._validation['analysis']
-            MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.TEST_RESULT_EVAL)
+            analysis = self._validation['analysis']
+            args = self._validation.get('args', {})
+            s = MetaConfig.root.get_internal("pColl").invoke_plugins(
+                Plugin.Step.TEST_RESULT_EVAL, analysis=analysis, job=self)
+            if s is not None:
+                state = s
             
 
         # if a custom script is provided
@@ -452,6 +466,12 @@ class Test:
         :rtype: :class:`Test.State`
         """
         return self._state
+    
+    @property
+    def time(self):
+        """TODO:
+        """
+        return self._exectime
 
     def to_json(self, strstate=False):
         """Serialize the whole Test as a JSON object.

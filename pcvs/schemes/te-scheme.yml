@@ -190,6 +190,15 @@ patternProperties:
                     type: boolean
                 additionalProperties: false
             additionalProperties: false
+          analysis:
+            type: object
+            properties:
+              method: {type: string}
+              args:
+                type: object
+                patternProperties:
+                  "^.*$":
+                    OneOf: [{type: string}, {type: int}, {type: float}]
           script:
             type: object
             properties:
@@ -209,5 +218,10 @@ patternProperties:
             type: object
             properties:
               key: {type: string}
+              attributes:
+                type: object
+                properties:
+                  unique: {type: boolean}
+              values: {type: array}
       additionalProperties: false
     additionalProperties: false

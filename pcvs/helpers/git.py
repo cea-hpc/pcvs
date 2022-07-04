@@ -7,6 +7,8 @@ import hashlib
 import sh
 from datetime import datetime
 from abc import ABC, abstractmethod, abstractproperty
+from pcvs.helpers import utils
+
 
 try:
     import pygit2
@@ -75,7 +77,6 @@ class GitByGeneric(ABC):
     
     def __init__(self, prefix=None, head="unknown/00000000"):
         self._path = None
-        self._lck = False
         self._lockname = ""
         self._lockfd = None
         self._authname = None
@@ -96,45 +97,31 @@ class GitByGeneric(ABC):
         
         (implies locking the directory).
         """
-        assert(not self._lck)
         self._path = prefix
-        self._lck = False
-        self._lockname = os.path.join(prefix, ".pcvs.lock")
+        self._lockname = os.path.join(prefix, ".pcvs")
         
     def _trylock(self):
         """
         Lock the current repository (NON-BLOCKING)
         """
-        if not self._lockfd:
-            self._lockfd = open(self._lockname, "w+")
-            self._lck = False
-            
-        try:
-            fcntl.flock(self._lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            self._lck = True
-        except BlockingIOError:
-            self._lck = False
-        return self._lck
+        return utils.trylock_file(self._lockname)
+       
         
     def _lock(self):
         """
         Lock the current reposiotry (BLOCKING)
         """
-        while not self._lck:
-            if not self._trylock():
-                time.sleep(1)
+        return utils.lock_file(self._lockname)
     
     def _unlock(self):
         """
         Unlock the current repository.
         """
-        if self._lck:
-            self._lck = False
-            fcntl.flock(self._lockfd, fcntl.LOCK_UN)
+        utils.unlock_file(self._lockname)
     
     def _is_locked(self):
         """Locked repo checker"""
-        return self._lck is True
+        utils.is_locked(self._lockname)
             
     def set_identity(self, authname, authmail, commname, commmail):
         """Identities to be used if a commit is created."""
