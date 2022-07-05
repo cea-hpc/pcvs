@@ -1,5 +1,6 @@
 import pcvs
 import subprocess
+from pcvs import testing
 from pcvs.testing.testfile import TestFile
 from pcvs.helpers.system import MetaDict
 from pcvs.helpers import utils
@@ -34,7 +35,7 @@ def generate_from_variants(package, label, prefix):
             "path_resolution": False,
             }
 
-    _, src, _, build = utils.generate_local_variables(label, prefix)
+    _, src, _, build = testing.generate_local_variables(label, prefix)
 
     t = TestFile(file_in=src, path_out=build, data=data, label=label, prefix=prefix)
     t.process()

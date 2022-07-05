@@ -84,12 +84,11 @@ class Collection:
     def register_default_plugins(self):
         """Detect plugins stored in default places."""
         try:
+            self.register_plugin_by_package("pcvs.plugins.default", activate=True)
+                
             self.register_plugin_by_package('pcvs-contrib')
-            pkg = importlib.import_module("pcvs.plugins.default")
-            for mod in pkg.__all__:
-                self.register_plugin_by_module(mod, activate=True)
+            
         except:
-            raise
             log.manager.info(
                 "No pcvs-contrib package found for plugin autoloading")
 
@@ -227,12 +226,11 @@ class Collection:
         :type pkgname: str
         :raises PluginException.LoadError: Error while importing the package
         """
-        mod = __import__(pkgname)
+        mod = importlib.import_module(pkgname)
 
-        for _, name, ispkg in pkgutil.iter_modules(mod.__path__, mod.__name__ + "."):
-            if not ispkg:
-                try:
-                    submod = importlib.import_module(name)
-                    self.register_plugin_by_module(submod, activate)
-                except Exception as e:
-                    raise PluginException.LoadError(name)
+        for _, name, _ in pkgutil.iter_modules(mod.__path__, mod.__name__ + "."):
+            try:
+                submod = importlib.import_module(name)
+                self.register_plugin_by_module(submod, activate)
+            except Exception as e:
+                raise PluginException.LoadError(name)

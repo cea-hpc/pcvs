@@ -7,7 +7,7 @@ from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.testing.test import Test
-
+from pcvs import testing
 
 def detect_source_lang(array_of_files):
     """Determine compilation language for a target file (or list of files).
@@ -172,7 +172,7 @@ class TEDescriptor:
         self._te_label = label
         self._te_subtree = subprefix
 
-        _, self._srcdir, _, self._buildir = utils.generate_local_variables(
+        _, self._srcdir, _, self._buildir = testing.generate_local_variables(
             label,
             subprefix
         )

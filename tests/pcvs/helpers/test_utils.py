@@ -58,22 +58,6 @@ def test_cwd_manager(wd_dir):
         "dirs": {'LABEL1': '/prefix1', 'LABEL2': "/prefix2"}
 }}))
 
-def test_generate_local_variables():
-    bs, cs, bb, cb = tested.generate_local_variables("LABEL1", "B/C/D/E")
-    assert(bs == "/prefix1")
-    assert(cs == "/prefix1/B/C/D/E")
-    assert(bb == "/prefix_build/test_suite/LABEL1")
-    assert(cb == "/prefix_build/test_suite/LABEL1/B/C/D/E")
-
-    bs, cs, bb, cb = tested.generate_local_variables("LABEL2", "")
-    assert(bs  == "/prefix2")
-    assert(cs  == "/prefix2/")
-    assert(bb == "/prefix_build/test_suite/LABEL2")
-    assert(cb == "/prefix_build/test_suite/LABEL2/")
-
-    with pytest.raises(CommonException.NotFoundError):
-        tested.generate_local_variables("LABEL_NOT_FOUND", "")
-
 @pytest.mark.parametrize("program", ["ls", "/bin/sh"])
 def test_check_program(program):
     class Success(Exception): pass

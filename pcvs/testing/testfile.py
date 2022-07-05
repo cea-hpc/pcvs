@@ -14,7 +14,7 @@ from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
 from pcvs.testing import tedesc
-
+from pcvs import testing
 
 def __load_yaml_file_legacy(f):
     """Legacy version to load a YAML file.
@@ -175,14 +175,14 @@ class TestFile:
         :param data: the YAML-formatted input stream.
         :type data: YAMl-formatted str
         """
-        source, _, build, _ = utils.generate_local_variables(
+        source, _, build, _ = testing.generate_local_variables(
             self._label, self._prefix)
         stream = replace_special_token(data, source, build, self._prefix)
         self._raw = YAML(typ='safe').load(stream)
 
     def process(self):
         """Load the YAML file and map YAML nodes to Test()."""
-        src, _, build, _ = utils.generate_local_variables(
+        src, _, build, _ = testing.generate_local_variables(
             self._label,
             self._prefix)
 

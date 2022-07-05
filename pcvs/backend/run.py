@@ -18,6 +18,7 @@ from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
 from pcvs.plugins import Plugin
+from pcvs import testing
 from pcvs.testing.tedesc import TEDescriptor
 from pcvs.testing.testfile import TestFile, load_yaml_file
 
@@ -360,12 +361,12 @@ def process_spack():
     path = "/spack"
     MetaConfig.root.validation.dirs[label] = path
     
-    _, _, rbuild, _ = utils.generate_local_variables(label, '')
+    _, _, rbuild, _ = testing.generate_local_variables(label, '')
     utils.create_or_clean_path(rbuild, dir=True)
 
     with log.progbar(MetaConfig.root.validation.spack_recipe) as itbar:
         for spec in itbar:
-            _, _, _, cbuild = utils.generate_local_variables(label, spec)
+            _, _, _, cbuild = testing.generate_local_variables(label, spec)
             utils.create_or_clean_path(cbuild, dir=True)
             pvSpack.generate_from_variants(spec, label, spec)
 
@@ -434,7 +435,7 @@ def process_dyn_setup_scripts(setup_files):
     with log.progbar(setup_files, print_func=print_progbar_walker) as itbar:
         for label, subprefix, fname in itbar:
             log.manager.debug("process {} ({})".format(subprefix, label))
-            base_src, cur_src, base_build, cur_build = utils.generate_local_variables(
+            base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
                 label, subprefix)
 
             # prepre to exec pcvs.setup script
@@ -508,7 +509,7 @@ def process_static_yaml_files(yaml_files):
     log.manager.info("Iteration over files")
     with log.progbar(yaml_files, print_func=print_progbar_walker) as iterbar:
         for label, subprefix, fname in iterbar:
-            _, cur_src, _, cur_build = utils.generate_local_variables(
+            _, cur_src, _, cur_build = testing.generate_local_variables(
                 label, subprefix)
             if not os.path.isdir(cur_build):
                 os.makedirs(cur_build)
