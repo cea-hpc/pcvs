@@ -366,11 +366,25 @@ def get_lock_owner(f):
 
 
 def program_timeout(sig, frame):
+    """Timeout handler, called when a SIGALRM is received.
+    
+    :param sig: signal number
+    :type sig: int
+    :param frame: the callee (unused)
+    :type f: 
+    :raises CommonException.TimeoutError: timeout is reached
+    """
     assert(sig == signal.SIGALRM)
     raise CommonException.TimeoutError("Timeout reached")
 
 
 def start_autokill(timeout=None):
+    """Initialize a new time to automatically stop the 
+    current process once time is expired.
+    
+    :param timeout: value in seconds before the autokill will be raised
+    :type timeout: positive integer
+    """
     if isinstance(timeout, int):
         log.manager.print_item(
             "Setting timeout to {} second(s)".format(timeout))
@@ -380,6 +394,10 @@ def start_autokill(timeout=None):
 
 
 class Program:
+    """Simple class to encapsulate process management.
+    
+    This is better and should be preferred as importing subprocess everywhere.
+    """
     def __init__(self, cmd=None):
         self._cmd = cmd
         self._out = None
@@ -387,6 +405,18 @@ class Program:
         self._except = None
 
     def run(self, input="", shell=False, timeout=0):
+        """Run the given program and capture I/Os
+        
+        :param input: raw data to be used as stdin
+        :type input: str
+        :param shell: is the provided command to be run within a shell
+        :type shell: boolean
+        :param timeout: allowed time before automatically killing the process
+        :type timeout: positive integer
+        :return: zero if the process started successfully, non-zero
+            otherwise.
+        :rtype: integer
+        """
         try:
             s = subprocess.Popen(self._cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self._out = s.communicate(input=input)
@@ -398,12 +428,27 @@ class Program:
 
     @property
     def out(self):
+        """Getter to actual execution output.
+        
+        :return: stderr/stdout combined
+        :rtype: str
+        """
         return self._out
 
     @property
     def rc(self):
+        """Getter, effective return code.
+        
+        :return: return code
+        :rtype: integer
+        """
         return self._rc
 
     @property
     def exception(self):
+        """Getter, raised exception (for any reason)
+        
+        :return: an Exception-derived object
+        :rtype: Exception
+        """
         return self._except

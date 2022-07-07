@@ -17,7 +17,12 @@ except ModuleNotFoundError as e:
     has_pygit2 = False
 
 def elect_handler(prefix=None):
-    """TODO:
+    """Select the proper repository handler based on python support
+    
+    Python 3.7+-based PCVS installations come with pygit2, thanks to provided
+    wheels. Older versions are relying on regular Git commands (as wheels are
+    not provided for Python3.6 and older & building pygit2 requires specific
+    libgit2 version to be installed, hardening the installation process)
     """
     if has_pygit2:
         git_handle = GitByAPI(prefix)
@@ -28,29 +33,38 @@ def elect_handler(prefix=None):
 
 
 class Reference:
+    """Maps an object which can be "pointed" (as a Git semantic). It can usually
+    be used to refer a commit, a simple hash or a branch. """
     def __init__(self, repo):
         self._repo = repo
         
     @property
     def repo(self):
+        """Getter to the repo this reference comes from."""
         return self._repo
 
 
 class Branch(Reference):
+    """Maps to a regular Git branch."""
     def __init__(self, repo, name='master'):
         super().__init__(repo)
         self.name = name
 
 class Commit(Reference):
+    """Maps to a regular Git commit"""
     def __init__(self, repo, obj, metadata={}):
         super().__init__(repo)
         self.cid = obj
         self.meta = metadata
     
     def get_info(self):
+        """Return commit metadata stored as a dict.
+        
+        It may contains extra infos compared to what a commit usually contains"""
         return self.meta
 
 class Tree(Reference):
+    """Maps to a git-lowlevel Tree object"""
     def __init__(self, repo, id, prefix='', children=[]):
         super().__init__(repo)
         self.tid = id
@@ -59,20 +73,42 @@ class Tree(Reference):
     
     @classmethod
     def as_root(self, repo, hdl, children=[]):
+        """Create a Tree and attach it with the git-specific handler (if any)
+
+        :param repo: the repo handle
+        :type repo: any
+        :param hdl: the git-specific root handle
+        :type hdl: any
+        :param children: any prebuild children for this root node
+        :type children: any
+        :return: the created Tree object
+        :rtype: Tree
+        """
         self.hdl = hdl
         return self(repo=repo, id=None, prefix='', children=children)
 
 class Blob(Tree):
+    """Maps a Git 'blob' object, dedicated to hold data ("leaves" in Git trees)"""
     def __init__(self, repo, id, prefix='', data=''):
         super().__init__(repo, id, prefix, children=[])
         self.data = data
     
     def __str__(self):
+        """Stringify data contained in blob.
+        
+        :returns: the decoded data
+        :rtype: bytes
+        """
         return self.data.decode()
 
 class GitByGeneric(ABC):
     """
     Create a Git endpoint able to discuss efficiently with repositories.
+    
+    This base classe serves abstract methods to be implemented to create a new
+    derived class. Currently are provided:
+    - GitByAPI: relies on python module pygit2 (requires libgit2)
+    - GitByCLI: based on regular Git program invocations (require git program)
     """
     
     def __init__(self, prefix=None, head="unknown/00000000"):
@@ -91,11 +127,21 @@ class GitByGeneric(ABC):
 
         self.set_identity(None, None, None, None)
 
+    @abstractmethod
+    def open(self, bare=True):
+        """Open the repo, with appropriate method.
+        
+        :param bare: true by default, manage or bare repo.
+        :type bare: boolean
+        """
+        pass
+
     def set_path(self, prefix):
         """
         Associate a new directory to this bank.
         
-        (implies locking the directory).
+        :param prefix: the prefix locating the Git repo
+        :type prefix: str
         """
         self._path = prefix
         self._lockname = os.path.join(prefix, ".pcvs")
@@ -103,6 +149,9 @@ class GitByGeneric(ABC):
     def _trylock(self):
         """
         Lock the current repository (NON-BLOCKING)
+        
+        :return: true if the file is locked, false otherwise
+        :rtype: boolean
         """
         return utils.trylock_file(self._lockname)
        
@@ -110,6 +159,9 @@ class GitByGeneric(ABC):
     def _lock(self):
         """
         Lock the current reposiotry (BLOCKING)
+        
+        :return: true if the file is locked, false otherwise
+        :rtype: boolean
         """
         return utils.lock_file(self._lockname)
     
@@ -120,18 +172,36 @@ class GitByGeneric(ABC):
         utils.unlock_file(self._lockname)
     
     def _is_locked(self):
-        """Locked repo checker"""
+        """Locked repo checker
+        
+        :return: true if the file is locked, false otherwise
+        :rtype: boolean
+        """
         utils.is_locked(self._lockname)
             
     def set_identity(self, authname, authmail, commname, commmail):
-        """Identities to be used if a commit is created."""
+        """Identities to be used if a commit is created.
+        
+        :param authname: author's name
+        :type authname: str
+        :param authmail: author's email
+        :type authmail: str
+        :param commname: Committer's name
+        :type commname: str
+        :param commmail: Committer's email
+        :type commmail: str
+        """
         self._authname = authname if authname else get_current_username()
         self._authmail = authmail if authmail else get_current_usermail()
         self._commname = commname if commname else get_current_username()
         self._commmail = commmail if commmail else get_current_usermail()
     
     def get_head(self):
-        """Get the current HEAD (used when no default)"""
+        """Get the current repo's HEAD (used when no default)
+        
+        :returns: a ref to the HEAD as a branch
+        :rtype: Branch
+        """
         return self._head
     
     def set_head(self, new_head):
@@ -142,6 +212,8 @@ class GitByGeneric(ABC):
     def branches(self):
         """
         Returns the list of available local branche names from this repo.
+    
+        This is an abstract function as its behavior depends on derived classes.
         """
         pass
     
@@ -182,21 +254,90 @@ class GitByGeneric(ABC):
         """
         pass
     @abstractmethod
-    def list_commits(self, rev, since, until): pass
+    def list_commits(self, rev, since, until): 
+        """List past commits finishing with 'rev'.
+        
+        The list can be shrunk with a start & end
+        
+        :param rev: the revision to extract commit from
+        :typ rev: any
+        :param since: the oldest commit should be newer than this date
+        :type since: date
+        :param until: the newest commit should be older than this date
+        :type until: date
+        """
+        pass
+    
     @abstractmethod
-    def commit(self, id): pass
+    def commit(self, tree, msg="No data", timestamp=None, parent=None, orphan=False):
+        """Create a commit from changes.
+        
+        :param tree: the changes tree to store as a commit
+        :type tree: any
+        :param msg: the commit msg
+        :type msg: str
+        :timestamp: a commit date (current if not provided)
+        :type: int
+        :param parent: the parent commit
+        :type parent: any
+        :param orphan: flag to create a dangling commit (=no-parent)
+        :type orphan: boolean
+        """
+        pass
+
     @abstractmethod
-    def revparse(self, rev): pass
+    def revparse(self, rev):
+        """
+        Convert a revision (tag, branch, commit) to a regular reference.
+        
+        :param rev: Reference
+        :type rev: Reference
+        """
+        pass
+    
     @abstractmethod
-    def iterate_over(self, ref): pass
+    def iterate_over(self, ref):
+        """starting from the ref, iterate references backwards (from newest to
+        oldest).
+        
+        :param ref: the starting point
+        :type ref: Reference
+        """
+        pass
+    
     @abstractmethod
-    def list_files(self, rev): pass
+    def list_files(self, rev):
+        """For a given revision, list files (not only changed ones).
+        
+        :param rev: the revision
+        :type rev: Reference
+        """
+        pass
+    
     @abstractmethod
-    def gc(self): pass
+    def gc(self):
+        """Run the garbage collector"""
+        pass
+    
     @abstractmethod
-    def get_parents(self): pass
+    def get_parents(self, ref):
+        """Retrieve parents for a given ref.
+        
+        This method is not a part of a Reference object as the approach changes
+        depending on the Git method used (lazy resolution).
+        
+        :param ref: the revision
+        :type ref: Reference
+        """
+        pass
     
     def _set_or_head(self, rev):
+        """Return a valid revision to be used
+        
+        If rev is not set, return the default HEAD repo.
+        
+        :param rev: the revision to use or replace if not set
+        :type rev: Reference"""
         return rev if rev else self._head
 
 
@@ -505,7 +646,7 @@ class GitByCLI(GitByGeneric):
                 obj=elt
             )
         
-    def open(self):
+    def open(self, bare=True):
         if not os.path.isdir(self._path):
             os.makedirs(self._path)
         
