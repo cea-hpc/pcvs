@@ -329,7 +329,7 @@ class TEDescriptor:
         self._build.sources.binary = binary
 
         command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
-            cc=MetaConfig.root.compiler.commands.get(lang, 'echo'),
+            cc=MetaConfig.root.compiler.commands.get(lang, ''),
             var=prepare_cmd_build_variants(self._build.variants),
             cflags=self._build.get('cflags', ''),
             files=" ".join(self._build.files),
@@ -565,7 +565,7 @@ class TEDescriptor:
                 )
             if self.get_run_attr('command_wrap', True) is True:
                 command = "{runtime} {runtime_args} {args} {cmd}".format(
-                    runtime=MetaConfig.root.runtime.program,
+                    runtime=MetaConfig.root.runtime.get('program', ''),
                     runtime_args=MetaConfig.root.runtime.get('args', ''),
                     args=" ".join(args),
                     cmd=command
@@ -613,7 +613,6 @@ class TEDescriptor:
                 self._serie = Serie({**self._program_criterion})
             else:
                 self._serie = Serie({**self._criterion, **self._program_criterion})
-            
             yield from self.__construct_runtime_tests()
             del self._serie
 

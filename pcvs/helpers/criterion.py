@@ -58,9 +58,11 @@ class Combination:
         string = list()
         # each combination is built following: 'defined-prefix+value'
         for n in sorted(self._combination.keys()):
-            if c[n].subtitle is None:
-                continue
-            string.append(c[n].subtitle +
+            subtitle = c[n].subtitle
+            if subtitle is None:
+                subtitle = "{}".format(n)
+                
+            string.append(subtitle +
                           str(self._combination[n]).replace(" ", "-"))
         return "_".join(string)
 
@@ -132,7 +134,6 @@ class Serie:
         """Generator to build each combination"""
         for combination in itertools.product(*self._values):
             d = {self._keys[i]: val for i, val in enumerate(combination)}
-    
             if not valid_combination(d):
                 continue
             yield Combination(
@@ -398,33 +399,35 @@ def initialize_from_system():
 
     TODO: Move this function elsewhere."""
     # sanity checks
-    assert (MetaConfig.root.criterion.iterators)
-    # raw YAML objects
-    runtime_iterators = MetaConfig.root.runtime.iterators
-    criterion_iterators = MetaConfig.root.criterion.iterators
-    it_to_remove = []
+    if not MetaConfig.root.criterion:
+        MetaConfig.root.set_internal('crit_obj', {})
+    else:
+        # raw YAML objects
+        runtime_iterators = MetaConfig.root.runtime.iterators
+        criterion_iterators = MetaConfig.root.criterion.iterators
+        it_to_remove = []
 
-    # if a criterion defined in criterion.yaml but
-    # not declared as part of a runtime, the criterion
-    # should be silently discarded
-    # here is the purpose
-    for it in criterion_iterators.keys():
-        if it not in runtime_iterators:
-            log.manager.warn("Undeclared criterion "
-                             "as part of runtime: '{}' ".format(it))
-        elif criterion_iterators[it]['values'] is None:
-            log.manager.debug('No combination found for {},'
-                              ' removing from schedule'.format(it))
-        else:
-            continue
+        # if a criterion defined in criterion.yaml but
+        # not declared as part of a runtime, the criterion
+        # should be silently discarded
+        # here is the purpose
+        for it in criterion_iterators.keys():
+            if it not in runtime_iterators:
+                log.manager.warn("Undeclared criterion "
+                                "as part of runtime: '{}' ".format(it))
+            elif criterion_iterators[it]['values'] is None:
+                log.manager.debug('No combination found for {},'
+                                ' removing from schedule'.format(it))
+            else:
+                continue
 
-        log.manager.info("Removing '{}'".format(it))
-        it_to_remove.append(it)
+            log.manager.info("Removing '{}'".format(it))
+            it_to_remove.append(it)
 
-    # register the new dict {criterion_name: Criterion object}
-    # the criterion object gathers both information from runtime & criterion
-    MetaConfig.root.set_internal('crit_obj', {k: Criterion(
-        k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove})
+        # register the new dict {criterion_name: Criterion object}
+        # the criterion object gathers both information from runtime & criterion
+        MetaConfig.root.set_internal('crit_obj', {k: Criterion(
+            k, {**runtime_iterators[k], **criterion_iterators[k]}) for k in criterion_iterators.keys() if k not in it_to_remove})
 
     # convert any sequence into valid range of integers for
 

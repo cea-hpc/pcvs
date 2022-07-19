@@ -257,6 +257,8 @@ class Manager:
                 job.extract_metrics()
                 job.evaluate()
                 job.display()
+                if self._comman:
+                    self._comman.send(job)
                 self._count.executed += 1
                 self._count[job.state] += 1
                 self._publisher.add(job.to_json())

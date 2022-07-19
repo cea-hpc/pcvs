@@ -251,8 +251,6 @@ def prepare():
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
 
-    log.manager.print_item("Init the global Orchestrator")
-    MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
     if valcfg.enable_report:
         log.manager.print_section("Connection to the Reporting Server")
@@ -265,6 +263,9 @@ def prepare():
                 valcfg.sid, valcfg.report_addr)
             log.manager.print_item("Listening on {}".format(comman.endpoint))
         MetaConfig.root.set_internal('comman', comman)
+
+    log.manager.print_item("Init the global Orchestrator")
+    MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
     log.manager.print_item("Save Configurations into {}".format(valcfg.output))
     conf_file = os.path.join(valcfg.output, NAME_BUILD_CONF_FN)

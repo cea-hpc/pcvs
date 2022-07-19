@@ -93,7 +93,7 @@ def handle_build_lockfile(exc=None):
         prefix = os.path.join(
             system.MetaConfig.root.validation.output, NAME_BUILDFILE)
         if utils.is_locked(prefix):
-            if utils.get_lock_owner(prefix) == os.getpid():
+            if utils.get_lock_owner(prefix)[1] == os.getpid():
                 utils.unlock_file(prefix)
 
     if exc:

@@ -62,16 +62,21 @@ def get_logged_output(prefix, testname):
     resdir = os.path.join(
                     utils.find_buildir_from_prefix(prefix),
                     pcvs.NAME_BUILD_RESDIR)
+    s = ""
     if os.path.isdir(resdir):
         for f in os.listdir(resdir):
             
             with open(os.path.join(resdir, f), 'r') as fh:
-                
                 data = json.load(fh)
                 for job in data['tests']:
                     if job['id']['fq_name'].startswith(testname):
-                        return base64.b64decode(job['result']['output']).decode('utf-8')
-    return "No test named '{}' found here.".format(testname)
+                        s += "\n#################\n### Found test-name: {}\n{}#################\n".format(
+                            job['id']['fq_name'],
+                            base64.b64decode(job['result']['output']).decode('utf-8'))
+    if not s:
+        s = "No test named '{}' found here.".format(testname)
+        
+    return s 
     
 
 def process_check_configs():
