@@ -186,7 +186,7 @@ class DataRepresentation:
         :return: number of tags
         :rtype: int
         """
-        return len(self.rootree[sid]['tags'].keys())
+        return len(self.rootree[sid]['tags']['__elems'].keys())
 
     def get_label_cnt(self, sid):
         """Get the number of labels for a given session.
@@ -196,7 +196,7 @@ class DataRepresentation:
         :return: number of labels
         :rtype: int
         """
-        return len(self.rootree[sid]["fs-tree"].keys())
+        return len(self.rootree[sid]["fs-tree"]['__elems'].keys())
 
     def get_test_cnt(self, sid):
         """Get the numbe rof tests for a given session.
