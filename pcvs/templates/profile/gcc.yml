@@ -1,0 +1,3 @@
+compiler:
+  commands: {cc: gcc, cxx: g++, f77: gfortran, f90: gfortran, fc: gfortran}
+machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
