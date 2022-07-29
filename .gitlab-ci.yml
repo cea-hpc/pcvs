@@ -83,6 +83,12 @@ pip:
     - pip3 install .
     - pcvs
 
+Python3.5:
+    extends: .pytest
+    image: "python:3.5"
+Python3.6:
+    extends: .pytest
+    image: "python:3.6"
 Python3.7:
     extends: .pytest
     image: "python:3.7"
