@@ -4,7 +4,7 @@ import os
 from pcvs import NAME_BUILD_RESDIR
 from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.plugins import Plugin
-
+    
 
 class Publisher:
     """Manage result publication and storage on disk.
@@ -29,7 +29,8 @@ class Publisher:
     """
     scheme = None
     increment = 0
-    fn_fmt = "pcvs_rawdat{:>04d}.json"
+    fn_fmt = "pcvs_rawdat{:>04d}"
+    fn_ext = ".json"
 
     def __init__(self, prefix=None):
         """constructor method.
@@ -91,15 +92,18 @@ class Publisher:
         if len(self._layout['tests']) <= 0:
             return
 
-        filename = os.path.join(
+        filename_prefix = os.path.join(
             self._destpath, self.fn_fmt.format(Publisher.increment))
-        assert(not os.path.isfile(filename))
+        json_file = filename_prefix + self.fn_ext
+        
+        assert(not os.path.isfile(json_file))
 
         Publisher.increment += 1
 
-        with open(filename, 'w+') as fh:
+        MetaConfig.root.get_internal('pColl').invoke_plugins(
+            Plugin.Step.SCHED_PUBLISH_WRITE, data=self._layout, outfile=filename_prefix)
+
+        with open(json_file, 'w+') as fh:
             json.dump(self._layout, fh)
             self.empty_entries()
 
-        MetaConfig.root.get_internal('pColl').invoke_plugins(
-            Plugin.Step.SCHED_PUBLISH_BEFORE)

@@ -43,6 +43,7 @@ class Plugin:
         SCHED_SET_AFTER = enum.auto(),
         TEST_RESULT_EVAL = enum.auto(),
         SCHED_PUBLISH_BEFORE = enum.auto(),
+        SCHED_PUBLISH_WRITE = enum.auto(),
         SCHED_PUBLISH_AFTER = enum.auto(),
         SCHED_AFTER = enum.auto(),
         END_BEFORE = enum.auto(),
@@ -100,7 +101,7 @@ class Collection:
         :type name: str"""
         for step, plugins in self._plugins.items():
             for p in plugins:
-                if name == type(p).__name__:
+                if name.lower() == type(p).__name__.lower():
                     log.manager.debug("Activate {}".format(name))
                     if self._enabled[p.step]:
                         log.manager.debug(
