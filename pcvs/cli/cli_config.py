@@ -259,11 +259,8 @@ def config_destroy(ctx, token) -> None:
                 shell_complete=compl_list_token)
 @click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
               help="runtime-only: edit plugin code instead of config file")
-@click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
-              default=None, type=str,
-              help="Open file with EDITOR")
 @click.pass_context
-def config_edit(ctx, token, editor, edit_plugin) -> None:
+def config_edit(ctx, token, edit_plugin) -> None:
     """
     Open the file with $EDITOR for direct modifications. The configuration is
     then validated to ensure consistency.
@@ -276,9 +273,9 @@ def config_edit(ctx, token, editor, edit_plugin) -> None:
     block = pvConfig.ConfigurationBlock(kind, label, scope)
     if block.is_found():
         if edit_plugin:
-            block.edit_plugin(editor)
+            block.edit_plugin()
         else:
-            block.edit(editor)
+            block.edit()
     else:
         raise click.BadArgumentUsage(
             "Cannot open this configuration: does not exist!")

@@ -298,7 +298,7 @@ class Profile:
             for k, v in self._details.items():
                 log.manager.print_item("{}: {}".format(k, v))
 
-    def edit(self, e=None):
+    def edit(self):
         """Open the editor to manipulate profile content.
 
         :param e: an editor program to use instead of defaults
@@ -321,7 +321,7 @@ class Profile:
             stream = fh.read()
 
         edited_stream = click.edit(
-            stream, editor=e, extension=".yml", require_save=True)
+            stream, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
                 edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
@@ -335,7 +335,7 @@ class Profile:
                 raise e
             self.flush_to_disk()
 
-    def edit_plugin(self, e=None):
+    def edit_plugin(self):
         """Edit the 'runtime.plugin' section of the current profile.
 
         :param e: an editor program to use instead of defaults
@@ -371,7 +371,7 @@ class MyPlugin(Plugin):
 """
         try:
             edited_code = click.edit(
-                plugin_code, editor=e, extension=".py", require_save=True)
+                plugin_code, extension=".py", require_save=True)
             if edited_code is not None:
                 self._details['runtime']['plugin'] = base64.b64encode(
                     edited_code.encode('utf-8'))

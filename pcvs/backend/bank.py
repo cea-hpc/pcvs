@@ -139,7 +139,7 @@ class Bank(dsl.Bank):
         """
         return str({self._name: self._path})
 
-    def show(self) -> None:
+    def show(self, stringify=False) -> None:
         """Print the bank on stdout.
 
         .. note::
@@ -152,7 +152,10 @@ class Bank(dsl.Bank):
             for s in series:
                 string.append("  * {}: {} run(s)".format(s.name, len(s)))
 
-        print("\n".join(string))
+        if stringify:
+            return "\n".join(string)
+        else:
+            print("\n".join(string))
 
     def __del__(self) -> None:
         """Close the bank."""

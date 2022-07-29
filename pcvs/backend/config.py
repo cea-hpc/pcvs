@@ -319,7 +319,7 @@ class ConfigurationBlock:
         for k, v in self._details.items():
             log.manager.print_item("{}: {}".format(k, v))
 
-    def edit(self, e=None) -> None:
+    def edit(self) -> None:
         """Open the current block for edition.
 
         :raises Exception: Something occured on the edited version.
@@ -335,7 +335,7 @@ class ConfigurationBlock:
             stream = fh.read()
 
         edited_stream = click.edit(
-            stream, editor=e, extension=".yml", require_save=True)
+            stream, extension=".yml", require_save=True)
         if edited_stream is not None:
             try:
                 edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
@@ -349,7 +349,7 @@ class ConfigurationBlock:
                     fh.write(edited_stream)
                 raise e
 
-    def edit_plugin(self, e=None) -> None:
+    def edit_plugin(self) -> None:
         """Special case to handle 'plugin' key for 'runtime' blocks.
 
         This allows to edit a de-serialized version of the 'plugin' field. By
@@ -385,7 +385,7 @@ class MyPlugin(Plugin):
 """
 
         edited_code = click.edit(
-            plugin_code, editor=e, extension=".py", require_save=True)
+            plugin_code, extension=".py", require_save=True)
         if edited_code is not None:
             stream_yaml['plugin'] = base64.b64encode(
                 edited_code.encode('utf-8'))

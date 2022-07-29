@@ -299,12 +299,9 @@ def profile_destroy(ctx, token):
                 shell_complete=compl_list_token)
 @click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
               help="Only edit the plugin code ('runtime')")
-@click.option("-e", "--editor", "editor", envvar="EDITOR", show_envvar=True,
-              default=None, type=str,
-              help="Open file with EDITOR")
 @click.pass_context
 @log.manager.capture_exception(ValidationException.FormatError)
-def profile_edit(ctx, token, editor, edit_plugin):
+def profile_edit(ctx, token, edit_plugin):
     """Edit an existing profile with the given EDITOR. The '-p' option will open
     the decoded runtime plugin code stored as a base64 string into the profile
     for edition.
@@ -320,9 +317,9 @@ def profile_edit(ctx, token, editor, edit_plugin):
             raise click.BadArgumentUsage('Wrongly formatted profile token')
         else:
             if edit_plugin:
-                pf.edit_plugin(editor)
+                pf.edit_plugin()
             else:
-                pf.edit(editor)
+                pf.edit()
     else:
         raise click.BadArgumentUsage(
             "\n".join([

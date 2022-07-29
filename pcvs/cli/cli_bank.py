@@ -1,4 +1,5 @@
 import os
+import sys
 
 import click
 from click.shell_completion import CompletionItem
