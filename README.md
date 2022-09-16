@@ -25,6 +25,7 @@ A more detailed guide to install PCVS can be found in the appropriate
 documentation, here is a quick overview to set up and test the framework.
 
 .. code-block:: bash
+
 	# considering python3.5+
 	$ pip3 install -r requirements.txt
 	# for dev/testing purposes, use:
@@ -47,6 +48,8 @@ Multiple documentation can be generated from this repo:
   information than the content of each ``--help`` command.
 * The general documentation (readthedocs.io-formatted) through ``sphinx``, able
   to generate multiple formats:
+
+.. code-block:: bash
 
 	$ pip3 install -r requirements-dev.txt
 	$ make -C docs/source # will list available doc formats
