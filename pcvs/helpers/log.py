@@ -6,7 +6,9 @@ import textwrap
 import traceback
 
 import click
+from rich.progress import track
 
+from pcvs import io
 from pcvs.helpers import exceptions
 from pcvs.helpers.exceptions import CommonException
 
@@ -328,7 +330,7 @@ class IOManager:
         :return: fancy bullet character
         :rtype: char
         """
-        assert(k in self.glyphs.keys())
+        assert (k in self.glyphs.keys())
         return self.glyphs[k]
 
     def style(self, *args, **kwargs):
@@ -440,7 +442,7 @@ class IOManager:
     def debug(self, msg):
         """prints a debug message
         """
-        if(self._verbose >= 2):
+        if (self._verbose >= 2):
             if type(msg) != list:
                 msg = [msg]
             for elt in msg:
@@ -451,7 +453,7 @@ class IOManager:
     def info(self, msg):
         """prints an info message
         """
-        if(self._verbose >= 1):
+        if (self._verbose >= 1):
             if type(msg) != list:
                 msg = [msg]
             for elt in msg:
@@ -597,6 +599,8 @@ class IOManager:
 
 manager = IOManager()
 
+manager = io.console
+
 
 def init(v=0, e=False, l=100, quiet=False):
     """initializes a global manager for everyone to use
@@ -613,9 +617,10 @@ def init(v=0, e=False, l=100, quiet=False):
     """
     global manager
     manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
+    manager = io.console
 
 
-def progbar(it, print_func=None, man=None, **kargs):
+def progress_iter(it, man=None, **kwargs):
     """prints a progress bar using click
 
     :param it: iterable on which the progress bar has to iterate
@@ -630,9 +635,12 @@ def progbar(it, print_func=None, man=None, **kargs):
     """
     if man is None:
         man = manager
-    return click.progressbar(
-        it, empty_char=man.utf('empty_pg'),
-        info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
-        show_percent=False, show_eta=False, show_pos=False,
-        item_show_func=print_func,
-        **kargs)
+
+    return track(it, transient=True, console=io.console)
+
+    # return click.progressbar(
+    #    it, empty_char=man.utf('empty_pg'),
+    #    info_sep=man.utf('sep_v'), fill_char=man.utf('full_pg'),
+    #    show_percent=False, show_eta=False, show_pos=False,
+    #    item_show_func=print_func,
+    #    **kargs)

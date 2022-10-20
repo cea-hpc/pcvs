@@ -1,6 +1,7 @@
 import os
-from pcvs.helpers.system import MetaConfig
+
 from pcvs.helpers.exceptions import CommonException
+from pcvs.helpers.system import MetaConfig
 
 
 def generate_local_variables(label, subprefix):

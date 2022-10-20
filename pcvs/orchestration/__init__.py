@@ -1,5 +1,6 @@
 import queue
 
+from pcvs import io
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
@@ -85,49 +86,51 @@ class Orchestrator:
         last_progress = 0
         log.manager.info("ORCH: start job scheduling")
         # While some jobs are available to run
-        while self._manager.get_leftjob_count() > 0 or not self._ready_q.empty():
-            # dummy init value
-            new_set: Set = not None
-            while new_set is not None:
-                # create a new set, if not possible, returns None
-                new_set = self._manager.create_subset(nb_nodes)
-                if new_set is not None:
-                    # schedule the set asynchronously
-                    nb_nodes -= new_set.dim
-                    log.manager.debug("ORCH: send Set to queue (#{}, sz:{})".format(new_set.id, new_set.size))
-                    self._ready_q.put(new_set)
+        with io.console.table_container(self._manager.get_count()):
+            while self._manager.get_leftjob_count() > 0 or not self._ready_q.empty():
+                # dummy init value
+                new_set: Set = not None
+                while new_set is not None:
+                    # create a new set, if not possible, returns None
+                    new_set = self._manager.create_subset(nb_nodes)
+                    if new_set is not None:
+                        # schedule the set asynchronously
+                        nb_nodes -= new_set.dim
+                        log.manager.debug("ORCH: send Set to queue (#{}, sz:{})".format(
+                            new_set.id, new_set.size))
+                        self._ready_q.put(new_set)
 
-            # Now, look for a completion
-            try:
-                set = self._complete_q.get(block=False, timeout=2)
-                log.manager.debug("ORCH: recv Set from queue (#{}, sz:{})".format(
+                # Now, look for a completion
+                try:
+                    set = self._complete_q.get(block=False, timeout=2)
+                    log.manager.debug("ORCH: recv Set from queue (#{}, sz:{})".format(
                         set.id, set.size))
-                nb_nodes += set.dim
-                self._manager.merge_subset(set)
-            except queue.Empty:
-                pass
-                # TODO: create backup to allow start/stop
+                    nb_nodes += set.dim
+                    self._manager.merge_subset(set)
+                except queue.Empty:
+                    pass
+                    # TODO: create backup to allow start/stop
 
-            current_progress = self._manager.get_count(
-                'executed') / self._manager.get_count('total')
+                current_progress = self._manager.get_count(
+                    'executed') / self._manager.get_count('total')
 
-            # Condition to trigger a dump of results
-            # info result file at a periodic step of 5% of
-            # the global workload
-            if (current_progress - last_progress) > 0.05:
-                # TODO: Publish results periodically
-                # 1. on file system
-                # 2. directly into the selected bank
-                log.manager.debug("ORCH: Flush a new progression file")
-                self._publisher.flush()
-                last_progress = current_progress
-                if the_session is not None:
-                    session.update_session_from_file(
-                        the_session.id, {'progress': current_progress * 100})
+                # Condition to trigger a dump of results
+                # info result file at a periodic step of 5% of
+                # the global workload
+                if (current_progress - last_progress) > 0.05:
+                    # TODO: Publish results periodically
+                    # 1. on file system
+                    # 2. directly into the selected bank
+                    log.manager.debug("ORCH: Flush a new progression file")
+                    self._publisher.flush()
+                    last_progress = current_progress
+                    if the_session is not None:
+                        session.update_session_from_file(
+                            the_session.id, {'progress': current_progress * 100})
 
         self._publisher.flush()
-        assert(self._manager.get_count('executed')
-               == self._manager.get_count('total'))
+        assert (self._manager.get_count('executed')
+                == self._manager.get_count('total'))
 
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_AFTER)

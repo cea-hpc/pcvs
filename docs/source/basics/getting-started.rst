@@ -135,7 +135,7 @@ Access the results
 Results are stored in ``$PWD/.pcvs-build/rawdata/*.json`` by default. the
 default output directory may be changed with `pcvs run --output`. JSON files can
 directly processed by this-party tools. The :download:`scheme
-<../../../pcvs/schemes/test-result-scheme.yml>` can be used to update the input
+<../../../src/pcvs/schemes/test-result-scheme.yml>` can be used to update the input
 parser with compliant output. Currently PCVS only provides specific JSON format.
 It is planned to support common validation format (like JUnit).
 

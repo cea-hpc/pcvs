@@ -10,7 +10,7 @@ from subprocess import CalledProcessError
 from ruamel.yaml import YAML
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
-                  NAME_BUILDIR, NAME_SRCDIR)
+                  NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR, io, testing)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
 from pcvs.helpers import communications, criterion, log, utils
@@ -18,7 +18,6 @@ from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
 from pcvs.plugins import Plugin
-from pcvs import testing
 from pcvs.testing.tedesc import TEDescriptor
 from pcvs.testing.testfile import TestFile, load_yaml_file
 
@@ -67,8 +66,6 @@ def display_summary(the_session):
 
     if cfg.target_bank:
         log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
-    log.manager.print_item("Verbosity: {}".format(
-        log.manager.get_verbosity_str().capitalize()))
     log.manager.print_section("User directories:")
     width = max([0] + [len(i) for i in cfg.dirs])
     for k, v in cfg.dirs.items():
@@ -84,10 +81,9 @@ def display_summary(the_session):
     MetaConfig.root.get_internal("orchestrator").print_infos()
 
     if cfg.simulated is True:
-        log.manager.warn([
-            "==============================================",
-            ">>>> DRY-RUN : TEST EXECUTION IS EMULATED <<<<",
-            "=============================================="])
+        log.manager.print_box("\n".join([
+            "[red bold]DRY-RUN:[yellow] TEST EXECUTION IS [underline]EMULATED[/] <<<<",
+            "[yellow italic]>>>> Dry run enabled for setup checking purposes."]), title="WARNING")
 
 
 def stop_pending_jobs(exc=None):
@@ -150,7 +146,7 @@ def process_main_workflow(the_session=None):
     log.manager.print_header("Execution")
     run_rc = MetaConfig.root.get_internal('orchestrator').run(the_session)
     rc += run_rc if isinstance(run_rc, int) else 1
-    
+
     log.manager.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
@@ -250,7 +246,6 @@ def prepare():
     # this is set by the run configuration
     # TODO: replace resource here by the one read from config
     TEDescriptor.init_system_wide('n_node')
-
 
     if valcfg.enable_report:
         log.manager.print_section("Connection to the Reporting Server")
@@ -352,24 +347,26 @@ def process_files():
                         )
         raise RunException.TestUnfoldError("See previous errors above.")
 
+
 def process_spack():
-    
+
     if not shutil.which('spack'):
-        log.manager.warn("Unable to parse Spack recipes without having Spack in $PATH")
+        log.manager.warn(
+            "Unable to parse Spack recipes without having Spack in $PATH")
         return
     log.manager.print_item("Build test-bases from Spack recipes")
     label = "spack"
     path = "/spack"
     MetaConfig.root.validation.dirs[label] = path
-    
+
     _, _, rbuild, _ = testing.generate_local_variables(label, '')
     utils.create_or_clean_path(rbuild, dir=True)
 
-    with log.progbar(MetaConfig.root.validation.spack_recipe) as itbar:
-        for spec in itbar:
-            _, _, _, cbuild = testing.generate_local_variables(label, spec)
-            utils.create_or_clean_path(cbuild, dir=True)
-            pvSpack.generate_from_variants(spec, label, spec)
+    for spec in log.progress_iter(MetaConfig.root.validation.spack_recipe):
+        _, _, _, cbuild = testing.generate_local_variables(label, spec)
+        utils.create_or_clean_path(cbuild, dir=True)
+        pvSpack.generate_from_variants(spec, label, spec)
+
 
 def build_env_from_configuration(current_node, parent_prefix="pcvs"):
     """create a flat dict of variables mapping to the actual configuration.
@@ -433,68 +430,67 @@ def process_dyn_setup_scripts(setup_files):
         fh.close()
 
     log.manager.info("Iteration over files")
-    with log.progbar(setup_files, print_func=print_progbar_walker) as itbar:
-        for label, subprefix, fname in itbar:
-            log.manager.debug("process {} ({})".format(subprefix, label))
-            base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
-                label, subprefix)
+    for label, subprefix, fname in log.progress_iter(setup_files):
+        log.manager.debug("process {} ({})".format(subprefix, label))
+        base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
+            label, subprefix)
 
-            # prepre to exec pcvs.setup script
-            # 1. setup the env
-            env['pcvs_src'] = base_src
-            env['pcvs_testbuild'] = base_build
-            te_node = None
-            out_file = None
+        # prepre to exec pcvs.setup script
+        # 1. setup the env
+        env['pcvs_src'] = base_src
+        env['pcvs_testbuild'] = base_build
+        te_node = None
+        out_file = None
 
-            if not os.path.isdir(cur_build):
-                os.makedirs(cur_build)
+        if not os.path.isdir(cur_build):
+            os.makedirs(cur_build)
 
-            f = os.path.join(cur_src, fname)
+        f = os.path.join(cur_src, fname)
 
-            if not subprefix:
-                subprefix = ""
-            # Run the script
-            try:
-                fds = subprocess.Popen([f, subprefix], env=env,
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-                fdout, fderr = fds.communicate()
+        if not subprefix:
+            subprefix = ""
+        # Run the script
+        try:
+            fds = subprocess.Popen([f, subprefix], env=env,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+            fdout, fderr = fds.communicate()
 
-                if fds.returncode != 0:
-                    raise subprocess.CalledProcessError(fds.returncode, '')
+            if fds.returncode != 0:
+                raise subprocess.CalledProcessError(fds.returncode, '')
 
-                # flush the output to $BUILD/pcvs.yml
-                out_file = os.path.join(cur_build, 'pcvs.yml')
-                with open(out_file, 'w') as fh:
-                    fh.write(fdout.decode('utf-8'))
-                te_node = load_yaml_file(
-                    out_file, base_src, base_build, subprefix)
-            except CalledProcessError:
-                if fds.returncode != 0:
-                    err.append((f, "(exit {}): {}".format(
-                        fds.returncode, fderr.decode('utf-8'))))
-                    log.manager.info("EXEC FAILED: {}: {}".format(
-                        f, fderr.decode('utf-8')))
-                continue
+            # flush the output to $BUILD/pcvs.yml
+            out_file = os.path.join(cur_build, 'pcvs.yml')
+            with open(out_file, 'w') as fh:
+                fh.write(fdout.decode('utf-8'))
+            te_node = load_yaml_file(
+                out_file, base_src, base_build, subprefix)
+        except CalledProcessError:
+            if fds.returncode != 0:
+                err.append((f, "(exit {}): {}".format(
+                    fds.returncode, fderr.decode('utf-8'))))
+                log.manager.info("EXEC FAILED: {}: {}".format(
+                    f, fderr.decode('utf-8')))
+            continue
 
-            # If the script did not generate any output, skip
-            if te_node is None:  # empty file
-                continue
+        # If the script did not generate any output, skip
+        if te_node is None:  # empty file
+            continue
 
-            # Now create the file handler
-            MetaConfig.root.get_internal(
-                "pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
-            obj = TestFile(file_in=out_file,
-                           path_out=cur_build,
-                           data=te_node,
-                           label=label,
-                           prefix=subprefix
-                           )
-            obj.load_from_str(fdout.decode('utf-8'))
-            obj.process()
-            obj.flush_sh_file()
-            MetaConfig.root.get_internal(
-                "pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
+        # Now create the file handler
+        MetaConfig.root.get_internal(
+            "pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
+        obj = TestFile(file_in=out_file,
+                       path_out=cur_build,
+                       data=te_node,
+                       label=label,
+                       prefix=subprefix
+                       )
+        obj.load_from_str(fdout.decode('utf-8'))
+        obj.process()
+        obj.flush_sh_file()
+        MetaConfig.root.get_internal(
+            "pColl").invoke_plugins(Plugin.Step.TFILE_AFTER)
     return err
 
 
@@ -508,26 +504,25 @@ def process_static_yaml_files(yaml_files):
     """
     err = []
     log.manager.info("Iteration over files")
-    with log.progbar(yaml_files, print_func=print_progbar_walker) as iterbar:
-        for label, subprefix, fname in iterbar:
-            _, cur_src, _, cur_build = testing.generate_local_variables(
-                label, subprefix)
-            if not os.path.isdir(cur_build):
-                os.makedirs(cur_build)
-            f = os.path.join(cur_src, fname)
+    for label, subprefix, fname in log.progress_iter(yaml_files):
+        _, cur_src, _, cur_build = testing.generate_local_variables(
+            label, subprefix)
+        if not os.path.isdir(cur_build):
+            os.makedirs(cur_build)
+        f = os.path.join(cur_src, fname)
 
-            try:
-                obj = TestFile(file_in=f,
-                               path_out=cur_build,
-                               label=label,
-                               prefix=subprefix
-                               )
-                obj.process()
-                obj.flush_sh_file()
-            except Exception as e:
-                raise e
-                err.append((f, e))
-                log.manager.info("{} (failed to parse): {}".format(f, e))
+        try:
+            obj = TestFile(file_in=f,
+                           path_out=cur_build,
+                           label=label,
+                           prefix=subprefix
+                           )
+            obj.process()
+            obj.flush_sh_file()
+        except Exception as e:
+            raise e
+            err.append((f, e))
+            log.manager.info("{} (failed to parse): {}".format(f, e))
     return err
 
 
@@ -611,9 +606,10 @@ def terminate():
     outdir = MetaConfig.root.validation.output
 
     log.manager.print_section("Prepare results")
-
+    io.console.move_debug_file(outdir)
     save_for_export(os.path.join(outdir, NAME_BUILD_RESDIR))
     save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
+    save_for_export(os.path.join(outdir, NAME_DEBUG_FILE))
 
     if MetaConfig.root.validation.anonymize:
         log.manager.print_item("Anonymize data")

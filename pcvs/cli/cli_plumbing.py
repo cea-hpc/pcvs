@@ -1,9 +1,15 @@
 import sys
-import click 
-from pcvs.cli.cli_bank import compl_list_banks
+
 from pcvs.backend.bank import Bank
+from pcvs.cli.cli_bank import compl_list_banks
 from pcvs.dsl.analysis import ResolverAnalysis
 from pcvs.helpers.system import MetaConfig
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 @click.command(name="resolve", short_help="Resolve test status")
@@ -14,7 +20,7 @@ from pcvs.helpers.system import MetaConfig
               is_flag=False, help="read from file instead of stdin")
 @click.pass_context
 def resolve(ctx, file, bankname):
-    
+
     if file:
         with open(file, 'r') as fh:
             stream = fh.read().rstrip()
@@ -28,5 +34,5 @@ def resolve(ctx, file, bankname):
     bank = Bank(bankname)
 
     print(stream)
-    
+
     bank.disconnect()

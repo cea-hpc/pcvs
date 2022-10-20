@@ -1,11 +1,16 @@
 import sys
 
-import click
 from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
 from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import ConfigException
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 def compl_list_token(ctx, args, incomplete) -> list:  # pragma: no cover
@@ -81,9 +86,8 @@ def config_list_single_kind(kind, scope) -> None:
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
-                log.manager.print_item("{: <6s}: {}".format(
-                    sc.upper(),
-                    log.manager.style('None', fg='bright_black')))
+                log.manager.print_item(
+                    "[bright_black]{: <6s}: None".format(sc.upper()))
             else:
                 log.manager.print_item("{: <6s}: {}".format(
                     sc.upper(),

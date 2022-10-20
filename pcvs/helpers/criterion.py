@@ -61,7 +61,7 @@ class Combination:
             subtitle = c[n].subtitle
             if subtitle is None:
                 subtitle = "{}".format(n)
-                
+
             string.append(subtitle +
                           str(self._combination[n]).replace(" ", "-"))
         return "_".join(string)
@@ -125,8 +125,8 @@ class Serie:
         # this has to be saved, need to be forwarded to each combination
         self._dict = dict_of_criterion
         for name, node in dict_of_criterion.items():
-            assert(isinstance(node, Criterion))
-            assert(name == node.name)
+            assert (isinstance(node, Criterion))
+            assert (name == node.name)
             self._values.append(node.values)
             self._keys.append(node.name)
 
@@ -192,8 +192,8 @@ class Criterion:
 
         This is used to refine overriden per-TE criterion according to 
         system-wide's"""
-        assert(isinstance(other, Criterion))
-        assert(self._name == other._name)
+        assert (isinstance(other, Criterion))
+        assert (self._name == other._name)
 
         # None is special value meaning, discard this criterion because
         # irrelevant
@@ -414,10 +414,10 @@ def initialize_from_system():
         for it in criterion_iterators.keys():
             if it not in runtime_iterators:
                 log.manager.warn("Undeclared criterion "
-                                "as part of runtime: '{}' ".format(it))
+                                 "as part of runtime: '{}' ".format(it))
             elif criterion_iterators[it]['values'] is None:
                 log.manager.debug('No combination found for {},'
-                                ' removing from schedule'.format(it))
+                                  ' removing from schedule'.format(it))
             else:
                 continue
 

@@ -1,14 +1,14 @@
 import base64
+import json
 import os
 import subprocess
 import tempfile
 
 import jsonschema
-import json
-from prettytable import PrettyTable
 from ruamel.yaml import YAML, YAMLError
 
 import pcvs
+from pcvs import io
 from pcvs.backend import config, profile, run
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import ValidationException
@@ -56,16 +56,17 @@ def compute_scriptpath_from_testname(testname, output=None):
         "list_of_tests.sh"
     )
 
+
 def get_logged_output(prefix, testname):
     if prefix is None:
         prefix = os.getcwd()
     resdir = os.path.join(
-                    utils.find_buildir_from_prefix(prefix),
-                    pcvs.NAME_BUILD_RESDIR)
+        utils.find_buildir_from_prefix(prefix),
+        pcvs.NAME_BUILD_RESDIR)
     s = ""
     if os.path.isdir(resdir):
         for f in os.listdir(resdir):
-            
+
             with open(os.path.join(resdir, f), 'r') as fh:
                 data = json.load(fh)
                 for job in data['tests']:
@@ -75,9 +76,9 @@ def get_logged_output(prefix, testname):
                             base64.b64decode(job['result']['output']).decode('utf-8'))
     if not s:
         s = "No test named '{}' found here.".format(testname)
-        
-    return s 
-    
+
+    return s
+
 
 def process_check_configs():
     """Analyse available configurations to ensure their correctness relatively
@@ -86,9 +87,7 @@ def process_check_configs():
     :return: caught errors, as a dict, where the keys is the errmsg base64
     :rtype: dict"""
     errors = dict()
-    t = PrettyTable()
-    t.field_names = ["Valid", "ID"]
-    t.align['ID'] = "l"
+    t = io.create_table("Configurations", ["Valid", "ID"])
 
     for kind in config.CONFIG_BLOCKS:
         for scope in utils.storage_order():
@@ -107,8 +106,8 @@ def process_check_configs():
                     errors[err_msg] += 1
                     log.manager.debug(str(e))
 
-                t.add_row([token, obj.full_name])
-    print(t)
+                t.add_row(token, obj.full_name)
+    io.console.print(t)
     return errors
 
 
@@ -118,10 +117,8 @@ def process_check_profiles():
 
     :return: list of caught errors as a dict, where keys are error msg base64
     :rtype: dict"""
-    t = PrettyTable()
+    t = io.create_table("Available Profile", ["valid", "ID"])
     errors = dict()
-    t.field_names = ["Valid", "ID"]
-    t.align['ID'] = "l"
 
     for scope in utils.storage_order():
         for blob in profile.list_profiles(scope):
@@ -137,8 +134,8 @@ def process_check_profiles():
                 errors[err_msg] += 1
                 log.manager.debug(str(e))
 
-            t.add_row([token, obj.full_name])
-    print(t)
+            t.add_row(token, obj.full_name)
+    io.console.print(t)
     return errors
 
 
@@ -333,7 +330,7 @@ class BuildSystem:
 
         Nothing to do, by default.
         """
-        assert(False)
+        assert (False)
 
     def generate_file(self, filename="pcvs.yml", force=False):
         """Build the YAML test file, based on path introspection and build

@@ -48,7 +48,6 @@ class Plugin:
         SCHED_AFTER = enum.auto(),
         END_BEFORE = enum.auto(),
         END_AFTER = enum.auto()
-        
 
         def __str__(self):
             """Stringify a Step as a printable string
@@ -85,10 +84,11 @@ class Collection:
     def register_default_plugins(self):
         """Detect plugins stored in default places."""
         try:
-            self.register_plugin_by_package("pcvs.plugins.default", activate=True)
-                
+            self.register_plugin_by_package(
+                "pcvs.plugins.default", activate=True)
+
             self.register_plugin_by_package('pcvs-contrib')
-            
+
         except:
             log.manager.info(
                 "No pcvs-contrib package found for plugin autoloading")

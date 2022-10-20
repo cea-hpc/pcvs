@@ -68,6 +68,7 @@ class CommonException:
 
     class AlreadyExistError(GenericError):
         """The content already exist as it should."""
+
         def __init__(self, msg="Invalid format", **kwargs):
             """Updated constructor"""
             super().__init__(err_msg=msg,
@@ -245,8 +246,10 @@ class PluginException(CommonException):
         """Unable to load plugin directory."""
         pass
 
+
 class SpackException(CommonException):
     pass
+
 
 class GitException(CommonException):
     pass

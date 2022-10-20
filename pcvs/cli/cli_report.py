@@ -1,10 +1,14 @@
 import os
 
-import click
-
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR
 from pcvs.backend import report as pvReport
 from pcvs.helpers import log
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 @click.command('report', short_help="Manage PCVS result reporting interface")
@@ -20,11 +24,11 @@ def report(ctx, path_list, static):
     for prefix in path_list:
         # if a dir is given BU does not point to a valid build dir,
         # attempt to resolve it.
-        # Note that files are always kept, it ensure to the user to 
+        # Note that files are always kept, it ensure to the user to
         # provide a valid archive-formatted file
         print(prefix)
         if not os.path.isfile(prefix) and \
-            not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
+                not os.path.isfile(os.path.join(prefix, NAME_BUILDFILE)):
             # if the 'builddir' default name was missing for resolution, add it
             if os.path.isfile(os.path.join(prefix, NAME_BUILDIR, NAME_BUILDFILE)):
                 prefix = os.path.join(prefix, NAME_BUILDIR)

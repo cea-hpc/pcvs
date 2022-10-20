@@ -66,7 +66,7 @@ def create_app():
         :rtype: str
         """
         sid = int(sid)
-        assert(sid in data_manager.session_ids)
+        assert (sid in data_manager.session_ids)
 
         if 'json' in request.args.get('render', []):
             return jsonify({"tag": data_manager.get_tag_cnt(sid),

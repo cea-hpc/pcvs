@@ -125,7 +125,7 @@ class Config(MetaDict):
         :param kw: keyword describing the configuration to be validated (scheme)
         :type kw: str
         """
-        assert(kw in ValidationScheme.available_schemes())
+        assert (kw in ValidationScheme.available_schemes())
         ValidationScheme(kw).validate(self)
 
     def __setitem__(self, param, value):

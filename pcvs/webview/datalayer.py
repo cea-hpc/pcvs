@@ -60,7 +60,7 @@ class DataRepresentation:
         :param depth: list of node names to walk through
         :type depth: list
         """
-        assert('__metadata' in node.keys())
+        assert ('__metadata' in node.keys())
 
         node["__metadata"]["count"][str(test.state)] += 1
 
@@ -129,7 +129,7 @@ class DataRepresentation:
         :param session_data: session infos (state)
         :type session_data: dict
         """
-        assert(sid in self.rootree.keys())
+        assert (sid in self.rootree.keys())
         self.rootree[sid]["state"] = session_data["state"]
 
     def insert_test(self, sid, test: Test):
@@ -241,7 +241,7 @@ class DataRepresentation:
         :return: list of tests under this subnode
         :rtype: list(class:`Test`)
         """
-        assert('__elems' in node.keys())
+        assert ('__elems' in node.keys())
         if isinstance(node['__elems'], list):
             return [x.to_json(strstate=True) for x in node['__elems'] if isinstance(x, Test)]
 

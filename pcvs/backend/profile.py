@@ -244,7 +244,7 @@ class Profile:
             profile OR incorrect profile.
         """
         for kind in config.CONFIG_BLOCKS:
-            #if kind not in self._details:
+            # if kind not in self._details:
             #    raise ValidationException.FormatError(
             #        "Missing '{}' in profile".format(kind))
             system.ValidationScheme(kind).validate(
@@ -276,7 +276,7 @@ class Profile:
         self._retrieve_file()
 
         log.manager.info("Compute target prefix: {}".format(self._file))
-        assert(not os.path.isfile(self._file))
+        assert (not os.path.isfile(self._file))
         self._details = clone._details
 
     def delete(self):

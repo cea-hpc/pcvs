@@ -1,8 +1,8 @@
 import base64
 import json
 import os
-import shlex
 import re
+import shlex
 from enum import IntEnum
 
 from pcvs.helpers import log
@@ -105,7 +105,7 @@ class Test:
             suffix=kwargs.get('user_suffix'))
 
         self._execmd = kwargs.get('command', '')
-    
+
         self._data = {
             'metrics': kwargs.get('metrics', {}),
             'tags': kwargs.get('tags', []),
@@ -239,13 +239,13 @@ class Test:
         :rtype: list
         """
         return self._mod_deps
-    
+
     def get_dep_graph(self):
         res = {}
         for d in self._deps:
             res[d.name] = d.get_dep_graph()
         return res
-        
+
     def resolve_a_dep(self, name, obj):
         """Resolve the dep object for a given dep name.
 
@@ -336,10 +336,10 @@ class Test:
         """
         if state is None:
             state = Test.State.SUCCESS if self._validation['expect_rc'] == rc else Test.State.FAILURE
-        
+
         self.save_raw_run(rc=rc, out=out, time=time)
         self.save_status(state)
-        
+
         for elt_k, elt_v in self._data['artifacts'].items():
             if os.path.isfile(elt_v):
                 with open(elt_v, 'rb') as fh:
@@ -362,26 +362,27 @@ class Test:
         raw_output = base64.b64decode(self._output).decode("utf-8")
         for name in self._data['metrics'].keys():
             node = self._data['metrics'][name]
-            
+
             try:
                 ens = set if node['attributes']['unique'] else list
             except KeyError:
                 ens = list
-            
-            self._data['metrics'][name]['values'] = list(ens(re.findall(node['key'], raw_output)))
+
+            self._data['metrics'][name]['values'] = list(
+                ens(re.findall(node['key'], raw_output)))
 
     def evaluate(self):
         """TODO:
         """
         state = Test.State.SUCCESS
-        
+
         if self._validation['expect_rc'] != self._rc:
             state = Test.State.FAILURE
-        
+
         raw_output = base64.b64decode(self._output).decode('utf-8')
-        
+
         # if test should be validated through a matching regex
-        if state == Test.State.SUCCESS and self._validation['matchers'] is not None :
+        if state == Test.State.SUCCESS and self._validation['matchers'] is not None:
             for k, v in self._validation['matchers'].items():
                 expected = (v.get('expect', True) is True)
                 found = re.search(v['expr'], raw_output)
@@ -396,7 +397,6 @@ class Test:
                 Plugin.Step.TEST_RESULT_EVAL, analysis=analysis, job=self)
             if s is not None:
                 state = s
-            
 
         # if a custom script is provided
         if state == Test.State.SUCCESS and self._validation['script'] is not None:
@@ -405,10 +405,10 @@ class Test:
             if self._validation['expect_rc'] != p.rc:
                 state = Test.State.FAILURE
         self._state = state
-        
+
     def save_status(self, state):
         self.executed(state)
-        
+
     def display(self):
         """Print the Test into stdout (through the manager)."""
         colorname = "yellow"
@@ -424,11 +424,16 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        log.manager.print_job(label, self._exectime, self.name,
+        # log.manager.print_job(label, self._exectime, self.name,
+        #                      colorname=colorname, icon=icon)
+        log.manager.print_job(label, self._exectime, self.label,
+                              "/{}".format(self.subtree) if self.subtree else "",
+                              self.name,
                               colorname=colorname, icon=icon)
+
         if self._output:
-            if (MetaConfig.root.validation.print_level == 'all' or \
-                (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
+            if (MetaConfig.root.validation.print_level == 'all' or
+                    (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
                 log.manager.print(base64.b64decode(self._output))
 
     def executed(self, state=None):
@@ -466,7 +471,7 @@ class Test:
         :rtype: :class:`Test.State`
         """
         return self._state
-    
+
     @property
     def time(self):
         """TODO:
@@ -501,7 +506,7 @@ class Test:
         if isinstance(test_json, str):
             test_json = json.loads(test_json)
 
-        assert(isinstance(test_json, dict))
+        assert (isinstance(test_json, dict))
         self.res_scheme.validate(test_json)
 
         self._id = test_json.get("id", -1)
@@ -532,7 +537,8 @@ class Test:
         cmd_code = ""
         post_code = ""
 
-        self._invocation_cmd = 'bash {} {}'.format(srcfile, self._id['fq_name'])
+        self._invocation_cmd = 'bash {} {}'.format(
+            srcfile, self._id['fq_name'])
 
         # if changing directory is required by the test
         if self._cwd is not None:
@@ -546,9 +552,9 @@ class Test:
         if self._testenv is not None:
             env_code = "\n".join([
                 "{}; export {}".format(shlex.quote(e),
-                                        shlex.quote(e.split('=')[0]))
+                                       shlex.quote(e.split('=')[0]))
                 for e in self._testenv
-                ])
+            ])
 
         cmd_code = self._execmd
 

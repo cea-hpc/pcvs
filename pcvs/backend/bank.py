@@ -1,18 +1,17 @@
 import fcntl
+import json
 import os
 import tarfile
 import tempfile
 import time
-import json
 from typing import Dict, List, Optional
 
 from ruamel.yaml import YAML
 
-from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK
+from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK, dsl
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 from pcvs.helpers.system import MetaDict
-from pcvs import dsl
 
 #: :var BANKS: list of available banks when PCVS starts up
 #: :type BANKS: dict, keys are bank names, values are file path
@@ -63,11 +62,11 @@ class Bank(dsl.Bank):
         self._dflt_proj = None
         self._name = None
         self._config: Optional[MetaDict] = None
-        
+
         # split name & default-proj from token
         array: List[str] = token.split('@', 1)
         if len(array) > 1:
-            self._dflt_proj  = array[1]
+            self._dflt_proj = array[1]
         self._name = array[0]
 
         global BANKS
@@ -80,9 +79,9 @@ class Bank(dsl.Bank):
                     if v == path:
                         self._name = k
                         break
-        
-        super().__init__(path, self._dflt_proj )
-    
+
+        super().__init__(path, self._dflt_proj)
+
     @property
     def default_project(self):
         return "unkwown" if not self._dflt_proj else self._dflt_proj
@@ -130,7 +129,7 @@ class Bank(dsl.Bank):
         :rtype: bool
         """
         return self._path in BANKS.values()
-        
+
     def __str__(self) -> str:
         """Stringification of a bank.
 
@@ -148,7 +147,8 @@ class Bank(dsl.Bank):
         string = ["Projects contained in bank '{}':".format(self._path)]
         # browse references
         for project, series in self.list_all().items():
-            string.append("- {:<8}: {} distinct testsuite(s)".format(project, len(series)))
+            string.append(
+                "- {:<8}: {} distinct testsuite(s)".format(project, len(series)))
             for s in series:
                 string.append("  * {}: {} run(s)".format(s.name, len(s)))
 
@@ -167,7 +167,7 @@ class Bank(dsl.Bank):
         if self._name in BANKS:
             self._name = os.path.basename(self._path).lower()
         add_banklink(self._name, self._path)
-        
+
     def load_config_from_str(self, s: str) -> None:
         """Load the configuration data associated with the archive to process.
 
@@ -175,7 +175,7 @@ class Bank(dsl.Bank):
         :type s: str
         """
         self._config = MetaDict(YAML(typ='safe').load(s))
-        
+
     def load_config_from_dict(self, s: dict) -> None:
         """TODO:
         """
@@ -200,16 +200,16 @@ class Bank(dsl.Bank):
         """
         self.load_config_from_file(buildpath)
         rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
-        
+
         seriename = self.build_target_branch_name(tag)
         serie = self.get_serie(seriename)
-        
+
         if not serie:
             serie = self.new_serie(seriename)
-            
+
         run = dsl.Run(from_serie=serie)
         metadata = {'cnt': {}}
-        
+
         for result_file in os.listdir(rawdata_dir):
             d = {}
             with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
@@ -221,9 +221,9 @@ class Bank(dsl.Bank):
                 metadata['cnt'].setdefault(state, 0)
                 metadata['cnt'][state] += 1
                 d[name] = elt
-                
+
             run.update_flatdict(d)
-        
+
         self.set_id(
             an=self._config.validation.author.name,
             am=self._config.validation.author.email,
@@ -231,7 +231,8 @@ class Bank(dsl.Bank):
             cm=git.get_current_usermail()
         )
 
-        serie.commit(run, metadata=metadata, timestamp=int(self._config.validation.datetime.timestamp()))
+        serie.commit(run, metadata=metadata, timestamp=int(
+            self._config.validation.datetime.timestamp()))
 
     def save_from_archive(self, tag: str, archivepath: str) -> None:
         """Extract results from the archive, if used to export results.
@@ -244,14 +245,14 @@ class Bank(dsl.Bank):
         :param archivepath: archive path
         :type archivepath: str
         """
-        assert(os.path.isfile(archivepath))
+        assert (os.path.isfile(archivepath))
 
         with tempfile.TemporaryDirectory() as tarpath:
             tarfile.open(os.path.join(archivepath)).extractall(tarpath)
             self.save_from_buildir(
                 tag, os.path.join(tarpath, "save_for_export"))
 
-    def build_target_branch_name(self, tag: str=None, hash: str=None) -> str:
+    def build_target_branch_name(self, tag: str = None, hash: str = None) -> str:
         """Compute the target branch to store data.
 
         This is used to build the exact Git branch name based on:
@@ -282,11 +283,12 @@ class Bank(dsl.Bank):
             'rootpath': self._path,
             'name': self._name
         }
-        
+
     def get_count(self):
         """TODO:
         """
         return len(self.list_projects())
+
 
 def init() -> None:
     """Bank interface detection.

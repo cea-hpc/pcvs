@@ -1,20 +1,25 @@
-from abc import ABC, abstractmethod
-from pcvs.dsl import Serie, Run, Job
-from pcvs.testing.test import Test
 import json
+from abc import ABC, abstractmethod
+
+from pcvs.dsl import Job, Run, Serie
+from pcvs.testing.test import Test
+
 
 class BaseAnalysis(ABC):
     """TODO:
     """
+
     def __init__(self, bank):
         self._bank = bank
-    
+
+
 class SimpleAnalysis(BaseAnalysis):
     """TODO:
     """
+
     def __init__(self, bank):
         super().__init__(bank)
-        
+
     def generate_serie_trend(self, serie, start=None, end=None):
         """TODO:
         """
@@ -25,7 +30,7 @@ class SimpleAnalysis(BaseAnalysis):
             ci_meta = run.get_info()
             run_meta = run.get_metadata()
             stats.append({'date': ci_meta['date'], **run_meta})
-        
+
         return stats
 
     def generate_weighted_divergence(self, serie, threshold=0, prefix=None):
@@ -62,13 +67,13 @@ class SimpleAnalysis(BaseAnalysis):
 class ResolverAnalysis(BaseAnalysis):
     """TODO:
     """
-    
+
     def __init__(self, bank):
         super().__init__(bank)
         self._data = None
-        
+
     def fill(self, data):
         """TODO:
         """
-        assert(isinstance(data, dict))
+        assert (isinstance(data, dict))
         self._data = data

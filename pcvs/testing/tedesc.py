@@ -2,12 +2,13 @@ import copy
 import os
 import re
 
+from pcvs import testing
 from pcvs.helpers import pm, utils
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.testing.test import Test
-from pcvs import testing
+
 
 def detect_source_lang(array_of_files):
     """Determine compilation language for a target file (or list of files).
@@ -179,8 +180,7 @@ class TEDescriptor:
         # before doing anything w/ node:
         # arregate the 'group' definitions with the TE
         # to get all the fields in their final form
-        if 'group' in node:
-            assert(node['group'] in MetaConfig.root.group.keys())
+        if 'group' in node and node['group'] in MetaConfig.root.group.keys():
             tmp = MetaDict(MetaConfig.root.group[node['group']])
             tmp.update(MetaDict(node))
             node = tmp
@@ -198,7 +198,7 @@ class TEDescriptor:
         path_prefix = self._buildir
         if self.get_run_attr('path_resolution', True) is False:
             path_prefix = ""
-            
+
         for elt_k, elt_v in self._artifacts.items():
             if not os.path.isabs(elt_v):
                 self._artifacts[elt_k] = os.path.join(path_prefix, elt_v)
@@ -233,7 +233,6 @@ class TEDescriptor:
 
     def get_build_attr(self, name, default=None):
         return TEDescriptor.get_attr(self._build, name, default)
-    
 
     def _compatibility_support(self, compat):
         """Convert tricky keywords from old syntax too complex to be handled
@@ -550,8 +549,7 @@ class TEDescriptor:
 
             # attempt to determine test working directory
             chdir = self._run.cwd if self._run.cwd else self._buildir
-            
-                
+
             if not os.path.isabs(chdir):
                 chdir = os.path.abspath(os.path.join(self._buildir, chdir))
 
@@ -560,9 +558,9 @@ class TEDescriptor:
                 program = os.path.abspath(os.path.join(chdir, program))
 
             command = "{program} {params}".format(
-                    program=program,
-                    params=" ".join(params)
-                )
+                program=program,
+                params=" ".join(params)
+            )
             if self.get_run_attr('command_wrap', True) is True:
                 command = "{runtime} {runtime_args} {args} {cmd}".format(
                     runtime=MetaConfig.root.runtime.get('program', ''),
@@ -608,11 +606,12 @@ class TEDescriptor:
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
-                
+
             if self.get_run_attr('command_wrap', True) is False:
                 self._serie = Serie({**self._program_criterion})
             else:
-                self._serie = Serie({**self._criterion, **self._program_criterion})
+                self._serie = Serie(
+                    {**self._criterion, **self._program_criterion})
             yield from self.__construct_runtime_tests()
             del self._serie
 

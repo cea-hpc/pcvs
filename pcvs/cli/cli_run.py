@@ -2,8 +2,6 @@ import os
 import sys
 from datetime import datetime
 
-import click
-
 from pcvs import NAME_BUILDFILE
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
@@ -11,6 +9,12 @@ from pcvs.backend import run as pvRun
 from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
 from pcvs.helpers import exceptions, log, system, utils
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 def iterate_dirs(ctx, param, value) -> dict:
@@ -76,8 +80,7 @@ def compl_list_dirs(ctx, args, incomplete) -> list:  # pragma: no cover
         label += ":"
     obj = click.Path(exists=True, dir_okay=True, file_okay=False)
     obj.shell_complete(ctx, args, incomplete)
-        
-    
+
 
 def handle_build_lockfile(exc=None):
     """Remove the file lock in build dir if the application stops abrubtly.
@@ -161,7 +164,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
-        
+
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config
     global_config.set_internal("pColl", ctx.obj['plugins'])
@@ -267,9 +270,12 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
     log.manager.info("PRE-RUN: Session to be started")
     if val_cfg.background:
+        from pcvs import io
+        io.detach_console(logfile=val_cfg.runlog)
         sid = the_session.run_detached(the_session)
-        log.manager.print_item(
+        print(
             "Session successfully started, ID {}".format(sid))
+
     else:
         sid = the_session.run(the_session)
         utils.unlock_file(buildfile)

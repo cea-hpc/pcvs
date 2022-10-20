@@ -67,7 +67,7 @@ def store_session_to_file(c):
 
         all_sessions["__metadata"]["next"] = (sid + 1) % 1000000
 
-        assert(sid not in all_sessions.keys())
+        assert (sid not in all_sessions.keys())
         all_sessions[sid] = c
 
         # dump the file back
@@ -249,7 +249,7 @@ class Session:
             s = constructor.construct_scalar(node)
             name, value = s.split('||')
             obj = Session.State(int(value))
-            assert(obj.name == name)
+            assert (obj.name == name)
 
             return obj
 
@@ -305,7 +305,7 @@ class Session:
         :return: the requested session infos if exist
         :rtype: Any
         """
-        assert(kw in self._session_infos)
+        assert (kw in self._session_infos)
         return self._session_infos[kw]
 
     def __init__(self, date=None, path="."):
@@ -398,7 +398,7 @@ class Session:
             log.manager.set_tty(enable=False)
             child.start()
             # complete the first child, to allow this process to terminate
-            child.join()
+            # pcchild.join()
 
             # do not close tty, to extra info to be printed but not logged
             log.manager = old

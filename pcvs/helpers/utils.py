@@ -1,8 +1,8 @@
-import subprocess
 import os
-import socket
 import shutil
 import signal
+import socket
+import subprocess
 import time
 from contextlib import contextmanager
 from shutil import SameFileError
@@ -148,7 +148,7 @@ def create_or_clean_path(prefix, dir=False):
         if dir:
             os.mkdir(prefix)
         else:
-            assert(os.path.isdir(os.path.dirname(prefix)))
+            assert (os.path.isdir(os.path.dirname(prefix)))
             open(prefix, 'w+').close()
         return
 
@@ -194,6 +194,8 @@ def copy_file(src, dest):
 ####################################
 ####           MISC.            ####
 ####################################
+
+
 def check_valid_program(p, succ=None, fail=None, raise_if_fail=True):
     """Check if p is a valid program, using the ``which`` function.
 
@@ -367,21 +369,21 @@ def get_lock_owner(f):
 
 def program_timeout(sig, frame):
     """Timeout handler, called when a SIGALRM is received.
-    
+
     :param sig: signal number
     :type sig: int
     :param frame: the callee (unused)
     :type f: 
     :raises CommonException.TimeoutError: timeout is reached
     """
-    assert(sig == signal.SIGALRM)
+    assert (sig == signal.SIGALRM)
     raise CommonException.TimeoutError("Timeout reached")
 
 
 def start_autokill(timeout=None):
     """Initialize a new time to automatically stop the 
     current process once time is expired.
-    
+
     :param timeout: value in seconds before the autokill will be raised
     :type timeout: positive integer
     """
@@ -395,9 +397,10 @@ def start_autokill(timeout=None):
 
 class Program:
     """Simple class to encapsulate process management.
-    
+
     This is better and should be preferred as importing subprocess everywhere.
     """
+
     def __init__(self, cmd=None):
         self._cmd = cmd
         self._out = None
@@ -406,7 +409,7 @@ class Program:
 
     def run(self, input="", shell=False, timeout=0):
         """Run the given program and capture I/Os
-        
+
         :param input: raw data to be used as stdin
         :type input: str
         :param shell: is the provided command to be run within a shell
@@ -418,7 +421,8 @@ class Program:
         :rtype: integer
         """
         try:
-            s = subprocess.Popen(self._cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            s = subprocess.Popen(self._cmd, shell=shell,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self._out = s.communicate(input=input)
             self._rc = s.returncode
         except Exception as e:
@@ -429,7 +433,7 @@ class Program:
     @property
     def out(self):
         """Getter to actual execution output.
-        
+
         :return: stderr/stdout combined
         :rtype: str
         """
@@ -438,7 +442,7 @@ class Program:
     @property
     def rc(self):
         """Getter, effective return code.
-        
+
         :return: return code
         :rtype: integer
         """
@@ -447,7 +451,7 @@ class Program:
     @property
     def exception(self):
         """Getter, raised exception (for any reason)
-        
+
         :return: an Exception-derived object
         :rtype: Exception
         """

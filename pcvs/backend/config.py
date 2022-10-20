@@ -293,10 +293,10 @@ class ConfigurationBlock:
         assert (isinstance(clone, ConfigurationBlock))
         assert (clone._kind == self._kind)
         assert (not self.is_found())
-        assert(clone.is_found())
+        assert (clone.is_found())
 
         self.retrieve_file()
-        assert(not os.path.isfile(self._file))
+        assert (not os.path.isfile(self._file))
 
         log.manager.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details

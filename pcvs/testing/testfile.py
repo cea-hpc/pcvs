@@ -8,13 +8,13 @@ import subprocess
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
 
-from pcvs import PATH_INSTDIR
+from pcvs import PATH_INSTDIR, testing
 from pcvs.helpers import log, system, utils
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
 from pcvs.testing import tedesc
-from pcvs import testing
+
 
 def __load_yaml_file_legacy(f):
     """Legacy version to load a YAML file.
@@ -262,9 +262,9 @@ for arg in "$@"; do case $arg in
     eval "${{echo_env}}${{pcvs_env}}"
     eval "${{echo_cmd}}${{pcvs_cmd}}"
     exit $?\n""".format(list_of_tests="\n".join([
-                    t.name
-                    for t in self._tests
-                ])))
+                t.name
+                for t in self._tests
+            ])))
 
         self.generate_debug_info()
 

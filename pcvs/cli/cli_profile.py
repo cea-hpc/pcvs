@@ -1,15 +1,21 @@
 import os
 import sys
 
-import click
+from rich.table import Table
 from ruamel.yaml import YAML
 
-from pcvs import PATH_INSTDIR
+from pcvs import PATH_INSTDIR, io
 from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config
 from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import ProfileException, ValidationException
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 def compl_list_token(ctx, args, incomplete):  # pragma: no cover
@@ -74,6 +80,7 @@ def profile_list(ctx, token, all):
     out profiles available at a given granularity.
     """
     (scope, label) = (None, None)
+    table = Table("Full name", "Location", title="Profiles", expand=True)
     if token:
         (scope, _, label) = utils.extract_infos_from_token(token, single="left",
                                                            maxsplit=2)
@@ -82,28 +89,18 @@ def profile_list(ctx, token, all):
         log.manager.warn("no LABEL required for this command")
 
     utils.check_valid_scope(scope)
+    scopes = [elt for elt in utils.storage_order(
+    ) if scope is None or scope in elt]
 
-    log.manager.print_header("Profile View")
+    #log.manager.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)
     if not profiles:
         log.manager.print_item("None")
         return
-    elif scope is None:  # if no scope has been provided by the user
-        for sc in utils.storage_order():
-            # aggregate names for each sccope
-            names = sorted([elt[0]
-                            for elt in [array for array in profiles[sc]]])
-            if not names:
-                log.manager.print_item("{: <6s}: {}".format(sc.upper(),
-                                                            log.manager.style('None',
-                                                                              fg='bright_black')))
-            else:
-                log.manager.print_item("{: <6s}: {}".format(sc.upper(),
-                                                            ", ".join(names)))
-    else:
-        names = sorted([x[0] for x in profiles])
-        log.manager.print_item("{: <6s}: {}".format(
-            scope.upper(), ", ".join(names)))
+
+    for sc in scopes:
+        for profile in profiles[sc]:
+            table.add_row(sc+"."+profile[0], profile[1])
 
     if all:
         log.manager.print_section(
@@ -116,6 +113,8 @@ def profile_list(ctx, token, all):
     for i, scope in enumerate(utils.storage_order()):
         log.manager.info("{}. {}: {}".format(
             i+1, scope.upper(), utils.STORAGES[scope]))
+
+    io.console.print(table)
 
 
 @profile.command(name="show",

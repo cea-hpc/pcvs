@@ -2,27 +2,17 @@
 
 import os
 import shutil
+
 import pkg_resources
 
 import pcvs
 from pcvs import io
-from pcvs.backend import bank
-from pcvs.backend import config
-from pcvs.backend import profile
-from pcvs.backend import session
-from pcvs.cli import cli_bank
-from pcvs.cli import cli_config
-from pcvs.cli import cli_plumbing
-from pcvs.cli import cli_profile
-from pcvs.cli import cli_report
-from pcvs.cli import cli_run
-from pcvs.cli import cli_session
-from pcvs.cli import cli_utilities
-from pcvs.helpers import log
-from pcvs.helpers import utils
+from pcvs.backend import bank, config, profile, session
+from pcvs.cli import (cli_bank, cli_config, cli_plumbing, cli_profile,
+                      cli_report, cli_run, cli_session, cli_utilities)
+from pcvs.helpers import log, utils
 from pcvs.helpers.exceptions import PluginException
-from pcvs.plugins import Collection
-from pcvs.plugins import Plugin
+from pcvs.plugins import Collection, Plugin
 
 try:
     import rich_click as click

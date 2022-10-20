@@ -1,11 +1,16 @@
 import os
 import sys
 
-import click
 from click.shell_completion import CompletionItem
 
 from pcvs.backend import bank as pvBank
 from pcvs.helpers import log, utils
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 
 def compl_list_banks(ctx, args, incomplete):
@@ -43,7 +48,7 @@ def compl_bank_projects(ctx, args, incomplete):
         for project in bank.list_projects():
             array.append((bankname + "@" + project, bankpath))
         bank.disconnect()
-    
+
     return [CompletionItem(elt[0], help=elt[1]) for elt in array if incomplete in elt[0]]
 
 

@@ -1,11 +1,11 @@
 import json
 import os
-import tempfile
 import tarfile
+import tempfile
 
 from ruamel.yaml import YAML
-from pcvs import NAME_BUILD_RESDIR
 
+from pcvs import NAME_BUILD_RESDIR
 from pcvs.backend.session import Session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaDict
@@ -38,8 +38,9 @@ def start_server():
     :rtype: class:`Flask`
     """
     app = create_app()
-    ret = app.run(host='0.0.0.0', port=int(os.getenv("PCVS_REPORT_PORT", 5000)))
-        
+    ret = app.run(host='0.0.0.0', port=int(
+        os.getenv("PCVS_REPORT_PORT", 5000)))
+
     return app
 
 
@@ -49,14 +50,14 @@ def upload_buildir_results(buildir):
     :param buildir: the build directory
     :type buildir: str
     """
-    
+
     # first, need to determine the session ID -> conf.yml
     with open(os.path.join(buildir, "conf.yml"), 'r') as fh:
         conf_yml = MetaDict(YAML().load(fh))
 
     sid = conf_yml.validation.sid
     dataman = data_manager
-    
+
     result_dir = os.path.join(buildir, NAME_BUILD_RESDIR)
     dataman.insert_session(sid, {
         'buildpath': buildir,
@@ -65,7 +66,7 @@ def upload_buildir_results(buildir):
     })
 
     for f in os.listdir(result_dir):
-        assert(f.endswith(".json"))
+        assert (f.endswith(".json"))
         log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
 
         with open(os.path.join(result_dir, f), 'r') as fh:
@@ -83,7 +84,7 @@ def upload_buildir_results_from_archive(archive):
         archive = os.path.abspath(archive)
         tarfile.open(archive).extractall(tempdir)
         upload_buildir_results(os.path.join(tempdir, "save_for_export"))
-        
+
 
 def build_static_pages(buildir):
     """From a given build directory, generate static pages.

@@ -4,7 +4,7 @@ import os
 from pcvs import NAME_BUILD_RESDIR
 from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.plugins import Plugin
-    
+
 
 class Publisher:
     """Manage result publication and storage on disk.
@@ -42,11 +42,11 @@ class Publisher:
         self._layout = {
             "tests": []
         }
-        
+
         if not prefix:
             prefix = "."
         self._destpath = os.path.join(prefix, NAME_BUILD_RESDIR)
-        assert(os.path.isdir(self._destpath))
+        assert (os.path.isdir(self._destpath))
 
     @property
     def format(self):
@@ -95,8 +95,8 @@ class Publisher:
         filename_prefix = os.path.join(
             self._destpath, self.fn_fmt.format(Publisher.increment))
         json_file = filename_prefix + self.fn_ext
-        
-        assert(not os.path.isfile(json_file))
+
+        assert (not os.path.isfile(json_file))
 
         Publisher.increment += 1
 
@@ -106,4 +106,3 @@ class Publisher:
         with open(json_file, 'w+') as fh:
             json.dump(self._layout, fh)
             self.empty_entries()
-

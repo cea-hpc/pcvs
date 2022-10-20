@@ -88,7 +88,7 @@ class RemoteServer(GenericServer):
                 self._waitlist.append(prev_test[1])
 
     def _send_unitary_test(self, test):
-        assert(isinstance(test, Test))
+        assert (isinstance(test, Test))
         to_send = {"metadata": self._metadata,
                    "test_data": test.to_json(),
                    "state": test.state}

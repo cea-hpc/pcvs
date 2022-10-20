@@ -6,13 +6,20 @@ import subprocess
 import sys
 from datetime import datetime
 
-import click
 from prettytable import PrettyTable
 
 from pcvs import NAME_BUILDFILE
 from pcvs.backend import utilities as pvUtils
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
+
+from click.shell_completion import CompletionItem
 
 
 @click.command(name="exec", short_help="Running aspecific test")
