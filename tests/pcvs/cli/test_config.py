@@ -161,13 +161,6 @@ def test_edit(mock_config):
     res = click_call('config', 'edit', "dummy-config")
     assert(res.exit_code == 0)
     instance.is_found.assert_called_once_with()
-    instance.edit.assert_called_once_with(os.environ.get('EDITOR', None))
-    
-    instance.reset_mock()
-    res = click_call('config', 'edit', "dummy-config", "-e", "editor")
-    assert(res.exit_code == 0)
-    instance.is_found.assert_called_once_with()
-    instance.edit.assert_called_once_with("editor")
 
     instance.reset_mock()
     instance.is_found.return_value = False

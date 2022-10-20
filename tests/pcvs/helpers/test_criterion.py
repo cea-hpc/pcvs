@@ -67,7 +67,7 @@ def test_combination_str(crit_desc, crit_comb):
             "type": "argument"
         })
     obj = tested.Combination(crit_desc, crit_comb)
-    assert(obj.translate_to_str() == "E=message_pa=parameter_pe=user_message")
+    assert(obj.translate_to_str() == "arg10_E=message_pa=parameter_pe=user_message")
 
 def test_combination_command(crit_desc, crit_comb):
     obj = tested.Combination(crit_desc, crit_comb)
