@@ -2,16 +2,33 @@
 
 import os
 import shutil
+import pkg_resources
 
-import click
-
-from pcvs import version
-from pcvs.backend import bank, config, profile, session
-from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
-                      cli_session, cli_utilities, cli_plumbing)
-from pcvs.helpers import log, utils
+import pcvs
+from pcvs import io
+from pcvs.backend import bank
+from pcvs.backend import config
+from pcvs.backend import profile
+from pcvs.backend import session
+from pcvs.cli import cli_bank
+from pcvs.cli import cli_config
+from pcvs.cli import cli_plumbing
+from pcvs.cli import cli_profile
+from pcvs.cli import cli_report
+from pcvs.cli import cli_run
+from pcvs.cli import cli_session
+from pcvs.cli import cli_utilities
+from pcvs.helpers import log
+from pcvs.helpers import utils
 from pcvs.helpers.exceptions import PluginException
-from pcvs.plugins import Collection, Plugin
+from pcvs.plugins import Collection
+from pcvs.plugins import Plugin
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
 
 CONTEXT_SETTINGS = dict(
     help_option_names=['-h', '--help', '-help'],
@@ -35,7 +52,7 @@ def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
     click.echo(
-        'Parallel Computing Validation System (pcvs) -- version {}'.format(version.__version__))
+        'Parallel Computing Validation System (pcvs) -- version {}'.format(pkg_resources.require("pcvs")[0].version))
     ctx.exit()
 
 
@@ -75,6 +92,8 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
 
     if width is None:
         width = shutil.get_terminal_size()[0]
+
+    io.console = io.TheConsole(color=color, verbose=verbose)
     log.init(verbose, encoding, width)
 
     utils.set_local_path(ctx.obj['exec'])
@@ -115,7 +134,7 @@ cli.add_command(cli_utilities.clean)
 cli.add_command(cli_utilities.discover)
 # cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
-#cli.add_command(cli_plumbing.resolve)
+# cli.add_command(cli_plumbing.resolve)
 
 if __name__ == "__main__":
     cli()

@@ -1,12 +1,19 @@
 import os
 import subprocess
-
 import setuptools
 
-loc = {}
-with open(os.path.join("pcvs/version.py")) as fh:
-    exec(fh.read(), None, loc)
-version = loc['__version__']
+# if installed from Git, put the commit revision
+# add -dirty if staged area is not empty
+try:
+    import sh
+    version = sh.git("describe", "--dirty").strip()[1:]
+    
+except:
+    loc = {}
+    with open(os.path.join("pcvs/__init__.py")) as fh:
+        exec(fh.read(), None, loc)
+    version = loc['__version__']
+    version = sh.git("describe --dirty")
 
 with open("README.md", 'r') as f:
     desc = f.read()
