@@ -256,8 +256,9 @@ class Test:
         """
         if name not in self._depnames:
             return
-
-        self._deps.append(obj)
+        
+        if obj not in self._deps:
+            self._deps.append(obj)
 
     def has_completed_deps(self):
         """Check if the test can be scheduled.
@@ -268,7 +269,7 @@ class Test:
         :return: True if the job can be scheduled
         :rtype: bool
         """
-        return not self.been_executed() and len([d for d in self._deps if not d.been_executed()]) == 0
+        return len([d for d in self._deps if not d.been_executed()]) == 0
 
     def has_failed_dep(self):
         """Check if at least one dep is blocking this job from ever be
@@ -277,7 +278,7 @@ class Test:
         :return: True if at least one dep is shown a `Test.State.FAILURE` state.
         :rtype: bool
         """
-        return len([d for d in self._deps if d.state == Test.State.FAILURE]) > 0
+        return len([d for d in self._deps if d.state in [Test.State.ERR_DEP, Test.State.ERR_OTHER, Test.State.FAILURE]]) > 0
 
     def first_incomplete_dep(self):
         """Retrive the first ready-for-schedule dep.

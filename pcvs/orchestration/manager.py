@@ -147,6 +147,17 @@ class Manager:
         """
         return self._count.total - self._count.executed
 
+    def publish_job(self, job, publish_args=None):
+        if publish_args:
+            job.save_final_result(**publish_args)
+        
+        if self._comman:
+            self._comman.send(job)
+        self._count.executed += 1
+        self._count[job.state] += 1
+        self._publisher.add(job.to_json())
+                            
+
     def create_subset(self, max_dim):
         """Extract one or more jobs, ready to be run.
 
@@ -176,73 +187,76 @@ class Manager:
                     continue
                 else:
                     # assert(self._builder.job_grabber)
-                    job: Test = self._dims[k].pop()
-
-                    # if there is still a job available for this dimention
+                    job: Test = self._dims[k].pop(0)
+                    publish_job_args = {}
                     if job:
-                        # but this job won't be run because:
-                        # - already run
-                        # - at least one dep run & failed
-                        if job.been_executed() or job.has_failed_dep():
-                            # jobs can be picked up outside of this pop() call
-                            # if tagged executed, they have been fully handled
-                            # and should just be removed from scheduling
-                            #
-                            # Another case: test can't be picked up because
-                            # job deps have failed.
-                            # in that case, no job management occured.
-                            # do it now.
-                            if job.has_failed_dep():
-                                job.save_final_result(rc=-1, time=0.0,
-                                                      out=Test.NOSTART_STR,
-                                                      state=Test.State.ERR_DEP)
-                                job.display()
-                                if self._comman:
-                                    self._comman.send(job)
-                                self._count.executed += 1
-                                self._count[job.state] += 1
-                                self._publisher.add(job.to_json())
-                            # sad to break, should retry
-                            break
-                        # If this job has at least one dep no executed yet
-                        # -> run it instead
+                        if job.been_executed():
+                            # skip job (only a pop() to do)
+                            continue
+                            
                         elif not job.has_completed_deps():
+                            
+                            # take the first unresolved dep to be scheduled
+                            # instead
+                            # CAUTION: no schedulable dep may be found at
+                            # present time. In the meantime, the completion may
+                            # occurs concurrently
                             self._dims[k].append(job)
-
-                            # careful: it means jobs are picked up
-                            # but not popped from
-                            while job and not job.has_completed_deps():
-                                job = job.first_incomplete_dep()
-
-                    # if a job has been elected
-                    if job:
-                        # the job shouldn't be running (scenario where a dep is
-                        # popped out & run but the Set didn't complete yet)
-                        # OR th job dim exceeds remaining resources
+                            # pick up a dep
+                            dep_job = job.first_incomplete_dep()
+                            while dep_job and not dep_job.has_completed_deps():
+                                dep_job = dep_job.first_incomplete_dep()
+                            # no "incomplete" task has been found
+                            # this may due to a dep completion in the mean time
+                            # discard for now, wait for another process
+                            # to schedule this job
+                            if dep_job:
+                                job = dep_job
+                            else:
+                                break
+                        
+                        # from here, it can be the original job or one of its
+                        # dep tree. But we are sure this job can be processed
+                        
+                        if job.has_failed_dep():
+                            # Cannot be scheduled for dep purposes
+                            # push it to publisher
+                            publish_job_args = {
+                                "rc": 1,
+                                "time": 0.0,
+                                "out": Test.NOSTART_STR,
+                                "state": Test.State.ERR_DEP
+                                }
+                            
+                            self.publish_job(job, publish_args=publish_job_args)
+                            job.display()
+                            # Attempt to find another job to schedule
+                            continue
+                        
+                        # Reached IF Job hasn't be run yet
+                        # Job has completed its dep scheme
+                        # all deps are successful
+                        # => SCHEDULE
                         if job.state != Test.State.IN_PROGRESS and job.get_dim() <= max_dim:
                             job.pick()
                             the_set = Set()
                             the_set.add(job)
                             break
                         else:
-                            # Ok, this could be rewritten...
-                            # packed with the 'same' code above ?
                             job.not_picked()
                             if job.pick_count() > Test.SCHED_MAX_ATTEMPTS:
-                                job.save_final_result(rc=-1, time=0.0,
-                                                      out=Test.MAXATTEMPTS_STR,
-                                                      state=Test.State.ERR_OTHER)
+                                publish_job_args = {
+                                    "rc": -1,
+                                    "time": 0.0,
+                                    "out": Test.MAXATTEMPTS_STR,
+                                    "state": Test.State.ERR_OTHER
+                                }
+                                self.publish_job(job, publish_args=publish_job_args)
+                                print(job.state)
                                 job.display()
-                                if self._comman:
-                                    self._comman.send(job)
-                                self._count.executed += 1
-                                self._count[job.state] += 1
-                                self._publisher.add(job.to_json())
                             else:
                                 self._dims[k].append(job)
-
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
-
         return the_set
 
     def merge_subset(self, set):
@@ -256,11 +270,7 @@ class Manager:
             if job.been_executed():
                 job.extract_metrics()
                 job.evaluate()
+                self.publish_job(job, publish_args=None)
                 job.display()
-                if self._comman:
-                    self._comman.send(job)
-                self._count.executed += 1
-                self._count[job.state] += 1
-                self._publisher.add(job.to_json())
             else:
                 self.add_job(job)
