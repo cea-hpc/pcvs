@@ -225,11 +225,11 @@ def __set_token(token, nset=None) -> str:
     if not nset:
         nset = log.manager.utf("none")
     if token is None:
-        return log.manager.style(nset, fg="yellow", bold=True)
+        return "[yellow bold]{}[/]".format(nset)
     elif token:
-        return log.manager.style(log.manager.utf("succ"), fg="green", bold=True)
+        return "[green bold]{}[/]".format(log.manager.utf("succ"))
     else:
-        return log.manager.style(log.manager.utf("fail"), fg="red", bold=True)
+        return "[red bold]{}[/]".format(log.manager.utf("fail"))
 
 
 def process_check_directory(dir, pf_name="default"):
@@ -250,11 +250,16 @@ def process_check_directory(dir, pf_name="default"):
     buildenv = run.build_env_from_configuration(pf.dump())
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
-
-    log.manager.print_section(
-        'Analyzing: Setup{s}Output{s}test Node(s)'.format(s=log.manager.utf('sep_v')))
-
-    for _, subprefix, f in [*setup_files, *yaml_files]:
+    
+    from rich.table import Table
+    table = Table(title="Results", expand=True, row_styles=["dim", ""])
+    table.add_column("Runnable Script", justify="center", max_width=5)
+    table.add_column("Valid", justify="center", max_width=5)
+    table.add_column("Node count", justify="center", max_width=5)
+    table.add_column("File Path", justify="left")
+    #with io.console.pager():
+        #with Live(table, refresh_per_second=4):
+    for _, subprefix, f in io.console.progress_iter([*setup_files, *yaml_files]):
         setup_ok = __set_token(None)
         yaml_ok = __set_token(None)
         nb_nodes = __set_token(None, "----")
@@ -278,22 +283,19 @@ def process_check_directory(dir, pf_name="default"):
             if cnt > 0:
                 nb_nodes = cnt
                 total_nodes += nb_nodes
-
-        log.manager.print_item(' {}{}{}{}{}{}{}'.format(
+        
+        table.add_row(
             setup_ok,
-            log.manager.utf('sep_v'),
             yaml_ok,
-            log.manager.utf('sep_v'),
-            log.manager.style("{:>4}".format(nb_nodes),
-                              fg="yellow", bold=True),
-            log.manager.utf('sep_v'),
-            "./" if not subprefix else subprefix), with_bullet=False)
+            "{:>4}" .format(nb_nodes),
+            "./" if not subprefix else subprefix)
 
         if err:
             log.manager.info("FAILED: {}".format(
                 base64.b64decode(err).decode('utf-8')))
             errors.setdefault(err, 0)
             errors[err] += 1
+    log.manager.print(table)
     log.manager.print_item("Jobs count: {}".format(total_nodes))
     return errors
 
@@ -399,13 +401,13 @@ def process_discover_directory(path, override=False, force=False):
     for root, dirs, files in os.walk(path):
         obj = None
         if 'configure' in files:
-            n = log.manager.style("Autotools", fg="yellow", bold=True)
+            n = "[yello bold]Autotools[/]"
             obj = AutotoolsBuildSystem(root, dirs, files)
         if 'CMakeLists.txt' in files:
-            n = log.manager.style("CMake", fg="cyan", bold=True)
+            n = "[cyan bold]CMake[/]"
             obj = CMakeBuildSystem(root, dirs, files)
         if 'Makefile' in files:
-            n = log.manager.style("Make", fg="red", bold=True)
+            n = "[red bold]Make[/]"
             obj = MakefileBuildSystem(root, dirs, files)
 
         if obj is not None:

@@ -6,7 +6,6 @@ import textwrap
 import traceback
 
 import click
-from rich.progress import track
 
 from pcvs import io
 from pcvs.helpers import exceptions
@@ -619,24 +618,8 @@ def init(v=0, e=False, l=100, quiet=False):
     manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
     manager = io.console
 
-
-def progress_iter(it, man=None, **kwargs):
-    """prints a progress bar using click
-
-    :param it: iterable on which the progress bar has to iterate
-    :type it: iterable
-    :param print_func: method used to show the item next to the progress bar,
-        defaults to None
-    :type print_func: function, optional
-    :param man: manager used to describe the bullets, defaults to None
-    :type man: log.IOManager, optional
-    :return: a click progress bar (iterable)
-    :rtype: click.ProgressBar
-    """
     if man is None:
         man = manager
-
-    return track(it, transient=True, console=io.console)
 
     # return click.progressbar(
     #    it, empty_char=man.utf('empty_pg'),

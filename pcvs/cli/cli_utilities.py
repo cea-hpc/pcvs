@@ -2,12 +2,14 @@ import base64
 import copy
 import os
 import shutil
+from rich.table import Table
+from rich.panel import Panel
 import subprocess
 import sys
 from datetime import datetime
 
 from prettytable import PrettyTable
-
+from pcvs import io
 from pcvs import NAME_BUILDFILE
 from pcvs.backend import utilities as pvUtils
 from pcvs.helpers import log
@@ -96,26 +98,25 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
     log.manager.print_banner()
     errors = dict()
     if color:
-        log.manager.print_header("Colouring")
-        t = PrettyTable()
-        ctx.color = True
-        t.field_names = ["Name", "Foreground", "Background"]
-        for k in sorted(log.manager.color_list):
-            t.add_row([k, click.style("Test", fg=k),
-                      click.style("Test", bg=k)])
-        print(t)
+        display = Panel.fit("\n".join([
+            "[red bold]Color[/], [i]Styles[/] & [underline]encoding[/] are managed by [cyan bold]Rich[/].",
+            "[green bold]Please[/] visit their project: https://github.com/Textualize/rich",
+            ":warning: To [underline]disable[/] [dim]Markups & Highlighting support[/]",
+            "please use `--no-color` to the [red blink]PCVS[/] root command."
+        ]))
+        io.console.print(display)
+        return
 
     if encoding:
-        log.manager.print_header("Encoding")
-
-        t = PrettyTable()
-        t.field_names = ["Alias", "Symbol", "Fallback"]
-        man_default = log.IOManager(0, False, 100, None, None)
-        man_unicode = log.IOManager(0, True, 100, None, None)
-
-        for k in sorted(man_default.avail_chars()):
-            t.add_row([k, man_unicode.utf(k), man_default.utf(k)])
-        print(t)
+        t = Table("Alias", "Symbol", "Fallback", title="UTF Support")
+        w = io.SpecialChar(utf_support=True)
+        wo = io.SpecialChar(utf_support=False)
+        for k in io.SpecialChar.__dict__.keys():
+            if k.startswith("_"):
+                continue
+            t.add_row(k, str(getattr(w, k)), str(getattr(wo, k)))
+        io.console.print(t)
+        return
 
     if configs:
         log.manager.print_header("Configurations")
@@ -135,24 +136,16 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
         errors = {**errors, **
                   pvUtils.process_check_directory(os.path.abspath(dir), pf_name)}
 
+    table = Table("Count", "Type of error", title="Classification of errors", expand=True)
     if errors:
-        log.manager.print_section("Classification of errors:")
-        table = PrettyTable()
-        table.field_names = ["Count", "Type of error"]
-
         for k, v in errors.items():
-            table.add_row([v, base64.b64decode(k).decode('utf-8')])
-
-        table.align["Count"] = "c"
-        table.align["Type of error"] = "l"
-        table.sortby = "Count"
-        table.reversesort = True
-        print(table)
+            table.add_row(str(v), base64.b64decode(k).decode('utf-8'))
+        io.console.print(table)
     else:
-        log.manager.print_section("{succ} {cg} {succ}".format(
+        log.manager.print("{succ} {cg} {succ}".format(
             succ=log.manager.utf('succ'),
-            cg=log.manager.style("Everything is OK!", fg='green', bold=True))
-        )
+            cg="[green bold]Everything is OK![/]"
+        ))
 
 
 @click.command(name="clean", short_help="Remove artifacts generated from PCVS")

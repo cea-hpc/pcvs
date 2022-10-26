@@ -3,7 +3,6 @@ import logging
 import os
 import shutil
 import sys
-import traceback
 
 import rich.box as box
 from rich.console import Console
@@ -13,6 +12,7 @@ from rich.panel import Panel
 from rich.progress import (BarColumn, Progress, SpinnerColumn, TextColumn,
                            TimeElapsedColumn)
 from rich.table import Table
+from rich.progress import track
 
 import pcvs
 
@@ -33,7 +33,7 @@ class SpecialChar:
 
     def __init__(self, utf_support=True):
         if not utf_support:
-            self.copy = '(c)',
+            self.copy = '(c)'
             self.item = '*'
             self.sec = '#'
             self.hdr = '='
@@ -50,19 +50,13 @@ class SpecialChar:
 class TheConsole(Console):
 
     def __init__(self, *args, **kwargs):
-        self._color = kwargs.get('color', True)
+        self._color = "auto" if kwargs.get('color', True) else None
         self._verbose = kwargs.get('verbose', 0)
         self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w")
         self.summary_table = dict()
-
-        try:
-            del kwargs['color']
-            del kwargs['verbose']
-        except:
-            pass
-
-        super().__init__(*args, **kwargs)
-        self._debugconsole = Console(file=self._debugfile, markup=self._color)
+        
+        super().__init__(color_system=self._color)
+        self._debugconsole = Console(file=self._debugfile, color_system=self._color, markup=self._color is not None)
 
         logging.basicConfig(
             level="DEBUG", format="%(message)s",
@@ -77,10 +71,6 @@ class TheConsole(Console):
         if self._debugfile:
             self._debugfile.close()
             self._debugfile = None
-
-    @property
-    def logger(self):
-        return self._loghdl
 
     def move_debug_file(self, newdir):
         assert (os.path.isdir(newdir))
@@ -102,9 +92,6 @@ class TheConsole(Console):
         self.print("[red bold]{}{}[/] {}".format(" " *
                    (depth*2), self.utf('item'), txt))
         self.debug("[CONSOLE]* {}".format(txt))
-
-    def print_box(self, txt, *args, **kwargs):
-        self.print(Panel.fit(txt, *args, **kwargs))
 
     def print_job(self, state, time, tlabel, tsubtree, tname, colorname="red", icon=None):
         if icon is not None:
@@ -176,6 +163,26 @@ class TheConsole(Console):
         self.live = Live(self._display_table, console=self)
         return self.live
 
+    def progress_iter(self, it, **kwargs):
+        """prints a progress bar using click
+        :param it: iterable on which the progress bar has to iterate
+        :type it: iterable
+        :param print_func: method used to show the item next to the progress bar,
+            defaults to None
+        :type print_func: function, optional
+        :param man: manager used to describe the bullets, defaults to None
+        :type man: log.IOManager, optional
+        :return: a click progress bar (iterable)
+        :rtype: click.ProgressBar
+        """
+        global console
+        return track(it, transient=True, console=console,
+                     complete_style="cyan",
+                     pulse_style="green",
+                     refresh_per_second=4,
+                     description="[red]In Progress...[red]",
+                     **kwargs)
+
     def utf(self, k):
         return getattr(self._chars, k)
 
@@ -209,16 +216,16 @@ class TheConsole(Console):
             r"""[green  ]  / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /  """,
             r"""[green  ] /_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /   """,
             r"""[green  ]                                                           /_/                     /____/     """,
-            r"""[default]                                            {} (PCVS) {}""".format(
+            r"""[default]                                            {} ([link=https://pcvs.io]PCVS[/link]) {}""".format(
                 self.utf('star'), self.utf('star')),
             r"""[green  ]    _    __      ___     __      __  _                _____            __                    """,
             r"""[green  ]   | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  _______/ /____  ____ ___      """,
             r"""[green  ]   | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \     """,
             r"""[yellow ]   | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ /__  / /_/  __/ / / / / /     """,
             r"""[red    ]   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      """,
-            r"""[green  ]                                                        /____/                               """,
-            r"""[green  ]                                                                                             """,
-            r"""[default]    Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives (CEA)""".format(
+            r"""[red    ]                                                        /____/                               """,
+            r"""[red    ]                                                                                             """,
+            r"""[default]    Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives ([link=https://cea.fr]CEA[/link])""".format(
                 self.utf('copy')),
             r"""[default]                                                                                             """,
             r"""[default]  This program comes with ABSOLUTELY NO WARRANTY;""",
@@ -303,8 +310,14 @@ class TheConsole(Console):
 
 
 console = TheConsole()
-log = console.logger
 
+def reset_console(color=True, verbose=0):
+    global console
+
+    if console:
+        del console
+        
+    console = TheConsole(color=color, verbose=verbose)
 
 def detach_console(logfile=None):
     global console

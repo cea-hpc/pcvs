@@ -342,7 +342,7 @@ def process_files():
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        log.manager.err(["Test-suites failed to be parsed, with the following errors:"] +
+        log.manager.error(["Test-suites failed to be parsed, with the following errors:"] +
                         ["\t-{}: {}".format(e[0], e[1]) for e in errors]
                         )
         raise RunException.TestUnfoldError("See previous errors above.")
@@ -362,7 +362,7 @@ def process_spack():
     _, _, rbuild, _ = testing.generate_local_variables(label, '')
     utils.create_or_clean_path(rbuild, dir=True)
 
-    for spec in log.progress_iter(MetaConfig.root.validation.spack_recipe):
+    for spec in io.console.progress_iter(MetaConfig.root.validation.spack_recipe):
         _, _, _, cbuild = testing.generate_local_variables(label, spec)
         utils.create_or_clean_path(cbuild, dir=True)
         pvSpack.generate_from_variants(spec, label, spec)
@@ -430,7 +430,7 @@ def process_dyn_setup_scripts(setup_files):
         fh.close()
 
     log.manager.info("Iteration over files")
-    for label, subprefix, fname in log.progress_iter(setup_files):
+    for label, subprefix, fname in io.console.progress_iter(setup_files):
         log.manager.debug("process {} ({})".format(subprefix, label))
         base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
             label, subprefix)
@@ -504,7 +504,7 @@ def process_static_yaml_files(yaml_files):
     """
     err = []
     log.manager.info("Iteration over files")
-    for label, subprefix, fname in log.progress_iter(yaml_files):
+    for label, subprefix, fname in io.console.progress_iter(yaml_files):
         _, cur_src, _, cur_build = testing.generate_local_variables(
             label, subprefix)
         if not os.path.isdir(cur_build):

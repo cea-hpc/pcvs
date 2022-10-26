@@ -80,11 +80,8 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
     # Click specific-related
     ctx.color = color
 
-    if width is None:
-        width = shutil.get_terminal_size()[0]
-
-    io.console = io.TheConsole(color=color, verbose=verbose)
-    log.init(verbose, encoding, width)
+    io.console.info("before")
+    io.reset_console(color=color, verbose=verbose)
 
     utils.set_local_path(ctx.obj['exec'])
 
