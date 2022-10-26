@@ -3,7 +3,8 @@ import sys
 from ruamel.yaml import YAML
 
 from pcvs.backend import config as pvConfig
-from pcvs.helpers import log, utils
+from pcvs.helpers import utils
+from pcvs import io
 from pcvs.helpers.exceptions import ConfigException
 
 try:
@@ -79,22 +80,22 @@ def config_list_single_kind(kind, scope) -> None:
     # retrieve blocks to print
     blocks = pvConfig.list_blocks(kind, scope)
     if not blocks:
-        log.manager.print_item("None")
+        io.console.print_item("None")
         return
     elif scope is None:  # if no scope has been provided by the user
         for sc in utils.storage_order():
             # aggregate names for each sccope
             names = sorted([elt[0] for elt in [array for array in blocks[sc]]])
             if not names:
-                log.manager.print_item(
+                io.console.print_item(
                     "[bright_black]{: <6s}: None".format(sc.upper()))
             else:
-                log.manager.print_item("{: <6s}: {}".format(
+                io.console.print_item("{: <6s}: {}".format(
                     sc.upper(),
                     ", ".join(names)))
     else:
         names = sorted([x[0] for x in blocks])
-        log.manager.print_item("{: <6s}: {}".format(
+        io.console.print_item("{: <6s}: {}".format(
             scope.upper(), ", ".join(names)))
 
 
@@ -119,7 +120,7 @@ def config_list(ctx, token, all) -> None:
         (scope, kind, label) = utils.extract_infos_from_token(
             token, pair="left", single="center")
     if label:
-        log.manager.warn("no LABEL required for this command")
+        io.console.warn("no LABEL required for this command")
 
     # special cases for 'list' command:
     # - no 'label' are required (ignored otherwise)
@@ -131,22 +132,22 @@ def config_list(ctx, token, all) -> None:
         kinds = [kind]
     utils.check_valid_scope(scope)
 
-    log.manager.print_header("Configuration view")
+    io.console.print_header("Configuration view")
 
     for k in kinds:
-        log.manager.print_section("Kind '{}'".format(k.upper()))
+        io.console.print_section("Kind '{}'".format(k.upper()))
         config_list_single_kind(k, scope)
 
     if all:
-        log.manager.print_section(
+        io.console.print_section(
             "Available templates to create from (--base option):")
-        log.manager.print_item(
+        io.console.print_item(
             ", ".join([x for x in sorted(pvConfig.list_templates())]))
 
     # in case verbosity is enabled, add scope paths
-    log.manager.info("Scopes are ordered as follows:")
+    io.console.info("Scopes are ordered as follows:")
     for i, scope in enumerate(utils.storage_order()):
-        log.manager.info("{}. {}: {}".format(
+        io.console.info("{}. {}: {}".format(
             i+1, scope.upper(), utils.STORAGES[scope]))
 
 

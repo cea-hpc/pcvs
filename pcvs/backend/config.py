@@ -6,7 +6,8 @@ import click
 from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
-from pcvs.helpers import log, system, utils
+from pcvs import io
+from pcvs.helpers import system, utils
 from pcvs.helpers.exceptions import ConfigException
 from pcvs.helpers.system import MetaDict
 
@@ -298,7 +299,7 @@ class ConfigurationBlock:
         self.retrieve_file()
         assert (not os.path.isfile(self._file))
 
-        log.manager.info("Compute target prefix: {}".format(self._file))
+        io.console.info("Compute target prefix: {}".format(self._file))
         self._details = clone._details
 
     def delete(self) -> None:
@@ -306,18 +307,18 @@ class ConfigurationBlock:
         assert (self.is_found())
         assert (os.path.isfile(self._file))
 
-        log.manager.info("remove {} from '{} ({})'".format(
+        io.console.info("remove {} from '{} ({})'".format(
             self._name, self._kind, self._scope))
         os.remove(self._file)
 
     def display(self) -> None:
         """Configuration block pretty printer"""
-        log.manager.print_header("Configuration display")
-        log.manager.print_section("Scope: {}".format(self._scope.capitalize()))
-        log.manager.print_section("Path: {}".format(self._file))
-        log.manager.print_section("Details:")
+        io.console.print_header("Configuration display")
+        io.console.print_section("Scope: {}".format(self._scope.capitalize()))
+        io.console.print_section("Path: {}".format(self._file))
+        io.console.print_section("Details:")
         for k, v in self._details.items():
-            log.manager.print_item("{}: {}".format(k, v))
+            io.console.print_item("{}: {}".format(k, v))
 
     def edit(self) -> None:
         """Open the current block for edition.

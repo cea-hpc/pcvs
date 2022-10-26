@@ -200,12 +200,23 @@ class TestException(CommonException):
 
     class TDFormatError(GenericError):
         """Test description is wrongly formatted."""
-
-        pass
+        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
+            """Updated constructor"""
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",
+                                 "See pcvs check --help for more information."]),
+                             dbg_info=kwargs)
 
     class DynamicProcessError(GenericError):
         """Test File is not properly formatted."""
-        pass
+        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
+            """Updated constructor"""
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",
+                                 "See pcvs check --help for more information."]),
+                             dbg_info=kwargs)
 
 
 class OrchestratorException(CommonException):

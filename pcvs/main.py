@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
-
-import os
-import shutil
-
 import pkg_resources
 
-import pcvs
 from pcvs import io
-from pcvs.backend import bank, config, profile, session
-from pcvs.cli import (cli_bank, cli_config, cli_plumbing, cli_profile,
+from pcvs.backend import bank, config, profile
+from pcvs.cli import (cli_bank, cli_config, cli_profile,
                       cli_report, cli_run, cli_session, cli_utilities)
-from pcvs.helpers import log, utils
+from pcvs.helpers import utils
 from pcvs.helpers.exceptions import PluginException
 from pcvs.plugins import Collection, Plugin
 
@@ -68,7 +63,7 @@ def print_version(ctx, param, value):
               help="Default Plugin path prefix")
 @click.option("-m", "--plugin", "select_plugins", multiple=True)
 @click.pass_context
-@log.manager.capture_exception(PluginException.NotFoundError)
+@io.capture_exception(PluginException.NotFoundError)
 def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins):
     """PCVS main program."""
     ctx.ensure_object(dict)
@@ -79,10 +74,9 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
 
     # Click specific-related
     ctx.color = color
-
-    io.console.info("before")
-    io.reset_console(color=color, verbose=verbose)
-
+    
+    io.init(color=color, verbose=verbose)
+    print("luuuu")
     utils.set_local_path(ctx.obj['exec'])
 
     utils.create_home_dir()

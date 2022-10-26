@@ -5,7 +5,7 @@ import re
 import shlex
 from enum import IntEnum
 
-from pcvs.helpers import log
+from pcvs import io
 from pcvs.helpers.criterion import Combination
 from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.helpers.utils import Program
@@ -425,9 +425,9 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        # log.manager.print_job(label, self._exectime, self.name,
+        # io.console.print_job(label, self._exectime, self.name,
         #                      colorname=colorname, icon=icon)
-        log.manager.print_job(label, self._exectime, self.label,
+        io.console.print_job(label, self._exectime, self.label,
                               "/{}".format(self.subtree) if self.subtree else "",
                               self.name,
                               colorname=colorname, icon=icon)
@@ -435,7 +435,7 @@ class Test:
         if self._output:
             if (MetaConfig.root.validation.print_level == 'all' or
                     (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
-                log.manager.print(base64.b64decode(self._output))
+                io.console.print(base64.b64decode(self._output))
 
     def executed(self, state=None):
         """Set current Test as executed.

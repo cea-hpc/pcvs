@@ -6,7 +6,7 @@ import pkgutil
 import sys
 from abc import abstractmethod
 
-from pcvs.helpers import log
+from pcvs import io
 from pcvs.helpers.exceptions import PluginException
 
 
@@ -90,7 +90,7 @@ class Collection:
             self.register_plugin_by_package('pcvs-contrib')
 
         except:
-            log.manager.info(
+            io.console.info(
                 "No pcvs-contrib package found for plugin autoloading")
 
     def activate_plugin(self, name):
@@ -102,13 +102,13 @@ class Collection:
         for step, plugins in self._plugins.items():
             for p in plugins:
                 if name.lower() == type(p).__name__.lower():
-                    log.manager.debug("Activate {}".format(name))
+                    io.console.debug("Activate {}".format(name))
                     if self._enabled[p.step]:
-                        log.manager.debug(
+                        io.console.debug(
                             " -> overrides {}".format(self._enabled[p.step]))
                     self._enabled[p.step] = p
                     return
-        log.manager.warn("Unable to find a plugin named '{}'".format(name))
+        io.console.warn("Unable to find a plugin named '{}'".format(name))
 
     def invoke_plugins(self, step, *args, **kwargs):
         """Load the appropriate plugin, given a step
@@ -156,9 +156,9 @@ class Collection:
         """Display plugin context to stdout."""
         for step, elements in self._plugins.items():
             if len(elements) > 0:
-                log.manager.print_section("Step {}:".format(str(step)))
+                io.console.print_section("Step {}:".format(str(step)))
                 for e in elements:
-                    log.manager.print_item("{}".format(type(e).__name__))
+                    io.console.print_item("{}".format(type(e).__name__))
 
     def show_enabled_plugins(self):
         """Display the list of loaded plugins."""
@@ -166,11 +166,11 @@ class Collection:
         for step, e in self._enabled.items():
             if e:
                 empty = False
-                log.manager.print_item(
+                io.console.print_item(
                     "{}: {}".format(str(step), type(e).__name__))
 
         if empty:
-            log.manager.print_item("None")
+            io.console.print_item("None")
 
     def register_plugin_by_file(self, modpath, activate=False):
         """Based on a filepath (as a module dir), load plugins contained in it.
@@ -198,7 +198,7 @@ class Collection:
             if issubclass(the_class, Plugin) and the_class is not Plugin:
                 step_str = str(the_class.step)
                 class_name = the_class.__name__
-                log.manager.debug(
+                io.console.debug(
                     "Register {} ({})".format(class_name, step_str))
                 self._plugins[the_class.step].append(the_class())
                 if activate:

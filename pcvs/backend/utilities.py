@@ -10,7 +10,7 @@ from ruamel.yaml import YAML, YAMLError
 import pcvs
 from pcvs import io
 from pcvs.backend import config, profile, run
-from pcvs.helpers import log, system, utils
+from pcvs.helpers import system, utils
 from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.system import MetaDict
 
@@ -92,19 +92,19 @@ def process_check_configs():
     for kind in config.CONFIG_BLOCKS:
         for scope in utils.storage_order():
             for blob in config.list_blocks(kind, scope):
-                token = log.manager.utf('fail')
+                token = io.console.utf('fail')
                 err_msg = ""
                 obj = config.ConfigurationBlock(kind, blob[0], scope)
                 obj.load_from_disk()
 
                 try:
                     obj.check()
-                    token = log.manager.utf('succ')
+                    token = io.console.utf('succ')
                 except jsonschema.exceptions.ValidationError as e:
                     err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                     errors.setdefault(err_msg, 0)
                     errors[err_msg] += 1
-                    log.manager.debug(str(e))
+                    io.console.debug(str(e))
 
                 t.add_row(token, obj.full_name)
     io.console.print(t)
@@ -122,17 +122,17 @@ def process_check_profiles():
 
     for scope in utils.storage_order():
         for blob in profile.list_profiles(scope):
-            token = log.manager.utf('fail')
+            token = io.console.utf('fail')
             obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
                 obj.check()
-                token = log.manager.utf('succ')
+                token = io.console.utf('succ')
             except jsonschema.exceptions.ValidationError as e:
                 err_msg = base64.b64encode(str(e.message).encode('utf-8'))
                 errors.setdefault(err_msg, 0)
                 errors[err_msg] += 1
-                log.manager.debug(str(e))
+                io.console.debug(str(e))
 
             t.add_row(token, obj.full_name)
     io.console.print(t)
@@ -223,13 +223,13 @@ def __set_token(token, nset=None) -> str:
     :rtype: str
     """
     if not nset:
-        nset = log.manager.utf("none")
+        nset = io.console.utf("none")
     if token is None:
         return "[yellow bold]{}[/]".format(nset)
     elif token:
-        return "[green bold]{}[/]".format(log.manager.utf("succ"))
+        return "[green bold]{}[/]".format(io.console.utf("succ"))
     else:
-        return "[red bold]{}[/]".format(log.manager.utf("fail"))
+        return "[red bold]{}[/]".format(io.console.utf("fail"))
 
 
 def process_check_directory(dir, pf_name="default"):
@@ -291,12 +291,12 @@ def process_check_directory(dir, pf_name="default"):
             "./" if not subprefix else subprefix)
 
         if err:
-            log.manager.info("FAILED: {}".format(
+            io.console.info("FAILED: {}".format(
                 base64.b64decode(err).decode('utf-8')))
             errors.setdefault(err, 0)
             errors[err] += 1
-    log.manager.print(table)
-    log.manager.print_item("Jobs count: {}".format(total_nodes))
+    io.console.print(table)
+    io.console.print_item("Jobs count: {}".format(total_nodes))
     return errors
 
 
@@ -345,7 +345,7 @@ class BuildSystem:
         """
         out_file = os.path.join(self._root, filename)
         if os.path.isfile(out_file) and not force:
-            log.manager.warn(" --> skipped, already exist;")
+            io.console.warn(" --> skipped, already exist;")
             return
 
         with open(out_file, 'w') as fh:
@@ -412,7 +412,7 @@ def process_discover_directory(path, override=False, force=False):
 
         if obj is not None:
             dirs[:] = []
-            log.manager.print_item("{} [{}]".format(root, n))
+            io.console.print_item("{} [{}]".format(root, n))
             obj.fill()
             if override:
                 obj.generate_file(filename="pcvs.yml", force=force)

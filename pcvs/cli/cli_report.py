@@ -56,8 +56,8 @@ def report(ctx, path_list, static):
                 else:
                     pvReport.upload_buildir_results(prefix)
             except Exception as e:
-                log.manager.warn("Unable to parse {}".format(prefix))
-                log.manager.debug("Caught {}".format(e))
+                io.console.warn("Unable to parse {}".format(prefix))
+                io.console.debug("Caught {}".format(e))
                 raise e
         # create the app
         pvReport.start_server()

@@ -48,11 +48,11 @@ class Orchestrator:
 
     def print_infos(self):
         """display pre-run infos."""
-        log.manager.print_item("Test count: {}".format(
+        io.console.print_item("Test count: {}".format(
             self._manager.get_count('total')))
-        log.manager.print_item(
+        io.console.print_item(
             "Max simultaneous Sets: {}".format(self._maxconcurrent))
-        log.manager.print_item("Resource count: {}".format(self._max_res))
+        io.console.print_item("Resource count: {}".format(self._max_res))
 
     # This func should only be a passthrough to the job manager
     def add_new_job(self, job):
@@ -63,7 +63,7 @@ class Orchestrator:
         """
         self._manager.add_job(job)
 
-    @log.manager.capture_exception(KeyboardInterrupt, global_stop)
+    @io.capture_exception(KeyboardInterrupt, global_stop)
     def start_run(self, the_session=None, restart=False):
         """Start the orchestrator.
 
@@ -76,7 +76,7 @@ class Orchestrator:
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_BEFORE)
 
-        log.manager.info("ORCH: initialize runners")
+        io.console.info("ORCH: initialize runners")
         for i in range(0, self._maxconcurrent):
             self.start_new_runner()
 
@@ -84,7 +84,7 @@ class Orchestrator:
 
         nb_nodes = self._max_res
         last_progress = 0
-        log.manager.info("ORCH: start job scheduling")
+        io.console.info("ORCH: start job scheduling")
         # While some jobs are available to run
         with io.console.table_container(self._manager.get_count()):
             while self._manager.get_leftjob_count() > 0 or not self._ready_q.empty():
@@ -96,14 +96,14 @@ class Orchestrator:
                     if new_set is not None:
                         # schedule the set asynchronously
                         nb_nodes -= new_set.dim
-                        log.manager.debug("ORCH: send Set to queue (#{}, sz:{})".format(
+                        io.console.debug("ORCH: send Set to queue (#{}, sz:{})".format(
                             new_set.id, new_set.size))
                         self._ready_q.put(new_set)
 
                 # Now, look for a completion
                 try:
                     set = self._complete_q.get(block=False, timeout=2)
-                    log.manager.debug("ORCH: recv Set from queue (#{}, sz:{})".format(
+                    io.console.debug("ORCH: recv Set from queue (#{}, sz:{})".format(
                         set.id, set.size))
                     nb_nodes += set.dim
                     self._manager.merge_subset(set)
@@ -121,7 +121,7 @@ class Orchestrator:
                     # TODO: Publish results periodically
                     # 1. on file system
                     # 2. directly into the selected bank
-                    log.manager.debug("ORCH: Flush a new progression file")
+                    io.console.debug("ORCH: Flush a new progression file")
                     self._publisher.flush()
                     last_progress = current_progress
                     if the_session is not None:
@@ -135,7 +135,7 @@ class Orchestrator:
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.SCHED_AFTER)
 
-        log.manager.info("ORCH: Stop active runners")
+        io.console.info("ORCH: Stop active runners")
         self.stop_runners()
 
         return 0 if self._manager.get_count('total') - self._manager.get_count(Test.State.SUCCESS) == 0 else 1

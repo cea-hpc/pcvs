@@ -4,6 +4,7 @@ import threading
 import time
 from typing import List
 
+from pcvs import io
 from pcvs.helpers import communications, log
 from pcvs.helpers.system import MetaConfig
 from pcvs.testing.test import Test
@@ -137,7 +138,7 @@ class Runner(threading.Thread):
         self._cq = complete
 
     def run(self):
-        log.manager.debug('{}: Set start'.format(self.ident))
+        io.console.debug('{}: Set start'.format(self.ident))
         while True:
             try:
                 if self.sched_in_progress:

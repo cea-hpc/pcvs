@@ -138,7 +138,7 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
         (valid, dest_k) = check_if_key_matches(k, v, ref_array)
 
         if valid:
-            log.manager.info("Processing {}".format(k))
+            io.console.info("Processing {}".format(k))
             # An empty array means the key does not exist in the new tree.
             # => discard
             if len(dest_k) <= 0:
@@ -166,9 +166,9 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
                 set_with(output, final_k.split('.'), final_v, should_append)
         else:
             # warn when an old_key hasn't be declared in spec.
-            log.manager.info("DISCARDING {}".format(k))
+            io.console.info("DISCARDING {}".format(k))
             if warn_if_missing:
-                log.manager.warn("Key {} undeclared in spec.".format(k))
+                io.console.warn("Key {} undeclared in spec.".format(k))
                 set_with(output, ['pcvs_missing'] + k.split("."), v)
             else:
                 set_with(output, k.split("."), v)
@@ -257,20 +257,20 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     ctx.color = color
     kind = kind.lower()
     log.init(verbose, encoding, None)
-    log.manager.print_header("YAML Conversion")
+    io.console.print_header("YAML Conversion")
 
     if template is None and kind == "te":
-        log.manager.warn(
+        io.console.warn(
             ["If the TE file contains YAML aliases, the conversion may",
              "fail. Use the '--template' option to provide the YAML file",
              "containing these aliases"])
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
     try:
-        log.manager.print_item("Load data file: {}".format(f.name))
+        io.console.print_item("Load data file: {}".format(f.name))
         stream = f.read()
         if template:
-            log.manager.print_item("Load template file: {}".format(template))
+            io.console.print_item("Load template file: {}".format(template))
             stream = open(template, 'r').read() + stream
         data_to_convert = YAML(typ='safe').load(stream)
     except yaml.composer.ComposerError as e:
@@ -280,7 +280,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     if not scheme:
         scheme = open(os.path.join(
             pcvs.PATH_INSTDIR, "converter/convert.json"))
-    log.manager.print_item("Load scheme file: {}".format(scheme.name))
+    io.console.print_item("Load scheme file: {}".format(scheme.name))
     tmp = json.load(scheme)
 
     # if modifiers are declared, replace token with regexes
@@ -290,31 +290,31 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     desc_dict['second'] = replace_placeholder(tmp,
                                               tmp['__tokens'])
 
-    log.manager.info(["Conversion list {old_key -> new_key):",
+    io.console.info(["Conversion list {old_key -> new_key):",
                      "{}".format(pprint.pformat(desc_dict))])
 
     # first, "flattening" the original array: {(1, 2, 3): "val"}
     data_to_convert = flatten(data_to_convert, kind)
 
     # then, process modifiers, altering original data before processing
-    log.manager.print_item("Process alterations to the original data")
+    io.console.print_item("Process alterations to the original data")
     data_to_convert = process_modifiers(data_to_convert)
     # as modifiers may have created nested dictionaries:
     # => "flattening" again, but with no prefix (persistent from first)
     data_to_convert = flatten(data_to_convert, "")
 
     # Finally, convert the original data to the final yaml dict
-    log.manager.print_item("Process the data")
+    io.console.print_item("Process the data")
     final_data = process(data_to_convert)
 
     # remove template key from the output to avoid polluting the caller
-    log.manager.print_item("Pruning templates from the final data")
+    io.console.print_item("Pruning templates from the final data")
     invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
-    log.manager.info(["Prune the following:", "{}".format(
+    io.console.info(["Prune the following:", "{}".format(
         pprint.pformat(invalid_nodes))])
     [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
 
-    log.manager.info(
+    io.console.info(
         ["Final layout:", "{}".format(pprint.pformat(final_data))])
 
     if stdout:
@@ -326,7 +326,7 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
             out = os.path.join(prefix, "convert-" + base)
         f = open(out, "w")
 
-    log.manager.print_section("Converted data written into {}".format(f.name))
+    io.console.print_section("Converted data written into {}".format(f.name))
     YAML(typ='safe').dump(final_data, f)
 
     f.flush()

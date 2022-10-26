@@ -78,7 +78,7 @@ class TheConsole(Console):
             shutil.move(self._debugfile.name, os.path.join(
                 newdir, pcvs.NAME_DEBUG_FILE))
         else:
-            self.warning("No debug.log file found for this Console")
+            self.warning("No '{}' file found for this Console".format(pcvs.NAME_DEBUG_FILE))
 
     def print_section(self, txt):
         self.print("[yellow bold]{} {}[/]".format(self.utf('sec'), txt))
@@ -92,6 +92,9 @@ class TheConsole(Console):
         self.print("[red bold]{}{}[/] {}".format(" " *
                    (depth*2), self.utf('item'), txt))
         self.debug("[CONSOLE]* {}".format(txt))
+
+    def print_box(self, txt, *args, **kwargs):
+        self.print(Panel.fit(txt, *args, **kwargs))
 
     def print_job(self, state, time, tlabel, tsubtree, tname, colorname="red", icon=None):
         if icon is not None:
@@ -152,10 +155,10 @@ class TheConsole(Console):
         self._progress = Progress(
             TimeElapsedColumn(),
             "Progression",
-            BarColumn(bar_width=None),
+            BarColumn(bar_width=None, complete_style="yellow", finished_style="green"),
             TextColumn("[progress.percentage]{task.percentage:>3.1f}%"),
             SpinnerColumn(speed=0.5),
-            expand=True, transient=False)
+            expand=True)
         self._singletask = self._progress.add_task(
             "Progression", total=int(total))
 
@@ -262,18 +265,31 @@ class TheConsole(Console):
         self.warning(fmt, *args, **kwargs)
 
     def error(self, fmt, *args, **kwargs):
-        self.print("[red bold]" + fmt + "[/]", *args, **kwargs)
         self._loghdl.error(fmt, *args, **kwargs)
 
     def critical(self, fmt, *args, **kwargs):
         self._loghdl.critical(fmt, *args, **kwargs)
 
     def exception(self, e: BaseException, *args, **kwargs):
-        if self._loghdl.getEffectiveLevel() <= logging.DEBUG:
-            console.print_exception()
+        if self._verbose >= 2:
+            console.print_exception(suppress=['click'])
         self._loghdl.exception(e)
 
-    def capture_exception(self, e_type, user_func=None):
+console = None
+
+def init(color=True, verbose=0):
+    global console
+    console = TheConsole(color=color, verbose=verbose)
+    print(console)
+
+def detach_console(logfile=None):
+    global console
+    if logfile:
+        console.file = open(logfile, "w")
+    else:
+        console.file = sys.stdout
+
+def capture_exception(e_type, user_func=None):
         """wraps functions to capture unhandled exceptions for high-level
             function not to crash.
             :param *e_type: errors to be caught
@@ -299,29 +315,15 @@ class TheConsole(Console):
                     return func(*args, **kwargs)
                 except e_type as e:
                     if user_func is None:
-                        self.print("[red bold]Exception: {}".format(e))
-                        self.print(
-                            "[red bold]See 'debug.log' or rerun with -vv for more detail")
+                        global console
+                        if not console:
+                            console = TheConsole()
+                        console.exception(e)
+                        console.print("[red bold]Exception: {}".format(e))
+                        console.print(
+                            "[red bold]See '{}' or rerun with -vv for more detail".format(pcvs.NAME_DEBUG_FILE))
                         sys.exit(1)
                     else:
                         user_func(e)
             return wrapper
         return inner_function
-
-
-console = TheConsole()
-
-def reset_console(color=True, verbose=0):
-    global console
-
-    if console:
-        del console
-        
-    console = TheConsole(color=color, verbose=verbose)
-
-def detach_console(logfile=None):
-    global console
-    if logfile:
-        console.file = open(logfile, "w")
-    else:
-        console.file = sys.stdout

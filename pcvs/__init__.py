@@ -7,7 +7,7 @@ NAME_BUILDFILE = ".pcvs-isbuilddir"
 NAME_SRCDIR = ".pcvs"
 NAME_BUILD_CONF_FN = "conf.yml"
 NAME_BUILD_RESDIR = "rawdata"
-NAME_DEBUG_FILE = ".pcvs-debug.log"
+NAME_DEBUG_FILE = "pcvs-debug.log"
 
 PATH_INSTDIR = os.path.dirname(__file__)
 PATH_HOMEDIR = click.get_app_dir('pcvs', force_posix=True)

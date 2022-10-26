@@ -95,7 +95,7 @@ def exec(ctx, output, argument, gen_list, display):
 def check(ctx, dir, encoding, color, configs, profiles, pf_name):
     """Global input/output analyzer, validating configuration, profiles &
     terminal supports."""
-    log.manager.print_banner()
+    io.console.print_banner()
     errors = dict()
     if color:
         display = Panel.fit("\n".join([
@@ -119,16 +119,16 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
         return
 
     if configs:
-        log.manager.print_header("Configurations")
+        io.console.print_header("Configurations")
         errors = {**errors, **pvUtils.process_check_configs()}
 
     if profiles:
-        log.manager.print_header("Profile(s)")
+        io.console.print_header("Profile(s)")
         errors = {**errors, **pvUtils.process_check_profiles()}
 
     if dir:
-        log.manager.print_header("Test directories")
-        log.manager.print_section("Prepare the environment")
+        io.console.print_header("Test directories")
+        io.console.print_section("Prepare the environment")
         # first, replace build dir with a temp one
         settings = MetaConfig()
         cfg_val = settings.bootstrap_validation({})
@@ -142,8 +142,8 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
             table.add_row(str(v), base64.b64decode(k).decode('utf-8'))
         io.console.print(table)
     else:
-        log.manager.print("{succ} {cg} {succ}".format(
-            succ=log.manager.utf('succ'),
+        io.console.print("{succ} {cg} {succ}".format(
+            succ=io.console.utf('succ'),
             cg="[green bold]Everything is OK![/]"
         ))
 
@@ -162,7 +162,7 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
 def clean(ctx, force, fake, paths, remove_build_dir, interactive):
     """Find & clean workspaces from PCVS artifacts (build & archives)"""
     if not fake and not force:
-        log.manager.warn(["IMPORTANT NOTICE:",
+        io.console.warn(["IMPORTANT NOTICE:",
                           "This command will delete files from previous run(s) and",
                           "no recovery will be possible after deletion.",
                           "Please use --force to indicate you acknowledge the risks",
@@ -174,16 +174,16 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
     if not paths:
         paths = [os.getcwd()]
 
-    log.manager.print_header("DELETION")
+    io.console.print_header("DELETION")
     for path in paths:
         for root, dirs, files in os.walk(path):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
-                log.manager.print_section("Found build: {}".format(root))
+                io.console.print_section("Found build: {}".format(root))
                 archives = [x for x in sorted(files) if x.startswith(
                     'pcvsrun_') and x.endswith('.tar.gz')]
                 if len(archives) == 0 and fake:
-                    log.manager.print_item("No archive found.")
+                    io.console.print_item("No archive found.")
                 else:
                     for f in archives:
                         arch_date = datetime.strptime(
@@ -192,21 +192,21 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
                         )
                         delta = datetime.now() - arch_date
                         if fake:
-                            log.manager.print_item('Age: {:>3} day(s): {}'.format(
+                            io.console.print_item('Age: {:>3} day(s): {}'.format(
                                 delta.days, f))
                             continue
                         elif interactive:
                             if not click.confirm('{}: ({} days ago) ?'.format(f, delta.days)):
                                 continue
                         os.remove(os.path.join(root, f))
-                        log.manager.print_item('Deleting {}'.format(f))
+                        io.console.print_item('Deleting {}'.format(f))
                 if remove_build_dir:
                     if not fake:
                         if interactive:
                             if not click.confirm('{}: ?'.format(root)):
                                 continue
                         shutil.rmtree(root)
-                        log.manager.print_item('Deleted {}'.format(root))
+                        io.console.print_item('Deleted {}'.format(root))
 
                 # stop the walk down to this top directory
                 dirs[:] = []
@@ -226,5 +226,5 @@ def discover(ctx, paths, set, force):
     paths = [os.path.abspath(x) for x in paths]
 
     for p in paths:
-        log.manager.print_section("{}".format(p))
+        io.console.print_section("{}".format(p))
         pvUtils.process_discover_directory(p, set, force)

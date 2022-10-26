@@ -2,13 +2,14 @@ import os
 import sys
 from datetime import datetime
 
+from pcvs import io
 from pcvs import NAME_BUILDFILE
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
 from pcvs.backend import session as pvSession
 from pcvs.cli import cli_bank, cli_profile
-from pcvs.helpers import exceptions, log, system, utils
+from pcvs.helpers import exceptions, system, utils
 
 try:
     import rich_click as click
@@ -147,9 +148,9 @@ def handle_build_lockfile(exc=None):
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
-@log.manager.capture_exception(Exception)
-@log.manager.capture_exception(Exception, handle_build_lockfile)
-@log.manager.capture_exception(KeyboardInterrupt, handle_build_lockfile)
+@io.capture_exception(Exception)
+@io.capture_exception(Exception, handle_build_lockfile)
+@io.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
         generate_only, spack_recipe, print_level, simulated, bank, dup,
         dirs, enable_report, report_addr, timeout) -> None:
@@ -160,7 +161,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     May also be provided as a list of directories as described by tests
     found in DIRS.
     """
-    log.manager.info("PRE-RUN: start")
+    from pcvs.io import console
+    console.info("PRE-RUN: start")
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
@@ -170,7 +172,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     global_config.set_internal("pColl", ctx.obj['plugins'])
 
     # then init the configuration
-    log.manager.debug(
+    console.debug(
         "PRE-RUN: load settings from local file: {}".format(settings_file))
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)
 
@@ -207,7 +209,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
     if bank is not None:
         obj = pvBank.Bank(token=bank, path=None)
-        log.manager.debug(
+        io.console.debug(
             "PRE-RUN: configure target bank: {}".format(obj.name))
         if not obj.exists():
             raise click.BadOptionUsage(
@@ -226,16 +228,16 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
                                                               owner_pid=utils.get_lock_owner(buildfile))
 
     elif not os.path.exists(val_cfg.output):
-        log.manager.debug(
+        io.console.debug(
             "PRE-RUN: Prepare output directory: {}".format(val_cfg.output))
         os.makedirs(val_cfg.output)
 
     # check if another build should reused
     # this avoids to re-run combinatorial system twice
     if val_cfg.reused_build is not None:
-        log.manager.info("PRE-RUN: Clone previous build to be reused")
+        io.console.info("PRE-RUN: Clone previous build to be reused")
         try:
-            log.manager.debug(
+            io.console.debug(
                 "PRE-RUN: previous build: {}".format(val_cfg.reused_build))
             global_config = pvRun.dup_another_build(
                 val_cfg.reused_build, val_cfg.output)
@@ -246,7 +248,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
                 "--duplicate", "{} is not a valid build directory!".format(val_cfg.reused_build))
     else:
         # otherwise create own settings command block
-        log.manager.info(
+        io.console.info(
             "PRE-RUN: Profile lookup: {}".format(val_cfg.default_profile))
         (scope, _, label) = utils.extract_infos_from_token(val_cfg.default_profile,
                                                            maxsplit=2)
@@ -268,9 +270,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     the_session.register_callback(callback=pvRun.process_main_workflow,
                                   io_file=val_cfg.runlog)
 
-    log.manager.info("PRE-RUN: Session to be started")
+    io.console.info("PRE-RUN: Session to be started")
     if val_cfg.background:
-        from pcvs import io
         io.detach_console(logfile=val_cfg.runlog)
         sid = the_session.run_detached(the_session)
         print(

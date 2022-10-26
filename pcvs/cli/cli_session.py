@@ -5,7 +5,7 @@ from rich.table import Table
 
 from pcvs import NAME_BUILDFILE, io
 from pcvs.backend import session as pvSession
-from pcvs.helpers import log, utils
+from pcvs.helpers import utils
 
 try:
     import rich_click as click

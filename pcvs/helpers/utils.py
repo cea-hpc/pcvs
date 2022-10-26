@@ -9,7 +9,7 @@ from shutil import SameFileError
 
 from pcvs import (NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_HOMEDIR,
                   PATH_INSTDIR)
-from pcvs.helpers import log
+from pcvs import io
 from pcvs.helpers.exceptions import (CommonException, LockException,
                                      RunException)
 
@@ -278,7 +278,7 @@ def unlock_file(f):
     lf_name = get_lockfile_name(f)
     if os.path.exists(lf_name) and os.path.isfile(lf_name):
         os.remove(lf_name)
-        log.manager.debug("Unlock {}".format(lf_name))
+        io.console.debug("Unlock {}".format(lf_name))
 
 
 def lock_file(f, reentrant=False, timeout=None, force=True):
@@ -297,7 +297,7 @@ def lock_file(f, reentrant=False, timeout=None, force=True):
     :rtype: bool
     """
 
-    log.manager.debug("Attempt locking {}".format(f))
+    io.console.debug("Attempt locking {}".format(f))
     if force:
         unlock_file(f)
     locked = trylock_file(f, reentrant)
@@ -326,13 +326,13 @@ def trylock_file(f, reentrant=False):
     if not os.path.exists(lockfile_name):
         with open(lockfile_name, 'w') as fh:
             fh.write("{}||{}".format(socket.gethostname(), os.getpid()))
-        log.manager.debug("Lock {}".format(lockfile_name))
+        io.console.debug("Lock {}".format(lockfile_name))
         return True
     else:
         try:
             hostname, pid = get_lock_owner(f)
             if pid == os.getpid() and hostname == socket.gethostname() and reentrant:
-                log.manager.debug("Lock {}".format(lockfile_name))
+                io.console.debug("Lock {}".format(lockfile_name))
                 return True
         except ValueError as e:
             pass  # return False
@@ -388,7 +388,7 @@ def start_autokill(timeout=None):
     :type timeout: positive integer
     """
     if isinstance(timeout, int):
-        log.manager.print_item(
+        io.console.print_item(
             "Setting timeout to {} second(s)".format(timeout))
         signal.signal(signal.SIGALRM, program_timeout)
 

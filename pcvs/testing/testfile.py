@@ -8,8 +8,9 @@ import subprocess
 import jsonschema
 from ruamel.yaml import YAML, YAMLError
 
+from pcvs import io
 from pcvs import PATH_INSTDIR, testing
-from pcvs.helpers import log, system, utils
+from pcvs.helpers import system
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
@@ -41,7 +42,7 @@ def __load_yaml_file_legacy(f):
 
     fds = proc.communicate()
     if proc.returncode != 0:
-        raise TestException.DynamicProcessError(f)
+        raise TestException.TDFormatError(f)
 
     return fds[0].decode('utf-8')
 
@@ -104,13 +105,13 @@ def load_yaml_file(f, source, build, prefix):
 
     # attempt to convert of the fly the YAML file
     if need_conversion:
-        log.manager.debug("\t--> Legacy syntax: {}".format(f))
+        io.console.debug("\t--> Legacy syntax: {}".format(f))
         obj = YAML(typ='safe').load(__load_yaml_file_legacy(f))
 
         # when 'debug' is activated, print the converted YAML file
-        if log.manager.has_verb_level('debug'):
+        if io.console.has_verb_level('debug'):
             cv_file = os.path.join(os.path.split(f)[0], "converted-pcvs.yml")
-            log.manager.debug("\t--> Stored file to {}".format(cv_file))
+            io.console.debug("\t--> Stored file to {}".format(cv_file))
             with open(cv_file, 'w') as fh:
                 YAML(typ='safe').dump(obj, fh)
     return obj
@@ -270,7 +271,7 @@ for arg in "$@"; do case $arg in
 
     def generate_debug_info(self):
         """Dump debug info to the appropriate file for the input object."""
-        if len(self._debug) and log.manager.has_verb_level('info'):
+        if len(self._debug) and io.console.has_verb_level('info'):
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
                 # compute max number of combinations from system iterators
                 sys_cnt = functools.reduce(

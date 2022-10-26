@@ -368,7 +368,7 @@ class Criterion:
             for i in range(start, end+1):
                 values.append(i**of)
         else:
-            log.manager.warn("failure in Criterion sequence!")
+            io.console.warn("failure in Criterion sequence!")
 
         return values
 
@@ -413,15 +413,15 @@ def initialize_from_system():
         # here is the purpose
         for it in criterion_iterators.keys():
             if it not in runtime_iterators:
-                log.manager.warn("Undeclared criterion "
+                io.console.warn("Undeclared criterion "
                                  "as part of runtime: '{}' ".format(it))
             elif criterion_iterators[it]['values'] is None:
-                log.manager.debug('No combination found for {},'
+                io.console.debug('No combination found for {},'
                                   ' removing from schedule'.format(it))
             else:
                 continue
 
-            log.manager.info("Removing '{}'".format(it))
+            io.console.info("Removing '{}'".format(it))
             it_to_remove.append(it)
 
         # register the new dict {criterion_name: Criterion object}

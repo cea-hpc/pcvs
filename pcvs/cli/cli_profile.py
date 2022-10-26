@@ -86,16 +86,16 @@ def profile_list(ctx, token, all):
                                                            maxsplit=2)
 
     if label:
-        log.manager.warn("no LABEL required for this command")
+        io.console.warn("no LABEL required for this command")
 
     utils.check_valid_scope(scope)
     scopes = [elt for elt in utils.storage_order(
     ) if scope is None or scope in elt]
 
-    #log.manager.print_header("Profile View")
+    #io.console.print_header("Profile View")
     profiles = pvProfile.list_profiles(scope)
     if not profiles:
-        log.manager.print_item("None")
+        io.console.print_item("None")
         return
 
     for sc in scopes:
@@ -103,15 +103,15 @@ def profile_list(ctx, token, all):
             table.add_row(sc+"."+profile[0], profile[1])
 
     if all:
-        log.manager.print_section(
+        io.console.print_section(
             "Available templates to create from (--base option):")
-        log.manager.print_item(
+        io.console.print_item(
             ", ".join([x[0] for x in pvProfile.list_templates()]))
 
     # in case verbosity is enabled, add scope paths
-    log.manager.info("Scopes are ordered as follows:")
+    io.console.info("Scopes are ordered as follows:")
     for i, scope in enumerate(utils.storage_order()):
-        log.manager.info("{}. {}: {}".format(
+        io.console.info("{}. {}: {}".format(
             i+1, scope.upper(), utils.STORAGES[scope]))
 
     io.console.print(table)
@@ -145,7 +145,7 @@ def profile_interactive_select():
     """
     composition = {}
     for kind in pvConfig.CONFIG_BLOCKS:
-        log.manager.print_section("Pick up a {}".format(kind.capitalize()))
+        io.console.print_section("Pick up a {}".format(kind.capitalize()))
         choices = []
         for scope, avails in pvConfig.list_blocks(kind).items():
             for elt in avails:
@@ -157,7 +157,7 @@ def profile_interactive_select():
         except ValueError:
             default = None
         for i, cell in enumerate(choices):
-            log.manager.print_item("{}: {}".format(i + 1, cell))
+            io.console.print_item("{}: {}".format(i + 1, cell))
         while idx < 0 or len(choices) <= idx:
             idx = click.prompt("Your selection", default, type=int) - 1
         (scope, _, label) = utils.extract_infos_from_token(
@@ -229,7 +229,7 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
     elif base:
         pf.load_template(base)
     elif interactive:
-        log.manager.print_header("profile view (build)")
+        io.console.print_header("profile view (build)")
         pf_blocks = profile_interactive_select()
         pf.fill(pf_blocks)
     else:
@@ -251,14 +251,14 @@ def profile_create(ctx, token, interactive, blocks, clone, base):
             base.load_template()
             pf.clone(base)
 
-    log.manager.print_header("profile view")
+    io.console.print_header("profile view")
     pf.flush_to_disk()
     # pf.display()
 
-    log.manager.print_section(
+    io.console.print_section(
         "final profile (registered as {})".format(pf.scope))
     for k, v in pf_blocks.items():
-        log.manager.print_item("{: >9s}: {}".format(
+        io.console.print_item("{: >9s}: {}".format(
             k.upper(), ".".join([v.scope, v.short_name])))
 
 
@@ -299,7 +299,7 @@ def profile_destroy(ctx, token):
 @click.option("-p", "--edit-plugin", "edit_plugin", is_flag=True, default=False,
               help="Only edit the plugin code ('runtime')")
 @click.pass_context
-@log.manager.capture_exception(ValidationException.FormatError)
+@io.capture_exception(ValidationException.FormatError)
 def profile_edit(ctx, token, edit_plugin):
     """Edit an existing profile with the given EDITOR. The '-p' option will open
     the decoded runtime plugin code stored as a base64 string into the profile
@@ -398,7 +398,7 @@ def profile_decompose_profile(ctx, token, name, block_opt, scope):
     else:
         pf.load_from_disk()
 
-    log.manager.print_section('"Create the subsequent configuration blocks:')
+    io.console.print_section('"Create the subsequent configuration blocks:')
     for c in pf.split_into_configs(name, blocks, scope):
-        log.manager.print_item(c.full_name)
+        io.console.print_item(c.full_name)
         c.flush_to_disk()

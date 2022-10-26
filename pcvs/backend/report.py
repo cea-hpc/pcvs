@@ -67,7 +67,7 @@ def upload_buildir_results(buildir):
 
     for f in os.listdir(result_dir):
         assert (f.endswith(".json"))
-        log.manager.info("Loading {}".format(os.path.join(result_dir, f)))
+        io.console.info("Loading {}".format(os.path.join(result_dir, f)))
 
         with open(os.path.join(result_dir, f), 'r') as fh:
             data = json.load(fh)

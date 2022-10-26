@@ -13,7 +13,7 @@ from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
                   NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR, io, testing)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
-from pcvs.helpers import communications, criterion, log, utils
+from pcvs.helpers import communications, criterion, utils
 from pcvs.helpers.exceptions import RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
@@ -52,36 +52,36 @@ def display_summary(the_session):
     """Display a summary for this run, based on profile & CLI arguments."""
     cfg = MetaConfig.root.validation
 
-    log.manager.print_section("Global Information")
-    log.manager.print_item("Date of execution: {}".format(
+    io.console.print_section("Global Information")
+    io.console.print_item("Date of execution: {}".format(
         MetaConfig.root.validation.datetime.strftime("%c")))
-    log.manager.print_item("Run by: {} <{}>".format(
+    io.console.print_item("Run by: {} <{}>".format(
         cfg.author.name, cfg.author.email))
-    log.manager.print_item("Active session ID: {}".format(the_session.id))
-    log.manager.print_item("Loaded profile: '{}'".format(cfg.pf_name))
-    log.manager.print_item("Build stored to: {}".format(cfg.output))
-    log.manager.print_item("Criterion matrix size per job: {}".format(
+    io.console.print_item("Active session ID: {}".format(the_session.id))
+    io.console.print_item("Loaded profile: '{}'".format(cfg.pf_name))
+    io.console.print_item("Build stored to: {}".format(cfg.output))
+    io.console.print_item("Criterion matrix size per job: {}".format(
         MetaConfig.root.get_internal("comb_cnt")
     ))
 
     if cfg.target_bank:
-        log.manager.print_item("Bank Management: {}".format(cfg.target_bank))
-    log.manager.print_section("User directories:")
+        io.console.print_item("Bank Management: {}".format(cfg.target_bank))
+    io.console.print_section("User directories:")
     width = max([0] + [len(i) for i in cfg.dirs])
     for k, v in cfg.dirs.items():
-        log.manager.print_item("{:<{width}}: {:<{width}}".format(
+        io.console.print_item("{:<{width}}: {:<{width}}".format(
             k.upper(),
             v,
             width=width))
 
-    log.manager.print_section("Globally loaded plugins:")
+    io.console.print_section("Globally loaded plugins:")
     MetaConfig.root.get_internal("pColl").show_enabled_plugins()
 
-    log.manager.print_section("Orchestration infos")
+    io.console.print_section("Orchestration infos")
     MetaConfig.root.get_internal("orchestrator").print_infos()
 
     if cfg.simulated is True:
-        log.manager.print_box("\n".join([
+        io.console.print_box("\n".join([
             "[red bold]DRY-RUN:[yellow] TEST EXECUTION IS [underline]EMULATED[/] <<<<",
             "[yellow italic]>>>> Dry run enabled for setup checking purposes."]), title="WARNING")
 
@@ -94,7 +94,7 @@ def stop_pending_jobs(exc=None):
         raise exc
 
 
-@log.manager.capture_exception(Exception, stop_pending_jobs)
+@io.capture_exception(Exception, stop_pending_jobs)
 def process_main_workflow(the_session=None):
     """Main run.py entry point, triggering a PCVS validation run.
 
@@ -104,37 +104,37 @@ def process_main_workflow(the_session=None):
     :param the_session: the session handler this run is connected to, defaults to None
     :type the_session: :class:`Session`, optional
     """
-    log.manager.info("RUN: Session start")
+    io.console.info("RUN: Session start")
     global_config = MetaConfig.root
     valcfg = global_config.validation
     rc = 0
 
-    log.manager.set_logfile(valcfg.runlog is not None, valcfg.runlog)
+    io.console.set_logfile(valcfg.runlog is not None, valcfg.runlog)
     valcfg.sid = the_session.id
 
-    log.manager.print_banner()
-    log.manager.print_header("Initialization")
+    io.console.print_banner()
+    io.console.print_header("Initialization")
     # prepare PCVS and third-party tools
     prepare()
 
     if valcfg.reused_build is not None:
-        log.manager.print_section("Reusing previously generated inputs")
+        io.console.print_section("Reusing previously generated inputs")
     else:
-        log.manager.print_section("Load Test Suites")
+        io.console.print_section("Load Test Suites")
         start = time.time()
         if MetaConfig.root.validation.dirs:
             process_files()
         if MetaConfig.root.validation.spack_recipe:
             process_spack()
         end = time.time()
-        log.manager.print_section(
+        io.console.print_section(
             "===> Processing done in {:<.3f} sec(s)".format(end-start))
 
-    log.manager.print_header("Summary")
+    io.console.print_header("Summary")
     display_summary(the_session)
 
     if valcfg.onlygen:
-        log.manager.warn(
+        io.console.warn(
             ["====================================================",
              "Tests won't be run. This program will now stop.",
              "You may list runnable tests with `pcvs exec --list`",
@@ -143,11 +143,11 @@ def process_main_workflow(the_session=None):
              ])
         return 0
 
-    log.manager.print_header("Execution")
+    io.console.print_header("Execution")
     run_rc = MetaConfig.root.get_internal('orchestrator').run(the_session)
     rc += run_rc if isinstance(run_rc, int) else 1
 
-    log.manager.print_header("Finalization")
+    io.console.print_header("Finalization")
     # post-actions to build the archive, post-process the webview...
     terminate()
 
@@ -156,7 +156,7 @@ def process_main_workflow(the_session=None):
         bank = pvBank.Bank(token=bank_token)
         pref_proj = bank.default_project
         if bank.exists():
-            log.manager.print_item("Upload results to bank: '{}{}'".format(
+            io.console.print_item("Upload results to bank: '{}{}'".format(
                 bank.name.upper(),
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
@@ -206,18 +206,18 @@ def prepare():
 
     This function prepares the build dir, create trees...
     """
-    log.manager.print_section("Prepare environment")
+    io.console.print_section("Prepare environment")
     valcfg = MetaConfig.root.validation
 
     utils.start_autokill(valcfg.timeout)
 
-    log.manager.print_item("Check whether build directory is valid")
+    io.console.print_item("Check whether build directory is valid")
     buildir = os.path.join(valcfg.output, "test_suite")
     if not os.path.exists(buildir):
         os.makedirs(buildir)
     # if a previous build exists
     if valcfg.reused_build is None:
-        log.manager.print_item("Cleaning up {}".format(buildir), depth=2)
+        io.console.print_item("Cleaning up {}".format(buildir), depth=2)
         utils.create_or_clean_path(buildir)
     utils.create_or_clean_path(os.path.join(
         valcfg.output, NAME_BUILDFILE))
@@ -231,16 +231,16 @@ def prepare():
         valcfg.output, NAME_BUILD_RESDIR), dir=True)
     utils.create_or_clean_path(valcfg.buildcache, dir=True)
 
-    log.manager.print_item("Create test subtrees")
+    io.console.print_item("Create test subtrees")
     os.makedirs(buildir, exist_ok=True)
     for label in valcfg.dirs.keys():
         os.makedirs(os.path.join(buildir, label), exist_ok=True)
     open(os.path.join(valcfg.output, NAME_BUILDFILE), 'w').close()
 
-    log.manager.print_item("Ensure user-defined programs exist")
+    io.console.print_item("Ensure user-defined programs exist")
     __check_defined_program_validity()
 
-    log.manager.print_item("Init & expand criterions")
+    io.console.print_item("Init & expand criterions")
     criterion.initialize_from_system()
     # Pick on criterion used as 'resources' by JCHRONOSS
     # this is set by the run configuration
@@ -248,21 +248,21 @@ def prepare():
     TEDescriptor.init_system_wide('n_node')
 
     if valcfg.enable_report:
-        log.manager.print_section("Connection to the Reporting Server")
+        io.console.print_section("Connection to the Reporting Server")
         comman = None
         if valcfg.report_addr == "local":
             comman = communications.EmbeddedServer(valcfg.sid)
-            log.manager.print_item("Running a local instance")
+            io.console.print_item("Running a local instance")
         else:
             comman = communications.RemoteServer(
                 valcfg.sid, valcfg.report_addr)
-            log.manager.print_item("Listening on {}".format(comman.endpoint))
+            io.console.print_item("Listening on {}".format(comman.endpoint))
         MetaConfig.root.set_internal('comman', comman)
 
-    log.manager.print_item("Init the global Orchestrator")
+    io.console.print_item("Init the global Orchestrator")
     MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
-    log.manager.print_item("Save Configurations into {}".format(valcfg.output))
+    io.console.print_item("Save Configurations into {}".format(valcfg.output))
     conf_file = os.path.join(valcfg.output, NAME_BUILD_CONF_FN)
     with open(conf_file, 'w') as conf_fh:
         handler = YAML(typ='safe')
@@ -300,7 +300,7 @@ def find_files_to_process(path_dict):
             last_dir = os.path.basename(root)
             # if the current dir is a 'special' one, discard
             if last_dir in [NAME_SRCDIR, NAME_BUILDIR, "build_scripts"]:
-                log.manager.debug("skip {}".format(root))
+                io.console.debug("skip {}".format(root))
                 # set dirs to null, avoiding os.wal() to go further in that dir
                 dirs[:] = []
                 continue
@@ -325,36 +325,36 @@ def process_files():
 
     :raises TestUnfoldError: An error occured while processing files
     """
-    log.manager.print_item("Locate benchmarks from user directories")
+    io.console.print_item("Locate benchmarks from user directories")
     setup_files, yaml_files = find_files_to_process(
         MetaConfig.root.validation.dirs)
 
-    log.manager.debug("Found setup files: {}".format(
+    io.console.debug("Found setup files: {}".format(
         pprint.pformat(setup_files)))
-    log.manager.debug("Found static files: {}".format(
+    io.console.debug("Found static files: {}".format(
         pprint.pformat(yaml_files)))
 
     errors = []
 
-    log.manager.print_item("Extract tests from dynamic definitions")
+    io.console.print_item("Extract tests from dynamic definitions")
     errors += process_dyn_setup_scripts(setup_files)
-    log.manager.print_item("Extract tests from static definitions")
+    io.console.print_item("Extract tests from static definitions")
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        log.manager.error(["Test-suites failed to be parsed, with the following errors:"] +
+        io.console.error(["Test-suites failed to be parsed, with the following errors:"] +
                         ["\t-{}: {}".format(e[0], e[1]) for e in errors]
                         )
-        raise RunException.TestUnfoldError("See previous errors above.")
+        raise RunException.TestUnfoldError("Errors found while parsing files")
 
 
 def process_spack():
 
     if not shutil.which('spack'):
-        log.manager.warn(
+        io.console.warn(
             "Unable to parse Spack recipes without having Spack in $PATH")
         return
-    log.manager.print_item("Build test-bases from Spack recipes")
+    io.console.print_item("Build test-bases from Spack recipes")
     label = "spack"
     path = "/spack"
     MetaConfig.root.validation.dirs[label] = path
@@ -420,7 +420,7 @@ def process_dyn_setup_scripts(setup_files):
     :rtype: list
     """
     err = []
-    log.manager.info("Convert configuration to Shell variables")
+    io.console.info("Convert configuration to Shell variables")
     env = os.environ.copy()
     env.update(build_env_from_configuration(MetaConfig.root))
 
@@ -429,9 +429,9 @@ def process_dyn_setup_scripts(setup_files):
         fh.write(str_dict_as_envvar(env))
         fh.close()
 
-    log.manager.info("Iteration over files")
+    io.console.info("Iteration over files")
     for label, subprefix, fname in io.console.progress_iter(setup_files):
-        log.manager.debug("process {} ({})".format(subprefix, label))
+        io.console.debug("process {} ({})".format(subprefix, label))
         base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
             label, subprefix)
 
@@ -469,7 +469,7 @@ def process_dyn_setup_scripts(setup_files):
             if fds.returncode != 0:
                 err.append((f, "(exit {}): {}".format(
                     fds.returncode, fderr.decode('utf-8'))))
-                log.manager.info("EXEC FAILED: {}: {}".format(
+                io.console.info("EXEC FAILED: {}: {}".format(
                     f, fderr.decode('utf-8')))
             continue
 
@@ -503,7 +503,7 @@ def process_static_yaml_files(yaml_files):
     :rtype: list
     """
     err = []
-    log.manager.info("Iteration over files")
+    io.console.info("Iteration over files")
     for label, subprefix, fname in io.console.progress_iter(yaml_files):
         _, cur_src, _, cur_build = testing.generate_local_variables(
             label, subprefix)
@@ -522,7 +522,7 @@ def process_static_yaml_files(yaml_files):
         except Exception as e:
             raise e
             err.append((f, e))
-            log.manager.info("{} (failed to parse): {}".format(f, e))
+            io.console.info("{} (failed to parse): {}".format(f, e))
     return err
 
 
@@ -605,17 +605,17 @@ def terminate():
         MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
     outdir = MetaConfig.root.validation.output
 
-    log.manager.print_section("Prepare results")
+    io.console.print_section("Prepare results")
     io.console.move_debug_file(outdir)
     save_for_export(os.path.join(outdir, NAME_BUILD_RESDIR))
     save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
     save_for_export(os.path.join(outdir, NAME_DEBUG_FILE))
 
     if MetaConfig.root.validation.anonymize:
-        log.manager.print_item("Anonymize data")
+        io.console.print_item("Anonymize data")
         anonymize_archive()
 
-    log.manager.print_item("Generate the archive: {}".format(archive_name))
+    io.console.print_item("Generate the archive: {}".format(archive_name))
 
     with utils.cwd(outdir):
         cmd = [
@@ -625,14 +625,14 @@ def terminate():
             "save_for_export"
         ]
         try:
-            log.manager.debug('cmd: {}'.format(" ".join(cmd)))
+            io.console.debug('cmd: {}'.format(" ".join(cmd)))
             subprocess.check_call(cmd)
         except CalledProcessError as e:
             raise RunException.ProgramError(e, cmd)
 
     comman = MetaConfig.root.get_internal("comman")
     if comman:
-        log.manager.print_item("Close connection to Reporting Server")
+        io.console.print_item("Close connection to Reporting Server")
         comman.close_connection()
     MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_AFTER)
 

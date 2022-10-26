@@ -3,8 +3,9 @@ import sys
 
 from click.shell_completion import CompletionItem
 
+from pcvs import io
 from pcvs.backend import bank as pvBank
-from pcvs.helpers import log, utils
+from pcvs.helpers import utils
 
 try:
     import rich_click as click
@@ -63,9 +64,9 @@ def bank(ctx):
 @click.pass_context
 def bank_list(ctx):
     """List known repositories, stored under ``PATH_BANK``."""
-    log.manager.print_header("Bank View")
+    io.console.print_header("Bank View")
     for label, path in pvBank.list_banks().items():
-        log.manager.print_item("{:<8}: {}".format(label.upper(), path))
+        io.console.print_item("{:<8}: {}".format(label.upper(), path))
 
 
 @bank.command(name="show", short_help="Display data stored in a repo.")
@@ -73,7 +74,7 @@ def bank_list(ctx):
 @click.pass_context
 def bank_show(ctx, name):
     """Display all data stored into NAME repository"""
-    log.manager.print_header("Bank View")
+    io.console.print_header("Bank View")
 
     b = pvBank.Bank(token=name)
     if not b.exists():
@@ -89,7 +90,7 @@ def bank_show(ctx, name):
 @click.pass_context
 def bank_create(ctx, name, path):
     """Create a new bank, named NAME, data will be stored under PATH."""
-    log.manager.print_header("Bank View")
+    io.console.print_header("Bank View")
     if path is None:
         path = os.getcwd()
 
@@ -117,15 +118,15 @@ def bank_destroy(ctx, name, symlink):
     repository deletion. 'data.yml' and bank entry in the configuratino file
     will be removed but existing data are preserved.
     """
-    log.manager.print_header("Bank View")
+    io.console.print_header("Bank View")
     b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         if not symlink:
-            log.manager.warn(
+            io.console.warn(
                 "To delete a bank, just remove the directory {}".format(b.prefix))
-        log.manager.print_item("Bank '{}' unlinked".format(name))
+        io.console.print_item("Bank '{}' unlinked".format(name))
         pvBank.rm_banklink(name)
 
 

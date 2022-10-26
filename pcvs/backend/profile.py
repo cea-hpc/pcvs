@@ -7,8 +7,9 @@ import click
 from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
+from pcvs import io
 from pcvs.backend import config
-from pcvs.helpers import git, log, system, utils
+from pcvs.helpers import git, system, utils
 from pcvs.helpers.exceptions import (ConfigException, ProfileException,
                                      ValidationException)
 from pcvs.helpers.system import MetaDict
@@ -216,7 +217,7 @@ class Profile:
         if not os.path.isfile(self._file):
             raise ProfileException.NotFoundError(self._file)
 
-        log.manager.debug("Load {} ({})".format(self._name, self._scope))
+        io.console.debug("Load {} ({})".format(self._name, self._scope))
         with open(self._file) as f:
             self._details = MetaDict(YAML(typ='safe').load(f))
 
@@ -275,7 +276,7 @@ class Profile:
         """
         self._retrieve_file()
 
-        log.manager.info("Compute target prefix: {}".format(self._file))
+        io.console.info("Compute target prefix: {}".format(self._file))
         assert (not os.path.isfile(self._file))
         self._details = clone._details
 
@@ -284,19 +285,19 @@ class Profile:
 
         It does not destroy the Python object, though.
         """
-        log.manager.info("delete {}".format(self._file))
+        io.console.info("delete {}".format(self._file))
         os.remove(self._file)
 
     def display(self):
         """Display profile data into stdout/file.
         """
-        log.manager.print_header("Profile View")
-        log.manager.print_section("Scope: {}".format(self._scope.capitalize()))
-        log.manager.print_section("Profile details:")
+        io.console.print_header("Profile View")
+        io.console.print_section("Scope: {}".format(self._scope.capitalize()))
+        io.console.print_section("Profile details:")
         if self._details:
-            log.manager.print_section("Details:")
+            io.console.print_section("Details:")
             for k, v in self._details.items():
-                log.manager.print_item("{}: {}".format(k, v))
+                io.console.print_item("{}: {}".format(k, v))
 
     def edit(self):
         """Open the editor to manipulate profile content.
