@@ -428,7 +428,7 @@ def process_dyn_setup_scripts(setup_files):
     with open(env_script, 'w') as fh:
         fh.write(str_dict_as_envvar(env))
         fh.close()
-
+    
     io.console.info("Iteration over files")
     for label, subprefix, fname in io.console.progress_iter(setup_files):
         io.console.debug("process {} ({})".format(subprefix, label))

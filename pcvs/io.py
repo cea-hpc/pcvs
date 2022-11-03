@@ -280,7 +280,6 @@ console = None
 def init(color=True, verbose=0):
     global console
     console = TheConsole(color=color, verbose=verbose)
-    print(console)
 
 def detach_console(logfile=None):
     global console

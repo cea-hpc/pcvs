@@ -76,7 +76,6 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
     ctx.color = color
     
     io.init(color=color, verbose=verbose)
-    print("luuuu")
     utils.set_local_path(ctx.obj['exec'])
 
     utils.create_home_dir()

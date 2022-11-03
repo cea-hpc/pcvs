@@ -177,7 +177,10 @@ class Bank(dsl.Bank):
         self._config = MetaDict(YAML(typ='safe').load(s))
 
     def load_config_from_dict(self, s: dict) -> None:
-        """TODO:
+        """Load the configuration data associated with the archive to process.
+
+        :param s: the configuration data
+        :type s: dict
         """
         self._config = MetaDict(s)
 

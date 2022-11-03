@@ -7,13 +7,11 @@ import setuptools
 try:
     import sh
     version = sh.git("describe", "--dirty").strip()[1:]
-    
 except:
     loc = {}
     with open(os.path.join("pcvs/__init__.py")) as fh:
         exec(fh.read(), None, loc)
     version = loc['__version__']
-    version = sh.git("describe --dirty")
 
 with open("README.md", 'r') as f:
     desc = f.read()

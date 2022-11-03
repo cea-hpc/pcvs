@@ -14,21 +14,33 @@ class Job(Test):
         PROGRESSION = 1,
         STABLE = 2
 
-    def __init__(self, s=None):
+    def __init__(self, s=None) -> None:
         super().__init__()
         if isinstance(s, dict):
             self.from_json(s)
 
-    def get_state(self):
+    def get_state(self) -> Test.State:
+        """Retrieve job state as stored in the Run.
+        
+        :return: the state
+        :rtype: Test.State
+        """
         return self._state
 
-    def get_date(self):
-        return None
-
-    def load(self, s=""):
+    def load(self, s="") -> None:
+        """Populate the job with given data.
+        
+        :param s: A Job's data dict representation
+        :type s: dict
+        """
         self.from_json(s)
 
-    def dump(self):
+    def dump(self) -> dict:
+        """Return serialied job data.
+        
+        :return: the mapped representation
+        :rtype: dict
+        """
         return self.to_json()
 
 
@@ -37,7 +49,10 @@ class Run:
     """
 
     def __init__(self, repo=None, cid=None, from_serie=None):
-        """TODO:
+        """Create a new run.
+        
+        :param repo: the associated repo this run is coming from
+        :type repo: Bank
         """
         # this attribute prevails
         if from_serie:

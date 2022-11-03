@@ -6,4 +6,6 @@ jsonschema>=3.0.0
 PrettyTable
 flask
 sh
+rich
+rich-click
 pygit2; python_version >= '3.7'

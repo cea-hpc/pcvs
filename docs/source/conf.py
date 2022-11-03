@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# PCVS-rt documentation build configuration file, created by
+# PCVS documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul  7 10:46:45 2020.
 #
 # This file is execfile()d with the current directory set to its
@@ -21,7 +21,7 @@ import os
 import sys
 from datetime import datetime
 
-sys.path.append(os.path.abspath('../../src'))
+sys.path.append(os.path.abspath('../../pcvs'))
 import pcvs
 
 # -- General configuration ------------------------------------------------
@@ -148,7 +148,7 @@ html_theme = 'sphinx_rtd_theme'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = 'PCVS-rt v0.6.0'
+# html_title = 'PCVS v0.6.0'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -248,7 +248,7 @@ html_favicon = "_static/pcvs_favicon.ico"
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PCVS-rtdoc'
+htmlhelp_basename = 'PCVS-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -274,7 +274,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PCVS-rt.tex', 'PCVS-rt Documentation',
+    (master_doc, 'PCVS.tex', 'PCVS Documentation',
      'Julien Adam', 'manual'),
 ]
 
@@ -331,8 +331,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'PCVS-rt', 'PCVS-rt Documentation',
-     author, 'PCVS-rt', 'One line description of project.',
+    (master_doc, 'PCVS', 'PCVS Documentation',
+     author, 'PCVS', 'Validate application at scale',
      'Miscellaneous'),
 ]
 
