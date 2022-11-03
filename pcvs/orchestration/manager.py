@@ -190,7 +190,7 @@ class Manager:
                     job: Test = self._dims[k].pop(0)
                     publish_job_args = {}
                     if job:
-                        if job.been_executed():
+                        if job.been_executed() or job.state == Test.State.IN_PROGRESS:
                             # skip job (only a pop() to do)
                             continue
                             
@@ -252,7 +252,6 @@ class Manager:
                                     "state": Test.State.ERR_OTHER
                                 }
                                 self.publish_job(job, publish_args=publish_job_args)
-                                print(job.state)
                                 job.display()
                             else:
                                 self._dims[k].append(job)
