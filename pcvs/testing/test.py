@@ -415,6 +415,7 @@ class Test:
         colorname = "yellow"
         icon = ""
         label = str(self._state)
+        raw_output = None
         if self._state == Test.State.SUCCESS:
             colorname = "green"
             icon = "succ"
@@ -425,17 +426,17 @@ class Test:
             colorname = "yellow"
             icon = "fail"
 
-        # io.console.print_job(label, self._exectime, self.name,
-        #                      colorname=colorname, icon=icon)
+        if self._output and \
+            (MetaConfig.root.validation.print_level == 'all' or
+            (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
+                raw_output = base64.b64decode(self._output).decode("utf-8")
+        
         io.console.print_job(label, self._exectime, self.label,
                               "/{}".format(self.subtree) if self.subtree else "",
                               self.name,
-                              colorname=colorname, icon=icon)
+                              colorname=colorname, icon=icon,content=raw_output)
 
-        if self._output:
-            if (MetaConfig.root.validation.print_level == 'all' or
-                    (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
-                io.console.print(base64.b64decode(self._output))
+        
 
     def executed(self, state=None):
         """Set current Test as executed.

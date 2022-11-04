@@ -96,7 +96,7 @@ class TheConsole(Console):
     def print_box(self, txt, *args, **kwargs):
         self.print(Panel.fit(txt, *args, **kwargs))
 
-    def print_job(self, state, time, tlabel, tsubtree, tname, colorname="red", icon=None):
+    def print_job(self, state, time, tlabel, tsubtree, tname, colorname="red", icon=None, content=None):
         if icon is not None:
             icon = self.utf(icon)
 
@@ -110,6 +110,8 @@ class TheConsole(Console):
                 self.utf("sep_v"),
                 tname)
             )
+            if content:
+                self.print(content)
         else:
             self.summary_table.setdefault(tlabel, {})
             self.summary_table[tlabel].setdefault(tsubtree, {
