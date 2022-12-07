@@ -5,12 +5,16 @@ import subprocess
 import tempfile
 
 import jsonschema
-from ruamel.yaml import YAML, YAMLError
+from ruamel.yaml import YAML
+from ruamel.yaml import YAMLError
 
 import pcvs
 from pcvs import io
-from pcvs.backend import config, profile, run
-from pcvs.helpers import system, utils
+from pcvs.backend import config
+from pcvs.backend import profile
+from pcvs.backend import run
+from pcvs.helpers import system
+from pcvs.helpers import utils
 from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.system import MetaDict
 
@@ -87,7 +91,7 @@ def process_check_configs():
     :return: caught errors, as a dict, where the keys is the errmsg base64
     :rtype: dict"""
     errors = dict()
-    t = io.create_table("Configurations", ["Valid", "ID"])
+    t = io.console.create_table("Configurations", ["Valid", "ID"])
 
     for kind in config.CONFIG_BLOCKS:
         for scope in utils.storage_order():
@@ -117,7 +121,7 @@ def process_check_profiles():
 
     :return: list of caught errors as a dict, where keys are error msg base64
     :rtype: dict"""
-    t = io.create_table("Available Profile", ["valid", "ID"])
+    t = io.console.create_table("Available Profile", ["valid", "ID"])
     errors = dict()
 
     for scope in utils.storage_order():

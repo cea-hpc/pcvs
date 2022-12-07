@@ -57,10 +57,10 @@ def mock_config():
     #tested.process_main_workflow(mock_session)
     #pass
 def test_process_setup_scripts(mock_config):
-    
     d = os.path.join(MetaConfig.root.validation.dirs['L1'], "subtree")
     f = os.path.join(d, "pcvs.setup")
     help_create_setup_file(f, good_content)
+    pcvs.io.init()
     with patch("pcvs.testing.tedesc.TEDescriptor") as mock_ted:
         err = tested.process_dyn_setup_scripts([("L1", "subtree", "pcvs.setup")])
         assert(len(err) == 0)
@@ -69,6 +69,7 @@ def test_process_bad_setup_script(mock_config):
     d = os.path.join(MetaConfig.root.validation.dirs['L1'], "subtree")
     f = os.path.join(d, "pcvs.setup")
     help_create_setup_file(f, bad_script)
+    pcvs.io.init()
     err = tested.process_dyn_setup_scripts([("L1", "subtree", "pcvs.setup")])
     assert(len(err) == 1)
     assert(err[0][0] == f)
@@ -79,5 +80,6 @@ def test_process_wrong_setup_script(mock_config):
     d = os.path.join(MetaConfig.root.validation.dirs['L1'], "subtree")
     f = os.path.join(d, "pcvs.setup")
     help_create_setup_file(f, bad_output)
+    pcvs.io.init()
     with pytest.raises(ValidationException.FormatError) as e:
         tested.process_dyn_setup_scripts([("L1", "subtree", "pcvs.setup")])

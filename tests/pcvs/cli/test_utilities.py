@@ -12,8 +12,12 @@ from .conftest import click_call
         'user': [('user', "/path/to/user_override.yml")],
         'global': [('system-wide', "/path/to/system-wide.yml")]
         })
-@patch('pcvs.backend.profile.Profile')
-def test_check_profiles(mock_init):
+@patch("pcvs.backend.profile.Profile")
+def test_check_profiles(mock_pf):
+    instance = mock_pf.return_value
+    instance.is_found.return_value = True
+    instance.full_name = "test-name"
+
     res = click_call('check', '--profiles')
     
     assert("Valid" in res.stdout)
@@ -25,8 +29,12 @@ def test_check_profiles(mock_init):
         'global': [('system-wide', "/path/to/system-wide.yml")]
         } for k in ['compiler', 'runtime', 'machine', 'criterion', 'group']
         })
-@patch('pcvs.backend.config.ConfigurationBlock')
-def test_check_configs(mock_init):
+@patch("pcvs.backend.config.ConfigurationBlock")
+def test_check_configs(mock_config):
+    instance = mock_config.return_value
+    instance.is_found.return_value = True
+    instance.full_name = "test-name"
+
     res = click_call('check', '--configs')
     print(res.stdout)
     assert("Valid" in res.stdout)

@@ -155,19 +155,36 @@ def bank_save_run(ctx, name, path):
 
 @bank.command(name="load", short_help="Extract infos from the datastore")
 @click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
-@click.argument("key", nargs=1, required=True)
 @click.option("--since", "start", default=None,
               help="Select a starting point from where data will be extracted")
 @click.option("--until", "end", default=None,
               help="Select the last date (included) where data will be searched for")
-@click.option("-f", "--format", "format",
-              type=click.Choice(['json', 'list']), default='json',
-              help="Request a set of values from a given key")
+@click.option("-s", "--startswith", "prefix",
+              type=str, default="",
+              help="Select only a subset of each runs based on provided prefix")
 @click.pass_context
-def bank_load(ctx, name, key, format, start, end):
-    print(name)
-    b = pvBank.Bank(name)
-    print(b.default_project)
-    serie = b.get_serie(b.default_project)
+def bank_load(ctx, name, prefix, start, end):
+    b = pvBank.Bank(token=name)
+    serie = b.get_serie()
     run = serie.last
-    print(run.get_data(key).to_json())
+    data = []
+    from rich.progress import Progress
+    with Progress():
+        if not prefix:
+            for j in run.jobs:
+                data.append(j.to_json())
+        else:
+            for j in run.get_data(prefix):
+                data.append(j.to_json())
+    import json
+    print(json.dumps(data))
+    
+
+
+@bank.command(name="extract", short_help="Extract infos from the datastore")
+@click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
+@click.argument("key", nargs=1, required=True)
+@click.pass_context
+def bank_extract(ctx, name, key):
+
+    pass

@@ -37,7 +37,7 @@ def test_list(mock_init):
     assert('default' not in res.stdout)
     assert('user' not in res.stdout)
     assert('system-wide' in res.stdout)
-    assert('no LABEL required' in res.stderr)
+    assert('WARN: no LABEL required' in res.stdout)
 
 
 @patch('pcvs.backend.profile.Profile')

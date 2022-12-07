@@ -19,7 +19,7 @@
     "data": {
         "tags": ["compilation", "tag_1", "tag_2"],
         "artifacts": {"file.txt": "ZHVtbXlfYXJ0aWZhY3QK"},
-        "metrics": {"metric_a": "value_a"},
+        "metrics": {"metric_a": "value_a"}
         
     }
 }

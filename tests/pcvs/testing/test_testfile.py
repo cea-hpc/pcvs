@@ -113,7 +113,6 @@ def test_TestFile(tedesc, isolated_yml_test):
         pass
     tedesc.construct_tests = dummydesc
     
-    l = log.IOManager(logfile = "out.log")
     testfile = tested.TestFile(os.path.join(isolated_yml_test, "test-dir/pcvs.yml"), 
         os.path.dirname(__file__), 
         label="keytestdir", 

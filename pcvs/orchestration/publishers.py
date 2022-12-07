@@ -2,7 +2,8 @@ import json
 import os
 
 from pcvs import NAME_BUILD_RESDIR
-from pcvs.helpers.system import MetaConfig, ValidationScheme
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import ValidationScheme
 from pcvs.plugins import Plugin
 
 

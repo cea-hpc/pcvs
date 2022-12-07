@@ -6,10 +6,12 @@ import pathlib
 import subprocess
 
 import jsonschema
-from ruamel.yaml import YAML, YAMLError
+from ruamel.yaml import YAML
+from ruamel.yaml import YAMLError
 
+from pcvs import PATH_INSTDIR
 from pcvs import io
-from pcvs import PATH_INSTDIR, testing
+from pcvs import testing
 from pcvs.helpers import system
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig

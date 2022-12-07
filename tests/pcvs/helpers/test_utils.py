@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
-
 from pcvs.helpers import utils as tested
 from pcvs.helpers.exceptions import CommonException, RunException
 from pcvs.helpers.system import MetaDict

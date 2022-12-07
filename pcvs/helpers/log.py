@@ -11,6 +11,7 @@ from pcvs import io
 from pcvs.helpers import exceptions
 from pcvs.helpers.exceptions import CommonException
 
+
 def init(v=0, e=False, l=100, quiet=False):
     """initializes a global manager for everyone to use
 
@@ -25,7 +26,6 @@ def init(v=0, e=False, l=100, quiet=False):
     :type quiet: bool, optional
     """
     global manager
-    manager = IOManager(verbose=v, enable_unicode=e, length=l, tty=(not quiet))
     manager = io.console
 
     if man is None:

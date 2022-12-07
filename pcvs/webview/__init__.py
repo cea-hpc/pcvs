@@ -3,7 +3,12 @@ import json
 import os
 import random
 
-from flask import Flask, abort, jsonify, render_template, request, sessions
+from flask import Flask
+from flask import abort
+from flask import jsonify
+from flask import render_template
+from flask import request
+from flask import sessions
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend import session

@@ -8,8 +8,9 @@ from ruamel.yaml import YAML
 from ruamel.yaml.main import yaml_object
 
 from pcvs import PATH_SESSION
-from pcvs.helpers import log, utils
 from pcvs import io
+from pcvs.helpers import log
+from pcvs.helpers import utils
 
 yml = YAML()
 

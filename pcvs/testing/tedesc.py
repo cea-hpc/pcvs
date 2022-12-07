@@ -3,10 +3,13 @@ import os
 import re
 
 from pcvs import testing
-from pcvs.helpers import pm, utils
-from pcvs.helpers.criterion import Criterion, Serie
+from pcvs.helpers import pm
+from pcvs.helpers import utils
+from pcvs.helpers.criterion import Criterion
+from pcvs.helpers.criterion import Serie
 from pcvs.helpers.exceptions import TestException
-from pcvs.helpers.system import MetaConfig, MetaDict
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import MetaDict
 from pcvs.testing.test import Test
 
 
@@ -24,7 +27,7 @@ def detect_source_lang(array_of_files):
     for f in array_of_files:
         if re.search(r'\.(h|H|i|I|s|S|c|c90|c99|c11)$', f):
             detect.append('cc')
-        elif re.search(r'\.C|cc|cxx|cpp|c\+\+$', f):
+        elif re.search(r'\.(C|cc|cxx|cpp|c\+\+)$', f):
             detect.append('cxx')
         elif re.search(r'\.(f|F)(77)$', f):
             detect.append('f77')

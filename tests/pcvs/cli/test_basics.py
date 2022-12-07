@@ -5,7 +5,7 @@ from .conftest import click_call, isolated_fs
 
 def test_cmd():
     res = click_call()
-    assert ('Usage:' in res.stderr)
+    assert ('Usage:' in res.stdout)
 
 
 def test_version():
@@ -17,4 +17,4 @@ def test_version():
 def test_bad_command():
     res = click_call('wrong_command')
     assert(res.exit_code != 0)
-    assert('Error: No such command' in res.stderr)
+    assert('No such command' in res.stdout)

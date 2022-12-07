@@ -1,7 +1,10 @@
 import json
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 
-from pcvs.dsl import Job, Run, Serie
+from pcvs.dsl import Job
+from pcvs.dsl import Run
+from pcvs.dsl import Serie
 from pcvs.testing.test import Test
 
 

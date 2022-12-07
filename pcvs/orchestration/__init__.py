@@ -6,7 +6,8 @@ from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.manager import Manager
 from pcvs.orchestration.publishers import Publisher
-from pcvs.orchestration.set import Runner, Set
+from pcvs.orchestration.set import Runner
+from pcvs.orchestration.set import Set
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
 

@@ -1,9 +1,12 @@
 import json
 import os
-from enum import Enum, IntEnum
+from enum import Enum
+from enum import IntEnum
 from typing import List
 
-from pcvs.helpers import exceptions, git
+from pcvs import io
+from pcvs.helpers import exceptions
+from pcvs.helpers import git
 from pcvs.testing.test import Test
 
 
@@ -91,15 +94,21 @@ class Run:
         return "{}: {}".format(self._cid.short, d)
 
     @property
-    def tests(self):
+    def jobs(self):
         for file in self._repo.list_files(rev=self._cid):
             data = self._repo.get_tree(rev=self._cid, prefix=file)
             job = Job(json.loads(str(data)))
             yield job
+    
+    @property
+    def get_full_data(self):
+        root = [j.to_json() for j in self.jobs]
+        return json.dumps(root)
 
     def get_data(self, jobname):
         res = Job()
         data = self._repo.get_tree(rev=self._cid, prefix=jobname)
+        print(data)
         if not data:
             return data
 
@@ -238,11 +247,17 @@ class Bank:
     def __init__(self, path="", head=None):
         self._path = path
         self._repo = git.elect_handler(self._path)
+        
         self._repo.open()
-
         if head:
             self._repo.set_head(head)
-
+        else:
+            first_branch = [b for b in self._repo.branches if b.name != "master"]
+            if len(first_branch) <= 0:
+                io.console.warn("This repository seems empty: {}".format(self._path))
+            else:
+                self._repo.set_head(first_branch[0].name)
+            
         if not self._repo.get_branch_from_str('master'):
             t = self._repo.insert_tree(
                 'README', "This file is intended to be used as a branch bootstrap.")

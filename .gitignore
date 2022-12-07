@@ -4,7 +4,7 @@
 *.o
 *.so
 *.py[cod]
-*/__pycache__/
+**/__pycache__/
 *.egg-info/
 
 # Temporary files #
@@ -14,6 +14,7 @@
 *.swp
 *.swo
 *~
+*.log 
 
 # others #
 ##########
@@ -25,5 +26,7 @@ build/
 .pcvs-build/
 .tox/
 .coverage
+coverage.xml
 htmlcov/
 .python-version
+.pytest_cache

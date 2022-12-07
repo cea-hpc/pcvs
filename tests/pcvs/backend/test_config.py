@@ -6,6 +6,7 @@ from click.testing import CliRunner
 from ruamel.yaml import YAML
 
 import pcvs
+from pcvs import io
 from pcvs.backend import config as tested
 from pcvs.backend.config import CONFIG_BLOCKS
 from pcvs.helpers import utils
@@ -55,7 +56,7 @@ def test_config_bad_kind():
 
 @pytest.mark.parametrize("kind", ["compiler", "runtime", "machine", "criterion", "group"])
 def test_config_load_template(kind, capsys):
-    
+    io.init()
     obj = tested.ConfigurationBlock(kind, "pcvs-pytest", 'local')
     assert(not obj.is_found())
     obj.load_template()

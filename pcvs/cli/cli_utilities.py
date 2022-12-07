@@ -2,17 +2,16 @@ import base64
 import copy
 import os
 import shutil
-from rich.table import Table
-from rich.panel import Panel
 import subprocess
 import sys
 from datetime import datetime
 
-from prettytable import PrettyTable
-from pcvs import io
+from rich.panel import Panel
+from rich.table import Table
+
 from pcvs import NAME_BUILDFILE
+from pcvs import io
 from pcvs.backend import utilities as pvUtils
-from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 
 try:
@@ -20,8 +19,6 @@ try:
     click.rich_click.SHOW_ARGUMENTS = True
 except ImportError:
     import click
-
-from click.shell_completion import CompletionItem
 
 
 @click.command(name="exec", short_help="Running aspecific test")
@@ -35,7 +32,7 @@ from click.shell_completion import CompletionItem
               help="Display information instead of executing the command")
 @click.argument("argument", type=str, required=False)
 @click.pass_context
-def exec(ctx, output, argument, gen_list, display):
+def exec(ctx, output, argument, gen_list, display) -> None:
     """ Run a unit test as it would have been through the whole engine (for
     reproducing purposes) from the command line."""
     rc = 0

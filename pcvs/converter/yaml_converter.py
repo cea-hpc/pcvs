@@ -9,6 +9,7 @@ import pkg_resources
 from ruamel.yaml import YAML
 
 import pcvs
+from pcvs import io
 from pcvs.helpers import log
 from pcvs.helpers.exceptions import CommonException
 
@@ -256,14 +257,14 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     # Click specific-related
     ctx.color = color
     kind = kind.lower()
-    log.init(verbose, encoding, None)
+    io.init()
     io.console.print_header("YAML Conversion")
 
     if template is None and kind == "te":
-        io.console.warn(
-            ["If the TE file contains YAML aliases, the conversion may",
-             "fail. Use the '--template' option to provide the YAML file",
-             "containing these aliases"])
+        io.console.warn("\n".join([
+            "If the TE file contains YAML aliases, the conversion may",
+            "fail. Use the '--template' option to provide the YAML file",
+            "containing these aliases"]))
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
     try:

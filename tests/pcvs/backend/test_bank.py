@@ -7,6 +7,7 @@ import pytest
 from click.testing import CliRunner
 from ruamel.yaml import YAML
 
+import pcvs
 from pcvs import NAME_BUILD_RESDIR, NAME_BUILDIR
 from pcvs.backend import bank as tested
 from pcvs.helpers import utils, git
@@ -66,6 +67,7 @@ def dummy_run():
 
 def test_bank_connect(mock_repo_fs):
     # first test with a specific dir to create the Git repo
+    pcvs.io.init()
     obj = tested.Bank(path=mock_repo_fs)
     assert(not obj.exists())
     obj.connect()
@@ -82,6 +84,7 @@ def test_bank_connect(mock_repo_fs):
     obj.disconnect()
 
 def test_save_run(mock_repo_fs, dummy_run, capsys):
+    pcvs.io.init()
     obj = tested.Bank(path=mock_repo_fs, token="dummy@original-tag")
     assert(not obj.exists())
     obj.connect()

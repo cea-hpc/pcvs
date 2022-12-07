@@ -7,11 +7,15 @@ import time
 from contextlib import contextmanager
 from shutil import SameFileError
 
-from pcvs import (NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_HOMEDIR,
-                  PATH_INSTDIR)
+from pcvs import NAME_BUILDFILE
+from pcvs import NAME_BUILDIR
+from pcvs import NAME_SRCDIR
+from pcvs import PATH_HOMEDIR
+from pcvs import PATH_INSTDIR
 from pcvs import io
-from pcvs.helpers.exceptions import (CommonException, LockException,
-                                     RunException)
+from pcvs.helpers.exceptions import CommonException
+from pcvs.helpers.exceptions import LockException
+from pcvs.helpers.exceptions import RunException
 
 ####################################
 ##    STORAGE SCOPE MANAGEMENT    ##
@@ -278,7 +282,8 @@ def unlock_file(f):
     lf_name = get_lockfile_name(f)
     if os.path.exists(lf_name) and os.path.isfile(lf_name):
         os.remove(lf_name)
-        io.console.debug("Unlock {}".format(lf_name))
+        if io.console:
+            io.console.debug("Unlock {}".format(lf_name))
 
 
 def lock_file(f, reentrant=False, timeout=None, force=True):
@@ -296,8 +301,8 @@ def lock_file(f, reentrant=False, timeout=None, force=True):
     :return: True if the file is reached, False otherwise
     :rtype: bool
     """
-
-    io.console.debug("Attempt locking {}".format(f))
+    if io.console:
+        io.console.debug("Attempt locking {}".format(f))
     if force:
         unlock_file(f)
     locked = trylock_file(f, reentrant)
@@ -326,7 +331,8 @@ def trylock_file(f, reentrant=False):
     if not os.path.exists(lockfile_name):
         with open(lockfile_name, 'w') as fh:
             fh.write("{}||{}".format(socket.gethostname(), os.getpid()))
-        io.console.debug("Lock {}".format(lockfile_name))
+        if io.console:
+            io.console.debug("Lock {}".format(lockfile_name))
         return True
     else:
         try:

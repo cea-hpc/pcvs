@@ -4,12 +4,15 @@ import sys
 from rich.table import Table
 from ruamel.yaml import YAML
 
-from pcvs import PATH_INSTDIR, io
+from pcvs import PATH_INSTDIR
+from pcvs import io
 from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config
-from pcvs.helpers import log, utils
-from pcvs.helpers.exceptions import ProfileException, ValidationException
+from pcvs.helpers import log
+from pcvs.helpers import utils
+from pcvs.helpers.exceptions import ProfileException
+from pcvs.helpers.exceptions import ValidationException
 
 try:
     import rich_click as click
@@ -86,21 +89,23 @@ def profile_list(ctx, token, all):
                                                            maxsplit=2)
 
     if label:
-        io.console.warn("no LABEL required for this command")
+        io.console.warn("no LABEL required for this command (s'{}' given)".format(label))
 
-    utils.check_valid_scope(scope)
-    scopes = [elt for elt in utils.storage_order(
-    ) if scope is None or scope in elt]
-
-    #io.console.print_header("Profile View")
-    profiles = pvProfile.list_profiles(scope)
+    profiles = list()
+    if scope:
+        utils.check_valid_scope(scope)
+        profiles = pvProfile.list_profiles(scope)
+    else:
+        for pf_list in pvProfile.list_profiles().values():
+            for pf in pf_list:
+                profiles.append((pf[0], pf[1]))
+    
     if not profiles:
         io.console.print_item("None")
         return
 
-    for sc in scopes:
-        for profile in profiles[sc]:
-            table.add_row(sc+"."+profile[0], profile[1])
+    for profile in profiles:
+        table.add_row(*profile)
 
     if all:
         io.console.print_section(

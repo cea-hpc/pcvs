@@ -1,6 +1,7 @@
 from pcvs.helpers import log
 from pcvs.helpers.exceptions import OrchestratorException
-from pcvs.helpers.system import MetaConfig, MetaDict
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import MetaDict
 from pcvs.orchestration.set import Set
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test

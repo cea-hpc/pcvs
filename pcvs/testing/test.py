@@ -7,7 +7,8 @@ from enum import IntEnum
 
 from pcvs import io
 from pcvs.helpers.criterion import Combination
-from pcvs.helpers.system import MetaConfig, ValidationScheme
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import ValidationScheme
 from pcvs.helpers.utils import Program
 from pcvs.plugins import Plugin
 

@@ -9,17 +9,27 @@ from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
 
-from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
-                  NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR, io, testing)
+from pcvs import NAME_BUILD_CONF_FN
+from pcvs import NAME_BUILD_RESDIR
+from pcvs import NAME_BUILDFILE
+from pcvs import NAME_BUILDIR
+from pcvs import NAME_DEBUG_FILE
+from pcvs import NAME_SRCDIR
+from pcvs import io
+from pcvs import testing
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
-from pcvs.helpers import communications, criterion, utils
+from pcvs.helpers import communications
+from pcvs.helpers import criterion
+from pcvs.helpers import utils
 from pcvs.helpers.exceptions import RunException
-from pcvs.helpers.system import MetaConfig, MetaDict
+from pcvs.helpers.system import MetaConfig
+from pcvs.helpers.system import MetaDict
 from pcvs.orchestration import Orchestrator
 from pcvs.plugins import Plugin
 from pcvs.testing.tedesc import TEDescriptor
-from pcvs.testing.testfile import TestFile, load_yaml_file
+from pcvs.testing.testfile import TestFile
+from pcvs.testing.testfile import load_yaml_file
 
 
 def print_progbar_walker(elt):

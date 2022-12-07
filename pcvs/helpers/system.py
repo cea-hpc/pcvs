@@ -2,12 +2,16 @@ import os
 
 import addict
 import jsonschema
-from ruamel.yaml import YAML, YAMLError
+from ruamel.yaml import YAML
+from ruamel.yaml import YAMLError
 
 import pcvs
-from pcvs import NAME_BUILDIR, PATH_INSTDIR
-from pcvs.helpers import git, pm
-from pcvs.helpers.exceptions import CommonException, ValidationException
+from pcvs import NAME_BUILDIR
+from pcvs import PATH_INSTDIR
+from pcvs.helpers import git
+from pcvs.helpers import pm
+from pcvs.helpers.exceptions import CommonException
+from pcvs.helpers.exceptions import ValidationException
 
 
 ####################################

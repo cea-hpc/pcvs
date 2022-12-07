@@ -7,13 +7,13 @@ from ruamel.yaml import YAML
 
 from pcvs import PATH_INSTDIR
 from pcvs import io
-from pcvs.helpers import system, utils
+from pcvs.helpers import system
+from pcvs.helpers import utils
 from pcvs.helpers.exceptions import ConfigException
 from pcvs.helpers.system import MetaDict
 
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
-
 
 def init() -> None:
     """Load configuration tree available on disk.
@@ -21,6 +21,9 @@ def init() -> None:
     This function is called when PCVS starts to load 3-scope configuration
     trees.
     """
+    if hasattr(init, 'done'):
+        return
+        
     global CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_EXISTING = {}
 
@@ -36,6 +39,7 @@ def init() -> None:
                                                       "*.yml")):
                 CONFIG_EXISTING[block][token].append(
                     (os.path.basename(config_file)[:-4], config_file))
+    init.done = True
 
 
 def list_blocks(kind, scope=None):
@@ -126,6 +130,8 @@ class ConfigurationBlock:
         :param scope: block scope, defaults to 'local'
         :type scope: str, optional
         """
+        init()
+        
         check_valid_kind(kind)
         utils.check_valid_scope(scope)
         self._kind = kind

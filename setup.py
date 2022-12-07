@@ -26,7 +26,7 @@ setuptools.setup(
     license="CeCILL-C",
     author="Julien Adam",
     author_email="adamj@paratools.com",
-    maintainer="Julien Adam", 
+    maintainer="Julien Adam",
     maintainer_email="adamj@paratools.com",
     keywords="validation hpc test-suite",
     url="https://pcvs.io/",

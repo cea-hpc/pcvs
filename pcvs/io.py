@@ -9,10 +9,14 @@ from rich.console import Console
 from rich.live import Live
 from rich.logging import RichHandler
 from rich.panel import Panel
-from rich.progress import (BarColumn, Progress, SpinnerColumn, TextColumn,
-                           TimeElapsedColumn)
-from rich.table import Table
+from rich.theme import Theme
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import SpinnerColumn
+from rich.progress import TextColumn
+from rich.progress import TimeElapsedColumn
 from rich.progress import track
+from rich.table import Table
 
 import pcvs
 
@@ -54,9 +58,16 @@ class TheConsole(Console):
         self._verbose = kwargs.get('verbose', 0)
         self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w")
         self.summary_table = dict()
+    
+        theme = Theme({
+            "warning": "bold yellow",
+            "danger": "bold red"
+        })
         
-        super().__init__(color_system=self._color)
-        self._debugconsole = Console(file=self._debugfile, color_system=self._color, markup=self._color is not None)
+        super().__init__(color_system=self._color, theme=theme)
+        self._debugconsole = Console(file=self._debugfile, theme=theme,
+                                     color_system=self._color,
+                                     markup=self._color is not None)
 
         logging.basicConfig(
             level="DEBUG", format="%(message)s",
@@ -149,25 +160,27 @@ class TheConsole(Console):
 
     def _reset_display_table(self, table):
         self._display_table = Table.grid(expand=True)
-        self._detail_table = Table(expand=True)
         self._display_table.add_row(table)
         self._display_table.add_row(Panel(self._progress))
 
     def table_container(self, total) -> Live:
         self._progress = Progress(
             TimeElapsedColumn(),
-            "Progression",
+            "Progress",
             BarColumn(bar_width=None, complete_style="yellow", finished_style="green"),
             TextColumn("[progress.percentage]{task.percentage:>3.1f}%"),
             SpinnerColumn(speed=0.5),
             expand=True)
         self._singletask = self._progress.add_task(
-            "Progression", total=int(total))
+            "Progress", total=int(total))
 
         self._reset_display_table(Table())
         self.live = Live(self._display_table, console=self)
         return self.live
-
+    
+    def create_table(self, title, cols):
+        return Table(*cols, title=title)
+    
     def progress_iter(self, it, **kwargs):
         """prints a progress bar using click
         :param it: iterable on which the progress bar has to iterate
@@ -265,12 +278,16 @@ class TheConsole(Console):
 
     def warn(self, fmt, *args, **kwargs):
         self.warning(fmt, *args, **kwargs)
+        self.print("[warning]WARN: {}[/warning]".format(fmt.format(*args, **kwargs)))
 
     def error(self, fmt, *args, **kwargs):
         self._loghdl.error(fmt, *args, **kwargs)
+        self.print("[danger]ERROR: {}[/danger]".format(fmt.format(*args, **kwargs)))
 
     def critical(self, fmt, *args, **kwargs):
         self._loghdl.critical(fmt, *args, **kwargs)
+        self.print("[danger]CRIT: {}[/danger]".format(fmt.format(*args, **kwargs)))
+        self.print("[danger]See pcvs-debug.log for more information[/danger]")
 
     def exception(self, e: BaseException, *args, **kwargs):
         if self._verbose >= 2:

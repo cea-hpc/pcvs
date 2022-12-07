@@ -49,7 +49,7 @@ def test_list(config_scope, config_kind):
 
     if config_scope and config_kind:
         res = click_call('config', 'list', token+".test")
-        assert ("WARN : no LABEL required" in res.stderr)
+        assert ("WARN: no LABEL required" in res.stdout)
 
 def test_list_wrong():
     with pytest.raises(pcvs.helpers.exceptions.ConfigException.BadTokenError):

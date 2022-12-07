@@ -14,6 +14,8 @@ properties:
         type: string
       f90:
         type: string
+      f08:
+        type: string
     additionalProperties: false
   variants:
     type: object

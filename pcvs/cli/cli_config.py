@@ -2,9 +2,9 @@ import sys
 
 from ruamel.yaml import YAML
 
+from pcvs import io
 from pcvs.backend import config as pvConfig
 from pcvs.helpers import utils
-from pcvs import io
 from pcvs.helpers.exceptions import ConfigException
 
 try:

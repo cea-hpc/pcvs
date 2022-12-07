@@ -6,11 +6,13 @@ import tempfile
 from ruamel.yaml import YAML
 
 from pcvs import NAME_BUILD_RESDIR
+from pcvs import io
 from pcvs.backend.session import Session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaDict
 from pcvs.testing.test import Test
-from pcvs.webview import create_app, data_manager
+from pcvs.webview import create_app
+from pcvs.webview import data_manager
 
 
 def locate_json_files(path):
