@@ -94,7 +94,8 @@ class Test:
             'te_name': kwargs.get('te_name', 'noname'),
             'label': kwargs.get('label', 'nolabel'),
             'subtree': kwargs.get('subtree', ''),
-            'comb': self._comb.translate_to_dict() if self._comb else {}
+            'comb': self._comb.translate_to_dict() if self._comb else {},
+            "jid": -1
         }
         comb_str = self._comb.translate_to_str() if self._comb else None
 
@@ -127,6 +128,28 @@ class Test:
         self._deps = []
         self._invocation_cmd = self._execmd
         self._sched_cnt = 0
+        self._output_info = {
+            'file': None,
+            'offset': -1,
+            'length': 0
+        }
+
+    @property
+    def jid(self) -> int:
+        """Getter for unique Job ID within a run.
+        
+        This attribute is generally set by the manager once job is uploaded
+        to the dataset.
+        :return: the job id
+        :rtype: an positive integer of -1 if not set
+        """
+        return self._id['jid']
+    
+    @jid.setter
+    def jid(self, id) -> None:
+        if type(id) != int:
+            raise Exception
+        self._id['jid'] = id
 
     @property
     def tags(self):
@@ -354,14 +377,14 @@ class Test:
         if rc is not None:
             self._rc = rc
         if out is not None:
-            self._output = base64.b64encode(out).decode('utf-8')
+            self._output = base64.b64encode(out)
         if time is not None:
             self._exectime = time
 
     def extract_metrics(self):
         """TODO:
         """
-        raw_output = base64.b64decode(self._output).decode("utf-8")
+        raw_output = self.output
         for name in self._data['metrics'].keys():
             node = self._data['metrics'][name]
 
@@ -381,7 +404,7 @@ class Test:
         if self._validation['expect_rc'] != self._rc:
             state = Test.State.FAILURE
 
-        raw_output = base64.b64decode(self._output).decode('utf-8')
+        raw_output = self.output
 
         # if test should be validated through a matching regex
         if state == Test.State.SUCCESS and self._validation['matchers'] is not None:
@@ -430,7 +453,7 @@ class Test:
         if self._output and \
             (MetaConfig.root.validation.print_level == 'all' or
             (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
-                raw_output = base64.b64decode(self._output).decode("utf-8")
+                raw_output = self.output
         
         io.console.print_job(label, self._exectime, self.label,
                               "/{}".format(self.subtree) if self.subtree else "",
@@ -476,28 +499,47 @@ class Test:
         return self._state
 
     @property
+    def encoded_output(self) -> bytes:
+        return self._output
+    
+    def get_raw_output(self, encoding="utf-8") -> bytes:
+        base = base64.b64decode(self._output)
+        
+        return base if not encoding else base.decode(encoding)
+    
+    @property
+    def output(self) -> str:
+        return self.get_raw_output(encoding='utf-8')
+
+    @property
     def time(self):
         """TODO:
         """
         return self._exectime
 
-    def to_json(self, strstate=False):
+    def to_json(self, strstate=False, force_output=False):
         """Serialize the whole Test as a JSON object.
 
         :return: a JSON object mapping the test
         :rtype: str
         """
-        return {
+        res = {
             "id": self._id,
             "exec": self._execmd,
             "result": {
                 "rc": self._rc,
                 "state": str(self._state) if strstate else self._state,
                 "time": self._exectime,
-                "output": self._output,
+                "output": self._output_info
             },
-            "data": self._data,
+            "data": self._data
         }
+        if self._output:
+            res['result']['output']['length'] = len(self.encoded_output)
+            if force_output:
+                res['result']['output']['raw'] = self.encoded_output
+
+        return res
 
     def from_json(self, test_json: str) -> None:
         """Replace the whole Test structure based on input JSON.
@@ -519,9 +561,13 @@ class Test:
 
         res = test_json.get("result", {})
         self._rc = res.get("rc", -1)
-        self._output = res.get("output", "")
         self._state = Test.State(res.get("state", Test.State.ERR_OTHER))
         self._exectime = res.get("time", 0)
+        self._output_info = res.get("output", {})
+        self._output = self._output_info.get('raw', b"")
+        if type(self._output) == str:
+            # should only be managed as bytes (as produced by b64 encoding)
+            self._output = self._output.encode('utf-8')
 
     def generate_script(self, srcfile):
         """Serialize test logic to its Shell representation.

@@ -8,6 +8,7 @@ properties:
       subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
       te_name: {"type": "string"}
       fq_name: {"type": "string"}
+      jid: {"type": "integer"}
       comb:
         OneOf:
           - type: null
@@ -23,7 +24,14 @@ properties:
       rc: {"type": "integer"}
       state: {"type": "integer"}
       time: {"type": "number"}
-      output: {"OneOf": [{"type": "string"}, {"type": null}]}
+      output:
+        type: object
+        properties:
+          file: {"type": "string"}
+          offset: {"type": "integer"}
+          length: {"type": "integer"}
+          raw: {"type": "string"}
+        additionalProperties: false
     additionalProperties: false
     required: ['rc', 'state', 'time']
   data:

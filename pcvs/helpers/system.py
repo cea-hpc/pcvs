@@ -338,6 +338,7 @@ class MetaConfig(MetaDict):
         subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
         subtree.set_nosquash('webreport', None)
+        subtree.set_nosquash('per_result_file_sz', 10 * 1024 * 1024)
         subtree.set_nosquash(
             'buildcache', os.path.join(subtree.output, 'cache'))
         subtree.set_nosquash('result', {"format": ['json']})

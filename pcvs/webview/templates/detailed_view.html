@@ -54,7 +54,7 @@
 			var raw_log = "";
 			if(data.result['output'])
 			{
-				raw_log = "<pre><code>"+decodeURIComponent(escape(window.atob(data.result['output'])))+"</code></pre>";
+				raw_log = "<pre><code>"+decodeURIComponent(escape(window.atob(data.result['output']['raw'])))+"</code></pre>";
 			}
 			return '<pre>'+
 				data['exec']+

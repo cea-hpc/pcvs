@@ -1,6 +1,8 @@
 import queue
+import os
 
 from pcvs import io
+from pcvs import NAME_BUILD_RESDIR
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
@@ -41,7 +43,9 @@ class Orchestrator:
         self._conf = config_tree
         self._runners = list()
         self._max_res = config_tree.machine.get('nodes', 1)
-        self._publisher = Publisher(config_tree.validation.output)
+        self._publisher = Publisher(
+            prefix=os.path.join(config_tree.validation.output, NAME_BUILD_RESDIR),
+            per_file_max_sz=config_tree.validation.per_result_file_sz)
         self._manager = Manager(self._max_res, publisher=self._publisher)
         self._maxconcurrent = config_tree.machine.get('concurrent_run', 1)
         self._complete_q = queue.Queue()
@@ -129,7 +133,7 @@ class Orchestrator:
                         session.update_session_from_file(
                             the_session.id, {'progress': current_progress * 100})
 
-        self._publisher.flush()
+        self._publisher.finalize()
         assert (self._manager.get_count('executed')
                 == self._manager.get_count('total'))
 

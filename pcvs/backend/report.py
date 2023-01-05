@@ -13,7 +13,7 @@ from pcvs.helpers.system import MetaDict
 from pcvs.testing.test import Test
 from pcvs.webview import create_app
 from pcvs.webview import data_manager
-
+from pcvs.orchestration import Publisher
 
 def locate_json_files(path):
     """Locate where json files are stored under the given prefix.
@@ -67,16 +67,10 @@ def upload_buildir_results(buildir):
         'dirs': conf_yml.validation.dirs
     })
 
-    for f in os.listdir(result_dir):
-        assert (f.endswith(".json"))
-        io.console.info("Loading {}".format(os.path.join(result_dir, f)))
-
-        with open(os.path.join(result_dir, f), 'r') as fh:
-            data = json.load(fh)
-            for t in data["tests"]:
-                obj = Test()
-                obj.from_json(t)
-                dataman.insert_test(sid, obj)
+    pub = Publisher(result_dir)
+    for test in pub.browse_tests():
+        print(test)
+        dataman.insert_test(sid, test)
 
     dataman.close_session(sid, {'state': Session.State.COMPLETED})
 

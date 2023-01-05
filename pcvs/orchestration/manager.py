@@ -88,6 +88,7 @@ class Manager:
         hashed = hash(job.name)
         # if test is not know yet, add + increment
         if hashed not in self.job_hashes:
+            job.jid = self._count.total
             self.job_hashes[hash(job.name)] = job
             self._count.total += 1
 
@@ -156,7 +157,7 @@ class Manager:
             self._comman.send(job)
         self._count.executed += 1
         self._count[job.state] += 1
-        self._publisher.add(job.to_json())
+        self._publisher.save(job)
                             
 
     def create_subset(self, max_dim):

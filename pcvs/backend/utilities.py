@@ -13,6 +13,7 @@ from pcvs import io
 from pcvs.backend import config
 from pcvs.backend import profile
 from pcvs.backend import run
+from pcvs.orchestration import Publisher
 from pcvs.helpers import system
 from pcvs.helpers import utils
 from pcvs.helpers.exceptions import ValidationException
@@ -69,15 +70,10 @@ def get_logged_output(prefix, testname):
         pcvs.NAME_BUILD_RESDIR)
     s = ""
     if os.path.isdir(resdir):
-        for f in os.listdir(resdir):
-
-            with open(os.path.join(resdir, f), 'r') as fh:
-                data = json.load(fh)
-                for job in data['tests']:
-                    if job['id']['fq_name'].startswith(testname):
-                        s += "\n#################\n### Found test-name: {}\n{}#################\n".format(
-                            job['id']['fq_name'],
-                            base64.b64decode(job['result']['output']).decode('utf-8'))
+        pub = Publisher(prefix=resdir)
+        for test in pub.retrieve_tests_by_name(name=testname):
+            s += "\n#################\n### Found test-name: {}\n{}#################\n".format(
+                test.name, test.get_raw_output(encoding='utf-8'))
     if not s:
         s = "No test named '{}' found here.".format(testname)
 
