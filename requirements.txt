@@ -2,7 +2,7 @@ ruamel.yaml
 addict
 Click>=8.0
 requests
-jsonschema
+jsonschema>=3.0.0
 PrettyTable
 flask
 sh
