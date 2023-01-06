@@ -1,8 +1,3 @@
-import os
-import subprocess
-import setuptools
-
-# if installed from Git, put the commit revision
 # add -dirty if staged area is not empty
 try:
     import sh
@@ -46,6 +41,7 @@ setuptools.setup(
         [console_scripts]
         pcvs=pcvs.main:cli
         pcvs_convert=pcvs.converter.yaml_converter:main
+        pcvs_result_convert=pcvs.converter.result_converter:main
     ''',
 
     project_urls={
