@@ -3,13 +3,10 @@ import os
 import re
 
 from pcvs import testing
-from pcvs.helpers import pm
-from pcvs.helpers import utils
-from pcvs.helpers.criterion import Criterion
-from pcvs.helpers.criterion import Serie
+from pcvs.helpers import pm, utils
+from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
-from pcvs.helpers.system import MetaConfig
-from pcvs.helpers.system import MetaDict
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.testing.test import Test
 
 

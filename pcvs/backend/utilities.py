@@ -5,19 +5,15 @@ import subprocess
 import tempfile
 
 import jsonschema
-from ruamel.yaml import YAML
-from ruamel.yaml import YAMLError
+from ruamel.yaml import YAML, YAMLError
 
 import pcvs
-from pcvs import io
-from pcvs.backend import config
-from pcvs.backend import profile
-from pcvs.backend import run
-from pcvs.orchestration import Publisher
-from pcvs.helpers import system
-from pcvs.helpers import utils
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
+from pcvs.backend import config, profile, run
+from pcvs.helpers import system, utils
 from pcvs.helpers.exceptions import ValidationException
 from pcvs.helpers.system import MetaDict
+from pcvs.orchestration.publishers import BuildDirectoryManager
 
 
 def locate_scriptpaths(output=None):
@@ -65,15 +61,15 @@ def compute_scriptpath_from_testname(testname, output=None):
 def get_logged_output(prefix, testname):
     if prefix is None:
         prefix = os.getcwd()
-    resdir = os.path.join(
-        utils.find_buildir_from_prefix(prefix),
-        pcvs.NAME_BUILD_RESDIR)
+    buildir = utils.find_buildir_from_prefix(prefix)
     s = ""
-    if os.path.isdir(resdir):
-        pub = Publisher(prefix=resdir)
-        for test in pub.retrieve_tests_by_name(name=testname):
-            s += "\n#################\n### Found test-name: {}\n{}#################\n".format(
+    if buildir:
+        man = BuildDirectoryManager(build_dir=buildir)
+        man.init_results()
+        for test in man.results.retrieve_tests_by_name(name=testname):
+            s += "\n#################\n### Found test-name: {}\n{}\n#################\n".format(
                 test.name, test.get_raw_output(encoding='utf-8'))
+        man.finalize()
     if not s:
         s = "No test named '{}' found here.".format(testname)
 

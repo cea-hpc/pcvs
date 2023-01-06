@@ -1,11 +1,17 @@
 import sys
 import os
-import click
 import shutil
 import json
 
 from pcvs.testing.test import Test
-from pcvs.orchestration.publishers import Publisher
+from pcvs.orchestration.publishers import BuildDirectoryManager
+
+try:
+    import rich_click as click
+    click.rich_click.SHOW_ARGUMENTS = True
+except ImportError:
+    import click
+
 
 @click.command()
 @click.option("-s", "--source", "source", type=click.Path(exists=True, file_okay=False, dir_okay=True),
@@ -26,7 +32,8 @@ def main(source, dest, force):
         shutil.rmtree(dest)
         
     os.makedirs(dest)
-    man = Publisher(prefix=dest)
+    man = BuildDirectoryManager(build_dir=dest)
+    results = man.results
     id_incr = 0
     json_filepath = os.path.join(source, "rawdata")
     for f in os.listdir(json_filepath):
@@ -36,7 +43,7 @@ def main(source, dest, force):
             for test_data in data['tests']:
                 job = Test()
                 job.from_json(test_data)
-                man.save(id_incr, job)
+                results.save(id_incr, job)
                 id_incr += 1
     
     

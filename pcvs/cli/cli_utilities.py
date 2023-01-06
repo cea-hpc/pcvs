@@ -9,10 +9,10 @@ from datetime import datetime
 from rich.panel import Panel
 from rich.table import Table
 
-from pcvs import NAME_BUILDFILE
-from pcvs import io
+from pcvs import NAME_BUILDFILE, NAME_BUILD_ARCHIVE_DIR, io
 from pcvs.backend import utilities as pvUtils
 from pcvs.helpers.system import MetaConfig
+from pcvs.helpers import utils
 
 try:
     import rich_click as click
@@ -159,14 +159,14 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
 def clean(ctx, force, fake, paths, remove_build_dir, interactive):
     """Find & clean workspaces from PCVS artifacts (build & archives)"""
     if not fake and not force:
-        io.console.warn(["IMPORTANT NOTICE:",
+        io.console.warn("\n".join(["IMPORTANT NOTICE:",
                           "This command will delete files from previous run(s) and",
                           "no recovery will be possible after deletion.",
                           "Please use --force to indicate you acknowledge the risks",
                           "and will face consequences in case of improper use.",
                           "",
                           "To list files to be deleted instead, you may use --dry-run."]
-                         )
+                         ))
         sys.exit(0)
     if not paths:
         paths = [os.getcwd()]
@@ -177,8 +177,10 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
                 io.console.print_section("Found build: {}".format(root))
-                archives = [x for x in sorted(files) if x.startswith(
-                    'pcvsrun_') and x.endswith('.tar.gz')]
+                
+                archive_dir = os.path.join(root, NAME_BUILD_ARCHIVE_DIR)
+                archives = sorted([x for x in os.listdir(archive_dir)])
+                
                 if len(archives) == 0 and fake:
                     io.console.print_item("No archive found.")
                 else:
@@ -195,7 +197,7 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
                         elif interactive:
                             if not click.confirm('{}: ({} days ago) ?'.format(f, delta.days)):
                                 continue
-                        os.remove(os.path.join(root, f))
+                        os.remove(os.path.join(archive_dir, f))
                         io.console.print_item('Deleting {}'.format(f))
                 if remove_build_dir:
                     if not fake:

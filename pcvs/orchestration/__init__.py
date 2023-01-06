@@ -1,15 +1,12 @@
-import queue
 import os
+import queue
 
-from pcvs import io
-from pcvs import NAME_BUILD_RESDIR
+from pcvs import NAME_BUILD_RESDIR, io
 from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.manager import Manager
-from pcvs.orchestration.publishers import Publisher
-from pcvs.orchestration.set import Runner
-from pcvs.orchestration.set import Set
+from pcvs.orchestration.set import Runner, Set
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
 
@@ -28,28 +25,26 @@ class Orchestrator:
     :type _pending_sets: list
     :ivar _max_res: number of resources allowed to be used
     :type _max_res: int
-    :ivar _publisher: result publisher
-    :type _publisher: :class:`Publisher`
+    :ivar _publisher: Result File Manager
+    :type _publisher: :class:`ResultFileManager`
     :ivar _manager: job manager
     :type _manager: :class:`Manager`
     :ivar _maxconcurrent: Max number of sets started at the same time.
     :type _maxconcurrent: int
 
     """
-
     def __init__(self):
         """constructor method"""
         config_tree = MetaConfig.root
         self._conf = config_tree
         self._runners = list()
         self._max_res = config_tree.machine.get('nodes', 1)
-        self._publisher = Publisher(
-            prefix=os.path.join(config_tree.validation.output, NAME_BUILD_RESDIR),
-            per_file_max_sz=config_tree.validation.per_result_file_sz)
+        self._publisher = config_tree.get_internal('build_manager').results
         self._manager = Manager(self._max_res, publisher=self._publisher)
         self._maxconcurrent = config_tree.machine.get('concurrent_run', 1)
         self._complete_q = queue.Queue()
         self._ready_q = queue.Queue()
+        
 
     def print_infos(self):
         """display pre-run infos."""
@@ -133,7 +128,7 @@ class Orchestrator:
                         session.update_session_from_file(
                             the_session.id, {'progress': current_progress * 100})
 
-        self._publisher.finalize()
+        self._publisher.flush()
         assert (self._manager.get_count('executed')
                 == self._manager.get_count('total'))
 

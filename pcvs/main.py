@@ -2,20 +2,12 @@
 import pkg_resources
 
 from pcvs import io
-from pcvs.backend import bank
-from pcvs.backend import config
-from pcvs.backend import profile
-from pcvs.cli import cli_bank
-from pcvs.cli import cli_config
-from pcvs.cli import cli_profile
-from pcvs.cli import cli_report
-from pcvs.cli import cli_run
-from pcvs.cli import cli_session
-from pcvs.cli import cli_utilities
+from pcvs.backend import bank, config, profile
+from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
+                      cli_session, cli_utilities)
 from pcvs.helpers import utils
 from pcvs.helpers.exceptions import PluginException
-from pcvs.plugins import Collection
-from pcvs.plugins import Plugin
+from pcvs.plugins import Collection, Plugin
 
 try:
     import rich_click as click
@@ -70,15 +62,18 @@ def print_version(ctx, param, value):
               type=click.Path(exists=True), show_envvar=True,
               help="Default Plugin path prefix")
 @click.option("-m", "--plugin", "select_plugins", multiple=True)
+@click.option("-t", "--tui", is_flag=True, default=False, show_envvar=True,
+              help="USe TUI-based interface instead of console (if applicable)")
 @click.pass_context
 @io.capture_exception(PluginException.NotFoundError)
-def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins):
+def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins, tui):
     """PCVS main program."""
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
     ctx.obj['exec'] = exec_path
+    ctx.obj['tui'] = tui
 
     # Click specific-related
     ctx.color = color

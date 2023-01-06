@@ -4,9 +4,7 @@ import hashlib
 import os
 import socket
 import time
-from abc import ABC
-from abc import abstractmethod
-from abc import abstractproperty
+from abc import ABC, abstractmethod, abstractproperty
 from datetime import datetime
 
 import sh

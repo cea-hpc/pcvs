@@ -4,15 +4,12 @@ import sys
 from rich.table import Table
 from ruamel.yaml import YAML
 
-from pcvs import PATH_INSTDIR
-from pcvs import io
+from pcvs import PATH_INSTDIR, io
 from pcvs.backend import config as pvConfig
 from pcvs.backend import profile as pvProfile
 from pcvs.cli import cli_config
-from pcvs.helpers import log
-from pcvs.helpers import utils
-from pcvs.helpers.exceptions import ProfileException
-from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers import log, utils
+from pcvs.helpers.exceptions import ProfileException, ValidationException
 
 try:
     import rich_click as click

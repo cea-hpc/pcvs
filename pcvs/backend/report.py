@@ -5,15 +5,14 @@ import tempfile
 
 from ruamel.yaml import YAML
 
-from pcvs import NAME_BUILD_RESDIR
-from pcvs import io
+from pcvs import NAME_BUILD_RESDIR, io
 from pcvs.backend.session import Session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaDict
+from pcvs.orchestration.publishers import BuildDirectoryManager
 from pcvs.testing.test import Test
-from pcvs.webview import create_app
-from pcvs.webview import data_manager
-from pcvs.orchestration import Publisher
+from pcvs.webview import create_app, data_manager
+
 
 def locate_json_files(path):
     """Locate where json files are stored under the given prefix.
@@ -60,15 +59,13 @@ def upload_buildir_results(buildir):
     sid = conf_yml.validation.sid
     dataman = data_manager
 
-    result_dir = os.path.join(buildir, NAME_BUILD_RESDIR)
+    man = BuildDirectoryManager(buildir)
     dataman.insert_session(sid, {
         'buildpath': buildir,
         'state': Session.State.COMPLETED,
         'dirs': conf_yml.validation.dirs
     })
-
-    pub = Publisher(result_dir)
-    for test in pub.browse_tests():
+    for test in man.results.browse_tests():
         print(test)
         dataman.insert_test(sid, test)
 

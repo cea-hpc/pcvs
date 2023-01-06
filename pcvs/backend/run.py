@@ -9,27 +9,18 @@ from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
 
-from pcvs import NAME_BUILD_CONF_FN
-from pcvs import NAME_BUILD_RESDIR
-from pcvs import NAME_BUILDFILE
-from pcvs import NAME_BUILDIR
-from pcvs import NAME_DEBUG_FILE
-from pcvs import NAME_SRCDIR
-from pcvs import io
-from pcvs import testing
+from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
+                  NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR, NAME_BUILD_SCRATCH, io, testing)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
-from pcvs.helpers import communications
-from pcvs.helpers import criterion
-from pcvs.helpers import utils
+from pcvs.helpers import communications, criterion, utils
 from pcvs.helpers.exceptions import RunException
-from pcvs.helpers.system import MetaConfig
-from pcvs.helpers.system import MetaDict
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
+from pcvs.orchestration.publishers import BuildDirectoryManager
 from pcvs.plugins import Plugin
 from pcvs.testing.tedesc import TEDescriptor
-from pcvs.testing.testfile import TestFile
-from pcvs.testing.testfile import load_yaml_file
+from pcvs.testing.testfile import TestFile, load_yaml_file
 
 
 def print_progbar_walker(elt):
@@ -43,20 +34,6 @@ def print_progbar_walker(elt):
     if elt is None:
         return None
     return "["+elt[0]+"] " + (elt[1] if elt[1] else "")
-
-
-def str_dict_as_envvar(d):
-    """Convert a dict to a list of shell-compliant variable strings.
-
-    The final result is a regular multiline str, each line being an entry.
-
-    :param d: the dict containing env vars to serialize
-    :type d: dict
-    :return: the str, containing mulitple lines, each of them being a var.
-    :rtype: str
-    """
-    return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
-
 
 def display_summary(the_session):
     """Display a summary for this run, based on profile & CLI arguments."""
@@ -121,6 +98,8 @@ def process_main_workflow(the_session=None):
 
     io.console.set_logfile(valcfg.runlog is not None, valcfg.runlog)
     valcfg.sid = the_session.id
+    build_manager = BuildDirectoryManager(build_dir=valcfg.output)
+    MetaConfig.root.set_internal('build_manager', build_manager)
 
     io.console.print_banner()
     io.console.print_header("Initialization")
@@ -218,34 +197,26 @@ def prepare():
     """
     io.console.print_section("Prepare environment")
     valcfg = MetaConfig.root.validation
-
+    build_man = MetaConfig.root.get_internal('build_manager')
+    
     utils.start_autokill(valcfg.timeout)
 
     io.console.print_item("Check whether build directory is valid")
-    buildir = os.path.join(valcfg.output, "test_suite")
-    if not os.path.exists(buildir):
-        os.makedirs(buildir)
-    # if a previous build exists
-    if valcfg.reused_build is None:
-        io.console.print_item("Cleaning up {}".format(buildir), depth=2)
-        utils.create_or_clean_path(buildir)
-    utils.create_or_clean_path(os.path.join(
-        valcfg.output, NAME_BUILDFILE))
-    utils.create_or_clean_path(os.path.join(
-        valcfg.output, 'webview'), dir=True)
-    utils.create_or_clean_path(os.path.join(valcfg.output, NAME_BUILD_CONF_FN))
-    utils.create_or_clean_path(os.path.join(valcfg.output, 'conf.env'))
-    utils.create_or_clean_path(os.path.join(
-        valcfg.output, 'save_for_export'), dir=True)
-    utils.create_or_clean_path(os.path.join(
-        valcfg.output, NAME_BUILD_RESDIR), dir=True)
-    utils.create_or_clean_path(valcfg.buildcache, dir=True)
-
-    io.console.print_item("Create test subtrees")
-    os.makedirs(buildir, exist_ok=True)
+    build_man.prepare(reuse=valcfg.reused_build)
+    
+    per_file_max_sz = 0
+    try:
+        per_file_max_sz = int(valcfg.per_result_file_sz)
+    except:
+        pass
+    build_man.init_results(per_file_max_sz=per_file_max_sz)
+    
     for label in valcfg.dirs.keys():
-        os.makedirs(os.path.join(buildir, label), exist_ok=True)
-    open(os.path.join(valcfg.output, NAME_BUILDFILE), 'w').close()
+        build_man.save_extras(os.path.join(NAME_BUILD_SCRATCH, label),
+                              dir=True,
+                              export=False)
+
+    utils.create_or_clean_path(valcfg.buildcache, dir=True)
 
     io.console.print_item("Ensure user-defined programs exist")
     __check_defined_program_validity()
@@ -436,7 +407,7 @@ def process_dyn_setup_scripts(setup_files):
 
     env_script = os.path.join(MetaConfig.root.validation.output, 'conf.env')
     with open(env_script, 'w') as fh:
-        fh.write(str_dict_as_envvar(env))
+        fh.write(utils.str_dict_as_envvar(env))
         fh.close()
     
     io.console.info("Iteration over files")
@@ -611,40 +582,24 @@ def terminate():
     """
     MetaConfig.root.get_internal(
         "pColl").invoke_plugins(Plugin.Step.END_BEFORE)
-    archive_name = "pcvsrun_{}.tar.gz".format(
-        MetaConfig.root.validation.datetime.strftime('%Y%m%d%H%M%S'))
+    
+    build_man = MetaConfig.root.get_internal('build_manager')
     outdir = MetaConfig.root.validation.output
 
     io.console.print_section("Prepare results")
     io.console.move_debug_file(outdir)
-    save_for_export(os.path.join(outdir, NAME_BUILD_RESDIR))
-    save_for_export(os.path.join(outdir, NAME_BUILD_CONF_FN))
-    save_for_export(os.path.join(outdir, NAME_DEBUG_FILE))
-
-    if MetaConfig.root.validation.anonymize:
-        io.console.print_item("Anonymize data")
-        anonymize_archive()
-
-    io.console.print_item("Generate the archive: {}".format(archive_name))
-
-    with utils.cwd(outdir):
-        cmd = [
-            "tar",
-            "czf",
-            "{}".format(archive_name),
-            "save_for_export"
-        ]
-        try:
-            io.console.debug('cmd: {}'.format(" ".join(cmd)))
-            subprocess.check_call(cmd)
-        except CalledProcessError as e:
-            raise RunException.ProgramError(e, cmd)
+    archive_path = build_man.create_archive()
+    
+    #if MetaConfig.root.validation.anonymize:
+    #    io.console.print_item("Anonymize data")
+    #    anonymize_archive()
 
     comman = MetaConfig.root.get_internal("comman")
     if comman:
         io.console.print_item("Close connection to Reporting Server")
         comman.close_connection()
     MetaConfig.root.get_internal("pColl").invoke_plugins(Plugin.Step.END_AFTER)
+    build_man.finalize()
 
 
 def dup_another_build(build_dir, outdir):

@@ -7,10 +7,8 @@ from multiprocessing import Process
 from ruamel.yaml import YAML
 from ruamel.yaml.main import yaml_object
 
-from pcvs import PATH_SESSION
-from pcvs import io
-from pcvs.helpers import log
-from pcvs.helpers import utils
+from pcvs import PATH_SESSION, io
+from pcvs.helpers import log, utils
 
 yml = YAML()
 

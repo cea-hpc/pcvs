@@ -1,9 +1,8 @@
 import os
 
-from pcvs import NAME_BUILDFILE
-from pcvs import NAME_BUILDIR
-from pcvs import io
+from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import report as pvReport
+from pcvs.gui.curses import viewer
 from pcvs.helpers import log
 
 try:
@@ -20,7 +19,10 @@ except ImportError:
 def report(ctx, path_list, static):
     """Start a webserver to browse result during or after execution.
 
-    Listens by default to http://localhost:5000/"""
+     Listens by default to http://localhost:5000/"""
+    
+    if ctx.obj['tui']:
+        return viewer.start_job_viewer_app(path_list[0] if path_list else None)
     inputs = list()
     # sanity check
     for prefix in path_list:

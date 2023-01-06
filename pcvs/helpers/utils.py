@@ -7,15 +7,10 @@ import time
 from contextlib import contextmanager
 from shutil import SameFileError
 
-from pcvs import NAME_BUILDFILE
-from pcvs import NAME_BUILDIR
-from pcvs import NAME_SRCDIR
-from pcvs import PATH_HOMEDIR
-from pcvs import PATH_INSTDIR
-from pcvs import io
-from pcvs.helpers.exceptions import CommonException
-from pcvs.helpers.exceptions import LockException
-from pcvs.helpers.exceptions import RunException
+from pcvs import (NAME_BUILDFILE, NAME_BUILDIR, NAME_SRCDIR, PATH_HOMEDIR,
+                  PATH_INSTDIR, io)
+from pcvs.helpers.exceptions import (CommonException, LockException,
+                                     RunException)
 
 ####################################
 ##    STORAGE SCOPE MANAGEMENT    ##
@@ -462,3 +457,34 @@ class Program:
         :rtype: Exception
         """
         return self._except
+
+def str_dict_as_envvar(d):
+    """Convert a dict to a list of shell-compliant variable strings.
+
+    The final result is a regular multiline str, each line being an entry.
+
+    :param d: the dict containing env vars to serialize
+    :type d: dict
+    :return: the str, containing mulitple lines, each of them being a var.
+    :rtype: str
+    """
+    return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
+
+def check_is_buildir(p):
+    if not os.path.isdir(p):
+        return False
+    return NAME_BUILDFILE in os.listdir(p)
+
+def check_is_archive(f):
+    if not os.path.isfile(f):
+        return False
+    return os.path.basename(f).startswith("pcvsrun_")
+
+def check_is_build_or_archive(x):
+    return check_is_buildir(x) or check_is_archive(x)
+
+def list_valid_buildirs_in_dir(p):
+    return [os.path.join(root, d) for root, d, _ in os.walk(p) if check_is_buildir(p)]
+
+def list_valid_archive_in_dir(p):
+    return [os.path.join(root, f) for root, _, f in os.walk(p) if check_is_archive(f)]

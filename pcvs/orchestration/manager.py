@@ -1,7 +1,6 @@
 from pcvs.helpers import log
 from pcvs.helpers.exceptions import OrchestratorException
-from pcvs.helpers.system import MetaConfig
-from pcvs.helpers.system import MetaDict
+from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration.set import Set
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
@@ -21,7 +20,7 @@ class Manager:
     :ivar _max_size: max number of resources allowed by the profile
     :type _max_size: int
     :ivar _publisher: the Formatter object, publishing results into files
-    :type _publisher: :class:`Publisher`
+    :type _publisher: :class:`ResultFileManager`
     :ivar _count: dict gathering various counters (total, executed...)
     :type _count: dict 
     """
@@ -35,7 +34,7 @@ class Manager:
         :param builder: Not used yet
         :type builder: None
         :param publisher: requested publisher by the orchestrator
-        :type publisher: :class:`Publisher`
+        :type publisher: :class:`ResultFileManager`
         """
         self._comman = MetaConfig.root.get_internal('comman')
         self._plugin = MetaConfig.root.get_internal('pColl')

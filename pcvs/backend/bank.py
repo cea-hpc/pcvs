@@ -4,16 +4,11 @@ import os
 import tarfile
 import tempfile
 import time
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Dict, List, Optional
 
 from ruamel.yaml import YAML
 
-from pcvs import NAME_BUILD_CONF_FN
-from pcvs import NAME_BUILD_RESDIR
-from pcvs import PATH_BANK
-from pcvs import dsl
+from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK, dsl
 from pcvs.helpers import git
 from pcvs.helpers.exceptions import BankException
 from pcvs.helpers.system import MetaDict
