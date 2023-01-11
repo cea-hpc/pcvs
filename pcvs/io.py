@@ -74,6 +74,14 @@ class TheConsole(Console):
         self._chars = SpecialChar(utf_support=(
             self.encoding.startswith('utf')))
 
+    @property
+    def verbose(self):
+        return self._verbose
+        
+    @verbose.setter
+    def verbose(self, v):
+        self._verbose = v
+
     def __del__(self):
         if self._debugfile:
             self._debugfile.close()

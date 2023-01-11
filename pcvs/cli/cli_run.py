@@ -166,6 +166,12 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
+    
+    if print_level and print_level != "none":
+        # any --print option will imply to disable packed rich console view
+        # --> enable verbose mode
+        ctx.obj['verbose'] = 2
+        io.console.verbose = 2
 
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config
@@ -219,6 +225,10 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     # BEFORE the build dir still does not exist !
     buildfile = os.path.join(val_cfg.output, NAME_BUILDFILE)
     if os.path.exists(val_cfg.output):
+        # careful if the build dir does not exist
+        # the condition above may be executed concurrently
+        # by two runs, inducing parallel execution in the same dir
+        # TODO.
         if not utils.trylock_file(buildfile):
             if val_cfg.override:
                 utils.lock_file(buildfile, force=True)
