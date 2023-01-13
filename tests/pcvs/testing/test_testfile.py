@@ -95,7 +95,7 @@ def isolated_yml_test():
 
 
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
-    "__internal": {
+    "_MetaConfig__internal_config": {
         "cc_pm": [pm.SpackManager("fakespec")],
         "pColl": Collection()
     },
@@ -112,9 +112,8 @@ def test_TestFile(tedesc, isolated_yml_test):
     def dummydesc():
         pass
     tedesc.construct_tests = dummydesc
-    
     testfile = tested.TestFile(os.path.join(isolated_yml_test, "test-dir/pcvs.yml"), 
-        os.path.dirname(__file__), 
+        os.path.dirname(isolated_yml_test), 
         label="keytestdir", 
         prefix=".")
     testfile.process()

@@ -5,6 +5,7 @@ import pytest
 
 import pcvs
 from pcvs.helpers import criterion, exceptions, pm, system
+from pcvs.plugins import Collection
 from pcvs.helpers.criterion import Criterion
 from pcvs.helpers.system import MetaDict
 from pcvs.testing import tedesc as tested
@@ -79,8 +80,9 @@ def test_handle_job_deps(mock_id):
 
 @patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
-    "__internal": {
+    "_MetaConfig__internal_config": {
         "cc_pm": pm.SpackManager("this_is_a_test"),
+        'pColl': Collection(),
     },
     "validation": {
         "output": "test_output",
@@ -143,7 +145,7 @@ def test_tedesc_regular():
 
 @patch.dict(os.environ, {'HOME': '/home/user', 'USER': 'superuser'})
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
-    "__internal": {
+    "_MetaConfig__internal_config": {
         "cc_pm": pm.SpackManager("this_is_a_test"),
     },
     "validation": {

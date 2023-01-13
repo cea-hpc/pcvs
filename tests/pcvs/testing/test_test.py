@@ -5,7 +5,7 @@ from pcvs.testing import test as tested
 
 
 @patch("pcvs.helpers.system.MetaConfig.root", system.MetaConfig({
-    "__internal": {
+    "_MetaConfig__internal_config": {
         "cc_pm": "test_cc_pm"
     },
     "validation": {

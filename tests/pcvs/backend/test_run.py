@@ -46,7 +46,7 @@ def mock_config():
                 'datetime': datetime.now(),
                 'buildcache': os.path.join(os.getcwd(), "buildcache")
             },
-            '__internal': {
+            '_MetaConfig__internal_config': {
                 'pColl': Collection()
             }
         })):
