@@ -40,7 +40,7 @@ def print_version(ctx, param, value):
         'Parallel Computing Validation System (pcvs) -- version {}'.format(pkg_resources.require("pcvs")[0].version))
     ctx.exit()
 
-
+i = 0
 @click.group(context_settings=CONTEXT_SETTINGS, name="cli")
 @click.option("-v", "--verbose", "verbose", show_envvar=True,
               count=True, default=0,

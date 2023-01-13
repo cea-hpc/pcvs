@@ -142,7 +142,7 @@ class Test:
         :return: the job id
         :rtype: an positive integer of -1 if not set
         """
-        return self._id['jid']
+        return int(self._id['jid'])
     
     @jid.setter
     def jid(self, id) -> None:

@@ -3,7 +3,7 @@ import tempfile
 import bz2
 import json
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 import datetime
 import tarfile
 
@@ -20,7 +20,7 @@ class ResultFile:
     MAGIC_TOKEN = "PCVS-START-RAW-OUTPUT"
     MAX_RAW_SIZE = 10 * 1024 * 1024
     
-    def __init__(self, filepath, filename):
+    def __init__(self, filepath, filename, mode="r"):
         self._fileprefix = filename
         self._path = filepath
         self._cnt = 0
@@ -40,6 +40,8 @@ class ResultFile:
             
         # no way to have a bz2 be opened R/W at once ? seems not :(
         self._rawout = bz2.open(self._rawdata_file, "a")
+        self._rawout_reader = bz2.open(self._rawdata_file, "r")
+        
        
     def close(self):
         self.flush()
@@ -90,33 +92,34 @@ class ResultFile:
 
     def load(self):
         with open(self._metadata_file, "r") as fh:
-            self._data = json.load(fh)
-            
+            # when reading metdata_file,
+            # convert string-based keys to int (as managed by Python)
+            content = json.load(fh)
+            self._data = {int(k): v for k, v in content.items()}
         
     def retrieve_test(self, id=None, name=None) -> List[Test]:
-        if not bool(id) ^ bool(name):
+        if (id is None and name is None) or \
+            (id is not None and name is not None):
             raise Exception()
-
+        
         lookup_table = []
-        if id:
+        if id is not None:
             if id not in self._data:
                 return []
             else:
                 lookup_table = [self._data[id]]
-        elif name:
+        elif name is not None:
                 lookup_table = list(filter(lambda x: name in x['id']['fq_name'], self._data.values()))
         
         res = []
         for elt in lookup_table:
-            
             offset = elt['result']['output']['offset']
             length = elt['result']['output']['length']
             rawout = ""
             if offset >= 0:
                 assert elt['result']['output']['file'] in self.rawdata_prefix
-                with bz2.open(self._rawdata_file, "r") as fh:
-                    fh.seek(offset)
-                    rawout = fh.read(length).decode('utf-8')
+                self._rawout_reader.seek(offset)
+                rawout = self._rawout_reader.read(length).decode('utf-8')
                 if not rawout.startswith(self.MAGIC_TOKEN):
                     raise Exception()
 
@@ -177,12 +180,20 @@ class ResultFileManager:
                 self._opened_files[f] = curfile
             
             self._current_file = curfile
-            
+    
+    def reconstruct_map_data(self):
+        if not self._mapdata:
+            return
+        
+        for fic, jobs in self._mapdata.items():
+            for job in jobs:
+                self._mapdata_rev[job] = fic
+
     def __init__(self, prefix=".", per_file_max_ent=0, per_file_max_sz=0):
         
         self._current_file = None
         self._outdir = prefix
-        self._opened_files = dict()
+        self._opened_files: Dict[ResultFile] = dict()
         
         map_filename = os.path.join(prefix, 'maps.json')
         view_filename = os.path.join(prefix, 'views.json')
@@ -198,15 +209,15 @@ class ResultFileManager:
                 return default
         
         self._mapdata = preload_if_exist(map_filename, {})
+        self._mapdata_rev = {}
         self._viewdata = preload_if_exist(view_filename, {
             'status': self._ret_state_split_dict(),
         })
         
-        self._mapfile = open(os.path.join(prefix, "maps.json"), "w")
-        self._viewfile = open(os.path.join(prefix, "views.json"), 'w')
-    
         self._max_entries = per_file_max_ent
         self._max_size = per_file_max_sz
+        
+        self.reconstruct_map_data()
         
         self.discover_result_files()
         if not self._current_file:
@@ -220,8 +231,8 @@ class ResultFileManager:
         self.register_view('tree')
         
     def save(self, job: Test):
-        str_id = str(job.jid)
-        if str_id in self._mapdata.keys():
+        id = job.jid
+        if id in self._mapdata.keys():
             raise Exception
         
         # create a new file if the current one is 'large' enough
@@ -230,32 +241,32 @@ class ResultFileManager:
             self.create_new_result_file()
         
         # save info to file
-        self._current_file.save(str_id, job.to_json(), job.encoded_output)
+        self._current_file.save(id, job.to_json(), job.encoded_output)
         
         # register this location from the map-id table
-        self._mapdata[str_id] = self._current_file.prefix
+        self._mapdata_rev[id] = self._current_file.prefix
+        assert self._current_file.prefix in self._mapdata
+        self._mapdata[self._current_file.prefix].append(id)
         # record this save as a FAILURE/SUCCESS statistic for multiple views
         state = str(job.state)
-        self._viewdata['status'][state].append(str_id)
+        self._viewdata['status'][state].append(id)
         for tag in job.tags:
-            self._viewdata['tags'][tag][state].append(str_id)
+            self._viewdata['tags'][tag][state].append(id)
         
         self.register_view_item('tree', job.label)
-        self._viewdata['tree'][job.label][state].append(str_id)
+        self._viewdata['tree'][job.label][state].append(id)
         if job.subtree:
             nodes = job.subtree.split('/')
             nb_nodes = len(nodes)
             for i in range(1, nb_nodes+1):
                 name = "/".join([job.label] + nodes[:i])
                 self.register_view_item('tree', name)
-                self._viewdata['tree'][name][state].append(str_id)
+                self._viewdata['tree'][name][state].append(id)
                 
-    def retrieve(self, id) -> List[Test]:
-        str_id = str(id)
-        if str_id not in self._mapdata:
+    def retrieve_test(self, id) -> List[Test]:
+        if id not in self._mapdata_rev:
             return None
-        
-        filename = self._mapdata[str_id]
+        filename = self._mapdata_rev[id]
         handler = None
         if filename == self._current_file.metadata_prefix:
             handler = self._current_file
@@ -265,7 +276,7 @@ class ResultFileManager:
             handler = ResultFile(self._outdir, filename)
             self._mapdata[filename] = handler
             
-        return handler.retrieve_test(str_id)
+        return handler.retrieve_test(id=id)
     
     def browse_tests(self) -> Test:
         for test_id in self._mapdata:
@@ -296,17 +307,60 @@ class ResultFileManager:
         ResultFileManager.increment += 1
         self._current_file = ResultFile(self._outdir, filename)
         self._opened_files[filename] = self._current_file
+        self._mapdata.setdefault(self._current_file.prefix, list())
 
     def flush(self):
         if self._current_file:
             self._current_file.flush()
         
-        self._mapfile.seek(0)
-        self._viewfile.seek(0)
+        with open(os.path.join(self._outdir, "maps.json"), "w") as fh:
+            json.dump(self._mapdata, fh)
         
-        json.dump(self._mapdata, self._mapfile)
-        json.dump(self._viewdata, self._viewfile)
+        with open(os.path.join(self._outdir, "views.json"), 'w') as fh:
+            json.dump(self._viewdata, fh)
+
+    @property
+    def views(self):
+        return self._viewdata
+
+    @property
+    def maps(self):
+        return self._mapdata
+    
+    @property
+    def total_cnt(self):
+        return len(self._mapdata_rev.keys())
+    
+    def map_id(self, id):
+
+        if id not in self._mapdata_rev:
+            return None
+        f = self._mapdata_rev[id]
+        if f not in self._opened_files:
+            self._opened_files[f] = ResultFile(self._outdir, f)
+        hdl = self._opened_files[f]
+        match = hdl.retrieve_test(id=id)
         
+        assert(len(match) <= 1)
+        return match[0]
+
+    @property
+    def status_view(self):
+        return self._viewdata['status']
+    
+    @property
+    def tags_view(self):
+        return self._viewdata['tags']
+    
+    @property
+    def tree_view(self):
+        return self._viewdata['tree']
+    
+    def subtree_view(self, subtree):
+        if subtree not in self._viewdata['tree']:
+            return None
+        return self._viewdata['tree'][subtree]
+    
     def finalize(self):
         self.flush()
         if self._current_file:
@@ -314,14 +368,6 @@ class ResultFileManager:
             
         for f in self._opened_files.values():
             f.close()
-        
-        if self._mapfile:
-            self._mapfile.close()
-            self._mapfile = None
-        if self._viewfile:
-            self._viewfile.close()
-            self._viewfile = None
-        
 
 
 class BuildDirectoryManager:
@@ -337,9 +383,9 @@ class BuildDirectoryManager:
         
         open(os.path.join(self._path, pcvs.NAME_BUILDFILE), 'w').close()
         
-        
         if not os.path.isdir(old_archive_dir):
             os.makedirs(old_archive_dir)
+            
     
     def init_results(self, per_file_max_sz=0):
         resdir = os.path.join(self._path, pcvs.NAME_BUILD_RESDIR)
@@ -363,21 +409,32 @@ class BuildDirectoryManager:
         self.clean(pcvs.NAME_BUILD_RESDIR)
         self.clean(pcvs.NAME_BUILD_CONF_FN)
         self.clean('conf.env')
-        
-        
-            
+
         self.clean_archives()
             
+    @property
+    def sid(self):
+        if self._config.validation.sid:
+            return self._config.validation.sid
+        else:
+            return None
+
     def load_config(self):
-        with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'w') as fh:
-            self._config = YAML(typ='safe').load(fh)
+        
+        with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'r') as fh:
+            self._config = MetaConfig(YAML(typ='safe').load(fh))
+
         return self._config
     
     def save_config(self, config):
         self._config = config
-        with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'r') as fh:
+        with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'w') as fh:
             YAML(typ='safe').dump(config, fh)
    
+    @property
+    def config(self):
+        return self._config
+        
     def save_extras(self, rel_filename, data="", dir=False, export=False):
         if os.path.isabs(rel_filename):
             raise Exception()
@@ -445,13 +502,16 @@ class BuildDirectoryManager:
             
         archive.close()
         return archive_file
-        
-    def load_from_archive(self, archive_path):
+    
+    @classmethod
+    def load_from_archive(cls, archive_path):
         archive = tarfile.open(archive_path, mode="w:gz")
         
-        self._path = tempfile.mkdtemp(prefix="pcvs-archive")
-        archive.extractall(self._path)
-        self.load_config()
+        path = tempfile.mkdtemp(prefix="pcvs-archive")
+        archive.extractall(path)
+        hdl =  BuildDirectoryManager(build_dir=path)
+        hdl.load_config()
+        return hdl
     
     def finalize(self):
         self.results.finalize()

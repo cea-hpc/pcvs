@@ -220,9 +220,9 @@ class MetaConfig(MetaDict):
         # The 'internal' node is a special one. Put here anything not requiring
         # to be published (like conf.yml, etc...). mainly one-time Python
         # objects
-        if '__internal' not in self:
-            self['__internal'] = Config()
-
+        
+        #self.__internal_config = Config()
+        
     def __setitem__(self, param, value):
         """Extend the default MetaDict setter mthod to reach the base class one"""
         super().__setitem__(param, value)
@@ -397,14 +397,19 @@ class MetaConfig(MetaDict):
         :type k: str
         :param v: value to add
         :type v: str"""
-        self['__internal'][k] = v
+        if not hasattr(self, "__internal_config"):
+            self.__internal_config = {}
+        self.__internal_config[k] = v
 
     def get_internal(self, k):
         """manipulate the internal MetaConfig() node to load not-exportable data
         :param k: value to get
         :type k: str"""
-        if k in self['__internal']:
-            return self['__internal'][k]
+        if not hasattr(self, "__internal_config"):
+            return None
+        
+        if k in self.__internal_config:
+            return self.__internal_config[k]
         else:
             return None
 
@@ -412,11 +417,10 @@ class MetaConfig(MetaDict):
         """Export the whole configuration as a dict. Prune any __internal node
         beforehand.
         """
-        res = MetaDict()
-        for k, v in self.items():
-            if k == '__internal':
-                continue
-            # should ignore __internal
-            res[k] = v.to_dict()
+        not_exported = self.__internal_config
+        del self.__internal_config
+        
+        res = self.to_dict()
+        self.__internal_config = not_exported
 
-        return res.to_dict()
+        return MetaDict(res).to_dict()

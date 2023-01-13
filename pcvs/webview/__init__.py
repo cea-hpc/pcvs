@@ -6,21 +6,19 @@ import random
 from flask import Flask, abort, jsonify, render_template, request, sessions
 
 from pcvs import PATH_INSTDIR
-from pcvs.backend import session
 from pcvs.testing.test import Test
-from pcvs.webview import datalayer
 
-data_manager = datalayer.DataRepresentation()
+data_manager = None
 
-
-def create_app():
+def create_app(iface):
     """Start and run the Flask application.
 
     :return: the application
     :rtype: :class:`Flask`
     """
     global data_manager
-
+    data_manager = iface
+    
     app = Flask(__name__, template_folder=os.path.join(
         PATH_INSTDIR, "webview/templates"))
 
@@ -53,7 +51,7 @@ def create_app():
         :rtype: str
         """
         if 'json' in request.args.get("render", []):
-            return jsonify(data_manager.get_sessions())
+            return jsonify(data_manager.session_infos())
         return render_template("main.html")
 
     @app.route("/run/<sid>")
@@ -66,19 +64,24 @@ def create_app():
         :rtype: str
         """
         sid = int(sid)
-        assert (sid in data_manager.session_ids)
+        if sid not in data_manager.session_ids:
+            abort(404)
+
+        labels = data_manager.single_session_labels(sid)
+        tags = data_manager.single_session_tags(sid)
+        jobs_cnt = data_manager.single_session_job_cnt(sid)
 
         if 'json' in request.args.get('render', []):
-            return jsonify({"tag": data_manager.get_tag_cnt(sid),
-                            "label": data_manager.get_label_cnt(sid),
-                            "test": data_manager.get_test_cnt(sid)
+            return jsonify({"tag": len(tags),
+                            "label": len(labels),
+                            "test": jobs_cnt
                             })
         return render_template('session_main.html',
                                sid=sid,
-                               rootdir=data_manager.get_root_path(sid),
-                               nb_tests=data_manager.get_test_cnt(sid),
-                               nb_labels=data_manager.get_label_cnt(sid),
-                               nb_tags=data_manager.get_tag_cnt(sid)
+                               rootdir=data_manager.single_session_build_path(sid),
+                               nb_tests=jobs_cnt,
+                               nb_labels=len(labels),
+                               nb_tags=len(tags)
                                )
 
     @app.route('/compare')
@@ -95,7 +98,7 @@ def create_app():
         """Get a listing.
 
         The response will depend on the request, which can be:
-            * tag
+            * tags
             * label
             * status
 
@@ -109,13 +112,12 @@ def create_app():
         sid = int(sid)
         if 'json' in request.args.get('render', []):
             out = list()
-            infos = data_manager.get_token_content(sid, selection)
-            if '__elems' in infos:
-                for k, v in infos['__elems'].items():
-                    out.append({
-                        "name": k,
-                        "count": v['__metadata']['count']
-                    })
+            infos = data_manager.single_session_get_view(sid, selection, summary=True)
+            for k, v in infos.items():
+                out.append({
+                    "name": k,
+                    "count": v
+                })
             return jsonify(out)
 
         return render_template('list_view.html', sid=sid, selection=selection)
@@ -141,10 +143,21 @@ def create_app():
         request_item = request.args.get('name', None)
 
         if 'json' in request.args.get('render', []):
-            infos = data_manager.get_token_content(sid, selection)
-            if request_item in infos['__elems'].keys():
-                out = data_manager.extract_tests_under(
-                    infos['__elems'][request_item])
+            #special case
+            if selection == "status":
+                job_list = data_manager.single_session_status(sid, filter=request_item)
+            else:
+                struct = data_manager.single_session_get_view(sid, selection, subset=request_item, summary=False)
+                # jobs are returned split into 3 lists, depending on their status
+                # -> browse all three lists
+                job_list = list()
+                for e, m in struct.items():
+                    for sn, s in m.items():
+                        job_list += s
+            for elt in job_list:
+                cur: Test = data_manager.single_session_map_id(sid, elt)
+                out.append(cur.to_json(strstate=True))
+            
             return jsonify(out)
 
         return render_template("detailed_view.html",
@@ -161,7 +174,7 @@ def create_app():
         """
         json_session = request.get_json()
         sid = json_session["sid"]
-        data_manager.insert_session(sid, json_session)
+        data_manager.add_session(sid, json_session)
 
         return "OK!", 200
 
@@ -172,8 +185,6 @@ def create_app():
         :return: OK
         :rtype: HTTP request
         """
-        json_session = request.get_json()
-        data_manager.close_session(json_session["sid"], json_session)
         return "OK!", 200
 
     @app.route("/submit/test", methods=["POST"])
@@ -183,6 +194,7 @@ def create_app():
         :return: OK
         :rtype: HTTP request
         """
+        return "OK!", 200
         json_str = request.get_json()
 
         test_sid = json_str["metadata"]["sid"]
@@ -206,13 +218,5 @@ def create_app():
         :rtype: str
         """
         return render_template('404.html')
-
-    def get_data_manager():
-        """Getter to the webview data manager.
-
-        :return: the data manager holding test-suite data.
-        :rtype: :class:`DataRepresentation`
-        """
-        return data_manager
 
     return app
