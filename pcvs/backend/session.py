@@ -395,7 +395,7 @@ class Session:
             # save the old manager to restore it after child starts
             #old = copy.copy(log.manager)
             #io.console.set_logfile(enable=True, logfile=self._io_file)
-            #io.console.set_tty(enable=False)
+            # io.console.set_tty(enable=False)
             child.start()
             # complete the first child, to allow this process to terminate
             # pcchild.join()

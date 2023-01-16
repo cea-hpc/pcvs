@@ -4,8 +4,7 @@ from sqlite3 import Row
 import npyscreen
 from genericpath import isfile
 
-from pcvs import NAME_BUILDIR
-from pcvs import dsl
+from pcvs import NAME_BUILDIR, dsl
 from pcvs.backend import bank as pvBank
 
 

@@ -86,7 +86,8 @@ def profile_list(ctx, token, all):
                                                            maxsplit=2)
 
     if label:
-        io.console.warn("no LABEL required for this command (s'{}' given)".format(label))
+        io.console.warn(
+            "no LABEL required for this command (s'{}' given)".format(label))
 
     profiles = list()
     if scope:
@@ -96,7 +97,7 @@ def profile_list(ctx, token, all):
         for pf_list in pvProfile.list_profiles().values():
             for pf in pf_list:
                 profiles.append((pf[0], pf[1]))
-    
+
     if not profiles:
         io.console.print_item("None")
         return

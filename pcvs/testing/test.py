@@ -136,14 +136,14 @@ class Test:
     @property
     def jid(self) -> int:
         """Getter for unique Job ID within a run.
-        
+
         This attribute is generally set by the manager once job is uploaded
         to the dataset.
         :return: the job id
         :rtype: an positive integer of -1 if not set
         """
         return int(self._id['jid'])
-    
+
     @jid.setter
     def jid(self, id) -> None:
         if type(id) != int:
@@ -279,7 +279,7 @@ class Test:
         """
         if name not in self._depnames:
             return
-        
+
         if obj not in self._deps:
             self._deps.append(obj)
 
@@ -451,15 +451,13 @@ class Test:
 
         if self._output and \
             (MetaConfig.root.validation.print_level == 'all' or
-            (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
-                raw_output = self.output
-        
-        io.console.print_job(label, self._exectime, self.label,
-                              "/{}".format(self.subtree) if self.subtree else "",
-                              self.name,
-                              colorname=colorname, icon=icon,content=raw_output)
+             (self.state == Test.State.FAILURE) and MetaConfig.root.validation.print_level == 'errors'):
+            raw_output = self.output
 
-        
+        io.console.print_job(label, self._exectime, self.label,
+                             "/{}".format(self.subtree) if self.subtree else "",
+                             self.name,
+                             colorname=colorname, icon=icon, content=raw_output)
 
     def executed(self, state=None):
         """Set current Test as executed.
@@ -500,12 +498,12 @@ class Test:
     @property
     def encoded_output(self) -> bytes:
         return self._output
-    
+
     def get_raw_output(self, encoding="utf-8") -> bytes:
         base = base64.b64decode(self._output)
-        
+
         return base if not encoding else base.decode(encoding)
-    
+
     @property
     def output(self) -> str:
         return self.get_raw_output(encoding='utf-8')

@@ -9,8 +9,9 @@ from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
 
-from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILDFILE,
-                  NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR, NAME_BUILD_SCRATCH, io, testing)
+from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILD_SCRATCH,
+                  NAME_BUILDFILE, NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR,
+                  io, testing)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
 from pcvs.helpers import communications, criterion, utils
@@ -34,6 +35,7 @@ def print_progbar_walker(elt):
     if elt is None:
         return None
     return "["+elt[0]+"] " + (elt[1] if elt[1] else "")
+
 
 def display_summary(the_session):
     """Display a summary for this run, based on profile & CLI arguments."""
@@ -198,19 +200,19 @@ def prepare():
     io.console.print_section("Prepare environment")
     valcfg = MetaConfig.root.validation
     build_man = MetaConfig.root.get_internal('build_manager')
-    
+
     utils.start_autokill(valcfg.timeout)
 
     io.console.print_item("Check whether build directory is valid")
     build_man.prepare(reuse=valcfg.reused_build)
-    
+
     per_file_max_sz = 0
     try:
         per_file_max_sz = int(valcfg.per_result_file_sz)
     except:
         pass
     build_man.init_results(per_file_max_sz=per_file_max_sz)
-    
+
     for label in valcfg.dirs.keys():
         build_man.save_extras(os.path.join(NAME_BUILD_SCRATCH, label),
                               dir=True,
@@ -324,8 +326,8 @@ def process_files():
 
     if len(errors):
         io.console.error(["Test-suites failed to be parsed, with the following errors:"] +
-                        ["\t-{}: {}".format(e[0], e[1]) for e in errors]
-                        )
+                         ["\t-{}: {}".format(e[0], e[1]) for e in errors]
+                         )
         raise RunException.TestUnfoldError("Errors found while parsing files")
 
 
@@ -409,7 +411,7 @@ def process_dyn_setup_scripts(setup_files):
     with open(env_script, 'w') as fh:
         fh.write(utils.str_dict_as_envvar(env))
         fh.close()
-    
+
     io.console.info("Iteration over files")
     for label, subprefix, fname in io.console.progress_iter(setup_files):
         io.console.debug("process {} ({})".format(subprefix, label))
@@ -582,15 +584,15 @@ def terminate():
     """
     MetaConfig.root.get_internal(
         "pColl").invoke_plugins(Plugin.Step.END_BEFORE)
-    
+
     build_man = MetaConfig.root.get_internal('build_manager')
     outdir = MetaConfig.root.validation.output
 
     io.console.print_section("Prepare results")
     io.console.move_debug_file(outdir)
     archive_path = build_man.create_archive()
-    
-    #if MetaConfig.root.validation.anonymize:
+
+    # if MetaConfig.root.validation.anonymize:
     #    io.console.print_item("Anonymize data")
     #    anonymize_archive()
 

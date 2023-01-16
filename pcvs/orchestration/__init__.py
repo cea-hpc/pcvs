@@ -33,6 +33,7 @@ class Orchestrator:
     :type _maxconcurrent: int
 
     """
+
     def __init__(self):
         """constructor method"""
         config_tree = MetaConfig.root
@@ -44,7 +45,6 @@ class Orchestrator:
         self._maxconcurrent = config_tree.machine.get('concurrent_run', 1)
         self._complete_q = queue.Queue()
         self._ready_q = queue.Queue()
-        
 
     def print_infos(self):
         """display pre-run infos."""

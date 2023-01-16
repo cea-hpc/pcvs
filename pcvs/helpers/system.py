@@ -220,9 +220,9 @@ class MetaConfig(MetaDict):
         # The 'internal' node is a special one. Put here anything not requiring
         # to be published (like conf.yml, etc...). mainly one-time Python
         # objects
-        
+
         #self.__internal_config = Config()
-        
+
     def __setitem__(self, param, value):
         """Extend the default MetaDict setter mthod to reach the base class one"""
         super().__setitem__(param, value)
@@ -407,7 +407,7 @@ class MetaConfig(MetaDict):
         :type k: str"""
         if not hasattr(self, "__internal_config"):
             return None
-        
+
         if k in self.__internal_config:
             return self.__internal_config[k]
         else:
@@ -419,7 +419,7 @@ class MetaConfig(MetaDict):
         """
         not_exported = self.__internal_config
         del self.__internal_config
-        
+
         res = self.to_dict()
         self.__internal_config = not_exported
 

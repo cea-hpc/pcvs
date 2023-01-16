@@ -458,6 +458,7 @@ class Program:
         """
         return self._except
 
+
 def str_dict_as_envvar(d):
     """Convert a dict to a list of shell-compliant variable strings.
 
@@ -470,21 +471,26 @@ def str_dict_as_envvar(d):
     """
     return "\n".join(["{}='{}'".format(i, d[i]) for i in sorted(d.keys())])
 
+
 def check_is_buildir(p):
     if not os.path.isdir(p):
         return False
     return NAME_BUILDFILE in os.listdir(p)
+
 
 def check_is_archive(f):
     if not os.path.isfile(f):
         return False
     return os.path.basename(f).startswith("pcvsrun_")
 
+
 def check_is_build_or_archive(x):
     return check_is_buildir(x) or check_is_archive(x)
 
+
 def list_valid_buildirs_in_dir(p):
     return [os.path.join(root, d) for root, d, _ in os.walk(p) if check_is_buildir(p)]
+
 
 def list_valid_archive_in_dir(p):
     return [os.path.join(root, f) for root, _, f in os.walk(p) if check_is_archive(f)]

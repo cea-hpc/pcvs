@@ -414,10 +414,10 @@ def initialize_from_system():
         for it in criterion_iterators.keys():
             if it not in runtime_iterators:
                 io.console.warn("Undeclared criterion "
-                                 "as part of runtime: '{}' ".format(it))
+                                "as part of runtime: '{}' ".format(it))
             elif criterion_iterators[it]['values'] is None:
                 io.console.debug('No combination found for {},'
-                                  ' removing from schedule'.format(it))
+                                 ' removing from schedule'.format(it))
             else:
                 continue
 

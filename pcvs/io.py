@@ -54,12 +54,12 @@ class TheConsole(Console):
         self._verbose = kwargs.get('verbose', 0)
         self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w")
         self.summary_table = dict()
-    
+
         theme = Theme({
             "warning": "bold yellow",
             "danger": "bold red"
         })
-        
+
         super().__init__(color_system=self._color, theme=theme)
         self._debugconsole = Console(file=self._debugfile, theme=theme,
                                      color_system=self._color,
@@ -77,7 +77,7 @@ class TheConsole(Console):
     @property
     def verbose(self):
         return self._verbose
-        
+
     @verbose.setter
     def verbose(self, v):
         self._verbose = v
@@ -93,7 +93,8 @@ class TheConsole(Console):
             shutil.move(self._debugfile.name, os.path.join(
                 newdir, pcvs.NAME_DEBUG_FILE))
         else:
-            self.warning("No '{}' file found for this Console".format(pcvs.NAME_DEBUG_FILE))
+            self.warning("No '{}' file found for this Console".format(
+                pcvs.NAME_DEBUG_FILE))
 
     def print_section(self, txt):
         self.print("[yellow bold]{} {}[/]".format(self.utf('sec'), txt))
@@ -171,7 +172,8 @@ class TheConsole(Console):
         self._progress = Progress(
             TimeElapsedColumn(),
             "Progress",
-            BarColumn(bar_width=None, complete_style="yellow", finished_style="green"),
+            BarColumn(bar_width=None, complete_style="yellow",
+                      finished_style="green"),
             TextColumn("[progress.percentage]{task.percentage:>3.1f}%"),
             SpinnerColumn(speed=0.5),
             expand=True)
@@ -181,10 +183,10 @@ class TheConsole(Console):
         self._reset_display_table(Table())
         self.live = Live(self._display_table, console=self)
         return self.live
-    
+
     def create_table(self, title, cols):
         return Table(*cols, title=title)
-    
+
     def progress_iter(self, it, **kwargs):
         """prints a progress bar using click
         :param it: iterable on which the progress bar has to iterate
@@ -282,15 +284,18 @@ class TheConsole(Console):
 
     def warn(self, fmt, *args, **kwargs):
         self.warning(fmt, *args, **kwargs)
-        self.print("[warning]WARN: {}[/warning]".format(fmt.format(*args, **kwargs)))
+        self.print(
+            "[warning]WARN: {}[/warning]".format(fmt.format(*args, **kwargs)))
 
     def error(self, fmt, *args, **kwargs):
         self._loghdl.error(fmt, *args, **kwargs)
-        self.print("[danger]ERROR: {}[/danger]".format(fmt.format(*args, **kwargs)))
+        self.print(
+            "[danger]ERROR: {}[/danger]".format(fmt.format(*args, **kwargs)))
 
     def critical(self, fmt, *args, **kwargs):
         self._loghdl.critical(fmt, *args, **kwargs)
-        self.print("[danger]CRIT: {}[/danger]".format(fmt.format(*args, **kwargs)))
+        self.print(
+            "[danger]CRIT: {}[/danger]".format(fmt.format(*args, **kwargs)))
         self.print("[danger]See pcvs-debug.log for more information[/danger]")
 
     def exception(self, e: BaseException, *args, **kwargs):
@@ -298,11 +303,14 @@ class TheConsole(Console):
             console.print_exception(suppress=['click'])
         self._loghdl.exception(e)
 
+
 console = None
+
 
 def init(color=True, verbose=0):
     global console
     console = TheConsole(color=color, verbose=verbose)
+
 
 def detach_console(logfile=None):
     global console
@@ -311,41 +319,42 @@ def detach_console(logfile=None):
     else:
         console.file = sys.stdout
 
+
 def capture_exception(e_type, user_func=None):
-        """wraps functions to capture unhandled exceptions for high-level
-            function not to crash.
-            :param *e_type: errors to be caught
+    """wraps functions to capture unhandled exceptions for high-level
+        function not to crash.
+        :param *e_type: errors to be caught
+    """
+    def inner_function(func):
+        """wrapper for inner function using try/except to avoid crashing
+
+        :param func: function to wrap
+        :type func: function
+        :raises e: exceptions to catch
+        :return: wrapper
+        :rtype: function
         """
-        def inner_function(func):
-            """wrapper for inner function using try/except to avoid crashing
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            """functools wrapping function
 
-            :param func: function to wrap
-            :type func: function
-            :raises e: exceptions to catch
-            :return: wrapper
-            :rtype: function
+            :raises e: exception to catch
+            :return: result of wrapped function
+            :rtype: any
             """
-            @functools.wraps(func)
-            def wrapper(*args, **kwargs):
-                """functools wrapping function
-
-                :raises e: exception to catch
-                :return: result of wrapped function
-                :rtype: any
-                """
-                try:
-                    return func(*args, **kwargs)
-                except e_type as e:
-                    if user_func is None:
-                        global console
-                        if not console:
-                            console = TheConsole()
-                        console.exception(e)
-                        console.print("[red bold]Exception: {}".format(e))
-                        console.print(
-                            "[red bold]See '{}' or rerun with -vv for more detail".format(pcvs.NAME_DEBUG_FILE))
-                        sys.exit(1)
-                    else:
-                        user_func(e)
-            return wrapper
-        return inner_function
+            try:
+                return func(*args, **kwargs)
+            except e_type as e:
+                if user_func is None:
+                    global console
+                    if not console:
+                        console = TheConsole()
+                    console.exception(e)
+                    console.print("[red bold]Exception: {}".format(e))
+                    console.print(
+                        "[red bold]See '{}' or rerun with -vv for more detail".format(pcvs.NAME_DEBUG_FILE))
+                    sys.exit(1)
+                else:
+                    user_func(e)
+        return wrapper
+    return inner_function

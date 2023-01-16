@@ -1,6 +1,7 @@
 import base64
 import glob
 import os
+from typing import Dict, List, Union
 
 import click
 from ruamel.yaml import YAML
@@ -13,6 +14,7 @@ from pcvs.helpers.system import MetaDict
 CONFIG_BLOCKS = ['compiler', 'runtime', 'machine', 'criterion', 'group']
 CONFIG_EXISTING = dict()
 
+
 def init() -> None:
     """Load configuration tree available on disk.
 
@@ -21,7 +23,7 @@ def init() -> None:
     """
     if hasattr(init, 'done'):
         return
-        
+
     global CONFIG_BLOCKS, CONFIG_EXISTING
     CONFIG_EXISTING = {}
 
@@ -40,7 +42,7 @@ def init() -> None:
     init.done = True
 
 
-def list_blocks(kind, scope=None):
+def list_blocks(kind, scope=None) -> Union[List[str], Dict[str, List[str]]]:
     """Get available configuration blocks, as present on disk.
 
     :param kind: configBlock kind (see ``CONFIG_BLOCKS`` for possible values)
@@ -58,7 +60,7 @@ def list_blocks(kind, scope=None):
         return CONFIG_EXISTING[kind][scope]
 
 
-def list_templates():
+def list_templates() -> List[str]:
     """List available templates to be used for boostraping config. blocks.
 
     :return: a list of valid templates.
@@ -70,7 +72,7 @@ def list_templates():
     return array
 
 
-def check_valid_kind(s):
+def check_valid_kind(s) -> bool:
     """Assert the parameter is a valid kind.
 
     Kind are defined by ``CONFIG_BLOCKS`` module attribute.
@@ -129,7 +131,7 @@ class ConfigurationBlock:
         :type scope: str, optional
         """
         init()
-        
+
         check_valid_kind(kind)
         utils.check_valid_scope(scope)
         self._kind = kind

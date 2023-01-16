@@ -200,6 +200,7 @@ class TestException(CommonException):
 
     class TDFormatError(GenericError):
         """Test description is wrongly formatted."""
+
         def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
             """Updated constructor"""
             super().__init__(err_msg=msg,
@@ -210,6 +211,7 @@ class TestException(CommonException):
 
     class DynamicProcessError(GenericError):
         """Test File is not properly formatted."""
+
         def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
             """Updated constructor"""
             super().__init__(err_msg=msg,

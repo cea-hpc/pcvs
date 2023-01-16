@@ -1,7 +1,7 @@
 import json
 import os
 from enum import Enum, IntEnum
-from typing import List
+from typing import Dict, List
 
 from pcvs import io
 from pcvs.helpers import exceptions, git
@@ -22,7 +22,7 @@ class Job(Test):
 
     def get_state(self) -> Test.State:
         """Retrieve job state as stored in the Run.
-        
+
         :return: the state
         :rtype: Test.State
         """
@@ -30,7 +30,7 @@ class Job(Test):
 
     def load(self, s="") -> None:
         """Populate the job with given data.
-        
+
         :param s: A Job's data dict representation
         :type s: dict
         """
@@ -38,7 +38,7 @@ class Job(Test):
 
     def dump(self) -> dict:
         """Return serialied job data.
-        
+
         :return: the mapped representation
         :rtype: dict
         """
@@ -51,7 +51,7 @@ class Run:
 
     def __init__(self, repo=None, cid=None, from_serie=None):
         """Create a new run.
-        
+
         :param repo: the associated repo this run is coming from
         :type repo: Bank
         """
@@ -97,7 +97,7 @@ class Run:
             data = self._repo.get_tree(rev=self._cid, prefix=file)
             job = Job(json.loads(str(data)))
             yield job
-    
+
     @property
     def get_full_data(self):
         root = [j.to_json() for j in self.jobs]
@@ -245,17 +245,19 @@ class Bank:
     def __init__(self, path="", head=None):
         self._path = path
         self._repo = git.elect_handler(self._path)
-        
+
         self._repo.open()
         if head:
             self._repo.set_head(head)
         else:
-            first_branch = [b for b in self._repo.branches if b.name != "master"]
+            first_branch = [
+                b for b in self._repo.branches if b.name != "master"]
             if len(first_branch) <= 0:
-                io.console.warn("This repository seems empty: {}".format(self._path))
+                io.console.warn(
+                    "This repository seems empty: {}".format(self._path))
             else:
                 self._repo.set_head(first_branch[0].name)
-            
+
         if not self._repo.get_branch_from_str('master'):
             t = self._repo.insert_tree(
                 'README', "This file is intended to be used as a branch bootstrap.")
@@ -302,7 +304,7 @@ class Bank:
                 res.append(Serie(elt))
         return res
 
-    def list_all(self):
+    def list_all(self) -> Dict[str, List]:
         """TODO:
         """
         res = {}

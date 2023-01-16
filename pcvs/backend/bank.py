@@ -59,9 +59,12 @@ class Bank(dsl.Bank):
         :param token: name & default project to manipulate, defaults to ""
         :type token: str
         """
-        self._dflt_proj = None
-        self._name = None
+        self._dflt_proj: Optional[str] = None
+        self._name: Optional[str] = None
         self._config: Optional[MetaDict] = None
+        self._path: str = path
+
+        global BANKS
 
         # split name & default-proj from token
         array: List[str] = token.split('@', 1)
@@ -69,8 +72,6 @@ class Bank(dsl.Bank):
             self._dflt_proj = array[1]
         self._name = array[0]
 
-        global BANKS
-        self._path = path
         if self.exists():
             if self.name_exist():
                 path = BANKS[self._name.lower()]
@@ -83,7 +84,13 @@ class Bank(dsl.Bank):
         super().__init__(path, self._dflt_proj)
 
     @property
-    def default_project(self):
+    def default_project(self) -> str:
+        """
+        Get project set as default when none are provided.
+
+        :return: the project name (as a Ref branch)
+        :rtype: str
+        """
         return "unkwown" if not self._dflt_proj else self._dflt_proj
 
     @property
@@ -102,7 +109,7 @@ class Bank(dsl.Bank):
         :return: the exact label (without default-project suffix)
         :rtype: str
         """
-        return self._name
+        return self._name if self._name else ""
 
     def exists(self) -> bool:
         """Check if the bank is stored in ``PATH_BANK`` file.
@@ -120,7 +127,7 @@ class Bank(dsl.Bank):
         :return: True if the name (lowered) is in the keys()
         :rtype: bool
         """
-        return self._name.lower() in BANKS.keys()
+        return self._name.lower() in BANKS.keys() if self._name else False
 
     def path_exist(self) -> bool:
         """Check if the bank path is registered into ``PATH_BANK`` file.
@@ -138,7 +145,7 @@ class Bank(dsl.Bank):
         """
         return str({self._name: self._path})
 
-    def show(self, stringify=False) -> None:
+    def show(self, stringify: bool = False) -> Optional[str]:
         """Print the bank on stdout.
 
         .. note::
@@ -158,7 +165,9 @@ class Bank(dsl.Bank):
             print("\n".join(string))
 
     def __del__(self) -> None:
-        """Close the bank."""
+        """
+        Close / disconnet a bank (releasing lock)
+        """
         self.disconnect()
 
     def save_to_global(self) -> None:
@@ -288,7 +297,11 @@ class Bank(dsl.Bank):
         }
 
     def get_count(self):
-        """TODO:
+        """
+        Get the number of projects managed by this bank handle.
+
+        :return: number of projects
+        :rtype: int
         """
         return len(self.list_projects())
 

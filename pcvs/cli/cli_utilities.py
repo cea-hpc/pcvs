@@ -9,10 +9,10 @@ from datetime import datetime
 from rich.panel import Panel
 from rich.table import Table
 
-from pcvs import NAME_BUILDFILE, NAME_BUILD_ARCHIVE_DIR, io
+from pcvs import NAME_BUILD_ARCHIVE_DIR, NAME_BUILDFILE, io
 from pcvs.backend import utilities as pvUtils
-from pcvs.helpers.system import MetaConfig
 from pcvs.helpers import utils
+from pcvs.helpers.system import MetaConfig
 
 try:
     import rich_click as click
@@ -133,7 +133,8 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
         errors = {**errors, **
                   pvUtils.process_check_directory(os.path.abspath(dir), pf_name)}
 
-    table = Table("Count", "Type of error", title="Classification of errors", expand=True)
+    table = Table("Count", "Type of error",
+                  title="Classification of errors", expand=True)
     if errors:
         for k, v in errors.items():
             table.add_row(str(v), base64.b64decode(k).decode('utf-8'))
@@ -160,13 +161,13 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
     """Find & clean workspaces from PCVS artifacts (build & archives)"""
     if not fake and not force:
         io.console.warn("\n".join(["IMPORTANT NOTICE:",
-                          "This command will delete files from previous run(s) and",
-                          "no recovery will be possible after deletion.",
-                          "Please use --force to indicate you acknowledge the risks",
-                          "and will face consequences in case of improper use.",
-                          "",
-                          "To list files to be deleted instead, you may use --dry-run."]
-                         ))
+                                   "This command will delete files from previous run(s) and",
+                                   "no recovery will be possible after deletion.",
+                                   "Please use --force to indicate you acknowledge the risks",
+                                   "and will face consequences in case of improper use.",
+                                   "",
+                                   "To list files to be deleted instead, you may use --dry-run."]
+                                  ))
         sys.exit(0)
     if not paths:
         paths = [os.getcwd()]
@@ -177,10 +178,10 @@ def clean(ctx, force, fake, paths, remove_build_dir, interactive):
             # current root need to be cleaned
             if NAME_BUILDFILE in files:
                 io.console.print_section("Found build: {}".format(root))
-                
+
                 archive_dir = os.path.join(root, NAME_BUILD_ARCHIVE_DIR)
                 archives = sorted([x for x in os.listdir(archive_dir)])
-                
+
                 if len(archives) == 0 and fake:
                     io.console.print_item("No archive found.")
                 else:

@@ -166,7 +166,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
-    
+
     if print_level and print_level != "none":
         # any --print option will imply to disable packed rich console view
         # --> enable verbose mode

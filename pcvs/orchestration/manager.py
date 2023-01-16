@@ -151,13 +151,12 @@ class Manager:
     def publish_job(self, job, publish_args=None):
         if publish_args:
             job.save_final_result(**publish_args)
-        
+
         if self._comman:
             self._comman.send(job)
         self._count.executed += 1
         self._count[job.state] += 1
         self._publisher.save(job)
-                            
 
     def create_subset(self, max_dim):
         """Extract one or more jobs, ready to be run.
@@ -194,9 +193,9 @@ class Manager:
                         if job.been_executed() or job.state == Test.State.IN_PROGRESS:
                             # skip job (only a pop() to do)
                             continue
-                            
+
                         elif not job.has_completed_deps():
-                            
+
                             # take the first unresolved dep to be scheduled
                             # instead
                             # CAUTION: no schedulable dep may be found at
@@ -215,10 +214,10 @@ class Manager:
                                 job = dep_job
                             else:
                                 break
-                        
+
                         # from here, it can be the original job or one of its
                         # dep tree. But we are sure this job can be processed
-                        
+
                         if job.has_failed_dep():
                             # Cannot be scheduled for dep purposes
                             # push it to publisher
@@ -227,13 +226,14 @@ class Manager:
                                 "time": 0.0,
                                 "out": Test.NOSTART_STR,
                                 "state": Test.State.ERR_DEP
-                                }
-                            
-                            self.publish_job(job, publish_args=publish_job_args)
+                            }
+
+                            self.publish_job(
+                                job, publish_args=publish_job_args)
                             job.display()
                             # Attempt to find another job to schedule
                             continue
-                        
+
                         # Reached IF Job hasn't be run yet
                         # Job has completed its dep scheme
                         # all deps are successful
@@ -252,7 +252,8 @@ class Manager:
                                     "out": Test.MAXATTEMPTS_STR,
                                     "state": Test.State.ERR_OTHER
                                 }
-                                self.publish_job(job, publish_args=publish_job_args)
+                                self.publish_job(
+                                    job, publish_args=publish_job_args)
                                 job.display()
                             else:
                                 self._dims[k].append(job)

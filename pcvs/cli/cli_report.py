@@ -4,6 +4,7 @@ from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import report as pvReport
 from pcvs.gui.curses import viewer
 from pcvs.helpers import utils
+
 try:
     import rich_click as click
     click.rich_click.SHOW_ARGUMENTS = True
@@ -36,7 +37,7 @@ def report(ctx, path_list, static):
             inputs.append(os.path.abspath(os.path.join(prefix, NAME_BUILDIR)))
         else:
             raise click.BadArgumentUsage(
-                    '{} is not a build directory.'.format(prefix))
+                '{} is not a build directory.'.format(prefix))
 
     if static:
         # server old-style JCRHONOSS pages after JSON transformation

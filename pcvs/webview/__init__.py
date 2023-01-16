@@ -10,6 +10,7 @@ from pcvs.testing.test import Test
 
 data_manager = None
 
+
 def create_app(iface):
     """Start and run the Flask application.
 
@@ -18,7 +19,7 @@ def create_app(iface):
     """
     global data_manager
     data_manager = iface
-    
+
     app = Flask(__name__, template_folder=os.path.join(
         PATH_INSTDIR, "webview/templates"))
 
@@ -78,7 +79,8 @@ def create_app(iface):
                             })
         return render_template('session_main.html',
                                sid=sid,
-                               rootdir=data_manager.single_session_build_path(sid),
+                               rootdir=data_manager.single_session_build_path(
+                                   sid),
                                nb_tests=jobs_cnt,
                                nb_labels=len(labels),
                                nb_tags=len(tags)
@@ -112,7 +114,8 @@ def create_app(iface):
         sid = int(sid)
         if 'json' in request.args.get('render', []):
             out = list()
-            infos = data_manager.single_session_get_view(sid, selection, summary=True)
+            infos = data_manager.single_session_get_view(
+                sid, selection, summary=True)
             for k, v in infos.items():
                 out.append({
                     "name": k,
@@ -143,11 +146,13 @@ def create_app(iface):
         request_item = request.args.get('name', None)
 
         if 'json' in request.args.get('render', []):
-            #special case
+            # special case
             if selection == "status":
-                job_list = data_manager.single_session_status(sid, filter=request_item)
+                job_list = data_manager.single_session_status(
+                    sid, filter=request_item)
             else:
-                struct = data_manager.single_session_get_view(sid, selection, subset=request_item, summary=False)
+                struct = data_manager.single_session_get_view(
+                    sid, selection, subset=request_item, summary=False)
                 # jobs are returned split into 3 lists, depending on their status
                 # -> browse all three lists
                 job_list = list()
@@ -157,7 +162,7 @@ def create_app(iface):
             for elt in job_list:
                 cur: Test = data_manager.single_session_map_id(sid, elt)
                 out.append(cur.to_json(strstate=True))
-            
+
             return jsonify(out)
 
         return render_template("detailed_view.html",

@@ -178,7 +178,6 @@ def bank_load(ctx, name, prefix, start, end):
                 data.append(j.to_json())
     import json
     print(json.dumps(data))
-    
 
 
 @bank.command(name="extract", short_help="Extract infos from the datastore")

@@ -40,7 +40,10 @@ def print_version(ctx, param, value):
         'Parallel Computing Validation System (pcvs) -- version {}'.format(pkg_resources.require("pcvs")[0].version))
     ctx.exit()
 
+
 i = 0
+
+
 @click.group(context_settings=CONTEXT_SETTINGS, name="cli")
 @click.option("-v", "--verbose", "verbose", show_envvar=True,
               count=True, default=0,
@@ -77,7 +80,7 @@ def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plu
 
     # Click specific-related
     ctx.color = color
-    
+
     io.init(color=color, verbose=verbose)
     utils.set_local_path(ctx.obj['exec'])
 

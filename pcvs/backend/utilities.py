@@ -246,15 +246,15 @@ def process_check_directory(dir, pf_name="default"):
     buildenv = run.build_env_from_configuration(pf.dump())
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
-    
+
     from rich.table import Table
     table = Table(title="Results", expand=True, row_styles=["dim", ""])
     table.add_column("Runnable Script", justify="center", max_width=5)
     table.add_column("Valid", justify="center", max_width=5)
     table.add_column("Node count", justify="center", max_width=5)
     table.add_column("File Path", justify="left")
-    #with io.console.pager():
-        #with Live(table, refresh_per_second=4):
+    # with io.console.pager():
+    # with Live(table, refresh_per_second=4):
     for _, subprefix, f in io.console.progress_iter([*setup_files, *yaml_files]):
         setup_ok = __set_token(None)
         yaml_ok = __set_token(None)
@@ -279,7 +279,7 @@ def process_check_directory(dir, pf_name="default"):
             if cnt > 0:
                 nb_nodes = cnt
                 total_nodes += nb_nodes
-        
+
         table.add_row(
             setup_ok,
             yaml_ok,
