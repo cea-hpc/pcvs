@@ -84,12 +84,14 @@ class Manager:
 
         self._dims[value].append(job)
 
-        hashed = hash(job.name)
+        hashed = job.jid
         # if test is not know yet, add + increment
         if hashed not in self.job_hashes:
-            job.jid = self._count.total
-            self.job_hashes[hash(job.name)] = job
+            self.job_hashes[hashed] = job
             self._count.total += 1
+        else:
+            print(job.name, self.job_hashes[hashed].name)
+            raise Exception()
 
     def get_count(self, tag="total"):
         """Access to a particular counter.
@@ -128,7 +130,7 @@ class Manager:
         chain.append(job.name)
         for depname in job.job_depnames:
 
-            hashed_dep = hash(depname)
+            hashed_dep = Test.get_jid_from_name(depname)
             if hashed_dep not in self.job_hashes:
                 raise OrchestratorException.UndefDependencyError(depname)
 

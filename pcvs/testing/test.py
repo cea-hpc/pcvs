@@ -1,8 +1,11 @@
 import base64
 import json
+import zlib
 import os
 import re
 import shlex
+import sys
+import hashlib
 from enum import IntEnum
 
 from pcvs import io
@@ -94,7 +97,6 @@ class Test:
             'label': kwargs.get('label', 'nolabel'),
             'subtree': kwargs.get('subtree', ''),
             'comb': self._comb.translate_to_dict() if self._comb else {},
-            "jid": -1
         }
         comb_str = self._comb.translate_to_str() if self._comb else None
 
@@ -104,7 +106,10 @@ class Test:
             self._id['te_name'],
             comb_str,
             suffix=kwargs.get('user_suffix'))
-
+        
+        # only positive ids
+        self._id['jid'] = self.get_jid_from_name(self.name)
+        
         self._execmd = kwargs.get('command', '')
 
         self._data = {
@@ -134,7 +139,7 @@ class Test:
         }
 
     @property
-    def jid(self) -> int:
+    def jid(self) -> str:
         """Getter for unique Job ID within a run.
 
         This attribute is generally set by the manager once job is uploaded
@@ -142,13 +147,7 @@ class Test:
         :return: the job id
         :rtype: an positive integer of -1 if not set
         """
-        return int(self._id['jid'])
-
-    @jid.setter
-    def jid(self, id) -> None:
-        if type(id) != int:
-            raise Exception
-        self._id['jid'] = id
+        return self._id['jid']
 
     @property
     def tags(self):
@@ -262,7 +261,14 @@ class Test:
         :rtype: list
         """
         return self._mod_deps
-
+    
+    @classmethod
+    def get_jid_from_name(self, name):
+        if not isinstance(name, bytes):
+            name = str(name).encode('utf-8')
+            
+        return hashlib.md5(name).hexdigest()
+    
     def get_dep_graph(self):
         res = {}
         for d in self._deps:

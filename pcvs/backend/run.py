@@ -319,9 +319,9 @@ def process_files():
 
     errors = []
 
-    io.console.print_item("Extract tests from dynamic definitions")
+    io.console.print_item("Extract tests from dynamic definitions ({} found)".format(len(setup_files)))
     errors += process_dyn_setup_scripts(setup_files)
-    io.console.print_item("Extract tests from static definitions")
+    io.console.print_item("Extract tests from static definitions ({} found)".format(len(yaml_files)))
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
@@ -422,7 +422,6 @@ def process_dyn_setup_scripts(setup_files):
         # 1. setup the env
         env['pcvs_src'] = base_src
         env['pcvs_testbuild'] = base_build
-        te_node = None
         out_file = None
 
         if not os.path.isdir(cur_build):
@@ -442,12 +441,11 @@ def process_dyn_setup_scripts(setup_files):
             if fds.returncode != 0:
                 raise subprocess.CalledProcessError(fds.returncode, '')
 
+            #### should be enabled only in debug mode
             # flush the output to $BUILD/pcvs.yml
-            out_file = os.path.join(cur_build, 'pcvs.yml')
-            with open(out_file, 'w') as fh:
-                fh.write(fdout.decode('utf-8'))
-            te_node = load_yaml_file(
-                out_file, base_src, base_build, subprefix)
+            #out_file = os.path.join(cur_build, 'pcvs.yml')
+            #with open(out_file, 'w') as fh:
+                #fh.write(fdout.decode('utf-8'))
         except CalledProcessError:
             if fds.returncode != 0:
                 err.append((f, "(exit {}): {}".format(
@@ -455,17 +453,12 @@ def process_dyn_setup_scripts(setup_files):
                 io.console.info("EXEC FAILED: {}: {}".format(
                     f, fderr.decode('utf-8')))
             continue
-
-        # If the script did not generate any output, skip
-        if te_node is None:  # empty file
-            continue
-
+        
         # Now create the file handler
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
-        obj = TestFile(file_in=out_file,
+        obj = TestFile(file_in="<stream>",
                        path_out=cur_build,
-                       data=te_node,
                        label=label,
                        prefix=subprefix
                        )
@@ -503,7 +496,6 @@ def process_static_yaml_files(yaml_files):
             obj.process()
             obj.flush_sh_file()
         except Exception as e:
-            raise e
             err.append((f, e))
             io.console.info("{} (failed to parse): {}".format(f, e))
     return err
