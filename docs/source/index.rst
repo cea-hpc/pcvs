@@ -33,7 +33,7 @@ validation plaform is strongly reduced, for instance:
 
 #. The dev team writes tests and describes scenarii.
 #. Cluster admins sets up the architecture for testing (compilers, tools...).
-#. Q/A dep. executes application tests on given resource.
+#. Q/A dept. executes applications on given resource.
 
 Splitting the effort will enforce reusability and flexibility. In many cases,
 multiple test bases share same compilers, runtimes, tools or even machine
