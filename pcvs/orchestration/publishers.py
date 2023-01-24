@@ -436,7 +436,7 @@ class ResultFileManager:
         :yield: Test
         :rtype: Iterator[Test]
         """
-        for test_id in self._mapdata:
+        for test_id in self._mapdata_rev:
             yield self.retrieve_test(test_id)
             
     def retrieve_tests_by_name(self, name) -> List[Test]:

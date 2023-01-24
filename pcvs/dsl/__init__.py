@@ -89,7 +89,7 @@ class Run:
         """
         assert (isinstance(self._cid, git.Commit))
         d = self._cid.get_info()
-        return "{}: {}".format(self._cid.short, d)
+        return "{}".format(d)
 
     @property
     def jobs(self):
@@ -106,7 +106,6 @@ class Run:
     def get_data(self, jobname):
         res = Job()
         data = self._repo.get_tree(rev=self._cid, prefix=jobname)
-        print(data)
         if not data:
             return data
 
@@ -289,6 +288,7 @@ class Bank:
             serie_name = self._repo.get_head().name
 
         branch = self._repo.get_branch_from_str(serie_name)
+    
         if not branch:
             return None
 

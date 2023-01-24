@@ -9,7 +9,9 @@ from typing import Dict, List, Optional
 from ruamel.yaml import YAML
 
 from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK, dsl
+from pcvs.helpers import utils
 from pcvs.helpers import git
+from pcvs.orchestration.publishers import BuildDirectoryManager
 from pcvs.helpers.exceptions import BankException
 from pcvs.helpers.system import MetaDict
 
@@ -263,7 +265,65 @@ class Bank(dsl.Bank):
             tarfile.open(os.path.join(archivepath)).extractall(tarpath)
             self.save_from_buildir(
                 tag, os.path.join(tarpath, "save_for_export"))
+            
+    def save_new_run_from_instance(self, target_project: str, hdl: BuildDirectoryManager) -> None:
+        """
+        Create a new node into the bank for the given project, based on the open
+        result handler.
 
+        :param target_project: valid project (=branch)
+        :type target_project: str
+        :param hdl: the result build directory handler
+        :type hdl: class:`BuildDirectoryManager`
+        """
+        seriename = self.build_target_branch_name(target_project)
+        serie = self.get_serie(seriename)
+        
+        if serie is None:
+            serie = self.new_serie(seriename)
+        
+        #TODO: populate the run with build-dir content
+        #TODO: add metadata to hidden root directory
+        # Init a new fun
+        run = dsl.Run(from_serie=serie)
+
+        # now use the handle to populate the bank
+        # We chose to make the layout slightly different between
+        # runs & banks as the `git-diff` does not permit to store
+        # other than a JSON file per test output (yet) :(
+        # Still, an hidden root directory will store aliases to easily
+        # maps tests to their on-disk counterparts.
+        d = dict()
+        for job in hdl.results.browse_tests():
+            d[job.name] = job.to_json()
+    
+        run.update_flatdict(d)
+        
+        self.set_id(
+            an=self._config.validation.author.name,
+            am=self._config.validation.author.email,
+            cn=git.get_current_username(),
+            cm=git.get_current_usermail()
+        )
+        
+        serie.commit(run, metadata={}, timestamp=int(
+            self._config.validation.datetime.timestamp()))
+
+    def save_new_run(self, target_project: str, path: str) -> None:
+        if not utils.check_is_build_or_archive(path):
+            raise Exception()
+
+        if utils.check_is_archive(path):
+            # convert to prefix
+            # update path according to it
+            pass
+            hdl = BuildDirectoryManager.load_from_archive(path)
+        else:
+            hdl = BuildDirectoryManager(build_dir=path)
+            
+        self.load_config_from_file(path)
+        self.save_new_run_from_instance(target_project, hdl)
+        
     def build_target_branch_name(self, tag: str = None, hash: str = None) -> str:
         """Compute the target branch to store data.
 

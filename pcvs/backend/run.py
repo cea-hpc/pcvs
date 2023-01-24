@@ -145,16 +145,19 @@ def process_main_workflow(the_session=None):
     bank_token = valcfg.target_bank
     if bank_token is not None:
         bank = pvBank.Bank(token=bank_token)
+        build_hdl = MetaConfig.root.get_internal('build_manager')
         pref_proj = bank.default_project
         if bank.exists():
             io.console.print_item("Upload results to bank: '{}{}'".format(
                 bank.name.upper(),
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
-            bank.save_from_buildir(
-                None,
-                os.path.join(valcfg.output)
-            )
+            bank.load_config_from_dict(MetaConfig.root)
+            bank.save_new_run_from_instance(None, build_hdl)
+            #bank.save_from_buildir(
+            #    None,
+            #    os.path.join(valcfg.output)
+            #)
 
     buildfile = os.path.join(valcfg.output, NAME_BUILDFILE)
     if utils.is_locked(buildfile):
@@ -454,6 +457,12 @@ def process_dyn_setup_scripts(setup_files):
                     f, fderr.decode('utf-8')))
             continue
         
+        out = fdout.decode('utf-8')
+        if not out:
+            # pcvs.setup did not output anything
+            continue
+        
+        
         # Now create the file handler
         MetaConfig.root.get_internal(
             "pColl").invoke_plugins(Plugin.Step.TFILE_BEFORE)
@@ -462,7 +471,10 @@ def process_dyn_setup_scripts(setup_files):
                        label=label,
                        prefix=subprefix
                        )
-        obj.load_from_str(fdout.decode('utf-8'))
+        
+        
+        obj.load_from_str(out)
+        
         obj.process()
         obj.flush_sh_file()
         MetaConfig.root.get_internal(
