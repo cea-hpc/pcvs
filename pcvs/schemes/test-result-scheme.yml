@@ -8,7 +8,7 @@ properties:
       subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
       te_name: {"type": "string"}
       fq_name: {"type": "string"}
-      jid: {"type": "integer"}
+      jid: {"type": "string"}
       comb:
         OneOf:
           - type: null

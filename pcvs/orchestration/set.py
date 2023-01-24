@@ -1,3 +1,5 @@
+import signal
+import os
 import queue
 import subprocess
 import threading
@@ -161,7 +163,8 @@ class Runner(threading.Thread):
                 p = subprocess.Popen('{}'.format(job.invocation_command),
                                      shell=True,
                                      stderr=subprocess.STDOUT,
-                                     stdout=subprocess.PIPE)
+                                     stdout=subprocess.PIPE,
+                                     start_new_session=True)
                 start = time.time()
                 stdout, _ = p.communicate(timeout=job.timeout)
                 final = time.time() - start
@@ -176,10 +179,10 @@ class Runner(threading.Thread):
                 rc = p.returncode
 
             except subprocess.TimeoutExpired:
-                p.kill()
-                final = job.timeout
+                os.killpg(os.getpgid(p.pid), signal.SIGTERM)
                 stdout, _ = p.communicate()
                 rc = Test.Timeout_RC  # nah, to be changed
+                final = job.timeout
             except Exception:
                 raise
             job.save_raw_run(time=final, rc=rc, out=stdout)
