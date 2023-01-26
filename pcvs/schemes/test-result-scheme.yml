@@ -27,7 +27,10 @@ properties:
       output:
         type: object
         properties:
-          file: {"type": "string"}
+          file:
+            OneOf:
+            - {"type": "string"}
+            - {"type": null}
           offset: {"type": "integer"}
           length: {"type": "integer"}
           raw: {"type": "string"}

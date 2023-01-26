@@ -109,7 +109,7 @@ class ResultFile:
 
         else:
             insert = {
-                'file': None,
+                'file': "",
                 'offset': -1,
                 'length': 0
             }
@@ -131,8 +131,32 @@ class ResultFile:
             # when reading metdata_file,
             # convert string-based keys to int (as managed by Python)
             content = json.load(fh)
-            self._data = {int(k): v for k, v in content.items()}
+            self._data = {k: v for k, v in content.items()}
 
+    @property
+    def content(self):
+        for name, data in self._data.items():
+            elt = Test()
+            elt.from_json(data)
+            
+            offset = data['result']['output']['offset']
+            length = data['result']['output']['length']
+            if offset >= 0 and length > 0:
+                elt.encoded_output = self.extract_output(offset, length)
+            yield elt
+    
+    def extract_output(self, offset, length) -> str:
+        assert(offset >= 0)
+        assert(length > 0)
+        
+        self._rawout_reader.seek(offset)
+        rawout = self._rawout_reader.read(length).decode('utf-8')
+                
+        if not rawout.startswith(self.MAGIC_TOKEN):
+            raise Exception()
+        
+        return rawout[len(self.MAGIC_TOKEN):]
+    
     def retrieve_test(self, id=None, name=None) -> List[Test]:
         """
         Find jobs based on its id or name and return associated Test object.
@@ -168,17 +192,11 @@ class ResultFile:
             rawout = ""
             if offset >= 0:
                 assert elt['result']['output']['file'] in self.rawdata_prefix
-                self._rawout_reader.seek(offset)
-                rawout = self._rawout_reader.read(length).decode('utf-8')
-                if not rawout.startswith(self.MAGIC_TOKEN):
-                    raise Exception()
-
-                rawout = rawout[len(self.MAGIC_TOKEN):]
-
-            elt['result']['output']['raw'] = rawout
+                rawout = self.extract_output(offset, length)
 
             eltt = Test()
             eltt.from_json(elt)
+            eltt.encoded_output = rawout
             res.append(eltt)
 
         return res
@@ -273,6 +291,7 @@ class ResultFileManager:
                 p = os.path.dirname(f)
                 f = os.path.splitext(os.path.basename(f))[0]
                 curfile = ResultFile(p, f)
+                curfile.load()
                 self._opened_files[f] = curfile
 
             self._current_file = curfile
@@ -340,7 +359,7 @@ class ResultFileManager:
         self._max_size = per_file_max_sz
 
         self.reconstruct_map_data()
-
+        
         self.discover_result_files()
         if not self._current_file:
             self.create_new_result_file()
@@ -436,8 +455,9 @@ class ResultFileManager:
         :yield: Test
         :rtype: Iterator[Test]
         """
-        for test_id in self._mapdata_rev:
-            yield self.retrieve_test(test_id)
+        for hdl in self._opened_files.values():
+            for j in hdl.content:
+                yield j
             
     def retrieve_tests_by_name(self, name) -> List[Test]:
         """
@@ -547,7 +567,6 @@ class ResultFileManager:
             self._opened_files[f] = ResultFile(self._outdir, f)
         hdl = self._opened_files[f]
         match = hdl.retrieve_test(id=id)
-
         assert (len(match) <= 1)
         if match:
             return match[0]

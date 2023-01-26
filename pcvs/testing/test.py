@@ -383,6 +383,7 @@ class Test:
             self._rc = rc
         if out is not None:
             self._output = base64.b64encode(out)
+            self._output_info['raw'] = self._output
         if time is not None:
             self._exectime = time
 
@@ -504,6 +505,11 @@ class Test:
     @property
     def encoded_output(self) -> bytes:
         return self._output
+    
+    @encoded_output.setter
+    def encoded_output(self, v) -> None:
+        self._output = v
+        self._output_info['raw'] = v
 
     def get_raw_output(self, encoding="utf-8") -> bytes:
         base = base64.b64decode(self._output)

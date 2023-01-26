@@ -328,9 +328,9 @@ def process_files():
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        io.console.error(["Test-suites failed to be parsed, with the following errors:"] +
+        io.console.error("\n".join(["Test-suites failed to be parsed, with the following errors:"] +
                          ["\t-{}: {}".format(e[0], e[1]) for e in errors]
-                         )
+                         ))
         raise RunException.TestUnfoldError("Errors found while parsing files")
 
 

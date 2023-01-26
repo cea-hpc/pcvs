@@ -52,7 +52,7 @@ def create_app(iface):
         :rtype: str
         """
         if 'json' in request.args.get("render", []):
-            return jsonify(data_manager.session_infos())
+            return jsonify(list(data_manager.session_infos()))
         return render_template("main.html")
 
     @app.route("/run/<sid>")
