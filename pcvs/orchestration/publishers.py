@@ -865,24 +865,30 @@ class BuildDirectoryManager:
         """
         if not timestamp:
             timestamp = datetime.datetime.now()
-
+        str_timestamp = timestamp.strftime('%Y%m%d%H%M%S')
         archive_file = os.path.join(
             self._path,
-            "pcvsrun_{}.tar.gz".format(timestamp.strftime('%Y%m%d%H%M%S'))
+            "pcvsrun_{}.tar.gz".format(str_timestamp)
         )
         archive = tarfile.open(archive_file, mode='w:gz')
 
+        def __relative_add(path, recursive=False):
+            archive.add(path,
+                        arcname=os.path.join("pcvsrun_{}".format(str_timestamp),
+                                             os.path.relpath(path, self._path)),
+                        recursive=recursive)
+
         # copy results
-        archive.add(os.path.join(
-            self._path, pcvs.NAME_BUILD_RESDIR), recursive=True)
+        __relative_add(os.path.join(self._path, pcvs.NAME_BUILD_RESDIR),
+                    recursive=True)
         # copy the config
-        archive.add(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN))
-        archive.add(os.path.join(self._path, pcvs.NAME_DEBUG_FILE))
+        __relative_add(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN))
+        __relative_add(os.path.join(self._path, pcvs.NAME_DEBUG_FILE))
 
         for p in self._extras:
             if not os.path.exists(p):
                 raise Exception()
-            archive.add(p)
+            __relative_add(p)
 
         archive.close()
         return archive_file
