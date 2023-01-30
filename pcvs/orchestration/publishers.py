@@ -43,6 +43,7 @@ class ResultFile:
         self._fileprefix = filename
         self._path = filepath
         self._cnt = 0
+        self._sz = 0
         self._data = {}
 
         prefix = os.path.join(filepath, filename)
@@ -94,6 +95,8 @@ class ResultFile:
         assert (type(data) == dict)
         assert ('result' in data.keys())
         insert = {}
+        start = 0
+        length = 0
         if len(output) > 0:
             # we consider the raw cursor to always be at the end of the file
             # maybe lock the following to be atomic ?
@@ -119,6 +122,7 @@ class ResultFile:
         assert (id not in self._data.keys())
         self._data[id] = data
         self._cnt += 1
+        self._sz = max(start+length, self._sz + len(json.dumps(data)))
 
         if self._cnt % 10 == 0:
             self.flush()
@@ -190,7 +194,7 @@ class ResultFile:
             offset = elt['result']['output']['offset']
             length = elt['result']['output']['length']
             rawout = ""
-            if offset >= 0:
+            if length > 0:
                 assert elt['result']['output']['file'] in self.rawdata_prefix
                 rawout = self.extract_output(offset, length)
 
@@ -209,7 +213,7 @@ class ResultFile:
         :return: lenght of the rawdata file.
         :rtype: int
         """
-        return self._rawout.tell()
+        return self._sz
 
     @property
     def count(self):
@@ -402,7 +406,8 @@ class ResultFileManager:
         state = str(job.state)
         self._viewdata['status'][state].append(id)
         for tag in job.tags:
-            self._viewdata['tags'][tag][state].append(id)
+            if tag in self._viewdata['tags']:
+                self._viewdata['tags'][tag][state].append(id)
 
         self.register_view_item('tree', job.label)
         self._viewdata['tree'][job.label][state].append(id)
@@ -562,13 +567,20 @@ class ResultFileManager:
         """
         if id not in self._mapdata_rev:
             return None
-        f = self._mapdata_rev[id]
-        if f not in self._opened_files:
-            self._opened_files[f] = ResultFile(self._outdir, f)
-        hdl = self._opened_files[f]
+        res = self._mapdata_rev[id]
+        # if the mapped object is already resolved:
+        if isinstance(res, Test):
+            return res
+
+        if res not in self._opened_files:
+            self._opened_files[res] = ResultFile(self._outdir, res)
+        hdl = self._opened_files[res]
+        
         match = hdl.retrieve_test(id=id)
         assert (len(match) <= 1)
         if match:
+            # cache the mapping
+            self._mapdata_rev[id] = match[0]
             return match[0]
         else: 
             return None

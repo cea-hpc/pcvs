@@ -528,7 +528,7 @@ class Test:
         """
         return self._exectime
 
-    def to_json(self, strstate=False, force_output=False):
+    def to_json(self, strstate=False):
         """Serialize the whole Test as a JSON object.
 
         :return: a JSON object mapping the test
@@ -545,11 +545,7 @@ class Test:
             },
             "data": self._data
         }
-        if self._output:
-            res['result']['output']['length'] = len(self.encoded_output)
-            if force_output:
-                res['result']['output']['raw'] = self.encoded_output
-
+        
         return res
 
     def from_json(self, test_json: str) -> None:
