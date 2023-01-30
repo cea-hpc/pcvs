@@ -863,6 +863,10 @@ class BuildDirectoryManager:
         :return: the archive path name
         :rtype: str
         """
+        
+        #ensure all results are flushed away before creating the archive
+        self.results.finalize()
+        
         if not timestamp:
             timestamp = datetime.datetime.now()
         str_timestamp = timestamp.strftime('%Y%m%d%H%M%S')
@@ -910,11 +914,15 @@ class BuildDirectoryManager:
         :return: _description_
         :rtype: _type_
         """
-        archive = tarfile.open(archive_path, mode="w:gz")
-
+        archive = tarfile.open(archive_path, mode="r:gz")
+        
         path = tempfile.mkdtemp(prefix="pcvs-archive")
         archive.extractall(path)
-        hdl = BuildDirectoryManager(build_dir=path)
+        archive.close()
+        
+        d = [x for x in os.listdir(path) if x.startswith("pcvsrun_")]
+        assert(len(d) == 1)
+        hdl = BuildDirectoryManager(build_dir=os.path.join(path, d[0]))
         hdl.load_config()
         return hdl
 
