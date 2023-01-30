@@ -2,7 +2,7 @@ import os
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import report as pvReport
-from pcvs.gui.curses import viewer
+#from pcvs.gui.curses import viewer
 from pcvs.helpers import utils
 
 try:
