@@ -334,7 +334,9 @@ class Test:
         :rtype: int or NoneType
         """
         if self._validation['time'] == 0:
-            return None
+            if MetaConfig.root.validation.job_timeout == 0:
+                return None
+            return MetaConfig.root.validation.job_timeout
         return self._validation['time'] + self._validation['delta']
 
     def get_dim(self, unit="n_node"):

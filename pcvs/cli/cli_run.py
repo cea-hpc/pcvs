@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from pcvs import NAME_BUILDFILE, io
+from pcvs import NAME_BUILDFILE, NAME_RUN_CONFIG_FILE, io
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
@@ -178,6 +178,10 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     global_config.set_internal("pColl", ctx.obj['plugins'])
 
     # then init the configuration
+    if settings_file is None:
+        # detect ?
+        detect = os.path.join(os.getcwd(), NAME_RUN_CONFIG_FILE)
+        settings_file = detect if os.path.isfile(detect) else None
     console.debug(
         "PRE-RUN: load settings from local file: {}".format(settings_file))
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)

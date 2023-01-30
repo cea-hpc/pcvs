@@ -40,3 +40,7 @@ properties:
             - json
             - yaml
     additionalProperties: false
+    job_timeout:
+      OneOf:
+      - {'type': null}
+      - {'type': 'integer'}
