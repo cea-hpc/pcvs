@@ -258,9 +258,10 @@ class TheConsole(Console):
             r"""[default]                                                                                             """,
         ]
         banner = logo
-        if self.size.width < max(map(lambda x: len(x), logo_short)):
+        
+        if self.size.width < 40:
             banner = logo_minimal
-        elif self.size.width < max(map(lambda x: len(x), logo)):
+        elif self.size.width < 95:
             banner = logo_short
 
         self.print("\n".join(banner))
