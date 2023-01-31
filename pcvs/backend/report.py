@@ -147,6 +147,12 @@ class Report:
                         'state': str(state),
                         'count': counts,
                         'path': sdata.prefix}
+        
+    def single_session_config(self, sid) -> dict:
+        assert sid in self._sessions
+        d = self._sessions[sid].get_config()
+        d['runtime']['plugin'] = ''
+        return d
 
     def single_session_status(self, sid, filter=None) -> Union[Dict, List]:
         """
@@ -276,6 +282,7 @@ class Report:
             return {k: self.dict_convert_list_to_cnt(v) for k, v in d.items()}
         else:
             return d
+        
 
 
 def build_static_pages(buildir) -> None:

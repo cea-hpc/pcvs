@@ -9,6 +9,7 @@
 			document.getElementById("labelnumber").textContent = resp.label
 			document.getElementById("tagnumber").textContent = resp.tag
 			document.getElementById("testnumber").textContent = resp.test
+			document.getElementById("config-block").textContent = JSON.stringify(resp.config, undefined, 2)
 		}).done(function(){
 			page_ready()
 		})
@@ -47,6 +48,11 @@ The content of this main page is still in progress. Here a short list of pages a
 <h4 id="labelnumber" class="card-title">{{"{:,}".format(nb_labels)}}</h4>
 <p class="card-text">Distinct Labels</p>
 </div></div></div>
+</div>
+
+<div class="config-display">
+<p>Configuration:</p>
+<pre><code id="config-block"></code></pre>
 </div>
 
 {% endblock %}

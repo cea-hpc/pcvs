@@ -769,6 +769,15 @@ class BuildDirectoryManager:
         with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'w') as fh:
             YAML(typ='safe').dump(config, fh)
 
+    def get_config(self) -> dict:
+        """
+        Return the loaded configuration for the current build directory.
+
+        :return: a dict representantion of yaml config
+        :rtype: dict
+        """
+        return self._config
+        
     @property
     def config(self) -> MetaConfig:
         """

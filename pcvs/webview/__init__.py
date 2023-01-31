@@ -75,7 +75,8 @@ def create_app(iface):
         if 'json' in request.args.get('render', []):
             return jsonify({"tag": len(tags),
                             "label": len(labels),
-                            "test": jobs_cnt
+                            "test": jobs_cnt,
+                            "config": data_manager.single_session_config(sid)
                             })
         return render_template('session_main.html',
                                sid=sid,
