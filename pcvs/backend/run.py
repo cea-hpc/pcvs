@@ -9,7 +9,7 @@ from subprocess import CalledProcessError
 
 from ruamel.yaml import YAML
 
-from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, NAME_BUILD_SCRATCH,
+from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_CACHEDIR, NAME_BUILD_SCRATCH,
                   NAME_BUILDFILE, NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR,
                   io, testing)
 from pcvs.backend import bank as pvBank
@@ -221,8 +221,9 @@ def prepare():
                               dir=True,
                               export=False)
 
-    utils.create_or_clean_path(valcfg.buildcache, dir=True)
-
+    build_man.save_extras(NAME_BUILD_CACHEDIR, dir=True, export=False)
+    valcfg.buildcache = os.path.join(build_man.prefix, NAME_BUILD_CACHEDIR)
+    
     io.console.print_item("Ensure user-defined programs exist")
     __check_defined_program_validity()
 
@@ -344,13 +345,14 @@ def process_spack():
     label = "spack"
     path = "/spack"
     MetaConfig.root.validation.dirs[label] = path
+    build_man = MetaConfig.root.get_internal('build_manager')
 
     _, _, rbuild, _ = testing.generate_local_variables(label, '')
-    utils.create_or_clean_path(rbuild, dir=True)
+    build_man.save_extras(os.path.relpath(rbuild, build_man.prefix), dir=True, export=False)
 
     for spec in io.console.progress_iter(MetaConfig.root.validation.spack_recipe):
         _, _, _, cbuild = testing.generate_local_variables(label, spec)
-        utils.create_or_clean_path(cbuild, dir=True)
+        build_man.save_extras(os.path.relpath(cbuild, build_man.prefix), dir=True, export=False)
         pvSpack.generate_from_variants(spec, label, spec)
 
 
@@ -631,7 +633,7 @@ def dup_another_build(build_dir, outdir):
     # first, clear fields overridden by current run
     global_config.validation.output = outdir
     global_config.validation.reused_build = build_dir
-    global_config.validation.buildcache = os.path.join(outdir, 'cache')
+    global_config.validation.buildcache = os.path.join(outdir, NAME_BUILD_CACHEDIR)
 
     # second, copy any xml/sh files to be reused
     for root, _, files, in os.walk(os.path.join(build_dir, "test_suite")):

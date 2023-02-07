@@ -727,6 +727,7 @@ class BuildDirectoryManager:
             self.clean(pcvs.NAME_BUILD_SCRATCH)
         self.clean(pcvs.NAME_BUILD_RESDIR)
         self.clean(pcvs.NAME_BUILD_CONF_FN)
+        self.clean(pcvs.NAME_BUILD_CACHEDIR)
         self.clean('conf.env')
 
         self.clean_archives()

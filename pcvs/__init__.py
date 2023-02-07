@@ -10,6 +10,7 @@ NAME_BUILD_CONF_FN = "conf.yml"
 NAME_BUILD_RESDIR = "rawdata"
 NAME_BUILD_SCRATCH = "test_suite"
 NAME_BUILD_ARCHIVE_DIR = "old_archives"
+NAME_BUILD_CACHEDIR = "cache"
 
 NAME_DEBUG_FILE = "pcvs-debug.log"
 
