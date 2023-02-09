@@ -299,7 +299,7 @@ class TEDescriptor:
                     # merge manually some definitions made by
                     # runtime, as some may be required to expand values:
 
-                    cur_criterion.expand_values()
+                    cur_criterion.expand_values(v_sys)
                     cur_criterion.intersect(v_sys)
                     if cur_criterion.is_empty():
                         self._skipped = True

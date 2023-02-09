@@ -3,7 +3,7 @@ import itertools
 import math
 import os
 
-from pcvs.helpers import log
+from pcvs import io
 from pcvs.helpers.exceptions import CommonException
 from pcvs.helpers.system import MetaConfig
 from pcvs.plugins import Plugin
@@ -171,6 +171,7 @@ class Criterion:
         self._local = local
         self._str = description.get('subtitle', None)
         self._values = description.get('values', [])
+        self._expanded = False
         if not isinstance(self._values, list):
             self._values = [self._values]
 
@@ -185,7 +186,7 @@ class Criterion:
         """
         if 'values' in desc:
             self._values = desc['values']
-
+    
     def intersect(self, other):
         """Update the calling Criterion with the interesection of the current
         range of possible values with the one given as a parameters.
@@ -372,15 +373,39 @@ class Criterion:
 
         return values
 
-    def expand_values(self):
+    @property
+    def expanded(self):
+        return self._expanded
+    
+    @property
+    def min_value(self):
+        assert(self.expanded)
+        return min(self._values)
+    
+    @property
+    def max_value(self):
+        assert(self.expanded)
+        return max(self._values)
+    
+    def expand_values(self, reference=None):
         """Browse values for the current criterion and make it ready to
         generate combinations"""
         values = []
+        start = 0
+        end = 100
 
+        if reference:
+            assert isinstance(reference, Criterion)
+            if not reference.expanded:
+                reference.expand_values()
+            start = reference.min_value
+            end = reference.max_value
+            
         if self._numeric is True:
             for v in self._values:
+                
                 if isinstance(v, dict):
-                    values += self.__convert_sequence_to_list(v, s=0, e=100)
+                    values += self.__convert_sequence_to_list(v, s=start, e=end)
                 elif isinstance(v, (int, float, str)):
                     values.append(v)
                 else:
@@ -390,7 +415,7 @@ class Criterion:
             values = self._values
         # now ensure values are unique
         self._values = set(values)
-
+        self._expanded = True
         # TODO: handle criterion dependency (ex: n_mpi: ['n_node * 2'])
 
 
