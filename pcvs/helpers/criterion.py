@@ -173,9 +173,6 @@ class Criterion:
         self._values = description.get('values', [])
         self._expanded = False
         #Sanity check
-        if not isinstance(self._values, list):
-            self._values = [self._values]
-        
         self.sanitize_values()
 
     def sanitize_values(self):
@@ -186,7 +183,10 @@ class Criterion:
         Will raise an exeption in case of inconsistency (Maybe this should be
         managed in another way through the error handling)
         """
-        assert(isinstance(self._values, list))
+        if self.is_discarded():
+            return
+        if not isinstance(self._values, list):
+            self._values = [self._values]
         for v in self._values:
             if isinstance(v, list):
                 raise Exception()
@@ -206,8 +206,6 @@ class Criterion:
         if 'values' in desc:
             self._values = desc['values']
             self._expanded = False
-            if not isinstance(self._values, list):
-                self._values = [self._values]
             self.sanitize_values()
     
     def intersect(self, other):

@@ -234,11 +234,11 @@ class TestFile:
 
         with open(fn_sh, 'w') as fh_sh:
             fh_sh.write("""#!/bin/sh
-if test -n "$PCVS_SIMULATION"; then
-    set PCVS_SHOW
-    set PCVS_SHOW_ENV
-    set PCVS_SHOW_MOD
-    set PCVS_SHOW_CMD
+if test -n "{simulated}"; then
+    PCVS_SHOW=1
+    PCVS_SHOW_ENV=1
+    PCVS_SHOW_MOD=1
+    PCVS_SHOW_CMD=1
 fi
 
 if test -n "$PCVS_SHOW"; then
