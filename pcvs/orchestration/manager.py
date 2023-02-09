@@ -138,8 +138,13 @@ class Manager:
 
             if job_dep.name in chain:
                 raise OrchestratorException.CircularDependencyError(
-                    job_dep.name)
-            self.resolve_single_job_deps(job_dep, chain)
+                    chain)
+            
+            # without copying the chain, resolution of siblings deps will alter
+            # the same list --> a single dep may appear multiple time and raise
+            # a false CircularDep
+            # solution: resolve subdep path in their own chain :)
+            self.resolve_single_job_deps(job_dep, list(chain))
             job.resolve_a_dep(depname, job_dep)
 
     def get_leftjob_count(self):
