@@ -172,11 +172,30 @@ class Criterion:
         self._str = description.get('subtitle', None)
         self._values = description.get('values', [])
         self._expanded = False
+        #Sanity check
         if not isinstance(self._values, list):
             self._values = [self._values]
+        
+        self.sanitize_values()
+
+    def sanitize_values(self):
+        """
+        Check for any inconsistent values in the current Criterion.
+        
+        Currently, only scalar items or dict (=> sequence) are allowed.
+        Will raise an exeption in case of inconsistency (Maybe this should be
+        managed in another way through the error handling)
+        """
+        assert(isinstance(self._values, list))
+        for v in self._values:
+            if isinstance(v, list):
+                raise Exception()
+            if isinstance(v, dict):
+                for key in v.keys():
+                    assert key in ['op', 'of', 'from', 'to']
+            
 
     # only allow overriding values (for now)
-
     def override(self, desc):
         """Replace the value of the criterion using a descriptor containing the
             said value
@@ -186,6 +205,10 @@ class Criterion:
         """
         if 'values' in desc:
             self._values = desc['values']
+            self._expanded = False
+            if not isinstance(self._values, list):
+                self._values = [self._values]
+            self.sanitize_values()
     
     def intersect(self, other):
         """Update the calling Criterion with the interesection of the current
@@ -393,14 +416,16 @@ class Criterion:
         values = []
         start = 0
         end = 100
-
+        
+        if self.expanded:
+            return
         if reference:
             assert isinstance(reference, Criterion)
             if not reference.expanded:
                 reference.expand_values()
             start = reference.min_value
             end = reference.max_value
-            
+        
         if self._numeric is True:
             for v in self._values:
                 
