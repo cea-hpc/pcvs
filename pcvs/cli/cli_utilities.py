@@ -22,30 +22,55 @@ except ImportError:
 
 
 @click.command(name="exec", short_help="Running aspecific test")
-@click.option('-o', '--output', 'output', default=None,
+@click.option('-o', '--output', 'output', default=None, type=click.Path(exists=True, dir_okay=True, file_okay=False),
               help="Directory where build artifacts are stored")
 @click.option('-l', '--list', 'gen_list', is_flag=True,
               help='List available tests (may take a while)')
 @click.option("-s", "--show", "display",
-              type=click.Choice(['cmd', 'env', 'loads', 'all', 'out']), default=None,
-              is_flag=False, flag_value="all",
+              type=click.Choice(['cmd', 'env', 'mod', 'all', 'out']), default=None, multiple=True,
               help="Display information instead of executing the command")
+@click.option("-C", "--print-command", "pcmd", flag_value="cmd",
+              help="Dedicated option to print target command")
+@click.option("-E", "--print-env", "penv", flag_value="env",
+              help="Dedicated option to print target modified environment")
+@click.option("-M", "--print-module", "pmod", flag_value="mod",
+              help="Dedicated option to print target manager pre-load")
+@click.option("-O", "--print-output", "pout", flag_value="out",
+              help="Dedicated option to print target output")
+@click.option("-A", "--print-all", "pall", flag_value="all",
+              help="Dedicated option to print everything")
 @click.argument("argument", type=str, required=False)
 @click.pass_context
-def exec(ctx, output, argument, gen_list, display) -> None:
+def exec(ctx, output, argument, gen_list, display, pcmd, penv, pmod, pout, pall) -> None:
     """ Run a unit test as it would have been through the whole engine (for
     reproducing purposes) from the command line."""
     rc = 0
     err = subprocess.STDOUT
     env = copy.deepcopy(os.environ)
 
-    if display == 'out':
-        # special case
-        print(pvUtils.get_logged_output(output, argument))
-        return
+    display = set(display)
+    if pall or 'all' in display:
+        pmod = "mod"
+        penv = "env"
+        pcmd = "cmd"
+        pout = "out"
+    
+    if pmod:
+        display.add(pmod)
+    if pcmd:
+        display.add(pcmd)
+    if pout:
+        display.add(pout)
+    if penv:
+        display.add(penv)
 
-    if display:
-        env.update({'PCVS_SHOW': str(display)})
+    if len(display) > 0:
+        env.update({"PCVS_SHOW": '1'})
+        for e in display:
+            env.update({'PCVS_SHOW_{}'.format(e.upper()): '1'})
+
+    if ctx.obj['verbose'] > 0:
+        env.update({"PCVS_VERBOSE": '1'})
 
     if gen_list:
         script_path = pvUtils.locate_scriptpaths(output)
@@ -69,6 +94,10 @@ def exec(ctx, output, argument, gen_list, display) -> None:
             rc = fds.returncode
     except subprocess.CalledProcessError as e:
         rc = e.returncode
+
+    if 'out' in display:
+        # special case
+        print(pvUtils.get_logged_output(output, argument))
 
     # return code to console
     sys.exit(rc)

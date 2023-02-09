@@ -232,13 +232,20 @@ class TestFile:
 
         with open(fn_sh, 'w') as fh_sh:
             fh_sh.write("""#!/bin/sh
-test -n '{simulated}' && PCVS_SHOW='all'
-if test -n "$PCVS_SHOW"; then
-    test "$PCVS_SHOW" = "env" -o "$PCVS_SHOW" = "all" &&  echo_env="echo " || echo_env="#"
-    test "$PCVS_SHOW" = "loads" -o "$PCVS_SHOW" = "all" &&  echo_load="echo " ||_echo_load="#"
-    test "$PCVS_SHOW" = "cmd" -o "$PCVS_SHOW" = "all" &&  echo_cmd="echo " || echo_cmd="#"
+if test -n "$PCVS_SIMULATION"; then
+    set PCVS_SHOW
+    set PCVS_SHOW_ENV
+    set PCVS_SHOW_MOD
+    set PCVS_SHOW_CMD
 fi
-    
+
+if test -n "$PCVS_SHOW"; then
+    test "$PCVS_SHOW_ENV" &&  echo_env="echo " || echo_env="#"
+    test "$PCVS_SHOW_MOD"&&  echo_load="echo " || echo_load="#"
+    test "$PCVS_SHOW_CMD" &&  echo_cmd="echo " || echo_cmd="#"
+fi
+
+test -n "$PCVS_VERBOSE" && echo "## MODULE LOADED FROM PROFILE ##"
 eval "${{echo_load}}{pm_string}"
 
 for arg in "$@"; do case $arg in
@@ -258,8 +265,11 @@ for arg in "$@"; do case $arg in
         esac
     done
     
+    test -n "$PCVS_VERBOSE" && echo "## MODULE LOADED ##"
     eval "${{echo_load}}${{pcvs_load}}"
+    test -n "$PCVS_VERBOSE" && echo "## SETUP ENV ##"
     eval "${{echo_env}}${{pcvs_env}}"
+    test -n "$PCVS_VERBOSE" && echo "## RUN COMMAND ##"
     eval "${{echo_cmd}}${{pcvs_cmd}}"
     exit $?\n""".format(list_of_tests="\n".join([
                 t.name
