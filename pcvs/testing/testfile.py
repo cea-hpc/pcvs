@@ -1,4 +1,5 @@
 import functools
+import pprint
 import getpass
 import operator
 import os
@@ -206,6 +207,7 @@ class TestFile:
             td = tedesc.TEDescriptor(k, content, self._label, self._prefix)
             for test in td.construct_tests():
                 self._tests.append(test)
+            io.console.info("{}: {}".format(td.name, pprint.pformat(td.get_debug())))
 
             MetaConfig.root.get_internal(
                 "pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)

@@ -625,33 +625,33 @@ class TEDescriptor:
         if self._skipped:
             return {}
 
-        user_cnt = 1
-        real_cnt = 1
+        #user_cnt = 1
+        #real_cnt = 1
         self._debug_yaml = dict()
 
         # count the compilation run
-        if self._build:
-            real_cnt = 1
+        #if self._build:
+        #    real_cnt = 1
 
         # count actual tests built
         if self._run:
             # for system-wide iterators, count max number of possibilites
             for k, v in self._criterion.items():
                 self._debug_yaml[k] = list(v.values)
-                real_cnt *= len(v.values)
+                #real_cnt *= len(v.values)
 
             # for program-lavel iterators, count number of possibilies
             self._debug_yaml['program'] = dict()
             for k, v in self._program_criterion.items():
                 self._debug_yaml['program'][k] = list(v.values)
-                user_cnt *= len(v.values)
+                #user_cnt *= len(v.values)
 
         # store debug info
-        self._debug_yaml['.stats'] = {
-            'theoric': user_cnt * real_cnt,
-            'program_factor': user_cnt,
-            'effective': self._effective_cnt
-        }
+        #self._debug_yaml['.stats'] = {
+        #    'theoric': user_cnt * real_cnt,
+        #    'program_factor': user_cnt,
+        #    'effective': self._effective_cnt
+        #}
 
         return self._debug_yaml
 
