@@ -127,7 +127,9 @@ class TheConsole(Console):
                 tname)
             )
             if content:
-                self.print(content)
+                # print raw input
+                # parsing on uncontrolled output may lead to errors
+                self.print(content, markup=False, highlight=False)
         else:
             self.summary_table.setdefault(tlabel, {})
             self.summary_table[tlabel].setdefault(tsubtree, {
