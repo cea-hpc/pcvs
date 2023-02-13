@@ -562,7 +562,7 @@ class TEDescriptor:
                 params=" ".join(params)
             )
             if self.get_run_attr('command_wrap', True) is True:
-                command = "{runtime} {runtime_args} {args} {cmd}".format(
+                command = "{runtime} {args} {runtime_args} {cmd}".format(
                     runtime=MetaConfig.root.runtime.get('program', ''),
                     runtime_args=MetaConfig.root.runtime.get('args', ''),
                     args=" ".join(args),
