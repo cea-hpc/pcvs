@@ -491,6 +491,7 @@ class Test:
 
     def not_picked(self):
         self._sched_cnt += 1
+        return self._sched_cnt >= self.SCHED_MAX_ATTEMPTS
 
     def pick_count(self):
         return self._sched_cnt
@@ -527,6 +528,10 @@ class Test:
         """TODO:
         """
         return self._exectime
+    
+    @property
+    def retcode(self):
+        return self._rc
 
     def to_json(self, strstate=False):
         """Serialize the whole Test as a JSON object.
@@ -548,6 +553,19 @@ class Test:
         
         return res
 
+    def to_minimal_json(self):
+        return {
+            "jid": self.jid,
+            "invocation_cmd": self._invocation_cmd,
+        }
+    
+    def from_minimal_json(self, json: str):
+        if isinstance(json, str):
+            json = json.loads(json)
+        self._invocation_cmd = json.get('invocation_cmd', "exit 1")
+        self._id['jid'] = json.get('jid', "-1")
+        
+        
     def from_json(self, test_json: str) -> None:
         """Replace the whole Test structure based on input JSON.
 
