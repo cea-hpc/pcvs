@@ -180,6 +180,14 @@ class TestFile:
             self._label, self._prefix)
         stream = replace_special_token(data, source, build, self._prefix)
         self._raw = YAML(typ='safe').load(stream)
+    
+    def save_yaml(self):
+        src, _, build, curbuild = testing.generate_local_variables(
+            self._label,
+            self._prefix)
+        
+        with open(os.path.join(curbuild, "pcvs.setup.yml"), "w") as fh:
+            YAML(typ='safe').dump(self._raw, fh)
 
     def process(self):
         """Load the YAML file and map YAML nodes to Test()."""
@@ -241,14 +249,14 @@ if test -n "{simulated}"; then
     PCVS_SHOW_CMD=1
 fi
 
-if test -n "$PCVS_SHOW"; then
-    test "$PCVS_SHOW_ENV" &&  echo_env="echo " || echo_env="#"
-    test "$PCVS_SHOW_MOD"&&  echo_load="echo " || echo_load="#"
-    test "$PCVS_SHOW_CMD" &&  echo_cmd="echo " || echo_cmd="#"
-fi
-
+if test -n "$PCVS_SHOW_MOD"; then
 test -n "$PCVS_VERBOSE" && echo "## MODULE LOADED FROM PROFILE ##"
-eval "${{echo_load}}{pm_string}"
+cat<<EOF
+{pm_string}
+EOF
+else
+eval "{pm_string}"
+fi
 
 for arg in "$@"; do case $arg in
 """.format(simulated="sim" if MetaConfig.root.validation.simulated is True else "",
@@ -267,12 +275,30 @@ for arg in "$@"; do case $arg in
         esac
     done
     
-    test -n "$PCVS_VERBOSE" && echo "## MODULE LOADED ##"
-    eval "${{echo_load}}${{pcvs_load}}"
-    test -n "$PCVS_VERBOSE" && echo "## SETUP ENV ##"
-    eval "${{echo_env}}${{pcvs_env}}"
-    test -n "$PCVS_VERBOSE" && echo "## RUN COMMAND ##"
-    eval "${{echo_cmd}}${{pcvs_cmd}}"
+    if test -n "$PCVS_SHOW_MOD"; then
+        test -n "$PCVS_VERBOSE" && echo "#### MODULE LOADED ####"
+cat<<EOF
+${{pcvs_load}}
+EOF
+    else
+        eval "${{pcvs_load}}"
+    fi
+    if test -n "$PCVS_SHOW_ENV"; then
+    test -n "$PCVS_VERBOSE" && echo "###### SETUP ENV ######"
+cat<<EOF
+${{pcvs_env}}
+EOF
+    else
+        eval "${{pcvs_env}}"
+    fi
+    if test -n "$PCVS_SHOW_CMD"; then
+    test -n "$PCVS_VERBOSE" && echo "##### RUN COMMAND #####"
+cat<<EOF
+${{pcvs_cmd}}
+EOF
+    else
+        eval "${{pcvs_cmd}}"
+    fi
     exit $?\n""".format(list_of_tests="\n".join([
                 t.name
                 for t in self._tests

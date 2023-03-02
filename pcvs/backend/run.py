@@ -422,7 +422,6 @@ def process_dyn_setup_scripts(setup_files):
         io.console.debug("process {} ({})".format(subprefix, label))
         base_src, cur_src, base_build, cur_build = testing.generate_local_variables(
             label, subprefix)
-
         # prepre to exec pcvs.setup script
         # 1. setup the env
         env['pcvs_src'] = base_src
@@ -474,8 +473,8 @@ def process_dyn_setup_scripts(setup_files):
                        prefix=subprefix
                        )
         
-        
         obj.load_from_str(out)
+        obj.save_yaml()
         
         obj.process()
         obj.flush_sh_file()
