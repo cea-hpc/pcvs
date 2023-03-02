@@ -11,6 +11,7 @@ NAME_BUILD_RESDIR = "rawdata"
 NAME_BUILD_SCRATCH = "test_suite"
 NAME_BUILD_ARCHIVE_DIR = "old_archives"
 NAME_BUILD_CACHEDIR = "cache"
+NAME_BUILD_CONTEXTDIR = os.path.join(NAME_BUILD_CACHEDIR, "runner_ctx")
 
 NAME_DEBUG_FILE = "pcvs-debug.log"
 
@@ -20,4 +21,4 @@ PATH_SESSION = os.path.join(PATH_HOMEDIR, "session.yml")
 PATH_BANK = os.path.join(PATH_HOMEDIR, "bank.yml")
 PATH_VALCFG = os.path.join(PATH_HOMEDIR, "validation.yml")
 
-__version__ = "0.7.0-dev"
+__version__ = "0.7.0.dev0"

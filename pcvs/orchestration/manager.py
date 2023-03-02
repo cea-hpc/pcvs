@@ -89,10 +89,7 @@ class Manager:
         if hashed not in self.job_hashes:
             self.job_hashes[hashed] = job
             self._count.total += 1
-        else:
-            print(job.name, self.job_hashes[hashed].name)
-            raise Exception()
-
+        
     def get_count(self, tag="total"):
         """Access to a particular counter.
 
@@ -165,6 +162,22 @@ class Manager:
         self._count[job.state] += 1
         self._publisher.save(job)
 
+    def prune_non_runnable_jobs(self):
+        for k in sorted(self._dims.keys(), reverse=True):
+                if len(self._dims[k]) <= 0:
+                    continue
+                else:
+                    removed_jobs = list()
+                    for job in self._dims[k]:
+                        if job.pick_count() > Test.SCHED_MAX_ATTEMPTS:
+                            self.publish_failed_to_run_job(job, Test.MAXATTEMPTS_STR, Test.State.ERR_OTHER)
+                            removed_jobs.append(job)
+                    for elt in removed_jobs:
+                        self._dims[k].remove(elt)
+            
+
+            
+
     def create_subset(self, max_dim):
         """Extract one or more jobs, ready to be run.
 
@@ -181,7 +194,8 @@ class Manager:
 
         the_set = None
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_BEFORE)
-
+        user_sched_job = self._plugin.has_enabled_step(Plugin.Step.SCHED_JOB_EVAL)
+        
         if self._plugin.has_enabled_step(Plugin.Step.SCHED_SET_EVAL):
             the_set = self._plugin.invoke_plugins(
                 Plugin.Step.SCHED_SET_EVAL,
@@ -228,16 +242,7 @@ class Manager:
                         if job.has_failed_dep():
                             # Cannot be scheduled for dep purposes
                             # push it to publisher
-                            publish_job_args = {
-                                "rc": 1,
-                                "time": 0.0,
-                                "out": Test.NOSTART_STR,
-                                "state": Test.State.ERR_DEP
-                            }
-
-                            self.publish_job(
-                                job, publish_args=publish_job_args)
-                            job.display()
+                            self.publish_failed_to_run_job(job, Test.NOSTART_STR, Test.State.ERR_DEP)
                             # Attempt to find another job to schedule
                             continue
 
@@ -245,27 +250,38 @@ class Manager:
                         # Job has completed its dep scheme
                         # all deps are successful
                         # => SCHEDULE
-                        if job.state != Test.State.IN_PROGRESS and job.get_dim() <= max_dim:
+                        if user_sched_job:
+                            pick_job = self._plugin.invoke_plugins(
+                                                    Plugin.Step.SCHED_JOB_EVAL,
+                                                    job=job,
+                                                    set=the_set)
+                        else:
+                            pick_job = job.get_dim() <= max_dim
+                            
+                        if job.state != Test.State.IN_PROGRESS and pick_job:
                             job.pick()
-                            the_set = Set()
+                            if not the_set:
+                                the_set = Set(execmode=Set.ExecMode.LOCAL)
                             the_set.add(job)
                             break
                         else:
-                            job.not_picked()
-                            if job.pick_count() > Test.SCHED_MAX_ATTEMPTS:
-                                publish_job_args = {
-                                    "rc": -1,
-                                    "time": 0.0,
-                                    "out": Test.MAXATTEMPTS_STR,
-                                    "state": Test.State.ERR_OTHER
-                                }
-                                self.publish_job(
-                                    job, publish_args=publish_job_args)
-                                job.display()
+                            if job.not_picked():
+                                self.publish_failed_to_run_job(job, Test.MAXATTEMPTS_STR, Test.State.ERR_OTHER)
                             else:
                                 self._dims[k].append(job)
         self._plugin.invoke_plugins(Plugin.Step.SCHED_SET_AFTER)
         return the_set
+
+    def publish_failed_to_run_job(self, job, out, state):
+        publish_job_args = {
+            "rc": -1,
+            "time": 0.0,
+            "out": out,
+            "state": state
+        }
+        self.publish_job(
+            job, publish_args=publish_job_args)
+        job.display()
 
     def merge_subset(self, set):
         """After completion, process the Set to publish test results.
@@ -281,4 +297,8 @@ class Manager:
                 self.publish_job(job, publish_args=None)
                 job.display()
             else:
-                self.add_job(job)
+                
+                if job.not_picked():
+                    self.publish_failed_to_run_job(job, Test.MAXATTEMPTS_STR, Test.State.ERR_OTHER)
+                else:
+                    self.add_job(job)

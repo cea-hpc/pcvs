@@ -67,7 +67,7 @@ def get_logged_output(prefix, testname):
         man = BuildDirectoryManager(build_dir=buildir)
         man.init_results()
         for test in man.results.retrieve_tests_by_name(name=testname):
-            s += "\n## TEST OUTPUT ##\n### Testname: {}\n{}\n#################\n".format(
+            s += "\n##### TEST OUTPUT #####\n### Testname: {}\n{}\n".format(
                 test.name, test.get_raw_output(encoding='utf-8'))
         man.finalize()
     if not s:
@@ -292,7 +292,7 @@ def process_check_directory(dir, pf_name="default"):
             errors.setdefault(err, 0)
             errors[err] += 1
     io.console.print(table)
-    io.console.print_item("Jobs count: {}".format(total_nodes))
+    io.console.print_item("Total node count: {}".format(total_nodes))
     return errors
 
 

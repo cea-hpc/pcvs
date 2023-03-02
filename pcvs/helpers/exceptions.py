@@ -257,7 +257,13 @@ class PluginException(CommonException):
 
     class LoadError(GenericError):
         """Unable to load plugin directory."""
-        pass
+        def __init__(self, msg="Issue(s) while loading plugin", **kwargs):
+            """Updated constructor"""
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "Please ensure plugins can be imported like:",
+                                 "python3 ./path/to/plugin/file.py"]),
+                             dbg_info=kwargs)
 
 
 class SpackException(CommonException):

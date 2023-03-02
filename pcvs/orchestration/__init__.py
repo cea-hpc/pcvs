@@ -6,7 +6,8 @@ from pcvs.backend import session
 from pcvs.helpers import log
 from pcvs.helpers.system import MetaConfig
 from pcvs.orchestration.manager import Manager
-from pcvs.orchestration.set import Runner, Set
+from pcvs.orchestration.set import Set
+from pcvs.orchestration.runner import RunnerAdapter
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
 
@@ -84,21 +85,25 @@ class Orchestrator:
 
         nb_nodes = self._max_res
         last_progress = 0
+        pending_list = list()
         io.console.info("ORCH: start job scheduling")
         # While some jobs are available to run
         with io.console.table_container(self._manager.get_count()):
-            while self._manager.get_leftjob_count() > 0 or not self._ready_q.empty():
+            while self._manager.get_leftjob_count() > 0 or len(pending_list) > 0:
                 # dummy init value
                 new_set: Set = not None
                 while new_set is not None:
                     # create a new set, if not possible, returns None
                     new_set = self._manager.create_subset(nb_nodes)
                     if new_set is not None:
+                        assert(isinstance(nb_nodes, int))
                         # schedule the set asynchronously
                         nb_nodes -= new_set.dim
                         io.console.debug("ORCH: send Set to queue (#{}, sz:{})".format(
                             new_set.id, new_set.size))
                         self._ready_q.put(new_set)
+                    else:
+                        self._manager.prune_non_runnable_jobs()
 
                 # Now, look for a completion
                 try:
@@ -108,6 +113,7 @@ class Orchestrator:
                     nb_nodes += set.dim
                     self._manager.merge_subset(set)
                 except queue.Empty:
+                    self._manager.prune_non_runnable_jobs()
                     pass
                     # TODO: create backup to allow start/stop
 
@@ -142,8 +148,8 @@ class Orchestrator:
 
     def start_new_runner(self):
         """Start a new Runner thread & register comm queues."""
-        Runner.sched_in_progress = True
-        r = Runner(ready=self._ready_q, complete=self._complete_q)
+        RunnerAdapter.sched_in_progress = True
+        r = RunnerAdapter(buildir=MetaConfig.root.validation.output, ready=self._ready_q, complete=self._complete_q)
         r.start()
         self._runners.append(r)
 
@@ -158,7 +164,7 @@ class Orchestrator:
     @classmethod
     def stop(cls):
         """Request runner threads to stop."""
-        Runner.sched_in_progress = False
+        RunnerAdapter.sched_in_progress = False
 
     def run(self, session):
         """Start the orchestrator.

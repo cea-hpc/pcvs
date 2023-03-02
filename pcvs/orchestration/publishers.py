@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Iterable
 from ruamel.yaml import YAML
 
 import pcvs
+from pcvs import io
 from pcvs.helpers import utils
 from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.plugins import Plugin
@@ -728,9 +729,14 @@ class BuildDirectoryManager:
         self.clean(pcvs.NAME_BUILD_RESDIR)
         self.clean(pcvs.NAME_BUILD_CONF_FN)
         self.clean(pcvs.NAME_BUILD_CACHEDIR)
+        self.clean(pcvs.NAME_BUILD_CONTEXTDIR)
         self.clean('conf.env')
 
         self.clean_archives()
+        
+        self.save_extras(pcvs.NAME_BUILD_CACHEDIR, dir=True, export=False)
+        self.save_extras(pcvs.NAME_BUILD_CONTEXTDIR, dir=True, export=False)
+        self.save_extras(pcvs.NAME_BUILD_SCRATCH, dir=True, export=False)
 
     @property
     def sid(self) -> Optional[int]:
@@ -758,7 +764,9 @@ class BuildDirectoryManager:
             self._config = MetaConfig(YAML(typ='safe').load(fh))
 
         return self._config
-
+    def use_as_global_config(self):
+        MetaConfig.root = self._config
+        
     def save_config(self, config) -> None:
         """
         Save the config & store it directly into the build directory.
@@ -789,6 +797,20 @@ class BuildDirectoryManager:
         """
         return self._config
 
+    def add_cache_entry(self, idx=0):
+        d = os.path.join(self._path, pcvs.NAME_BUILD_CONTEXTDIR, str(idx))
+        
+        if os.path.exists(d):
+            raise Exception()
+        else:
+            os.makedirs(d)
+        
+        return d
+    
+    def get_cache_entry(self, idx=0):
+        return os.path.join(self._path, pcvs.NAME_BUILD_CONTEXTDIR, str(idx))
+    
+
     def save_extras(self, rel_filename, data="", dir=False, export=False) -> None:
         """
         Register a specific build-relative path, to be saved into the directory.
@@ -812,7 +834,10 @@ class BuildDirectoryManager:
             raise Exception()
 
         if dir:
-            os.makedirs(os.path.join(self._path, rel_filename))
+            try:
+                os.makedirs(os.path.join(self._path, rel_filename))
+            except FileExistsError:
+                io.console.warn("subprefix {} existed before registering".format(rel_filename))
         else:
             d = os.path.dirname(rel_filename)
             if not os.path.isdir(d):

@@ -28,7 +28,7 @@ properties:
                 args: {"type": "string"}
                 wrapper: {"type": "string"}
               additionalProperties: false
-            run:
+            remote:
               <<: *alloc_node
             batch:
               <<: *alloc_node
