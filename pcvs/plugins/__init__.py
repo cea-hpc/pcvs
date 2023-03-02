@@ -40,6 +40,7 @@ class Plugin:
         SCHED_BEFORE = enum.auto(),
         SCHED_SET_BEFORE = enum.auto(),
         SCHED_SET_EVAL = enum.auto(),
+        SCHED_JOB_EVAL = enum.auto(),
         SCHED_SET_AFTER = enum.auto(),
         TEST_RESULT_EVAL = enum.auto(),
         SCHED_PUBLISH_BEFORE = enum.auto(),
@@ -87,11 +88,11 @@ class Collection:
             self.register_plugin_by_package(
                 "pcvs.plugins.default", activate=True)
 
-            self.register_plugin_by_package('pcvs-contrib')
+            self.register_plugin_by_package('contrib')
 
         except:
             io.console.info(
-                "No pcvs-contrib package found for plugin autoloading")
+                "No 'contrib' package found for plugin autoloading")
 
     def activate_plugin(self, name):
         """Flag a plugin as active, meaning it will be called when the pass is
@@ -180,7 +181,7 @@ class Collection:
         """
 
         # the content is added to "pcvs-contrib" module
-        spec = importlib.util.spec_from_file_location("pcvs-contrib",
+        spec = importlib.util.spec_from_file_location("contrib",
                                                       modpath)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
@@ -228,7 +229,6 @@ class Collection:
         :raises PluginException.LoadError: Error while importing the package
         """
         mod = importlib.import_module(pkgname)
-
         for _, name, _ in pkgutil.iter_modules(mod.__path__, mod.__name__ + "."):
             try:
                 submod = importlib.import_module(name)

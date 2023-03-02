@@ -1,14 +1,21 @@
-from xml.dom import xmlbuilder
 from pcvs.orchestration import publishers
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
-from junit_xml import TestSuite, TestCase
+
+try:
+    from xml.dom import xmlbuilder
+    from junit_xml import TestSuite, TestCase
+except:
+    load_failed=True
+    pass
 
 class JUnit(Plugin):
     
     step = Plugin.Step.SCHED_PUBLISH_WRITE
     
     def run(self, *args, **kwargs):
+        if load_failed:
+            raise Exception()
         data = kwargs.get("data", {})
         out_prefix = kwargs.get('outfile', "./testfile") + ".xml"
         
