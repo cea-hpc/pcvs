@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import sys
+from datetime import datetime
 
 import rich.box as box
 from rich.console import Console
@@ -215,11 +216,11 @@ class TheConsole(Console):
     def print_banner(self):
 
         logo_minimal = [
-            r"""[green]{}""".format(self.utf('star') * 14),
-            r"""[yellow]   -- PCVS --  """,
-            r"""[red] {} CEA {} 2017 {}""".format(
-                self.utf('star'), self.utf('copy'), self.utf('star')),
-            r"""[green]{}""".format(self.utf('star') * 14)
+            r"""[green]{}""".format(self.utf('star') * 19),
+            r"""[yellow]     -- PCVS --  """,
+            r"""[red]{} CEA {} 2017-{} {}""".format(
+                self.utf('star'), self.utf('copy'), datetime.now().year, self.utf('star')),
+            r"""[green]{}""".format(self.utf('star') * 19)
         ]
 
         logo_short = [
@@ -230,8 +231,8 @@ class TheConsole(Console):
             r"""[red    ] /_/      \____/    |___/  /____/  """,
             r"""[red    ]                                   """,
             r"""[default] Parallel Computing -- Validation System""",
-            r"""[default] Copyright {} 2017 -- CEA""".format(
-                self.utf('copy')),
+            r"""[default] Copyright {} 2017-{} -- CEA""".format(
+                self.utf('copy'), datetime.now().year),
             r""""""
         ]
 
@@ -251,8 +252,8 @@ class TheConsole(Console):
             r"""[red    ]   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      """,
             r"""[red    ]                                                        /____/                               """,
             r"""[red    ]                                                                                             """,
-            r"""[default]    Copyright {} 2017 Commissariat à l'Énergie Atomique et aux Énergies Alternatives ([link=https://cea.fr]CEA[/link])""".format(
-                self.utf('copy')),
+            r"""[default]  Copyright {} 2017-{} Commissariat à l'Énergie Atomique et aux Énergies Alternatives ([link=https://cea.fr]CEA[/link])""".format(
+                self.utf('copy'), datetime.now().year),
             r"""[default]                                                                                             """,
             r"""[default]  This program comes with ABSOLUTELY NO WARRANTY;""",
             r"""[default]  This is free software, and you are welcome to redistribute it""",
