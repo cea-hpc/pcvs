@@ -4,7 +4,7 @@ import pkg_resources
 from pcvs import io
 from pcvs.backend import bank, config, profile
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,
-                      cli_session, cli_utilities)
+                      cli_session, cli_utilities, cli_remote_run)
 from pcvs.helpers import utils
 from pcvs.helpers.exceptions import PluginException
 from pcvs.plugins import Collection, Plugin
@@ -69,6 +69,7 @@ i = 0
               help="USe TUI-based interface instead of console (if applicable)")
 @click.pass_context
 @io.capture_exception(PluginException.NotFoundError)
+@io.capture_exception(PluginException.LoadError)
 def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins, tui):
     """PCVS main program."""
     ctx.ensure_object(dict)
@@ -120,6 +121,7 @@ cli.add_command(cli_utilities.clean)
 cli.add_command(cli_utilities.discover)
 # cli.add_command(cli_gui.gui)
 cli.add_command(cli_report.report)
+cli.add_command(cli_remote_run.remote_run)
 # cli.add_command(cli_plumbing.resolve)
 
 if __name__ == "__main__":
