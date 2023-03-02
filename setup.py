@@ -1,19 +1,23 @@
 # add -dirty if staged area is not empty
+import os
+loc = {}
+with open(os.path.join("pcvs/__init__.py")) as fh:
+    exec(fh.read(), None, loc)
+version = loc['__version__']
+
 try:
     import sh
-    version = sh.git("describe", "--dirty").strip()[1:]
+    version += "+{}".format(sh.git("rev-parse", "HEAD").strip()[:8])
+    if sh.git('diff', 'HEAD'):
+        version += ".dirty"
 except:
-    loc = {}
-    with open(os.path.join("pcvs/__init__.py")) as fh:
-        exec(fh.read(), None, loc)
-    version = loc['__version__']
+    pass
 
 with open("README.md", 'r') as f:
     desc = f.read()
 
 with open('requirements.txt') as f:
     requires = f.read().strip().split('\n')
-
 
 setuptools.setup(
     name="pcvs",
