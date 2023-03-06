@@ -52,8 +52,5 @@ class SchedMultiJobs(Plugin):
                         if count >= 10:
                             break
                     else:
-                        if job.not_picked():
-                            jobman.publish_failed_to_run_job(job, Test.MAXATTEMPTS_STR, Test.State.ERR_OTHER)
-                        else:
-                            per_res_list.append(job)
+                        per_res_list.append(job)
             return the_set
