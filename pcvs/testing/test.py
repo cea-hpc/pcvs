@@ -88,7 +88,7 @@ class Test:
         self._comb = kwargs.get('comb')
         self._cwd = kwargs.get('wd')
         self._exectime = 0.0
-        self._output = None
+        self._output = b""
         self._state = Test.State.WAITING
         self._dim = kwargs.get('dim', 1)
         self._testenv = kwargs.get('environment')

@@ -96,6 +96,8 @@ class RunnerAdapter(threading.Thread):
         os.makedirs(ctx_path)
         updated_env = {"PCVS_JOB_MANAGER_{}".format(i.upper()): jobman_cfg[i] for i in ['program', 'args'] if i in jobman_cfg}
         updated_env['PCVS_SET_DIM'] = str(set.dim)
+        updated_env['PCVS_SET_CMD'] = jobman_cfg.program if jobman_cfg.program else ""
+        updated_env['PCVS_SET_CMD_ARGS'] = jobman_cfg.args if jobman_cfg.args else ""
         env.update(updated_env)
         
         cmd = "{script} pcvs remote-run -c {ctx}".format(
@@ -182,7 +184,11 @@ class RemoteContext:
         if not self._outfile:
             self._outfile = open(os.path.join(self._path, "output.bin"), 'wb')
         data = job.encoded_output
-        self._outfile.write("{}:{}:{}:{}:{}\n{}\n".format(self.MAGIC_TOKEN, job.jid, len(data), job.time, job.retcode, data).encode("utf-8"))
+        self._outfile.writelines([
+            "{}:{}:{}:{}:{}\n".format(self.MAGIC_TOKEN, job.jid, len(data), job.time, job.retcode).encode("utf-8"),
+            data,
+            "\n".encode('utf-8')
+            ])
         
     def load_result_from_disk(self, set):
         with open(os.path.join(self._path, "output.bin"), "rb") as fh:
@@ -203,8 +209,9 @@ class RemoteContext:
                     job: Test = set.find(jobid)
                     assert(job)
                     if datalen > 0:
-                        data = lines[lineum+1]
-                    job.save_raw_run(out=data, rc=retcode, time=timexec)
+                        data = lines[lineum+1].strip()
+                        job.encoded_output = data
+                    job.save_raw_run(rc=retcode, time=timexec)
                     job.save_status(Test.State.EXECUTED)
 
     def mark_as_completed(self):
