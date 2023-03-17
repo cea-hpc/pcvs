@@ -130,7 +130,7 @@ class TheConsole(Console):
             if content:
                 # print raw input
                 # parsing on uncontrolled output may lead to errors
-                self.print(content, markup=False, highlight=False)
+                self.out(content)
         else:
             self.summary_table.setdefault(tlabel, {})
             self.summary_table[tlabel].setdefault(tsubtree, {
@@ -354,9 +354,9 @@ def capture_exception(e_type, user_func=None):
                     if not console:
                         console = TheConsole()
                     console.exception(e)
-                    console.print("[red bold]Exception: {}".format(e))
+                    console.print("[red bold]Exception: {}[/]".format(e))
                     console.print(
-                        "[red bold]See '{}' or rerun with -vv for more detail".format(pcvs.NAME_DEBUG_FILE))
+                        "[red bold]See '{}' or rerun with -vv for more details[/]".format(pcvs.NAME_DEBUG_FILE))
                     sys.exit(1)
                 else:
                     user_func(e)
