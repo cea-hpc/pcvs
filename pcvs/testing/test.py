@@ -624,12 +624,14 @@ class Test:
 
         # manage environment variables defined in TE
         if self._testenv is not None:
-            env_code = "\n".join([
-                "{}; export {}".format(shlex.quote(e),
-                                       shlex.quote(e.split('=')[0]))
-                for e in self._testenv
-            ])
-
+            envs = []
+            for e in self._testenv:
+                k, v = e.split('=', 1)
+                envs.append("{k}={v}; export {k}".format(k=shlex.quote(k),
+                                                         v=shlex.quote(v)))
+            env_code = "\n".join(envs)
+            
+                
         cmd_code = self._execmd
 
         return """
