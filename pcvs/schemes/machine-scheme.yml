@@ -37,13 +37,7 @@ properties:
 
   <<: *raw_properties
   default_partition:
-    type: string
-  package_manager:
-    type: object
-    properties:
-      spack:
-        type: string
-      module:
-        type: string
-    additionalProperties: false
+    OneOf:
+    - {type: string}
+    - {type: null}
 additionalProperties: false

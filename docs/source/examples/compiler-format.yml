@@ -1,30 +1,31 @@
 ---
 # List of programs to be used to compile
 # a wide variety of programs
-commands:
-    # C compiler
-    cc: "/path/to/cc"
-    # C++ compiler
-    cxx: "/pat/to/cxx"
-    # Fortran compiler
-    fc: "/path/to/fc"
-    # If a more-specific compiler is required:
-    f77: "/path/to/f77"
-    f90: "/path/to/f90"
-
 # Variants can add flavour to test requiring them.
 # For instance a test asking for the variant 'openmp'
 # will have its cflags extended with the content of
-# openmp.args here
-variants:
-    openmp:
-        args: "-fopenmp"
-    tbb:
-        args: "-ltbb -ltbbmalloc -ldl"
-    cuda:
-        args: ""
-    strict:
-        args: "-Werror -Wall -Wextra"
+# openmp.args here. Variants override parent fields, except
+# list objects, where more specialized content is appended
+# to the parent
+# C compiler
+cc:
+    program: "/path/to/cc"
+    args: ["-Wall", "-foption"]
+    envs: ["MPI_CC=cc", "EXTRA_FLAGS=-foption"]
+    variant:
+        openmp:
+            args: ["-fopenmp"]
+        mpi:
+            program: "/path/to/mpicc"
+# available keys: cc, cxx, fc, f77, f90, f08, accl
+# The drawback here is to duplicate variants for each compiler
+# please use YAML anchors (&, *) when possible:
+# cc:
+#   variant: &variants_below
+#     openmp: 
+#       args: ['-fopenmp'] 
+# cxx:
+#   variant: *variants_below
 
 # Manage the compiler through a package manager
 # Before any test to be run, the PM is invoked to load

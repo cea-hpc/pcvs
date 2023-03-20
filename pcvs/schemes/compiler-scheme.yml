@@ -1,41 +1,57 @@
 ---
 type: object
 properties:
-  commands:
+  cc: &compiler_properties
     type: object
     properties:
-      cc:
-        type: string
-      cxx:
-        type: string
-      fc:
-        type: string
-      f77:
-        type: string
-      f90:
-        type: string
-      f08:
-        type: string
-    additionalProperties: false
-  variants:
-    type: object
-    patternProperties:
-      "^.*$":
+      program: {type: string}
+      args:
+        OneOf:
+        - {type: array, items: {type: string}}
+        - {type: string}
+      envs:
+        OneOf:
+        - {type: array, items: {type: string}}
+        - {type: string}
+      variants:
         type: object
-        properties:
-          args:
-            type: string
+        patternProperties:
+          "^.*$":
+            type: object
+            properties:
+              program: {type: string}
+              args:
+                OneOf:
+                - {type: array, items: {type: string}}
+                - {type: string}
+              envs:
+                OneOf:
+                - {type: array, items: {type: string}}
+                - {type: string}
+            additionalProperties: false
     additionalProperties: false
-  package_manager:
-    type: object
-    properties:
-      spack:
-        type: array
-        items:
+  cxx:
+    <<: *compiler_properties
+  fc:
+    <<: *compiler_properties
+  f77:
+    <<: *compiler_properties
+  f90:
+    <<: *compiler_properties
+  f08:
+    <<: *compiler_properties
+  accl:
+    <<: *compiler_properties
+package_manager:
+  type: object
+  properties:
+    spack:
+      type: array
+      items:
+        type: string
+    module:
+      type: array
+      items:
           type: string
-      module:
-        type: array
-        items:
-          type: string
-    additionalProperties: false
+  additionalProperties: false
 additionalProperties: false

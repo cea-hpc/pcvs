@@ -22,10 +22,12 @@
     ldflags: "extra ldflags"
     # directory where program should be built
     cwd: "dir/to/build"
-    # variants describing the job
+    # variants describing the job.
+    # available variants are provided by compiler.$LANG
     variants:
       - openmp
       - accel
+      - mpi
     attributes:
       command_wrap: true
 

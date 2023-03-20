@@ -80,6 +80,18 @@ patternProperties:
                 items:
                   type: string
             additionalProperties: false
+          custom:
+            type: object
+            properties:
+              program: {type: string}
+              args:
+                OneOf:
+                - {type: array, items: {type: string}}
+                - {type: string}
+              envs:
+                OneOf:
+                - {type: array, items: {type: string}}
+                - {type: string}
         additionalProperties: false
       run:
         type: object

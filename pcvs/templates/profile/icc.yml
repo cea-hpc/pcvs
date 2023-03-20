@@ -1,3 +1,8 @@
 compiler:
-  commands: {cc: icc, cxx: icpc, f77: ifort, f90: ifort, fc: ifort}
+  cc: {program: icc}
+  cxx: {program: icpc}
+  f77: {program: ifort}
+  f90: {program: ifort}
+  f08: {program: ifort}
+  fc: {program: ifort}
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}

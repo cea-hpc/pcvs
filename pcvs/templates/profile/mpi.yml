@@ -1,7 +1,10 @@
 compiler:
-  commands: {cc: mpicc, cxx: mpicxx, f77: mpif77, f90: mpif90, fc: mpif90}
+  cc: {program: mpicc}
+  cxx: {program: mpicxx}
+  f77: {program: mpif77}
+  f90: {program: mpif90}
+  fc: {program: mpif90}
 criterion:
-  iterators:
     n_mpi:
       subtitle: n
       values: [1, 2, 3, 4]
@@ -12,7 +15,7 @@ group:
         n_omp: {values: null}
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
 runtime:
-  iterators:
+  criterions:
     n_mpi: {numeric: true, option: '-np '}
   plugin: !!binary |
     YVcxd2IzSjBJRzFoZEdnS1puSnZiU0J3WTNaekxuQnNkV2RwYm5NZ2FXMXdiM0owSUZCc2RXZHBi

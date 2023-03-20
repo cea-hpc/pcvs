@@ -1,10 +1,14 @@
 compiler:
-  commands: {cc: gcc, cxx: g++, f77: gfortran, f90: gfortran, fc: gfortran}
+  cc: {program: gcc}
+  cxx: {program: g++}
+  f77: {program: gfortran}
+  f90: {program: gfortran}
+  f08: {program: gfortran}
+  fc: {program: gfortran}
 criterion:
-  iterators:
-    n_omp:
-      subtitle: o
-      values: [1, 2, 4, 8]
+  n_omp:
+    subtitle: o
+    values: [1, 2, 4, 8]
 group:
   GRPMPI:
     run:
@@ -12,7 +16,7 @@ group:
         n_omp: {values: null}
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
 runtime:
-  iterators:
+  criterions:
     n_omp: {numeric: true, option: OMP_NUM_THREADS=, type: environment}
   plugin: !!binary |
     YVcxd2IzSjBJRzFoZEdnS1puSnZiU0J3WTNaekxuQnNkV2RwYm5NZ2FXMXdiM0owSUZCc2RXZHBi

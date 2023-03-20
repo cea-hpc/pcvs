@@ -1,20 +1,21 @@
 compiler:
-  commands: {cc: mpicc, cxx: mpicxx, f77: mpif77, f90: mpif90, fc: mpif90}
-  variants:
-    openmp: {args: -fopenmp}
+  cc: {program: "mpicc", variants: &var {openmp: {args: ['-fopenmp']}}}
+  cxx: {program: mpicxx, variants: *var}
+  f77: {program: mpif77, variants: *var}
+  f90: {program: mpif90, variants: *var}
+  fc: {program: mpif90, variants: *var}
 criterion:
-  iterators:
-    n_mpi:
-      subtitle: n
-      values: [2, 8]
-    n_omp:
-      subtitle: o
-      values: [2, 4]
+  n_mpi:
+    subtitle: n
+    values: [2, 8]
+  n_omp:
+    subtitle: o
+    values: [2, 4]
 group:
   GRPMPI:
     run:
       iterate:
-        n_omp: {values: null}
+  é      n_omp: {values: null}
   GRPOMP:
     run:
       iterate:
@@ -30,7 +31,7 @@ group:
         n_omp: {values: null}
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
 runtime:
-  iterators:
+  criterions:
     n_mpi: {numeric: true, option: '-np '}
     n_omp: {numeric: true, option: OMP_NUM_THREADS=, type: environment}
   plugin: !!binary |

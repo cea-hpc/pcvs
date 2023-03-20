@@ -12,8 +12,7 @@ program: ''
 # - Type of network to enable inter process communication
 # A single test is a combination of one single value picked up from
 # these components.
-iterators:
-        void:
-                option: ''
-                values: []
+criterions:
+    void:
+        option: ''
 

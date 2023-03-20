@@ -1,19 +1,22 @@
 compiler:
-  commands: {cc: mpicc, cxx: mpicxx, f77: mpif77, f90: mpif90, fc: mpif90}
+  cc: {program: mpicc}
+  cxx: {program: mpicxx}
+  f77: {program: mpif77}
+  f90: {program: mpif90}
+  fc: {program: mpif90}
 criterion:
-  iterators:
-    n_node:
-        subtitle: N
-        values: [1, 2, 3, 4]
-    n_mpi:
-      subtitle: n
+  n_node:
+      subtitle: N
       values: [1, 2, 3, 4]
-    n_core:
-      subtitle: c
-      values: [1, 2, 5, 8]
+  n_mpi:
+    subtitle: n
+    values: [1, 2, 3, 4]
+  n_core:
+    subtitle: c
+    values: [1, 2, 5, 8]
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}
 runtime:
-  iterators:
+  criterions:
     n_core: {numeric: true, option: '-c '}
     n_node: {numeric: true, option: 'N '}
     n_mpi: {numeric: true, option: '-n '}

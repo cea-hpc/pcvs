@@ -25,7 +25,11 @@ job_manager:
     args: ""
     wrapper: ""
   # Resource alloc & exec properties. Jobs will be spawned on remote nodes).
-  run:
+  remote:
+    program: "echo"
+    args: ""
+    wrapper: ""
+  batch:
     program: "echo"
     args: ""
     wrapper: ""

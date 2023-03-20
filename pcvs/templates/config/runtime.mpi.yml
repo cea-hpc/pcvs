@@ -12,7 +12,7 @@ program: mpirun
 # - Type of network to enable inter process communication
 # A single test is a combination of one single value picked up from
 # these components.
-iterators:
+criterions:
     # please use a short, without-space names
     n_mpi:
         # option known by the runtime to handle a value of this component

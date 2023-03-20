@@ -39,8 +39,9 @@ properties:
             - junit
             - json
             - yaml
+      job_timeout:
+        OneOf:
+        - {'type': null}
+        - {'type': 'integer'}
     additionalProperties: false
-    job_timeout:
-      OneOf:
-      - {'type': null}
-      - {'type': 'integer'}
+    

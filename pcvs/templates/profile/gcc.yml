@@ -1,3 +1,8 @@
 compiler:
-  commands: {cc: gcc, cxx: g++, f77: gfortran, f90: gfortran, fc: gfortran}
+  cc: {program: gcc}
+  cxx: {program: g++}
+  f77: {program: gfortran}
+  f90: {program: gfortran}
+  f08: {program: gfortran}
+  fc: {program: gfortran}
 machine: {concurrent_run: 4, cores_per_node: 4, name: localhost, nodes: 1}

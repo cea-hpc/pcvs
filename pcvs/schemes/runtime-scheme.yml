@@ -8,7 +8,7 @@ properties:
   plugin:
     media:
       binaryEncoding: base64
-  iterators:
+  criterions:
     type: object
     patternProperties:
       "^.*$":
