@@ -55,13 +55,13 @@ class TheConsole(Console):
         self._verbose = kwargs.get('verbose', 0)
         self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w")
         self.summary_table = dict()
-
+        err = kwargs.get('stderr', False)
         theme = Theme({
             "warning": "bold yellow",
             "danger": "bold red"
         })
 
-        super().__init__(color_system=self._color, theme=theme)
+        super().__init__(color_system=self._color, theme=theme, stderr=err)
         self._debugconsole = Console(file=self._debugfile, theme=theme,
                                      color_system=self._color,
                                      markup=self._color is not None)
@@ -311,9 +311,9 @@ class TheConsole(Console):
 console = None
 
 
-def init(color=True, verbose=0):
+def init(color=True, verbose=0, *args, **kwargs):
     global console
-    console = TheConsole(color=color, verbose=verbose)
+    console = TheConsole(color=color, verbose=verbose, *args, **kwargs)
 
 
 def detach_console(logfile=None):

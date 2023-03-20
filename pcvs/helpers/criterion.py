@@ -453,8 +453,8 @@ def initialize_from_system():
         MetaConfig.root.set_internal('crit_obj', {})
     else:
         # raw YAML objects
-        runtime_iterators = MetaConfig.root.runtime.iterators
-        criterion_iterators = MetaConfig.root.criterion.iterators
+        runtime_iterators = MetaConfig.root.runtime.criterions
+        criterion_iterators = MetaConfig.root.criterion
         it_to_remove = []
 
         # if a criterion defined in criterion.yaml but

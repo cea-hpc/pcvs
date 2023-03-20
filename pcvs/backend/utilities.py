@@ -96,8 +96,8 @@ def process_check_configs():
                 try:
                     obj.check()
                     token = io.console.utf('succ')
-                except jsonschema.exceptions.ValidationError as e:
-                    err_msg = base64.b64encode(str(e.message).encode('utf-8'))
+                except ValidationException.FormatError as e:
+                    err_msg = base64.b64encode(str(e.dbg).encode('utf-8'))
                     errors.setdefault(err_msg, 0)
                     errors[err_msg] += 1
                     io.console.debug(str(e))
@@ -122,10 +122,10 @@ def process_check_profiles():
             obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
-                obj.check()
+                obj.check(allow_legacy=False)
                 token = io.console.utf('succ')
-            except jsonschema.exceptions.ValidationError as e:
-                err_msg = base64.b64encode(str(e.message).encode('utf-8'))
+            except ValidationException.FormatError as e:
+                err_msg = base64.b64encode(str(e.dbg).encode('utf-8'))
                 errors.setdefault(err_msg, 0)
                 errors[err_msg] += 1
                 io.console.debug(str(e))

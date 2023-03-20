@@ -315,13 +315,13 @@ EOF
                     operator.mul,
                     [
                         len(v['values'])
-                        for v in MetaConfig.root.criterion.iterators.values()
+                        for v in MetaConfig.root.criterion.values()
                     ]
                 )
                 self._debug.setdefault('.system-values', {})
                 self._debug['.system-values'].setdefault('stats', {})
 
-                for c_k, c_v in MetaConfig.root.criterion.iterators.items():
+                for c_k, c_v in MetaConfig.root.criterion.items():
                     self._debug[".system-values"][c_k] = c_v['values']
                 self._debug[".system-values"]['stats']['theoric'] = sys_cnt
                 yml = YAML(typ='safe')

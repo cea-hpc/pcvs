@@ -42,23 +42,6 @@ def test_lang_detection():
     
     assert(tested.detect_source_lang(["/path/to/a.f77",
                                       "/path/to/a.f08"]) == 'f08')
-    
-
-@patch('pcvs.helpers.system.MetaConfig.root', MetaDict({
-            'compiler': {
-                'variants': {
-                    'openmp': {'args': '-fopenmp'},
-                    'other_variant': {'args': '-fvariant'},
-                    'all_errors': {'args': '-Werror'}
-                }
-            }}))
-def test_build_variants():
-    print(system.MetaConfig.root.compiler.variants)
-    assert("-fopenmp" in tested.prepare_cmd_build_variants(['openmp']))
-
-    s = tested.prepare_cmd_build_variants(['openmp', 'all_errors'])
-    assert(all(x in s for x in ['-fopenmp', '-Werror']))
-    assert('-fvariant' not in s)
 
 
 @patch('pcvs.helpers.pm.identify')

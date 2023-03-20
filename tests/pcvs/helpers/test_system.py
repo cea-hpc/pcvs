@@ -53,7 +53,7 @@ def test_bootstrap_runtime():
     obj = s.MetaConfig()
     obj.bootstrap_runtime({
         "program": "/path/to/rt",
-        "iterators": {
+        "criterions": {
             "n_mpi": {
                 "numeric": True
             }
@@ -65,7 +65,7 @@ def test_bootstrap_runtime():
     )
     assert(isinstance(obj.runtime, s.Config))
     assert(obj.runtime.program == "/path/to/rt")
-    assert(obj.runtime.iterators.n_mpi.numeric)
+    assert(obj.runtime.criterions.n_mpi.numeric)
     
     assert(isinstance(obj.runtime.package_manager.spack, list))
     assert(len(obj.runtime.package_manager.spack) == 1)

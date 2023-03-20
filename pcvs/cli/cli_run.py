@@ -271,6 +271,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
             raise click.BadOptionUsage(
                 "--profile", "Profile '{}' not found".format(val_cfg.default_profile))
         pf.load_from_disk()
+        pf.check()
 
         val_cfg.set_ifdef('pf_name', pf.full_name)
         val_cfg.set_ifdef('pf_hash', pf.get_unique_id())
