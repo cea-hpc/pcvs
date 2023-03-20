@@ -99,7 +99,7 @@ def check_if_key_matches(key, value, ref_array) -> tuple:
     for old_k, new_k in ref_array.items():
         # compile the regex (useful ?)
         r = re.compile(old_k)
-        if re.search(r, key) is not None:  # if the key exist
+        if re.fullmatch(r, key) is not None:  # if the key exist
             # CAUTION: we only parse the first match_obj iteration:
             # we do not consider a token to match multiple times in
             # the source key!
@@ -137,7 +137,6 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
         # in the latter case, a split is required to identify key & value
         # an array is returned as a single node can produe multiple new nodes
         (valid, dest_k) = check_if_key_matches(k, v, ref_array)
-
         if valid:
             io.console.info("Processing {}".format(k))
             # An empty array means the key does not exist in the new tree.
@@ -221,7 +220,7 @@ def print_version(ctx, param, value) -> None:
 
 @click.command("pcvs_convert", short_help="YAML to YAML converter")
 @click.option("-k", "--kind", "kind",
-              type=click.Choice(['compiler', 'runtime', 'environment', 'te'],
+              type=click.Choice(['compiler', 'runtime', 'environment', 'te', "profile"],
                                 case_sensitive=False),
               required=True, help="Select a kind to apply for the file")
 @click.option("-t", "--template", "template",
@@ -246,25 +245,36 @@ def print_version(ctx, param, value) -> None:
               help="Filepath where to put the converted YAML")
 @click.option("--stdout", "stdout", is_flag=True, default=False,
               help="Print the stdout nothing but the converted data")
+@click.option("--skip-unknown", "skip_unknown", default=False, is_flag=True,
+              help="Missing keys are ignored and kept as is in final output")
+@click.option("--in-place", "in_place", is_flag=True, default=False,
+              help="Write conversion back to the original file (DESTRUCTIVE)")
 @click.argument("input_file", type=click.Path(exists=True, dir_okay=False,
                                               readable=True, allow_dash=True))
 @click.pass_context
-def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template, stdout) -> None:
+def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template, stdout, skip_unknown, in_place) -> None:
     """
     Process the conversion from one YAML format to another.
     Conversion specifications are described by the SCHEME file.
     """
-    # Click specific-related
+    # Click specific-related²
     ctx.color = color
     kind = kind.lower()
-    io.init()
+    io.init(stderr=True)
     io.console.print_header("YAML Conversion")
+
+    if in_place and (stdout or out is not None):
+        raise click.BadOptionUsage("--stdout/--in-place", "Cannot use --in-place option with any other output options (--output/--stdout)")
+    elif in_place:
+        out = input_file
 
     if template is None and kind == "te":
         io.console.warn("\n".join([
             "If the TE file contains YAML aliases, the conversion may",
             "fail. Use the '--template' option to provide the YAML file",
             "containing these aliases"]))
+    if kind == "profile":
+        kind = ""
     # load the input file
     f = sys.stdin if input_file == '-' else open(input_file, 'r')
     try:
@@ -303,10 +313,10 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     # as modifiers may have created nested dictionaries:
     # => "flattening" again, but with no prefix (persistent from first)
     data_to_convert = flatten(data_to_convert, "")
-
+    
     # Finally, convert the original data to the final yaml dict
     io.console.print_item("Process the data")
-    final_data = process(data_to_convert)
+    final_data = process(data_to_convert, warn_if_missing=not(skip_unknown))
 
     # remove template key from the output to avoid polluting the caller
     io.console.print_item("Pruning templates from the final data")
