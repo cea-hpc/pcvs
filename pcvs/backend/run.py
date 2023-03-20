@@ -10,7 +10,7 @@ from subprocess import CalledProcessError
 from ruamel.yaml import YAML
 
 from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_CACHEDIR, NAME_BUILD_SCRATCH,
-                  NAME_BUILDFILE, NAME_BUILDIR, NAME_DEBUG_FILE, NAME_SRCDIR,
+                  NAME_BUILDFILE, NAME_BUILDIR, NAME_BUILD_CONF_SH, NAME_SRCDIR,
                   io, testing)
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
@@ -178,8 +178,8 @@ def __check_defined_program_validity():
         MetaConfig.root.machine.job_manager.allocate.program)
     utils.check_valid_program(
         MetaConfig.root.machine.job_manager.allocate.wrapper)
-    utils.check_valid_program(MetaConfig.root.machine.job_manager.run.program)
-    utils.check_valid_program(MetaConfig.root.machine.job_manager.run.wrapper)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.remote.program)
+    utils.check_valid_program(MetaConfig.root.machine.job_manager.remote.wrapper)
     utils.check_valid_program(
         MetaConfig.root.machine.job_manager.batch.program)
     utils.check_valid_program(
@@ -187,11 +187,11 @@ def __check_defined_program_validity():
     return
     # TODO: need to handle package_manager commands to process below
     # maybe a dummy testfile should be used
-    utils.check_valid_program(MetaConfig.root.compiler.commands.cc)
-    utils.check_valid_program(MetaConfig.root.compiler.commands.cxx)
-    utils.check_valid_program(MetaConfig.root.compiler.commands.fc)
-    utils.check_valid_program(MetaConfig.root.compiler.commands.f77)
-    utils.check_valid_program(MetaConfig.root.compiler.commands.f90)
+    utils.check_valid_program(MetaConfig.root.compiler.cc.program)
+    utils.check_valid_program(MetaConfig.root.compiler.cxx.program)
+    utils.check_valid_program(MetaConfig.root.compiler.fc.program)
+    utils.check_valid_program(MetaConfig.root.compiler.f77.program)
+    utils.check_valid_program(MetaConfig.root.compiler.f90.program)
     utils.check_valid_program(MetaConfig.root.runtime.program)
 
 
@@ -367,7 +367,7 @@ def build_env_from_configuration(current_node, parent_prefix="pcvs"):
     This function is called recursively to walk through the whole tree.
 
     :example:
-        The `compiler.commands.cc` config node become `$compiler_commands_cc=<...>`
+        The `compiler.cc` config node become `$compiler_cc_program=<...>`
 
     :param current_node: current node to flatten
     :type current_node: dict
@@ -410,11 +410,11 @@ def process_dyn_setup_scripts(setup_files):
     err = []
     io.console.info("Convert configuration to Shell variables")
     env = os.environ.copy()
-    env.update(build_env_from_configuration(MetaConfig.root))
+    env.update()
+    env_config = build_env_from_configuration(MetaConfig.root)
 
-    env_script = os.path.join(MetaConfig.root.validation.output, 'conf.env')
-    with open(env_script, 'w') as fh:
-        fh.write(utils.str_dict_as_envvar(env))
+    with open(os.path.join(MetaConfig.root.validation.output, NAME_BUILD_CONF_SH), 'w') as fh:
+        fh.write(utils.str_dict_as_envvar(env_config))
         fh.close()
 
     io.console.info("Iteration over files")
@@ -509,6 +509,7 @@ def process_static_yaml_files(yaml_files):
             obj.process()
             obj.flush_sh_file()
         except Exception as e:
+            #raise e
             err.append((f, e))
             io.console.info("{} (failed to parse): {}".format(f, e))
     return err
@@ -648,7 +649,7 @@ def dup_another_build(build_dir, outdir):
                 utils.copy_file(src, dest)
 
     # other files
-    for f in ('conf.env'):
+    for f in (NAME_BUILD_CONF_SH):
         src = os.path.join(build_dir, f)
         dest = os.path.join(outdir,
                             os.path.relpath(
