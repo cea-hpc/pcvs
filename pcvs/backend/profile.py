@@ -1,3 +1,4 @@
+import subprocess
 import base64
 import glob
 import os
@@ -236,19 +237,41 @@ class Profile:
         with open(filepath, "r") as fh:
             self.fill(YAML(typ='safe').load(fh))
 
-    def check(self):
+    def check(self, allow_legacy=True):
         """Ensure profile meets scheme requirements, as a concatenation of 5
         configuration block schemes.
 
         :raises FormatError: A 'kind' is missing from
             profile OR incorrect profile.
         """
-        for kind in config.CONFIG_BLOCKS:
-            # if kind not in self._details:
-            #    raise ValidationException.FormatError(
-            #        "Missing '{}' in profile".format(kind))
-            system.ValidationScheme(kind).validate(
-                self._details[kind], filepath=self._name)
+        try:
+            for kind in config.CONFIG_BLOCKS:
+                # if kind not in self._details:
+                #    raise ValidationException.FormatError(
+                #        "Missing '{}' in profile".format(kind))
+                system.ValidationScheme(kind).validate(
+                    self._details[kind], filepath=self._name)
+        except ValidationException.FormatError as e:
+            if not allow_legacy:
+                raise e
+            # Is the profile a legacy format ?
+            # Attempt to convert it on the fly
+            proc = subprocess.Popen(
+                "pcvs_convert '{}' --stdout -k profile --skip-unknown".format(
+                    self._file),
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                shell=True)
+            
+            fds = proc.communicate()
+            if proc.returncode != 0:
+                raise e
+            converted_data = YAML(typ='safe').load(fds[0].decode('utf-8'))
+            self.fill(converted_data)
+            self.check(allow_legacy=False)
+            io.console.warning("Legacy format for profile '{}'".format(self._name))
+            io.console.warning("Please consider updating it with `pcvs_convert -k profile`")
+            
 
     def flush_to_disk(self):
         """Write down profile to disk.
