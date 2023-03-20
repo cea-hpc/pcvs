@@ -245,6 +245,13 @@ class Profile:
             profile OR incorrect profile.
         """
         try:
+            err_dbg = list()
+            for k in self._details.keys():
+                if k not in config.CONFIG_BLOCKS:
+                    err_dbg.append(k)
+            if err_dbg:
+                raise ValidationException.FormatError("Unknown kind in Profile", invalid_kinds=err_dbg)
+
             for kind in config.CONFIG_BLOCKS:
                 # if kind not in self._details:
                 #    raise ValidationException.FormatError(
@@ -272,7 +279,6 @@ class Profile:
             io.console.warning("Legacy format for profile '{}'".format(self._name))
             io.console.warning("Please consider updating it with `pcvs_convert -k profile`")
             
-
     def flush_to_disk(self):
         """Write down profile to disk.
 
@@ -280,7 +286,7 @@ class Profile:
         schemes.
         """
         self._retrieve_file()
-        self.check()
+        #self.check()
 
         # just in case the block subprefix does not exist yet
         prefix_file = os.path.dirname(self._file)
@@ -346,17 +352,14 @@ class Profile:
         edited_stream = click.edit(
             stream, extension=".yml", require_save=True)
         if edited_stream is not None:
+            edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
+            self.fill(edited_yaml)
+            self.flush_to_disk()
             try:
-                edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
-                self.fill(edited_yaml)
                 self.check()
             except Exception as e:
-                fname = "./rej{}-{}.yml".format(
-                    random.randint(0, 1000), self.full_name)
-                with open(fname, "w") as fh:
-                    fh.write(edited_stream)
                 raise e
-            self.flush_to_disk()
+            
 
     def edit_plugin(self):
         """Edit the 'runtime.plugin' section of the current profile.
@@ -400,10 +403,6 @@ class MyPlugin(Plugin):
                     edited_code.encode('utf-8'))
                 self.flush_to_disk()
         except Exception as e:
-            fname = "./rej{}-{}-plugin.yml".format(
-                random.randint(0, 1000), self.full_name)
-            with open(fname, "w") as fh:
-                fh.write(edited_code)
             raise e
 
     def split_into_configs(self, prefix, blocklist, scope=None):

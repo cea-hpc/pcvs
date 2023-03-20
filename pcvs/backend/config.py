@@ -344,16 +344,13 @@ class ConfigurationBlock:
         edited_stream = click.edit(
             stream, extension=".yml", require_save=True)
         if edited_stream is not None:
+            edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
+            system.ValidationScheme(self._kind).validate(edited_yaml)
+            self.fill(edited_yaml)
+            self.flush_to_disk()
             try:
-                edited_yaml = MetaDict(YAML(typ='safe').load(edited_stream))
-                system.ValidationScheme(self._kind).validate(edited_yaml)
-                self.fill(edited_yaml)
-                self.flush_to_disk()
+                self.check()
             except Exception as e:
-                fname = "./rej{}-{}.yml".format(
-                    random.randint(0, 1000), self.full_name)
-                with open(fname, "w") as fh:
-                    fh.write(edited_stream)
                 raise e
 
     def edit_plugin(self) -> None:
