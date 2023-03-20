@@ -2,6 +2,7 @@ import copy
 import os
 import re
 
+import pcvs
 from pcvs import testing
 from pcvs.helpers import pm, utils
 from pcvs.helpers.criterion import Criterion, Serie
@@ -43,32 +44,38 @@ def detect_source_lang(array_of_files):
     # order matters: if sources contains multiple languages, the first
     # appearing in this list will be considered as the main language
     for i in ['f08', 'f03', 'f95', 'f90', 'f77', 'fc', 'cxx', 'cc']:
-        if i in detect and i in MetaConfig.root.compiler.commands:
+        if i in detect and i in MetaConfig.root.compiler:
             return i
     return 'cc'
 
 
-def prepare_cmd_build_variants(variants=[]):
-    """Build the list of extra args to add to a test using variants.
-
-    Each defined variant comes with an ``arg`` option. When tests enable this
-    variant, these definitions are additioned to test compilation command. For
-    instance, the variant ``omp`` defines `-fopenmp` within GCC-based profile.
-    When a test requests to be built we ``omp`` variant, the flag is appended to
-    cflags.
-
-    :param variants: the list of variants to load
-    :type variants: list
-    :return: the string as the concatenation of variant args
-    :rtype: str
+def extract_compiler_config(lang, variants):
     """
-    s = ""
-    variant_def = MetaConfig.root.compiler.variants
-    for i in variants:
+    Build resource to compile based on language and variants involved.
 
-        if i in variant_def.keys():
-            s = "{} {}".format(s, variant_def[i].args)
-    return s
+    :param lang: target language
+    :type lang: str
+    :param variants: list of enabled variants
+    :type variants: list
+    :return: the program, its args and env modifiers (in that order)
+    :rtype: tuple
+    """
+    if not lang or lang not in MetaConfig.root.compiler:
+        raise Exception()
+    
+    config = MetaConfig.root.compiler[lang]
+    for v in variants:
+        if v in config.variants:
+            for k, v in config.variants[v].items():
+                if k == 'program':
+                    config[k] = v
+                else:
+                    config.setdefault(k, list())
+                    config[k] += v
+        else:
+            return (None, None, None)
+                    
+    return (config.program, config.args, config.envs)
 
 
 def build_job_deps(deps_node, pkg_label, pkg_prefix):
@@ -313,6 +320,9 @@ class TEDescriptor:
             for _, elt in self._program_criterion.items():
                 elt.expand_values()
 
+    
+        
+
     def __build_from_sources(self):
         """How to create build tests from a collection of source files.
 
@@ -325,17 +335,20 @@ class TEDescriptor:
             binary = self._build.sources.binary
         elif self._run.program:
             binary = self._run.program
+
         self._build.sources.binary = binary
 
-        command = "{cc} {var} {cflags} {files} {ldflags} {out}".format(
-            cc=MetaConfig.root.compiler.commands.get(lang, ''),
-            var=prepare_cmd_build_variants(self._build.variants),
+        program, args, envs = extract_compiler_config(lang, self._build.variants)
+        
+        command = "{cc} {cflags} {files} {ldflags} {args} {out}".format(
+            cc=program,
+            args=" ".join(args),
             cflags=self._build.get('cflags', ''),
             files=" ".join(self._build.files),
             ldflags=self._build.get('ldflags', ''),
             out="-o {}".format(os.path.join(self._buildir, binary))
         )
-        return command
+        return (command, envs)
 
     def __build_from_makefile(self):
         """How to create build tests from a Makefile.
@@ -351,6 +364,7 @@ class TEDescriptor:
             basepath = os.path.dirname(self._build.files[0])
             command.append("-f {}".format(" ".join(self._build.files)))
 
+        compiler, args, envs = extract_compiler_config("cc", self._build.variants)
         # build the 'make' command
         command.append(
             '-C {path} {target} '
@@ -358,16 +372,16 @@ class TEDescriptor:
             'PCVS_CFLAGS="{var} {cflags}" PCVS_LDFLAGS="{ldflags}"'.format(
                 path=basepath,
                 target=self._build.make.get('target', ''),
-                cc=MetaConfig.root.compiler.commands.get('cc', ''),
-                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
-                fc=MetaConfig.root.compiler.commands.get('fc', ''),
-                cu=MetaConfig.root.compiler.commands.get('cu', ''),
-                var=prepare_cmd_build_variants(self._build.variants),
+                cc=MetaConfig.root.compiler.get('cc', {'program': "echo"}).program,
+                cxx=MetaConfig.root.compiler.commands.get('cxx', {'program': "echo"}).program,
+                fc=MetaConfig.root.compiler.commands.get('fc', {'program': "echo"}).program,
+                cu=MetaConfig.root.compiler.commands.get('cu', {'program': "echo"}).program,
+                var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', '')
             )
         )
-        return " ".join(command)
+        return (" ".join(command), envs)
 
     def __build_from_cmake(self):
         """How to create build tests from a CMake project.
@@ -380,6 +394,8 @@ class TEDescriptor:
             command.append(self._build.files[0])
         else:
             command.append(self._srcdir)
+            
+        _, args, envs = extract_compiler_config("cc", self._build.variants)
         command.append(
             r"-DCMAKE_C_COMPILER='{cc}' -DCMAKE_CXX_COMPILER='{cxx}' "
             r"-DCMAKE_FC_COPILER='{fc}' -DCMAKE_CUDA_COMPILER='{cu}' "
@@ -388,11 +404,11 @@ class TEDescriptor:
             r"-DCMAKE_BINARY_DIR='{build}' "
             r"-DCMAKE_MODULE_LINKER_FLAGS='{ldflags}' "
             r"-DCMAKE_SHARED_LINKER_FLAGS='{ldflags}'".format(
-                cc=MetaConfig.root.compiler.commands.get('cc', ''),
-                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
-                fc=MetaConfig.root.compiler.commands.get('fc', ''),
-                cu=MetaConfig.root.compiler.commands.get('cu', ''),
-                var=prepare_cmd_build_variants(self._build.variants),
+                cc=MetaConfig.root.compiler.commands.get('cc', {'program': "echo"}).program,
+                cxx=MetaConfig.root.compiler.commands.get('cxx', {'program': "echo"}).program,
+                fc=MetaConfig.root.compiler.commands.get('fc', {'program': "echo"}).program,
+                cu=MetaConfig.root.compiler.commands.get('cu', {'program': "echo"}).program,
+                var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
                 build=self._buildir
@@ -402,8 +418,11 @@ class TEDescriptor:
             command.append("-D"+' -D'.join(self._build['cmake']['vars']))
 
         self._build.files = [os.path.join(self._buildir, "Makefile")]
-        next_command = self.__build_from_makefile()
-        return " && ".join([" ".join(command), next_command])
+        tmp =  self.__build_from_makefile()
+        next_command = tmp[0]
+        for k, v in tmp[1].items():
+            envs[k] = v
+        return (" && ".join([" ".join(command), next_command]), envs)
 
     def __build_from_autotools(self):
         """How to create build tests from a Autotools-based project.
@@ -426,6 +445,8 @@ class TEDescriptor:
                 "autogen.sh"
             )
             command.append("{} && ".format(autogen_path))
+            
+        _, args, envs = extract_compiler_config("cc", self._build.variants)
 
         command.append(
             r"{configure} "
@@ -437,7 +458,7 @@ class TEDescriptor:
                 cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
                 fc=MetaConfig.root.compiler.commands.get('fc', ''),
                 cu=MetaConfig.root.compiler.commands.get('cu', ''),
-                var=prepare_cmd_build_variants(self._build.variants),
+                var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
             )
@@ -449,9 +470,22 @@ class TEDescriptor:
         next_command = self.__build_from_makefile()
 
         # TODO: why not creating another test, with a dep on this one ?
-        return " && ".join([" ".join(command), next_command])
+        return (" && ".join([" ".join(command), next_command]), envs)
 
-    def __build_command(self):
+    def __build_from_user_script(self):
+        command = []
+        env = []
+        
+        command = self._build.custom.get('program', 'echo')
+        # args not relevant as cflags/ldflags can be used instead
+        env = self._build.custom.get('envs', [])
+        
+        if not os.path.isabs(command):
+            command = os.path.join(self._buildir, command)
+            
+        return (". {} && {}".format(os.path.join(MetaConfig.root.validation.output, pcvs.NAME_BUILD_CONF_SH), command), env)
+
+    def __build_exec_process(self):
         """Drive compilation command generation based on TE format.
 
         :return: the command to be used.
@@ -463,6 +497,8 @@ class TEDescriptor:
             return self.__build_from_cmake()
         elif 'make' in self._build:
             return self.__build_from_makefile()
+        elif 'custom' in self._build:
+            return self.__build_from_user_script()
         else:
             return self.__build_from_sources()
 
@@ -492,7 +528,7 @@ class TEDescriptor:
 
         tags = ["compilation"] + self._tags
 
-        command = self.__build_command()
+        command, env = self.__build_exec_process()
 
         # count number of built tests
         self._effective_cnt += 1
@@ -503,6 +539,7 @@ class TEDescriptor:
             label=self._te_label,
             subtree=self._te_subtree,
             command=command,
+            environment=env,
             tags=tags,
             job_deps=job_deps,
             mod_deps=mod_deps,
