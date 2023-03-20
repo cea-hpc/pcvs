@@ -42,16 +42,16 @@ properties:
     <<: *compiler_properties
   accl:
     <<: *compiler_properties
-package_manager:
-  type: object
-  properties:
-    spack:
-      type: array
-      items:
-        type: string
-    module:
-      type: array
-      items:
+  package_manager:
+    type: object
+    properties:
+      spack:
+        type: array
+        items:
           type: string
-  additionalProperties: false
+      module:
+        type: array
+        items:
+            type: string
+    additionalProperties: false
 additionalProperties: false

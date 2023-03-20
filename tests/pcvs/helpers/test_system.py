@@ -14,12 +14,12 @@ from pcvs.helpers.system import MetaDict
 def test_bootstrap_compiler():
     obj = s.MetaConfig()
     obj.bootstrap_compiler({
-        "commands": {
-            "cc": "/path/to/cc"
-        },
-        "variants": {
-            "openmp": {
-                "args": "-fopenmp"
+        "cc": {
+            "program": "/path/to/cc",
+            "variants": {
+                "openmp": {
+                    "args": "-fopenmp"
+                }
             }
         },
         "package_manager": {
@@ -28,8 +28,8 @@ def test_bootstrap_compiler():
         }}
     )
     assert(isinstance(obj.compiler, s.Config))
-    assert(obj.compiler.commands.cc == "/path/to/cc")
-    assert(obj.compiler.variants.openmp.args == "-fopenmp")
+    assert(obj.compiler.cc.program == "/path/to/cc")
+    assert(obj.compiler.cc.variants.openmp.args == "-fopenmp")
     
     assert(isinstance(obj.compiler.package_manager.spack, list))
     assert(len(obj.compiler.package_manager.spack) == 1)
@@ -97,28 +97,28 @@ def init_config():
 def test_validate(kw_keys):
     vs = system.Config()
     compiler = {
-        "commands": {
-            "cc": "example",
-            "cxx": "example",
-            "fc": "example",
-            "f77": "example",
-            "f90" : "example",
+        "cc": {
+            "program": "example",
+            "variants": {
+                "openmp": {"args": "example"},
+                "tbb": {"args": "example"},
+                "cuda": {"args" : "example"},
+                "strict": {"args" : "example"},
+            },
         },
-        "variants": {
-            "openmp": {"args": "example"},
-            "tbb": {"args": "example"},
-            "cuda": {"args" : "example"},
-            "strict": {"args" : "example"}
-        },
+        "cxx": {"program": "example"},
+        "fc": {"program": "example"},
+        "f77": {"program": "example"},
+        "f90" : {"program": "example"},
         "package_manager": {
             "spack": ["example"],
             "module": ["example"]
         }
-    }    
+    }
     runtime = {
         "program": "example",
         "args": "example",
-        "iterators": {
+        "criterions": {
             "iterator_name": {
                 "option": "example",
                 "numeric": True,
@@ -138,11 +138,9 @@ def test_validate(kw_keys):
         }
     }
     criterion = {
-        "iterators":{
-            "example":{
-                "values": [1,2],
-                "subtitle": "example"
-            }
+        "example":{
+            "values": [1,2],
+            "subtitle": "example"
         }
     }
     criterion_wrong = {

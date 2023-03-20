@@ -372,10 +372,10 @@ class TEDescriptor:
             'PCVS_CFLAGS="{var} {cflags}" PCVS_LDFLAGS="{ldflags}"'.format(
                 path=basepath,
                 target=self._build.make.get('target', ''),
-                cc=MetaConfig.root.compiler.get('cc', {'program': "echo"}).program,
-                cxx=MetaConfig.root.compiler.commands.get('cxx', {'program': "echo"}).program,
-                fc=MetaConfig.root.compiler.commands.get('fc', {'program': "echo"}).program,
-                cu=MetaConfig.root.compiler.commands.get('cu', {'program': "echo"}).program,
+                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
+                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
+                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
+                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
                 var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', '')
@@ -404,10 +404,10 @@ class TEDescriptor:
             r"-DCMAKE_BINARY_DIR='{build}' "
             r"-DCMAKE_MODULE_LINKER_FLAGS='{ldflags}' "
             r"-DCMAKE_SHARED_LINKER_FLAGS='{ldflags}'".format(
-                cc=MetaConfig.root.compiler.commands.get('cc', {'program': "echo"}).program,
-                cxx=MetaConfig.root.compiler.commands.get('cxx', {'program': "echo"}).program,
-                fc=MetaConfig.root.compiler.commands.get('fc', {'program': "echo"}).program,
-                cu=MetaConfig.root.compiler.commands.get('cu', {'program': "echo"}).program,
+                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
+                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
+                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
+                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
                 var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
@@ -454,10 +454,10 @@ class TEDescriptor:
             r"FC='{fc}' NVCC='{cu}' "
             r"CFLAGS='{var} {cflags}' LDFLAGS='{ldflags}' ".format(
                 configure=configure_path,
-                cc=MetaConfig.root.compiler.commands.get('cc', ''),
-                cxx=MetaConfig.root.compiler.commands.get('cxx', ''),
-                fc=MetaConfig.root.compiler.commands.get('fc', ''),
-                cu=MetaConfig.root.compiler.commands.get('cu', ''),
+                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
+                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
+                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
+                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
                 var=" ".join(args),
                 cflags=self._build.get('cflags', ''),
                 ldflags=self._build.get('ldflags', ''),
@@ -467,7 +467,10 @@ class TEDescriptor:
             command.append(" ".join(self._build['autotools']['params']))
 
         self._build.files = [os.path.join(self._buildir, "Makefile")]
-        next_command = self.__build_from_makefile()
+        tmp = self.__build_from_makefile()
+        next_command = tmp[0]
+        for k, v in tmp[1].items():
+            envs[k] = v
 
         # TODO: why not creating another test, with a dep on this one ?
         return (" && ".join([" ".join(command), next_command]), envs)

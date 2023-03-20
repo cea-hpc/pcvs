@@ -31,7 +31,7 @@ def test_simple_run():
 
         ret = click_call('-k', 'te', '--stdout', f)
         assert(ret.exit_code == 0)
-        assert("Converted data written into <stdout>" in ret.stdout)
+        assert("Converted data written into <stdout>" in ret.stderr)
         assert("simple_counter_std_thread:" in ret.stdout)
 
         ret = click_call('-k', 'te', f)

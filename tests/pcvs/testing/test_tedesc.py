@@ -13,7 +13,6 @@ from pcvs.testing import tedesc as tested
 
 @patch('pcvs.helpers.system.MetaConfig.root', MetaDict({
             'compiler': {
-                'commands': {
                     'cc': 'CC',
                     'cxx': 'CXX',
                     'fc': 'FC',
@@ -23,7 +22,7 @@ from pcvs.testing import tedesc as tested
                     'f03': 'F03',
                     'f08': 'F08'
                 }
-        }}))
+        }))
 def test_lang_detection():
     assert(tested.detect_source_lang(["/path/to/nothing.valid"]) == 'cc')
     assert(tested.detect_source_lang(["/path/to/a.c"]) == 'cc')
@@ -75,6 +74,9 @@ def test_handle_job_deps(mock_id):
     },
     "group": {
         "GRPSERIAL": {}
+    },
+    "compiler": {
+      "cc": {'program': "/path/to/cc"}
     },
     "criterion": {
         "n_mpi": {"option": "-n ", "numeric": True, "values": [1, 2, 3, 4]}}
@@ -139,6 +141,9 @@ def test_tedesc_regular():
     },
     "group": {
         "GRPSERIAL": {}
+    },
+    "compiler": {
+      "cc": {'program': "/path/to/cc"}
     },
     "criterion": {"n_mpi": {"option": "-n ", "numeric": True, "values": [1, 2, 3, 4]}}
 }))
