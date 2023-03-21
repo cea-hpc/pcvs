@@ -150,6 +150,9 @@ class Test:
         return self._id['jid']
 
     @property
+    def basename(self) -> str:
+        return Test.compute_fq_name(self._id['label'], self._id['subtree'], self._id['te_name'])
+    @property
     def tags(self):
         """Getter for the full list of tags.
 

@@ -82,6 +82,8 @@ class Orchestrator:
             self.start_new_runner()
 
         self._manager.resolve_deps()
+        if io.console.verbose:
+            self._manager.print_dep_graph(outfile="./graph.dat")
 
         nb_nodes = self._max_res
         last_progress = 0

@@ -25,6 +25,7 @@ class Manager:
     :type _count: dict 
     """
     job_hashes = dict()
+    dep_rules = dict()
 
     def __init__(self, max_size=0, builder=None, publisher=None):
         """constructor method.
@@ -89,6 +90,16 @@ class Manager:
         if hashed not in self.job_hashes:
             self.job_hashes[hashed] = job
             self._count.total += 1
+            self.save_dependency_rule(job.basename, job)
+            
+    def save_dependency_rule(self, pattern, jobs):
+        assert(isinstance(pattern, str))
+        
+        if not isinstance(jobs, list):
+            jobs = [jobs]
+            
+        self.dep_rules.setdefault(pattern, list())
+        self.dep_rules[pattern] += jobs
         
     def get_count(self, tag="total"):
         """Access to a particular counter.
@@ -110,6 +121,20 @@ class Manager:
             for job in joblist:
                 self.resolve_single_job_deps(job, list())
 
+    def print_dep_graph(self, outfile=None):
+        s = ["digraph D {"]
+        for joblist in self._dims.values():
+            for job in joblist:
+                for d in job.get_dep_graph().keys():
+                    s.append('"{}"->"{}";'.format(job.name, d))
+        s.append("}")
+        
+        if not outfile:
+            print("\n".join(s))
+        else:
+            with open(outfile, 'w') as fh:
+                fh.write("\n".join(s))
+
     def resolve_single_job_deps(self, job, chain):
         """Resolve the dependency graph for a single test.
 
@@ -128,21 +153,23 @@ class Manager:
         for depname in job.job_depnames:
 
             hashed_dep = Test.get_jid_from_name(depname)
-            if hashed_dep not in self.job_hashes:
+            if hashed_dep in self.job_hashes:
+                job_dep_list = [self.job_hashes[hashed_dep]]
+            elif depname in self.dep_rules:
+                job_dep_list = self.dep_rules[depname]
+            else:
                 raise OrchestratorException.UndefDependencyError(depname)
 
-            job_dep = self.job_hashes[hashed_dep]
-
-            if job_dep.name in chain:
-                raise OrchestratorException.CircularDependencyError(
-                    chain)
-            
-            # without copying the chain, resolution of siblings deps will alter
-            # the same list --> a single dep may appear multiple time and raise
-            # a false CircularDep
-            # solution: resolve subdep path in their own chain :)
-            self.resolve_single_job_deps(job_dep, list(chain))
-            job.resolve_a_dep(depname, job_dep)
+            for job_dep in job_dep_list:
+                if job_dep.name in chain:
+                    raise OrchestratorException.CircularDependencyError(chain)
+                
+                # without copying the chain, resolution of siblings deps will alter
+                # the same list --> a single dep may appear multiple time and raise
+                # a false CiprcularDep
+                # solution: resolve subdep path in their own chain :)
+                self.resolve_single_job_deps(job_dep, list(chain))
+                job.resolve_a_dep(depname, job_dep)
 
     def get_leftjob_count(self):
         """Return the number of jobs remainig to be executed.
