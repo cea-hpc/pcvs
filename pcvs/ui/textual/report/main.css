@@ -1,0 +1,92 @@
+#error-log
+{
+	text-style: bold;
+	color: $error;
+}
+
+ActiveSessionList, FileBrowser {
+	height: 70%;
+	margin: 1 1;
+	align: center middle;
+	content-align: center middle;
+}
+
+
+#session-pick-done, #session-pick-cancel
+{
+	width: 40%;
+	margin: 2 2;
+	/* content-align: center middle; */
+}
+
+#add-session{
+	width: 80%;
+	margin: 2 2;
+	/* content-align: center middle; */
+}
+
+ModalScreen
+{
+	align: center middle;
+	content-align: center middle;
+}
+
+#session-infos
+{
+	height: 70%;
+	border: solid round $secondary;
+	grid-size: 2;
+	grid-gutter: 1 2;
+}
+
+
+#session-list-screen
+{
+	grid-size: 2;
+	grid-gutter: 1 2;
+	margin: 2 2;
+	padding: 2 2;
+	width: 70%;
+	height: 70%;
+	border: solid round $secondary;
+	align: center middle;
+	content-align: center middle;
+}
+
+PleaseWaitScreen {
+	margin: 2;
+	padding: 2;
+	border: solid round $secondary;
+}
+
+SingleJobViewer Static {
+	border: solid round $secondary;
+}
+TextLog {
+	border: solid round $secondary;
+}
+
+#dialog {
+	grid-size: 2;
+	grid-gutter: 1 2;
+	margin: 1 2;
+	padding: 1 2;
+	width: 40;
+	height: 10;
+	border: solid round $secondary;
+}
+
+ExitConfirmScreen {
+    align: center middle;
+}
+
+#question {
+	column-span: 2;
+	width: 100%;
+	height: 100%;
+}
+
+SingleJobViewer {
+	dock: bottom;
+	height: 40%;
+}

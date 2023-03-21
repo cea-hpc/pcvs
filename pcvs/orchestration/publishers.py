@@ -704,6 +704,7 @@ class BuildDirectoryManager:
         self._path = build_dir
         self._extras = list()
         self._results = None
+        self._archive_path = None
         self._config = None
         self._scratch = os.path.join(build_dir, pcvs.NAME_BUILD_SCRATCH)
         old_archive_dir = os.path.join(build_dir, pcvs.NAME_BUILD_ARCHIVE_DIR)
@@ -749,7 +750,7 @@ class BuildDirectoryManager:
         :return: the build path
         :rtype: str
         """
-        return self._path
+        return self._archive_path if self._archive_path else self._path
 
     def prepare(self, reuse=False):
         """
@@ -1011,6 +1012,7 @@ class BuildDirectoryManager:
         assert(len(d) == 1)
         hdl = BuildDirectoryManager(build_dir=os.path.join(path, d[0]))
         hdl.load_config()
+        hdl._archive_path = archive_path
         return hdl
 
     def finalize(self):

@@ -1,0 +1,92 @@
+DataLoadingScreen Grid {
+	grid-size: 2;
+	grid-gutter: 1 2;
+	grid-columns: 2fr 1fr;
+	margin: 1 1;
+	padding: 1 1;
+	width: 70%;
+	height: 30;
+	content-align: center middle;
+	align: center middle;
+	border: solid round cyan;
+}
+
+DataLoadingScreen Container {
+	align: center middle;
+	content-align: center middle;
+	margin: 1 2;
+	padding: 1 2;
+	width: 100%;
+	height: 100%;
+}
+
+#filepicker {
+	row-span: 2;
+}
+
+#load_message {
+	align: center middle;
+	width: 100%;
+	height: 100%;
+	border: solid round $error;
+}
+
+DataLoadingScreen Container {
+	align: center middle;
+}
+
+#main {
+	grid-size: 2;
+	grid-columns: 1fr 2fr;
+}
+
+#jobs {
+	row-span: 2;
+}
+
+.box {
+	border: solid green;
+	height: 100%;
+}
+#dialog {
+	grid-size: 2;
+	grid-gutter: 1 2;
+	margin: 1 2;
+	padding: 1 2;
+	width: 40;
+	height: 10;
+	border: solid round cyan;
+	content-align: center middle;
+}
+
+#question {
+	column-span: 2;
+	width: 100%;
+	height: 100%;
+	content-align: center middle;
+}
+
+Button {
+	width: 10%;
+}
+
+PleaseWait {
+	layer: above;
+	width: 40;
+	height: 5;
+	align: center middle;
+	border: solid red;
+	content-align: center middle;
+}
+
+.hidden {
+	visibility: hidden;
+}
+.visible {
+	visibility: visible;
+}
+
+
+App {
+	layers: below above;
+}

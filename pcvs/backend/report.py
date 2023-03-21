@@ -78,7 +78,7 @@ class Report:
             )
         return hdl
 
-    def add_session(self, path) -> None:
+    def add_session(self, path) -> BuildDirectoryManager:
         """
         Insert new session to be managed.
 
@@ -89,6 +89,7 @@ class Report:
         hdl.load_config()
         hdl.init_results()
         self._sessions[hdl.sid] = hdl
+        return hdl
 
     def load_alive_sessions(self) -> None:
         """

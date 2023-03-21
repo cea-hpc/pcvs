@@ -2,7 +2,7 @@ import os
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import report as pvReport
-#from pcvs.gui.curses import viewer
+from pcvs.ui.textual import report as gui
 from pcvs.helpers import utils
 
 try:
@@ -22,7 +22,6 @@ def report(ctx, path_list, static):
      Listens by default to http://localhost:5000/"""
     if not path_list:
         path_list = [os.getcwd()]
-
     inputs = list()
     for prefix in path_list:
         # if a dir is given BU does not point to a valid build dir,
@@ -36,7 +35,10 @@ def report(ctx, path_list, static):
         else:
             raise click.BadArgumentUsage(
                 '{} is not a build directory.'.format(prefix))
-
+    
+    if ctx.obj['tui']:
+        return gui.start_app(inputs)
+    
     if static:
         # server old-style JCRHONOSS pages after JSON transformation
         for prefix in inputs:
