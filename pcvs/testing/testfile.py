@@ -221,7 +221,7 @@ class TestFile:
                 "pColl").invoke_plugins(Plugin.Step.TDESC_AFTER)
 
             # register debug informations relative to the loaded TEs
-            #self._debug[k] = td.get_debug()
+            self._debug[k] = td.get_debug()
 
     def flush_sh_file(self):
         """Store the given input file into their destination."""
@@ -308,7 +308,7 @@ EOF
 
     def generate_debug_info(self):
         """Dump debug info to the appropriate file for the input object."""
-        if len(self._debug) and io.console.has_verb_level('info'):
+        if len(self._debug) and io.console.verbose:
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
                 # compute max number of combinations from system iterators
                 sys_cnt = functools.reduce(

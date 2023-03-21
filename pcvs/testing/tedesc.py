@@ -73,7 +73,7 @@ def extract_compiler_config(lang, variants):
                     config.setdefault(k, list())
                     config[k] += v
         else:
-            return (None, None, None)
+            return (None, [], [])
                     
     return (config.program, config.args, config.envs)
 

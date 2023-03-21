@@ -14,6 +14,9 @@
     sources:
       # program binary (if needed)
       binary: "a.out"
+    custom:
+      program: "myscript.sh"
+      envs: ["VAR1=value", "VAR2=value"]
     # dependency scheme
     depends_on: ["this_is_another_test"]
     # extra cflags
