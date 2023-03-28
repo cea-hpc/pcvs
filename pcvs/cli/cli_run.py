@@ -275,11 +275,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
 
         val_cfg.set_ifdef('pf_name', pf.full_name)
         val_cfg.set_ifdef('pf_hash', pf.get_unique_id())
-        global_config.bootstrap_compiler(pf.compiler)
-        global_config.bootstrap_runtime(pf.runtime)
-        global_config.bootstrap_machine(pf.machine)
-        global_config.bootstrap_criterion(pf.criterion)
-        global_config.bootstrap_group(pf.group)
+        global_config.bootstrap_from_profile(pf.dump())
 
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
     the_session.register_callback(callback=pvRun.process_main_workflow,

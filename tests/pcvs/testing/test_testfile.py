@@ -50,28 +50,15 @@ def test_replace_tokens():
     ) == 'USER is {}'.format(getpass.getuser()))
 
 
-def test_load_yaml_file():
-    tested.load_yaml_file(os.path.join(PATH_INSTDIR, "schemes/criterion-scheme.yml"), 
-        os.path.join(PATH_INSTDIR, "schemes"), 
-        NAME_BUILDIR, 
-        "schemes")
-
-    # test invalid yml ?
-
-    # tested.load_yaml_file(os.path.join(os.path.dirname(__file__), "appveyor.yml"), 
-    #     os.path.join(PATH_INSTDIR, "schemes"), 
-    #     NAME_BUILDIR, 
-    #     "schemes")
-
 @pytest.fixture
 def isolated_yml_test():
     testyml = {
         "test_MPI_2INT":{
             "build":{
-                "cflags": "-DSYMB=MPI_2INT -DTYPE1='int' -DTYPE='int'",
                 "files": "'@SRCPATH@/constant.c'",
                 "sources": {
-                    "binary": "test_MPI_2INT"
+                    "binary": "test_MPI_2INT",
+                    "cflags": "-DSYMB=MPI_2INT -DTYPE1='int' -DTYPE='int'",
                 }
             },
             "group": "GRPSERIAL",

@@ -21,13 +21,10 @@ def generate_local_variables(label, subprefix):
     :return: paths for PCVS working tree
     :rtype: tuple
     """
-    if label not in MetaConfig.root.validation.dirs:
-        raise CommonException.NotFoundError(label)
-
     if subprefix is None:
         subprefix = ""
 
-    base_srcdir = MetaConfig.root.validation.dirs[label]
+    base_srcdir = MetaConfig.root.validation.dirs.get(label, '')
     cur_srcdir = os.path.join(base_srcdir, subprefix)
     base_buildir = os.path.join(
         MetaConfig.root.validation.output, "test_suite", label)

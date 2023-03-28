@@ -15,7 +15,7 @@ group:
   GRPMPI:
     run:
       iterate:
-  é      n_omp: {values: null}
+        n_omp: {values: null}
   GRPOMP:
     run:
       iterate:

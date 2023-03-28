@@ -21,7 +21,7 @@ echo '      binary: "a.out"'
 
 bad_output = """#!/bin/sh
 echo "test_node:"
-echo " unknown_node: 'test'"
+echo "  unknown_node: 'test'"
 """
 
 bad_script = """#!/bin/sh

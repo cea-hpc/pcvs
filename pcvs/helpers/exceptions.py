@@ -33,7 +33,7 @@ class GenericError(Exception):
         :return: only the error part
         :rtype: str"""
         return self._err_msg
-
+    
     @property
     def help(self):
         """returns the help part of the exceptions.
@@ -49,6 +49,11 @@ class GenericError(Exception):
         :return: only the debug infos.
         :rtype: str"""
         return self._dbg_info
+
+    def add_dbg(self, **kwargs):
+        for k, v in kwargs.items():
+            if k not in self._dbg_info:
+                self._dbg_info[k] = v
 
     @property
     def dbg_str(self):
@@ -142,6 +147,16 @@ class ValidationException(CommonException):
                              help_msg="\n".join([
                                  "Note configuration, profiles & pcvs.* files can be ",
                                  "verified through `pcvs check [-c|-p|-D <path>]`"]),
+                             dbg_info=kwargs)
+            
+    class WrongTokenError(GenericError):
+        """A unknown token is found in valided content"""
+
+        def __init__(self, msg="Invalid token(s)", **kwargs):
+            """Updated constructor"""
+            super().__init__(err_msg=msg,
+                             help_msg="\n".join([
+                                 "A list of valid token is available in the documentation"]),
                              dbg_info=kwargs)
 
     class SchemeError(GenericError):

@@ -55,7 +55,7 @@ def test_config_bad_kind():
         tested.ConfigurationBlock(None, "test")
 
 @pytest.mark.parametrize("kind", ["compiler", "runtime", "machine", "criterion", "group"])
-def test_config_load_template(kind, capsys):
+def test_config_test_runtemplate(kind, capsys):
     io.init()
     obj = tested.ConfigurationBlock(kind, "pcvs-pytest", 'local')
     assert(not obj.is_found())

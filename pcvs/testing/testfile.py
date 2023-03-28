@@ -1,3 +1,5 @@
+import tempfile
+import re
 import functools
 import pprint
 import getpass
@@ -6,7 +8,7 @@ import os
 import pathlib
 import subprocess
 
-import jsonschema
+from pcvs.helpers.exceptions import ValidationException
 from ruamel.yaml import YAML, YAMLError
 
 from pcvs import PATH_INSTDIR, io, testing
@@ -17,104 +19,59 @@ from pcvs.plugins import Plugin
 from pcvs.testing import tedesc
 
 
-def __load_yaml_file_legacy(f):
-    """Legacy version to load a YAML file.
+constant_tokens = None
 
-    This function intends to be backward-compatible with old YAML syntax
-    by relying on external converter (not perfect).
-
-    :raises DynamicProcessError: the setup script cannot be executed properly
-    :param f: old-syntax YAML filepath
-    :type f: str
-    :return: new-syntax YAML stream
+def init_constant_tokens():
     """
-    # Special case: old files required non-existing tags to be resolved
-    old_group_file = os.path.join(PATH_INSTDIR, "templates/group-compat.yml")
-
-    proc = subprocess.Popen(
-        "pcvs_convert '{}' --stdout -k te -t '{}'".format(
-            f,
-            old_group_file
-        ).split(),
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.PIPE,
-        shell=True)
-
-    fds = proc.communicate()
-    if proc.returncode != 0:
-        raise TestException.TDFormatError(f)
-
-    return fds[0].decode('utf-8')
-
-
-def replace_special_token(stream, src, build, prefix):
-    """Replace placeholders by their actual definition in a stream.
-
-    :param stream: the stream to alter
-    :type stream: str
-    :param src: source directory (replace SRCPATH)
-    :type src: str
-    :param build: build directory (replace BUILDPATH)
-    :type build: str
-    :param prefix: subtree for the current parsed stream
-    :type prefix: str
-    :return: the modified stream
-    :rtype: str
+    Initialize global tokens to be replaced.
+    
+    The dict is built from profile specifications. The exact location for this
+    function is still to be determined.
     """
+    global constant_tokens
+    constant_tokens = {
+        '@HOME@': str(pathlib.Path.home()),
+        '@USER@': getpass.getuser(),
+    }
+    for comp, comp_node in MetaConfig.root.compiler.items():
+        constant_tokens['@COMPILER_{}@'.format(comp.upper())] = comp_node.get('program', "")
+        
+    constant_tokens['@RUNTIME_PROGRAM@'] = MetaConfig.root.runtime.get('program', "")
 
+def replace_special_token(content, src, build, prefix, list=False):
+    output = []
+    errors = []
+    
+    global constant_tokens
+    if not constant_tokens:
+        init_constant_tokens()
+    
     if prefix is None:
         prefix = ""
+    
     tokens = {
+        **constant_tokens,
         '@BUILDPATH@': os.path.join(build, prefix),
         '@SRCPATH@': os.path.join(src, prefix),
         '@ROOTPATH@': src,
         '@BROOTPATH@': build,
         '@SPACKPATH@': "TBD",
-        '@HOME@': str(pathlib.Path.home()),
-        '@USER@': getpass.getuser()
     }
-    for k, v in tokens.items():
-        stream = stream.replace(k, v)
-    return stream
+    
+    r = re.compile("(?P<name>@[a-zA-Z0-9-_]+@)")
+    for line in content.split('\n'):
+        for match in r.finditer(line):
+            
+            name = match.group('name')
+            if name not in tokens:
+                errors.append(name)
+            else:
+                line = line.replace(name, tokens[name])
+        output.append(line)
 
-
-def load_yaml_file(f, source, build, prefix):
-    """Load a YAML test description file.
-
-    :param f: YAML-based source testfile
-    :type f: str
-    :param source: source directory (used to replace placeholders)
-    :type source: str
-    :param build: build directory (placeholders)
-    :type build: str
-    :param prefix: file subtree (placeholders)
-    :type prefix: str
-    :return: the YAML-to-dict content
-    :rtype: dict
-    """
-    need_conversion = False
-    obj = {}
-    try:
-        with open(f, 'r') as fh:
-            stream = fh.read()
-            stream = replace_special_token(stream, source, build, prefix)
-            obj = YAML(typ='safe').load(stream)
-    # badly formatted YAML
-    except YAMLError:
-        need_conversion = True
-
-    # attempt to convert of the fly the YAML file
-    if need_conversion:
-        io.console.debug("\t--> Legacy syntax: {}".format(f))
-        obj = YAML(typ='safe').load(__load_yaml_file_legacy(f))
-
-        # when 'debug' is activated, print the converted YAML file
-        if io.console.has_verb_level('debug'):
-            cv_file = os.path.join(os.path.split(f)[0], "converted-pcvs.yml")
-            io.console.debug("\t--> Stored file to {}".format(cv_file))
-            with open(cv_file, 'w') as fh:
-                YAML(typ='safe').dump(obj, fh)
-    return obj
+    if errors:
+        raise ValidationException.WrongTokenError(invalid_tokens=errors)
+    return "\n".join(output)
 
 
 class TestFile:
@@ -168,6 +125,11 @@ class TestFile:
         if TestFile.val_scheme is None:
             TestFile.val_scheme = system.ValidationScheme('te')
 
+    def load_from_file(self, f):
+        with open(f, 'r') as fh:
+            stream = fh.read()
+            self.load_from_str(stream)
+
     def load_from_str(self, data):
         """Fill a File object from stream.
 
@@ -178,8 +140,12 @@ class TestFile:
         """
         source, _, build, _ = testing.generate_local_variables(
             self._label, self._prefix)
+        
         stream = replace_special_token(data, source, build, self._prefix)
-        self._raw = YAML(typ='safe').load(stream)
+        try:
+            self._raw = YAML(typ='safe').load(stream)
+        except YAMLError as e:
+            raise ValidationException.FormatError(origin="<stream>")
     
     def save_yaml(self):
         src, _, build, curbuild = testing.generate_local_variables(
@@ -189,21 +155,67 @@ class TestFile:
         with open(os.path.join(curbuild, "pcvs.setup.yml"), "w") as fh:
             YAML(typ='safe').dump(self._raw, fh)
 
+    def validate(self, allow_conversion=True) -> bool:
+        try:
+            if self._raw:
+                TestFile.val_scheme.validate(self._raw, filepath=self._in)
+            return True
+        except ValidationException.WrongTokenError as e:
+            # Issues with replacing @...@ keys
+            e.add_dbg(file=self._in)
+            raise TestException.TDFormatError(self._in, error=e)
+        
+        except ValidationException.FormatError as e:
+            # YAML is valid but not following the Scheme
+            # If YAML is invalid, load() functions will failed first
+            
+            # At first attempt, YAML are converted.
+            # There is no second chance
+            if not allow_conversion:
+                e.add_dbg(file=self._in)
+                raise e
+            
+            tmpfile = tempfile.mkstemp()[1]
+            with open(tmpfile, 'w') as fh:
+                YAML(typ='safe').dump(self._raw, fh)
+            proc = subprocess.Popen(
+                "pcvs_convert {} --stdout -k te --skip-unknown -t '{}'".format(
+                    tmpfile,
+                    os.path.join(PATH_INSTDIR, "templates/config/group-compat.yml")),
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                shell=True)
+            
+            fds = proc.communicate()
+            os.remove(tmpfile)
+            if proc.returncode != 0:
+                raise e
+            converted_data = YAML(typ='safe').load(fds[0].decode('utf-8'))
+            #keep only TE conversion
+            # anything else is dropped when converting on-the-fly
+            self._raw = converted_data['te']
+            self.validate(allow_conversion=False)
+            io.console.warning("\t--> Legacy syntax for: {}".format(self._in))
+            io.console.warning("Please consider updating it with `pcvs_convert -k te`")
+            return False
+
+    @property
+    def nb_descs(self):
+        if self._raw is None:
+            return 0
+        return len(self._raw.keys())
+
     def process(self):
         """Load the YAML file and map YAML nodes to Test()."""
         src, _, build, _ = testing.generate_local_variables(
             self._label,
             self._prefix)
 
+        # if file hasn't be loaded yet
         if self._raw is None:
-            self._raw = load_yaml_file(self._in, src, build, self._prefix)
-        # this check should also be used while loading the file.
-        # (old syntax files will only be converted if they are wrongly
-        # formatted, not if they are invalid)
-        try:
-            TestFile.val_scheme.validate(self._raw, filepath=self._in)
-        except jsonschema.ValidationError as e:
-            self._debug['.yaml_errors'].append(e)
+            self.load_from_file(self._in)
+            
+        self.validate()
 
         # main loop, parse each node to register tests
         for k, content, in self._raw.items():

@@ -21,7 +21,7 @@ from pcvs.orchestration import Orchestrator
 from pcvs.orchestration.publishers import BuildDirectoryManager
 from pcvs.plugins import Plugin
 from pcvs.testing.tedesc import TEDescriptor
-from pcvs.testing.testfile import TestFile, load_yaml_file
+from pcvs.testing.testfile import TestFile
 
 
 def print_progbar_walker(elt):
