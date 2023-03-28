@@ -62,7 +62,7 @@ def flatten(dd, prefix='') -> dict:
     are chained in a tuple. for instance:
     {'a': {'b': {'c': value}}} --> {('a', 'b', 'c'): value}
     """
-    return {prefix + "." + k if prefix else k: v
+    return {prefix + "||" + k if prefix else k: v
             for kk, vv in dd.items()
             for k, v in flatten(vv, kk).items()
             } if isinstance(dd, dict) else {prefix: dd}
@@ -76,18 +76,33 @@ def compute_new_key(k, v, m) -> str:
     execute python code on the fly (complex transformation)
     """
     replacement = ""
-    # basic replace the whole string with any placeholder
-    for elt in m.groupdict().keys():
-        k = k.replace("<"+elt+">", m.group(elt))
-
+    
+    # A tricky thing here. Recently we realised users may use a dot as a
+    # TE name, also used as a split pattern.
+    # To make the converter work again, any dot used to flatten the dict 
+    # is replaced with a "||".
+    # BUT dots in user-defined input & regexes should not be touched
+    # This is why the replacement is done BEFORE applying regex results.
+    # EXCEPTION: dynamic conversion through code execution cannot be parsed
+    # automatically and "||" need to be manually inserted (hard to say which dots
+    # are relevant).
+    
     # if this key is a special python expression to process:
     if k.startswith('call:'):
+        # basic replace the whole string with any placeholder
+        for elt in m.groupdict().keys():
+            k = k.replace("<"+elt+">", m.group(elt))
+
         env = {'k': k, 'v': v, 'm': m}
         # the 'k' & 'm' vars are exposed to evaluated code
         exec("import re\n"+k.split("call:")[1], env)
         # the 'k' is retrieved and used as a whole
         replacement = env['k']
     else:
+        # basic replace the whole string with any placeholder
+        for elt in m.groupdict().keys():
+            k = k.replace(".", "||").replace("<"+elt+">", m.group(elt))
+
         replacement = k
     return replacement
 
@@ -163,15 +178,15 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
                 # if none of the split() succeeded, just keep the old value
                 final_v = v if not final_v else final_v
                 # set the new key with the new value
-                set_with(output, final_k.split('.'), final_v, should_append)
+                set_with(output, final_k.split('||'), final_v, should_append)
         else:
             # warn when an old_key hasn't be declared in spec.
             io.console.info("DISCARDING {}".format(k))
             if warn_if_missing:
                 io.console.warn("Key {} undeclared in spec.".format(k))
-                set_with(output, ['pcvs_missing'] + k.split("."), v)
+                set_with(output, ['pcvs_missing'] + k.split("||"), v)
             else:
-                set_with(output, k.split("."), v)
+                set_with(output, k.split("||"), v)
     return output
 
 
@@ -205,7 +220,7 @@ def replace_placeholder(tmp, refs) -> dict:
                     replacement.append(elt.replace(valid_k, refs[valid_k]))
             if not insert:
                 replacement.append(re.escape(elt))
-        final[r"\.".join(replacement)] = new
+        final["\|\|".join(replacement)] = new
     return final
 
 
@@ -320,10 +335,10 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
 
     # remove template key from the output to avoid polluting the caller
     io.console.print_item("Pruning templates from the final data")
-    invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
+    invalid_nodes = [k for k in final_data.get(kind, final_data).keys() if k.startswith('pcvst_')]
     io.console.info(["Prune the following:", "{}".format(
         pprint.pformat(invalid_nodes))])
-    [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
+    [final_data.get(kind, final_data).pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
 
     io.console.info(
         ["Final layout:", "{}".format(pprint.pformat(final_data))])

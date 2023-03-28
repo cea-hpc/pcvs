@@ -1,10 +1,10 @@
 {
 	"__tokens": {
-		"<name>": "(?P<name>[a-zA-Z0-9-_]+)",
+		"<name>": "(?P<name>[a-zA-Z0-9-_+.]+)",
 		"<ropt>": "(?P<ropt>[a-zA-Z0-9-_]+)",
 		"<child_nodes>": "(?P<child_nodes>.*)",
 		"<it>": "(?P<it>.*)",
-		"<te_it>": "(?P<te_it>(?!(type|files|bin|cargs|chdir|target|deps|args|time|tolerance|timeout|returns|herit|tbb|accl|openmp))[a-zA-Z0-9-_]+)",
+		"<te_it>": "(?P<te_it>(?!(type|build|run|validate|metric|files|bin|cargs|chdir|target|deps|args|time|tolerance|timeout|returns|herit|tbb|accl|openmp))[a-zA-Z0-9-_]+)",
 		"<compiler>": "(?P<compiler>[a-z0-9]+)"
 		
 	},
@@ -59,26 +59,28 @@
 	"runtime.args": "runtime.args",
 	"runtime.module": "runtime.plugin",
 	"runtime.timeout-prefix": null,
-	"runtime.<it>.key": ["call:k = 'runtime.criterions.<it>.numeric=True' if '<it>'.startswith('n_') else 'runtime.criterions.<it>.numeric=False'", "runtime.criterions.<it>.option"],
+	"runtime.<it>.key": ["call:k = 'runtime||criterions||<it>||numeric=True' if '<it>'.startswith('n_') else 'runtime||criterions||<it>||numeric=False'", "runtime||criterions||<it>||option"],
 	"runtime.<it>.usage": "runtime.criterions.<it>.type",
 	"runtime.<it>.<ropt>_val": "runtime.criterions.<it>.aliases.<ropt>",
 
-	"te.<name>.type": ["<name>._compat.type"],
-	"te.<name>.files": ["<name>.build.files"],
-	"te.<name>.bin": ["<name>._compat.bin"],
-	"te.<name>.cargs": "<name>.build.cflags",
-	"te.<name>.chdir": ["<name>._compat.chdir"],
-	"te.<name>.target": "<name>.build.make.target",
-	"te.<name>.deps": "<name>.run.depends_on",
-	"te.<name>.args": "<name>.run.iterate.program.args.values",
-	"te.<name>.time": "<name>.run.validate.time.mean_time",
-	"te.<name>.tolerance": "<name>.run.validate.time.tolerance",
-	"te.<name>.timeout": "<name>.run.validate.time.kill_after",
-	"te.<name>.returns": "<name>.run.validate.expect_exit",
+	"te.<name>.type": ["te.<name>._compat.type"],
+	"te.<name>.files": ["te.<name>.build.files"],
+	"te.<name>.bin": ["te.<name>._compat.bin"],
+	"te.<name>.cargs": "te.<name>.build.cflags",
+	"te.<name>.cwd": ["te.<name>._compat.chdir"],
+	"te.<name>.chdir": ["te.<name>._compat.chdir"],
+	"te.<name>.target": "te.<name>.build.make.target",
+	"te.<name>.deps": "te.<name>.run.depends_on",
+	"te.<name>.args": "te.<name>.run.iterate.program.args.values",
+	"te.<name>.time": "te.<name>.run.validate.time.mean_time",
+	"te.<name>.tolerance": "te.<name>.run.validate.time.tolerance",
+	"te.<name>.timeout": "te.<name>.run.validate.time.kill_after",
+	"te.<name>.returns": "te.<name>.run.validate.expect_exit",
 	"te.<name>.herit": null,
-	"te.<name>.tbb": "<name>.build.variants+tbb",
-	"te.<name>.accl": "<name>.build.variants+accl",
-	"te.<name>.openmp": "<name>.build.variants+openmp",
+	"te.<name>.tbb": "te.<name>.build.variants+tbb",
+	"te.<name>.accl": "te.<name>.build.variants+accl",
+	"te.<name>.openmp": "te.<name>.build.variants+openmp",
 
-	"te.<name>.<te_it>": "<name>.run.iterate.<te_it>.values"
+	"te.<name>.build.cflags": "te.<name>.build.sources.cflags",
+	"te.<name>.build.ldflags": "te.<name>.build.sources.ldflags"
 }
