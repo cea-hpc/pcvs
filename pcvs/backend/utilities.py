@@ -4,10 +4,8 @@ import os
 import subprocess
 import tempfile
 
-import jsonschema
 from ruamel.yaml import YAML, YAMLError
 
-import pcvs
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import config, profile, run
 from pcvs.helpers import system, utils
@@ -176,34 +174,6 @@ def process_check_setup_file(filename, prefix, run_configuration):
 
     return (err_msg, data)
 
-
-scheme = system.ValidationScheme('te')
-
-
-def process_check_yaml_stream(data):
-    """Analyze a pcvs.yml stream and check its correctness relatively to
-    standard. 
-    :param data: the stream to process
-    :type data: str
-    :return: a tuple (err_msg, load status icon, yaml format status icon)
-    :rtype: tuple
-    """
-    global scheme
-    err_msg = None
-    nb_nodes = 0
-    try:
-        stream = YAML(typ='safe').load(data)
-        scheme.validate(stream)
-        nb_nodes = len(stream.keys())
-
-    except YAMLError as e:
-        err_msg = base64.b64encode(str(e).encode('utf-8'))
-    except ValidationException.FormatError as e:
-        err_msg = base64.b64encode(str(e).encode('utf-8'))
-
-    return (err_msg, nb_nodes)
-
-
 def __set_token(token, nset=None) -> str:
     """Manage display token (job display) depending on given condition.
 
@@ -243,6 +213,9 @@ def process_check_directory(dir, pf_name="default"):
         pf.load_template()
     else:
         pf.load_from_disk()
+    system.MetaConfig.root = system.MetaConfig()
+    system.MetaConfig.root.bootstrap_from_profile(pf.dump())
+    system.MetaConfig.root.validation.output = "/tmp"
     buildenv = run.build_env_from_configuration(pf.dump())
     setup_files, yaml_files = run.find_files_to_process(
         {os.path.basename(dir): dir})
@@ -274,11 +247,32 @@ def process_check_directory(dir, pf_name="default"):
                 data = fh.read()
 
         if not err:
-            err, cnt = process_check_yaml_stream(data)
-            yaml_ok = __set_token(err is None)
-            if cnt > 0:
-                nb_nodes = cnt
+            converted = None
+            dflt = None
+            err = None
+            try:
+                from pcvs.testing.testfile import TestFile
+                cur = TestFile(file_in="", path_out="", label="", prefix=subprefix)
+                cur.load_from_str(data)
+                converted = not(cur.validate())
+                nb_nodes = cur.nb_descs
                 total_nodes += nb_nodes
+                success=True
+
+            except YAMLError as e:
+                err = base64.b64encode(str(e).encode('utf-8'))
+                success=False
+            except ValidationException.FormatError as e:
+                err = base64.b64encode(str(e).encode('utf-8'))
+                success=False
+                
+            if converted is True:
+                # yaml VALID but old syntax
+                # --> yellow
+                success=None
+                dflt = "{} {}".format(io.console.utf('succ'), io.console.utf('copy'))
+            yaml_ok = __set_token(success, nset=dflt)
+            
 
         table.add_row(
             setup_ok,
