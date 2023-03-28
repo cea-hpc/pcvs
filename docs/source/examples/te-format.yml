@@ -6,23 +6,29 @@
     # source files to include (if needed)
     files: "@SRCPATH@/*.c"
     autotools:
-      params: ['--disable-bootstrap']
+      args: ['--disable-bootstrap']
+      envs: []
     cmake:
       vars: ['CMAKE_VERBOSE_MAKEFILE=ON']
+      args: []
+      envs: []
     make:
-      target: all
+      target: "all"
+      args: ['MPICC=@COMPILER_CC@']
+      envs: []
     sources:
       # program binary (if needed)
       binary: "a.out"
+      # extra cflags
+      cflags: "extra cflags"
+      # extra ldflags
+      ldflags: "extra ldflags"
+      envs: []
     custom:
       program: "myscript.sh"
       envs: ["VAR1=value", "VAR2=value"]
     # dependency scheme
     depends_on: ["this_is_another_test"]
-    # extra cflags
-    cflags: "extra cflags"
-    # extra ldflags
-    ldflags: "extra ldflags"
     # directory where program should be built
     cwd: "dir/to/build"
     # variants describing the job.

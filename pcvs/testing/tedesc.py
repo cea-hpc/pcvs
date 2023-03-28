@@ -275,6 +275,16 @@ class TEDescriptor:
                     self._build.binary = compat[k]
                 if self._run and 'program' not in self._run:
                     self._run.program = compat[k]
+        
+        if 'cflags' in self._build and 'sources' in self._build:
+            self._build['sources']['cflags'] = self._build['cflags']
+        if 'ldflags' in self._build and 'sources' in self._build:
+            self._build['sources']['ldflags'] = self._build['ldflags']
+        if 'params' in self._build.get('autotools', {}):
+            self._build.autotools.args = self._build.autotools.params
+        if 'vars' in self._build.get('cmake', {}):
+            self._build.cmake.args = self._build.cmake.vars
+        
 
     def _configure_criterions(self):
         """Prepare the list of components this TE will be built against.
@@ -320,9 +330,6 @@ class TEDescriptor:
             for _, elt in self._program_criterion.items():
                 elt.expand_values()
 
-    
-        
-
     def __build_from_sources(self):
         """How to create build tests from a collection of source files.
 
@@ -343,9 +350,9 @@ class TEDescriptor:
         command = "{cc} {cflags} {files} {ldflags} {args} {out}".format(
             cc=program,
             args=" ".join(args),
-            cflags=self._build.get('cflags', ''),
+            cflags=self._build.sources.get('cflags', ''),
             files=" ".join(self._build.files),
-            ldflags=self._build.get('ldflags', ''),
+            ldflags=self._build.sources.get('ldflags', ''),
             out="-o {}".format(os.path.join(self._buildir, binary))
         )
         return (command, envs)
@@ -367,20 +374,15 @@ class TEDescriptor:
         compiler, args, envs = extract_compiler_config("cc", self._build.variants)
         # build the 'make' command
         command.append(
-            '-C {path} {target} '
-            'PCVS_CC="{cc}" PCVS_CXX="{cxx}" PCVS_CU="{cu}" PCVS_FC="{fc}" '
-            'PCVS_CFLAGS="{var} {cflags}" PCVS_LDFLAGS="{ldflags}"'.format(
+            '-C {path} {target} '.format(
                 path=basepath,
-                target=self._build.make.get('target', ''),
-                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
-                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
-                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
-                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
-                var=" ".join(args),
-                cflags=self._build.get('cflags', ''),
-                ldflags=self._build.get('ldflags', '')
+                target=self._build.make.get('target', '')
             )
         )
+        
+        command += " ".join(self._build['make'].get('args', []))
+        envs += self._build['make'].get('envs', [])
+
         return (" ".join(command), envs)
 
     def __build_from_cmake(self):
@@ -397,31 +399,19 @@ class TEDescriptor:
             
         _, args, envs = extract_compiler_config("cc", self._build.variants)
         command.append(
-            r"-DCMAKE_C_COMPILER='{cc}' -DCMAKE_CXX_COMPILER='{cxx}' "
-            r"-DCMAKE_FC_COPILER='{fc}' -DCMAKE_CUDA_COMPILER='{cu}' "
-            r"-DCMAKE_C_FLAGS='{var} {cflags}' -DCMAKE_EXE_LINKER_FLAGS='{ldflags}' "
             r"-G 'Unix Makefiles' "
-            r"-DCMAKE_BINARY_DIR='{build}' "
-            r"-DCMAKE_MODULE_LINKER_FLAGS='{ldflags}' "
-            r"-DCMAKE_SHARED_LINKER_FLAGS='{ldflags}'".format(
-                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
-                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
-                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
-                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
-                var=" ".join(args),
-                cflags=self._build.get('cflags', ''),
-                ldflags=self._build.get('ldflags', ''),
+            r"-DCMAKE_BINARY_DIR='{build}' ".format(
                 build=self._buildir
             )
         )
-        if 'vars' in self._build['cmake']:
-            command.append("-D"+' -D'.join(self._build['cmake']['vars']))
+
+        command += self._build['cmake'].get('args', [])
+        envs += self._build['cmake'].get('envs', [])
 
         self._build.files = [os.path.join(self._buildir, "Makefile")]
         tmp =  self.__build_from_makefile()
         next_command = tmp[0]
-        for k, v in tmp[1].items():
-            envs[k] = v
+        envs += tmp[1]
         return (" && ".join([" ".join(command), next_command]), envs)
 
     def __build_from_autotools(self):
@@ -446,32 +436,18 @@ class TEDescriptor:
             )
             command.append("{} && ".format(autogen_path))
             
-        _, args, envs = extract_compiler_config("cc", self._build.variants)
+        _, _, envs = extract_compiler_config("cc", self._build.variants)
 
-        command.append(
-            r"{configure} "
-            r"CC='{cc}' CXX='{cxx}' "
-            r"FC='{fc}' NVCC='{cu}' "
-            r"CFLAGS='{var} {cflags}' LDFLAGS='{ldflags}' ".format(
-                configure=configure_path,
-                cc=MetaConfig.root.compiler.get('cc', MetaDict({'program': "echo"})).program,
-                cxx=MetaConfig.root.compiler.get('cxx', MetaDict({'program': "echo"})).program,
-                fc=MetaConfig.root.compiler.get('fc', MetaDict({'program': "echo"})).program,
-                cu=MetaConfig.root.compiler.get('cu', MetaDict({'program': "echo"})).program,
-                var=" ".join(args),
-                cflags=self._build.get('cflags', ''),
-                ldflags=self._build.get('ldflags', ''),
-            )
-        )
-        if 'params' in self._build['autotools']:
-            command.append(" ".join(self._build['autotools']['params']))
+        command.append(r"{configure} ".format(configure=configure_path))
+        
+        command += self._build['autotools'].get('args', [])
+        envs += self._build['autotools'].get('envs', [])
 
         self._build.files = [os.path.join(self._buildir, "Makefile")]
         tmp = self.__build_from_makefile()
         next_command = tmp[0]
-        for k, v in tmp[1].items():
-            envs[k] = v
-
+        envs += tmp[1]
+        
         # TODO: why not creating another test, with a dep on this one ?
         return (" && ".join([" ".join(command), next_command]), envs)
 

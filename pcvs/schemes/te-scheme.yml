@@ -4,6 +4,7 @@ patternProperties:
   "^[^\\.].*$":
     type: object
     properties:
+      _compat: {type: object}
       group:
         type: string
       tag:
@@ -40,10 +41,6 @@ patternProperties:
                 items:
                   type: string
             additionalProperties: false
-          cflags:
-            type: string
-          ldflags:
-            type: string
           cwd:
             type: string
           variants:
@@ -55,30 +52,44 @@ patternProperties:
             properties:
               target:
                 type: string
+              args:
+                type: array
+                items: {type: string}
+              envs:
+                type: array
+                items: {type: string}
             additionalProperties: false
           sources:
             type: object
             properties:
               binary:
                 type: string
+              cflags:
+                type: string
+              ldflags:
+                type: string
             additionalProperties: false
           cmake:
             type: object
             properties:
-              vars:
+              args:
                 type: array
-                items:
-                  type: string
+                items: {type: string}
+              envs:
+                type: array
+                items: {type: string}
             additionalProperties: false
           autotools:
             type: object
             properties:
               autogen:
                 type: boolean
-              params:
+              args:
                 type: array
-                items:
-                  type: string
+                items: {type: string}
+              envs:
+                type: array
+                items: {type: string}
             additionalProperties: false
           custom:
             type: object
