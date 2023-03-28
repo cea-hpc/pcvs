@@ -166,7 +166,7 @@ def process(data, ref_array=None, warn_if_missing=True) -> dict:
                 if final_k is None:
                     continue
                 # if a split is required
-                for token in ['+', '=']:
+                for token in ['|+|', '|=|']:
                     (final_k, final_v) = separate_key_and_value(elt_dest_k,
                                                                 token)
                     # the split() succeeded ? stop
