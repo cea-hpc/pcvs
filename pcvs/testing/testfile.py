@@ -293,7 +293,7 @@ cat<<EOF
 ${{pcvs_load}}
 EOF
     else
-        eval "${{pcvs_load}}"
+        eval "${{pcvs_load}}" || exit "$?"
     fi
     if test -n "$PCVS_SHOW_ENV"; then
     test -n "$PCVS_VERBOSE" && echo "###### SETUP ENV ######"
@@ -301,7 +301,7 @@ cat<<EOF
 ${{pcvs_env}}
 EOF
     else
-        eval "${{pcvs_env}}"
+        eval "${{pcvs_env}}" || exit "$?"
     fi
     if test -n "$PCVS_SHOW_CMD"; then
     test -n "$PCVS_VERBOSE" && echo "##### RUN COMMAND #####"
@@ -309,7 +309,7 @@ cat<<EOF
 ${{pcvs_cmd}}
 EOF
     else
-        eval "${{pcvs_cmd}}"
+        eval "${{pcvs_cmd}}" || exit "$?"
     fi
     exit $?\n""".format(list_of_tests="\n".join([
                 t.name
