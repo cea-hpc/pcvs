@@ -1,10 +1,12 @@
+import shutil
+import tempfile
 import copy
 import os
 import re
 
 import pcvs
 from pcvs import testing
-from pcvs.helpers import pm, utils
+from pcvs.helpers import pm
 from pcvs.helpers.criterion import Criterion, Serie
 from pcvs.helpers.exceptions import TestException
 from pcvs.helpers.system import MetaConfig, MetaDict
@@ -197,13 +199,14 @@ class TEDescriptor:
         self._validation = MetaDict(node.get('validate', None))
         self._artifacts = MetaDict(node.get('artifact', None))
         self._metrics = MetaDict(node.get('metric', None))
+        self._attributes = MetaDict(node.get("attributes", None))
         self._template = node.get('group', None)
         self._debug = self._te_name+":\n"
         self._effective_cnt = 0
         self._tags = node.get('tag', list())
 
         path_prefix = self._buildir
-        if self.get_run_attr('path_resolution', True) is False:
+        if self.get_attr('path_resolution', True) is False:
             path_prefix = ""
 
         for elt_k, elt_v in self._artifacts.items():
@@ -228,18 +231,11 @@ class TEDescriptor:
         # apply retro-compatibility w/ old syntax
         self._compatibility_support(node.get('_compat', None))
 
-    @staticmethod
-    def get_attr(node, name, dflt=None):
-        if 'attributes' in node and name in node['attributes'].keys():
-            return node['attributes'][name]
+    def get_attr(self, name, dflt=None):
+        if name in self._attributes:
+            return self._attributes[name]
         else:
             return dflt
-
-    def get_run_attr(self, name, default=None):
-        return TEDescriptor.get_attr(self._run, name, default)
-
-    def get_build_attr(self, name, default=None):
-        return TEDescriptor.get_attr(self._build, name, default)
 
     def _compatibility_support(self, compat):
         """Convert tricky keywords from old syntax too complex to be handled
@@ -563,21 +559,28 @@ class TEDescriptor:
             elif self._build.sources.binary:
                 program = self._build.sources.binary
 
+
+            clone_outdir = self.get_attr('copy_output', False)
+            if clone_outdir:
+                buildir = tempfile.mkdtemp(prefix="{}.".format(self._te_name), dir=self._buildir)
+            else:
+                buildir = self._buildir
+
             # attempt to determine test working directory
-            chdir = self._run.cwd if self._run.cwd else self._buildir
+            chdir = self._run.cwd if self._run.cwd else buildir
 
             if not os.path.isabs(chdir):
-                chdir = os.path.abspath(os.path.join(self._buildir, chdir))
+                chdir = os.path.abspath(os.path.join(buildir, chdir))
 
             # keep the original value if user disabled prefix resolution
-            if self.get_run_attr('path_resolution', True) is True:
-                program = os.path.abspath(os.path.join(chdir, program))
+            if self.get_attr('path_resolution', True) is True:
+                program = os.path.abspath(os.path.join(self._buildir, program))
 
             command = "{program} {params}".format(
                 program=program,
                 params=" ".join(params)
             )
-            if self.get_run_attr('command_wrap', True) is True:
+            if self.get_attr('command_wrap', True) is True:
                 command = "{runtime} {args} {runtime_args} {cmd}".format(
                     runtime=MetaConfig.root.runtime.get('program', ''),
                     runtime_args=MetaConfig.root.runtime.get('args', ''),
@@ -618,12 +621,23 @@ class TEDescriptor:
         # if this TE does not lead to a single test, skip now
         if self._skipped:
             return
-
+        
+        clone_indir = self.get_attr('copy_input', False)
+    
+        if clone_indir:
+            isolation_path = tempfile.mkdtemp(prefix="{}.".format(self._te_name), dir=self._buildir)
+            old_src_dir = self._srcdir
+            self._srcdir = os.path.join(isolation_path, "src")
+            shutil.copytree(old_src_dir, self._srcdir)
+            self._buildir = os.path.join(isolation_path, "build")
+            os.mkdir(self._buildir)
+                
+            
         if self._build:
             yield from self.__construct_compil_tests()
         if self._run:
 
-            if self.get_run_attr('command_wrap', True) is False:
+            if self.get_attr('command_wrap', True) is False:
                 self._serie = Serie({**self._program_criterion})
             else:
                 self._serie = Serie(
@@ -641,13 +655,7 @@ class TEDescriptor:
         if self._skipped:
             return {}
 
-        #user_cnt = 1
-        #real_cnt = 1
         self._debug_yaml = dict()
-
-        # count the compilation run
-        #if self._build:
-        #    real_cnt = 1
 
         # count actual tests built
         if self._run:

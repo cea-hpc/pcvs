@@ -213,7 +213,7 @@ class Test:
         """Getter for the full command.
 
         This is a real command, executed in a shell, coming from user's
-        specificaition. It should not be confused with `wrapped_command`.
+        specificaition. It should not be confused with `invocation_command`.
 
         :return: unescaped command line
         :rtype: str

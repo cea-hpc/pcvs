@@ -11,14 +11,20 @@ patternProperties:
         type: array
         items:
           type: string
+      attributes:
+        type: object
+        properties:
+          copy_input:
+            type: boolean
+          copy_output:
+            type: boolean
+          command_wrap:
+            type: boolean
+          path_resolution:
+            type: boolean
       build:
         type: object
         properties:
-          attributes:
-            type: object
-            properties:
-              command_wrap:
-                type: boolean
           files:
             OneOf:
               - type: string
@@ -107,13 +113,6 @@ patternProperties:
       run:
         type: object
         properties:
-          attributes:
-            type: object
-            properties:
-              command_wrap:
-                type: boolean
-              path_resolution:
-                type: boolean
           program:
             type: string
           cwd:
