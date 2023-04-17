@@ -28,26 +28,25 @@ class Plugin:
         ``*_EVAL`` steps describe plugin passes where the function outcome can
         infer with the actual workflow.
         """
-        INVALID = -1,
-
-        START_BEFORE = enum.auto(),
-        START_AFTER = enum.auto(),
-        TFILE_BEFORE = enum.auto(),
-        TDESC_BEFORE = enum.auto(),
-        TEST_EVAL = enum.auto(),
-        TDESC_AFTER = enum.auto(),
-        TFILE_AFTER = enum.auto(),
-        SCHED_BEFORE = enum.auto(),
-        SCHED_SET_BEFORE = enum.auto(),
-        SCHED_SET_EVAL = enum.auto(),
-        SCHED_JOB_EVAL = enum.auto(),
-        SCHED_SET_AFTER = enum.auto(),
-        TEST_RESULT_EVAL = enum.auto(),
-        SCHED_PUBLISH_BEFORE = enum.auto(),
-        SCHED_PUBLISH_WRITE = enum.auto(),
-        SCHED_PUBLISH_AFTER = enum.auto(),
-        SCHED_AFTER = enum.auto(),
-        END_BEFORE = enum.auto(),
+        INVALID = -1
+        START_BEFORE = enum.auto()
+        START_AFTER = enum.auto()
+        TFILE_BEFORE = enum.auto()
+        TDESC_BEFORE = enum.auto()
+        TEST_EVAL = enum.auto()
+        TDESC_AFTER = enum.auto()
+        TFILE_AFTER = enum.auto()
+        SCHED_BEFORE = enum.auto()
+        SCHED_SET_BEFORE = enum.auto()
+        SCHED_SET_EVAL = enum.auto()
+        SCHED_JOB_EVAL = enum.auto()
+        SCHED_SET_AFTER = enum.auto()
+        TEST_RESULT_EVAL = enum.auto()
+        SCHED_PUBLISH_BEFORE = enum.auto()
+        SCHED_PUBLISH_WRITE = enum.auto()
+        SCHED_PUBLISH_AFTER = enum.auto()
+        SCHED_AFTER = enum.auto()
+        END_BEFORE = enum.auto()
         END_AFTER = enum.auto()
 
         def __str__(self):

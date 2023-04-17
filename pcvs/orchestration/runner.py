@@ -9,6 +9,7 @@ import json
 import pcvs
 from pcvs.testing.test import Test
 from pcvs import io
+from pcvs.helpers.exceptions import RunnerException
 from pcvs.orchestration.publishers import BuildDirectoryManager
 from pcvs.orchestration.set import Set
 from pcvs.helpers.system import MetaConfig
@@ -118,7 +119,9 @@ class RunnerAdapter(threading.Thread):
             else:
                 io.console.warning("Set {} did not produce any output".format(set.id))
         except:
-            raise Exception(cmd)
+            raise RunnerException.LaunchError(
+                reason="Fail to start a remote Runner",
+                dbg_info={'cmd': cmd})
 
 class RunnerRemote:
     

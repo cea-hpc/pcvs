@@ -8,7 +8,7 @@ import pcvs
 from pcvs import testing
 from pcvs.helpers import pm
 from pcvs.helpers.criterion import Criterion, Serie
-from pcvs.helpers.exceptions import TestException
+from pcvs.helpers.exceptions import TestException, ProfileException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.testing.test import Test
 
@@ -63,7 +63,10 @@ def extract_compiler_config(lang, variants):
     :rtype: tuple
     """
     if not lang or lang not in MetaConfig.root.compiler:
-        raise Exception()
+        raise ProfileException.IncompleteError(
+            reason="Unknown language, not defined into Profile",
+            dbg_info={"lang": lang, "list": MetaConfig.root.compiler.keys()}
+        )
     
     config = MetaConfig.root.compiler[lang]
     for v in variants:
@@ -176,7 +179,8 @@ class TEDescriptor:
         :raises TDFormatError: Unproper YAML TE format (sanity check)
         """
         if not isinstance(node, dict):
-            raise TestException.TDFormatError(node)
+            raise TestException.TestExpressionError(node)
+        
         self._te_name = name
         self._skipped = name.startswith('.')
         self._te_label = label

@@ -163,7 +163,7 @@ class TestFile:
         except ValidationException.WrongTokenError as e:
             # Issues with replacing @...@ keys
             e.add_dbg(file=self._in)
-            raise TestException.TDFormatError(self._in, error=e)
+            raise TestException.TestExpressionError(self._in, error=e)
         
         except ValidationException.FormatError as e:
             # YAML is valid but not following the Scheme
@@ -320,7 +320,7 @@ EOF
 
     def generate_debug_info(self):
         """Dump debug info to the appropriate file for the input object."""
-        if len(self._debug) and io.console.verbose:
+        if len(self._debug) and io.console.verb_debug:
             with open(os.path.join(self._path_out, "dbg-pcvs.yml"), 'w') as fh:
                 # compute max number of combinations from system iterators
                 sys_cnt = functools.reduce(

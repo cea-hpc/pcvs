@@ -189,7 +189,10 @@ class Criterion:
             self._values = [self._values]
         for v in self._values:
             if isinstance(v, list):
-                raise Exception()
+                raise CommonException.UnclassifiableError(
+                    reason="list elements should be scalar OR dict",
+                    dbg_info={"element": v}
+                )
             if isinstance(v, dict):
                 for key in v.keys():
                     assert key in ['op', 'of', 'from', 'to']

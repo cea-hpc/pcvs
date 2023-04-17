@@ -390,20 +390,8 @@ class Session:
                             args=(self._sid, self._func, *args),
                             kwargs=kwargs)
 
-            # set the child IOManager before starting
-            # enable logfile but disable tty
-            # save the old manager to restore it after child starts
-            #old = copy.copy(log.manager)
-            #io.console.set_logfile(enable=True, logfile=self._io_file)
-            # io.console.set_tty(enable=False)
             child.start()
-            # complete the first child, to allow this process to terminate
-            # pcchild.join()
-
-            # do not close tty, to extra info to be printed but not logged
-            #log.manager = old
-            #rm -io.console.set_logfile(enable=False)
-
+            
             return self._sid
 
     def run(self, *args, **kwargs):
@@ -425,8 +413,6 @@ class Session:
             self._session_infos['state'] = self.State.IN_PROGRESS
             self._sid = store_session_to_file(self._session_infos)
 
-            io.console.set_logfile(enable=True, logfile=self._io_file)
-            io.console.set_tty(enable=True)
             # run the code
             try:
                 self._rc = self._func(*args, **kwargs)

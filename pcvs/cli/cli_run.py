@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 
 from pcvs import NAME_BUILDFILE, NAME_RUN_CONFIG_FILE, io
+from pcvs.io import Verbosity
 from pcvs.backend import bank as pvBank
 from pcvs.backend import profile as pvProfile
 from pcvs.backend import run as pvRun
@@ -161,8 +162,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     May also be provided as a list of directories as described by tests
     found in DIRS.
     """
-    from pcvs.io import console
-    console.info("PRE-RUN: start")
+    
+    io.console.info("PRE-RUN: start")
     # first, prepare raw arguments to be usable
     if output is not None:
         output = os.path.abspath(output)
@@ -170,8 +171,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     if print_level and print_level != "none":
         # any --print option will imply to disable packed rich console view
         # --> enable verbose mode
-        ctx.obj['verbose'] = 2
-        io.console.verbose = 2
+        ctx.obj['verbose'] = Verbosity.DETAILED
+        io.console.verbose = ctx.obj['verbose']
 
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config
@@ -182,7 +183,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         # detect ?
         detect = os.path.join(os.getcwd(), NAME_RUN_CONFIG_FILE)
         settings_file = detect if os.path.isfile(detect) else None
-    console.debug(
+    io.console.debug(
         "PRE-RUN: load settings from local file: {}".format(settings_file))
     val_cfg = global_config.bootstrap_validation_from_file(settings_file)
 

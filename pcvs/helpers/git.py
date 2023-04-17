@@ -10,6 +10,7 @@ from datetime import datetime
 import sh
 
 from pcvs.helpers import utils
+from pcvs.helpers.exceptions import GitException
 
 try:
     import pygit2
@@ -549,7 +550,10 @@ class GitByAPI(GitByGeneric):
                 update_ref = None
                 parents = [parent.cid.oid]
             else:
-                raise Exception()
+                raise GitException.BadEntryError(
+                    reason="Parent is unknown",
+                    dbg_info={"ref": parent}
+                )
 
         coid = self._repo.create_commit(update_ref,
                                         author,

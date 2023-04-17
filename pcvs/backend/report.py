@@ -8,6 +8,7 @@ from ruamel.yaml import YAML
 
 import pcvs
 from pcvs.backend.session import Session, list_alive_sessions
+from pcvs.helpers.exceptions import CommonException
 from pcvs.helpers import utils
 from pcvs.helpers.system import MetaDict
 from pcvs.orchestration.publishers import BuildDirectoryManager
@@ -70,7 +71,10 @@ class Report:
         elif utils.check_is_archive(path):
             hdl = BuildDirectoryManager.load_from_archive(path)
         else:
-            raise Exception()
+            raise CommonException.NotPCVSRelated(
+                reason="Given path is not PCVS build related",
+                dbg_info={"path": path}
+            )
         return hdl
 
     def add_session(self, path) -> None:
@@ -294,7 +298,7 @@ def build_static_pages(buildir) -> None:
     :param buildir: the build directory to load
     :type buildir: str
     """
-    raise Exception()
+    raise CommonException.WIPError()
 
 def start_server(report: Report) -> Flask:
     """Initialize the Flask server, default to 5000.

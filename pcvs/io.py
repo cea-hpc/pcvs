@@ -3,8 +3,10 @@ import logging
 import os
 import shutil
 import sys
+import enum
 from datetime import datetime
-
+import click
+import rich
 import rich.box as box
 from rich.console import Console
 from rich.live import Live
@@ -47,15 +49,25 @@ class SpecialChar:
             self.sep_v = " | "
             self.sep_h = "-"
 
+class Verbosity(enum.IntEnum):
+    COMPACT = 0
+    DETAILED = 1
+    INFO = 2
+    DEBUG = 3
+    NB_LEVELS = enum.auto()
+    
+    def __str__(self):
+        return str()
 
 class TheConsole(Console):
 
     def __init__(self, *args, **kwargs):
         self._color = "auto" if kwargs.get('color', True) else None
-        self._verbose = kwargs.get('verbose', 0)
+        self._verbose = Verbosity(min(Verbosity.NB_LEVELS -1, kwargs.get('verbose', 0)))
         self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w")
         self.summary_table = dict()
         err = kwargs.get('stderr', False)
+        log_level = "DEBUG" if self._verbose else "INFO"
         theme = Theme({
             "warning": "bold yellow",
             "danger": "bold red"
@@ -67,10 +79,14 @@ class TheConsole(Console):
                                      markup=self._color is not None)
 
         logging.basicConfig(
-            level="DEBUG", format="%(message)s",
-            handlers=[RichHandler(console=self._debugconsole,
+            level=log_level, format="%(message)s",
+            handlers=[RichHandler(
+                                  console=self._debugconsole,
                                   omit_repeated_times=False,
-                                  show_path=False)])
+                                  rich_tracebacks=True,
+                                  show_level=True,
+                                  tracebacks_suppress=[click],
+                                  show_path=True)])
         self._loghdl = logging.getLogger("pcvs")
         self._chars = SpecialChar(utf_support=(
             self.encoding.startswith('utf')))
@@ -78,6 +94,25 @@ class TheConsole(Console):
     @property
     def verbose(self):
         return self._verbose
+
+    def verb_level(self, level):
+        return self._verbose >= level 
+    
+    @property
+    def verb_compact(self):
+        return self.verb_level(Verbosity.COMPACT)
+    
+    @property
+    def verb_detailed(self):
+        return self.verb_level(Verbosity.DETAILED)
+    
+    @property
+    def verb_info(self):
+        return self.verb_level(Verbosity.INFO)
+    
+    @property
+    def verb_debug(self):
+        return self.verb_level(Verbosity.DEBUG)
 
     @verbose.setter
     def verbose(self, v):
@@ -99,16 +134,16 @@ class TheConsole(Console):
 
     def print_section(self, txt):
         self.print("[yellow bold]{} {}[/]".format(self.utf('sec'), txt))
-        self.debug("[CONSOLE]===> {}".format(txt))
+        self.info("[DISPLAY] ======= {} ======".format(txt))
 
     def print_header(self, txt):
         self.rule("[green bold]{}[/]".format(txt.upper()))
-        self.debug("[CONSOLE]## {}".format(txt))
+        self.info("[DISPLAY] ------- {} ------".format(txt))
 
     def print_item(self, txt, depth=1):
         self.print("[red bold]{}{}[/] {}".format(" " *
                    (depth*2), self.utf('item'), txt))
-        self.debug("[CONSOLE]* {}".format(txt))
+        self.info("[DISPLAY] * {}".format(txt))
 
     def print_box(self, txt, *args, **kwargs):
         self.print(Panel.fit(txt, *args, **kwargs))
@@ -299,14 +334,17 @@ class TheConsole(Console):
     def critical(self, fmt, *args, **kwargs):
         self._loghdl.critical(fmt, *args, **kwargs)
         self.print(
-            "[danger]CRIT: {}[/danger]".format(fmt.format(*args, **kwargs)))
-        self.print("[danger]See pcvs-debug.log for more information[/danger]")
+            "[danger]CRITICAL: {}[/danger]".format(fmt.format(*args, **kwargs)))
+        sys.exit(42)
 
     def exception(self, e: BaseException, *args, **kwargs):
         if self._verbose >= 2:
-            console.print_exception(suppress=['click'])
+            self.print_exception(suppress=['click'])
         self._loghdl.exception(e)
 
+    @property
+    def logger(self):
+        return self._loghdl
 
 console = None
 

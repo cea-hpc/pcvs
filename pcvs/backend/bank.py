@@ -12,7 +12,7 @@ from pcvs import NAME_BUILD_CONF_FN, NAME_BUILD_RESDIR, PATH_BANK, dsl
 from pcvs.helpers import utils
 from pcvs.helpers import git
 from pcvs.orchestration.publishers import BuildDirectoryManager
-from pcvs.helpers.exceptions import BankException
+from pcvs.helpers.exceptions import BankException, CommonException
 from pcvs.helpers.system import MetaDict
 
 #: :var BANKS: list of available banks when PCVS starts up
@@ -311,12 +311,14 @@ class Bank(dsl.Bank):
 
     def save_new_run(self, target_project: str, path: str) -> None:
         if not utils.check_is_build_or_archive(path):
-            raise Exception()
+            raise CommonException.NotPCVSRelated(
+                reason="Invalid path, not PCVS-related",
+                dbg_info={"path": path}
+            )
 
         if utils.check_is_archive(path):
             # convert to prefix
             # update path according to it
-            pass
             hdl = BuildDirectoryManager.load_from_archive(path)
         else:
             hdl = BuildDirectoryManager(build_dir=path)

@@ -12,6 +12,7 @@ from ruamel.yaml import YAML
 import pcvs
 from pcvs import io
 from pcvs.helpers import utils
+from pcvs.helpers.exceptions import PublisherException, CommonException
 from pcvs.helpers.system import MetaConfig, ValidationScheme
 from pcvs.plugins import Plugin
 from pcvs.testing.test import Test
@@ -158,7 +159,7 @@ class ResultFile:
         rawout = self._rawout_reader.read(length).decode('utf-8')
                 
         if not rawout.startswith(self.MAGIC_TOKEN):
-            raise Exception()
+            raise PublisherException.BadMagicTokenError()
         
         return rawout[len(self.MAGIC_TOKEN):]
     
@@ -178,7 +179,7 @@ class ResultFile:
         """
         if (id is None and name is None) or \
                 (id is not None and name is not None):
-            raise Exception()
+            raise PublisherException.UnknownJobError(id, name)
 
         lookup_table = []
         if id is not None:
@@ -389,7 +390,7 @@ class ResultFileManager:
         """
         id = job.jid
         if id in self._mapdata.keys():
-            raise Exception
+            raise PublisherException.AlreadyExistJobError(job.name)
 
         # create a new file if the current one is 'large' enough
         if (self._current_file.size >= self._max_size and self._max_size) or \
@@ -446,7 +447,13 @@ class ResultFileManager:
         res = handler.retrieve_test(id=id)
         if res:
             if len(res) > 1:
-                raise Exception()
+                raise CommonException.UnclassifiableError(
+                    reason="Given info leads to more than one job",
+                    dbg_info={
+                        "data": id,
+                        'matches': res
+                    }
+                )
             else:
                 return res[0]
         else:
@@ -662,7 +669,10 @@ class BuildDirectoryManager:
         :type build_dir: str, optional
         """
         if not os.path.isdir(build_dir):
-            raise Exception()
+            raise CommonException.NotFoundError(
+                reason="Invalid build directory, should exist *before* init.",
+                dbg_info={"build prefix": build_dir}
+            )
 
         self._path = build_dir
         self._extras = list()
@@ -801,7 +811,7 @@ class BuildDirectoryManager:
         d = os.path.join(self._path, pcvs.NAME_BUILD_CONTEXTDIR, str(idx))
         
         if os.path.exists(d):
-            raise Exception()
+            raise CommonException.AlreadyExistError(d)
         else:
             os.makedirs(d)
         
@@ -831,7 +841,9 @@ class BuildDirectoryManager:
         :type export: bool, optional
         """
         if os.path.isabs(rel_filename):
-            raise Exception()
+            raise CommonException.UnclassifiableError(
+                reason="Extras should be saved as relative paths",
+                dbg_info={"filename": rel_filename})
 
         if dir:
             try:
@@ -924,10 +936,17 @@ class BuildDirectoryManager:
         __relative_add(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN))
         __relative_add(os.path.join(self._path, pcvs.NAME_DEBUG_FILE))
 
+        not_found_files = list()
         for p in self._extras:
             if not os.path.exists(p):
-                raise Exception()
+                not_found_files.append(p)
             __relative_add(p)
+            
+        if len(not_found_files) > 0:
+            raise CommonException.NotFoundError(
+                    reason="Extra files to be stored to archive do not exist",
+                    dbg_info={"Failed paths": not_found_files}
+                )
 
         archive.close()
         return archive_file

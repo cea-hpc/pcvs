@@ -1,17 +1,17 @@
-class GenericError(Exception):
+class GenericException(Exception):
     """Generic error (custom errors will inherit of this)."""
 
-    def __init__(self, err_msg="Unkown error",
+    def __init__(self, reason="Unkown error",
                  help_msg="Please check pcvs --help for more information.",
                  dbg_info={}):
         """Constructor for generic errors.
         :param *args: unused
         :param **kwargs: messages for the error.
         """
-        self._err_msg = "{} - {}".format(type(self).__name__, err_msg)
         self._help_msg = help_msg
         self._dbg_info = dbg_info
-
+        super().__init__("{} - {}".format(type(self).__name__, reason))
+        
     def __str__(self):
         """Stringify an exception for pretty-printing.
 
@@ -19,9 +19,9 @@ class GenericError(Exception):
         :type: str"""
         dbg_str = ""
         if self._dbg_info:
-            dbg_str = "\n\nExtra infos:\n" + self.dbg_str
+            dbg_str = "\n\nAdditional notes:\n" + self.dbg_str
         return "{}\n{}{}".format(
-            self._err_msg,
+            super().__str__(),
             self._help_msg,
             dbg_str
         )
@@ -32,7 +32,7 @@ class GenericError(Exception):
 
         :return: only the error part
         :rtype: str"""
-        return self._err_msg
+        return str(self)
     
     @property
     def help(self):
@@ -70,101 +70,97 @@ initially.
 
 class CommonException:
     """Gathers exceptions commonly encountered by more specific namespaces."""
+    class NotPCVSRelated(GenericException):
+        pass
 
-    class AlreadyExistError(GenericError):
+    class AlreadyExistError(GenericException):
         """The content already exist as it should."""
 
-        def __init__(self, msg="Invalid format", **kwargs):
+        def __init__(self, reason="Already Exist", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
                                  "Note configuration, profiles & pcvs.* files can be ",
                                  "verified through `pcvs check [-c|-p|-D <path>]`"]),
                              dbg_info=kwargs)
 
-    class UnclassifiableError(GenericError):
+    class UnclassifiableError(GenericException):
         """Unable to classify this common error."""
         pass
 
-    class NotFoundError(GenericError):
+    class NotFoundError(GenericException):
         """Content haven't been found based on specifications."""
-
         pass
 
-    class IOError(GenericError):
+    class IOError(GenericException):
         """Communication error (FS, process) while processing data."""
-
         pass
 
-    class BadTokenError(GenericError):
+    class BadTokenError(GenericException):
         """Badly formatted string, unable to parse."""
-
         pass
 
-    class WIPError(GenericError):
+    class WIPError(GenericException):
         """Work in Progress, not a real error."""
         pass
 
-    class TimeoutError(GenericError):
+    class TimeoutError(GenericException):
         """The parent class timeout error."""
         pass
 
-    class NotImplementedError(GenericError):
+    class NotImplementedError(GenericException):
         """Missing implementation for this particular feature."""
+        pass
 
 
 class BankException(CommonException):
     "Bank-specific exceptions."""
-    class ProjectNameError(GenericError):
+    class ProjectNameError(GenericException):
         """name is not a valid project under the given bank."""
         pass
 
 
 class ConfigException(CommonException):
     """Config-specific exceptions."""
-
     pass
 
 
 class ProfileException(CommonException):
     """Profile-specific exceptions."""
 
-    class IncompleteError(GenericError):
+    class IncompleteError(GenericException):
         """A configuration block is missing to build the profile."""
-
         pass
 
 
 class ValidationException(CommonException):
     """Validation-specific exceptions."""
 
-    class FormatError(GenericError):
+    class FormatError(GenericException):
         """The content does not comply the required format (schemes)."""
-
-        def __init__(self, msg="Invalid format", **kwargs):
+        def __init__(self, reason="Invalid format", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
-                                 "Note configuration, profiles & pcvs.* files can be ",
-                                 "verified through `pcvs check [-c|-p|-D <path>]`"]),
+                                 "Input files may be checked with `pcvs check`"]),
                              dbg_info=kwargs)
             
-    class WrongTokenError(GenericError):
+    class WrongTokenError(GenericException):
         """A unknown token is found in valided content"""
 
-        def __init__(self, msg="Invalid token(s)", **kwargs):
+        def __init__(self, reason="Invalid token(s) used as Placeholders", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
-                                 "A list of valid token is available in the documentation"]),
+                                 "A list of valid tokens is available in the documentation"]),
                              dbg_info=kwargs)
 
-    class SchemeError(GenericError):
+    class SchemeError(GenericException):
         """The content is not a valid format (scheme)."""
 
-        def __init__(self, msg="Invalid Scheme provided", **kwargs):
+        def __init__(self, reason="Invalid Scheme provided", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
                                  "Provided schemes should be static. If code haven't be",
                                  "changed, please report this error."]),
@@ -174,91 +170,83 @@ class ValidationException(CommonException):
 class RunException(CommonException):
     """Run-specific exceptions."""
 
-    class InProgressError(GenericError):
+    class InProgressError(GenericException):
         """A run is currently occuring in the given dir."""
 
-        def __init__(self, msg="Execution in progress in this build directory", **kwargs):
+        def __init__(self, reason="Build directory currently used by another instance", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
                                  "Please Wait for previous executions to complete.",
-                                 "You may also use --override or --output to change",
-                                 "the default build directory path"]),
+                                 "You may also use --override or --output to change default build directory"]),
                              dbg_info=kwargs)
 
-    class ProgramError(GenericError):
+    class ProgramError(GenericException):
         """The given program cannot be found."""
 
-        def __init__(self, msg="Program cannot be found", **kwargs):
+        def __init__(self, reason="A program cannot be found", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
                                  "A program/binary defined in loaded profile cannot",
                                  "be found in $PATH or spack/module. Please report",
                                  "if this is a false warning."]),
                              dbg_info=kwargs)
 
-    class TestUnfoldError(GenericError):
-        """Issue raised during processing test files."""
-
-        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
-            """Updated constructor"""
-            super().__init__(err_msg=msg,
-                             help_msg="\n".join([
-                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",
-                                 "See pcvs check --help for more information."]),
-                             dbg_info=kwargs)
-
 
 class TestException(CommonException):
     """Test-specific exceptions."""
 
-    class TDFormatError(GenericError):
+    class TestExpressionError(GenericException):
         """Test description is wrongly formatted."""
 
-        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
+        def __init__(self, reason="Issue(s) while parsing a Test Descriptor", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
-                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",
-                                 "See pcvs check --help for more information."]),
-                             dbg_info=kwargs)
-
-    class DynamicProcessError(GenericError):
-        """Test File is not properly formatted."""
-
-        def __init__(self, msg="Issue(s) while parsing test input", **kwargs):
-            """Updated constructor"""
-            super().__init__(err_msg=msg,
-                             help_msg="\n".join([
-                                 "Test directories can be checked beforehand with `pcvs check -D <path>`",
-                                 "See pcvs check --help for more information."]),
+                                 "Please check input files with `pcvs check`"]),
                              dbg_info=kwargs)
 
 
 class OrchestratorException(CommonException):
     """Execution-specific errors."""
 
-    class UndefDependencyError(GenericError):
+    class UndefDependencyError(GenericException):
         """Declared job dep cannot be fully qualified, not defined."""
-
         pass
 
-    class CircularDependencyError(GenericError):
+    class CircularDependencyError(GenericException):
         """Circular dep detected while processing job dep tree."""
-
         pass
 
+class RunnerException(CommonException):
+    class LaunchError(GenericException):
+        """Unable to run a remote container"""
+        pass
+    
+class PublisherException(CommonException):
+    class BadMagicTokenError(GenericException):
+        """Issue with token stored to file to check consistency"""
+        pass
+
+    class UnknownJobError(GenericException):
+        """Unable to identify a job by its ID"""
+        pass
+    
+    class AlreadyExistJobError(GenericException):
+        """A single ID leads to multiple jobs."""
+        pass
+        
 
 class LockException(CommonException):
     """Lock-specific exceptions."""
 
-    class BadOwnerError(GenericError):
+    class BadOwnerError(GenericException):
         """Attempt to manipulate the lock while the current process is not the
         owner."""
         pass
 
-    class TimeoutError(GenericError):
+    class TimeoutError(GenericException):
         """Timeout reached before lock."""
         pass
 
@@ -266,24 +254,22 @@ class LockException(CommonException):
 class PluginException(CommonException):
     """Plugin-related exceptions."""
 
-    class BadStepError(GenericError):
+    class BadStepError(GenericException):
         """targeted pass does not exist."""
         pass
 
-    class LoadError(GenericError):
+    class LoadError(GenericException):
         """Unable to load plugin directory."""
-        def __init__(self, msg="Issue(s) while loading plugin", **kwargs):
+        def __init__(self, reason="Issue(s) while loading plugin", **kwargs):
             """Updated constructor"""
-            super().__init__(err_msg=msg,
+            super().__init__(reason=reason,
                              help_msg="\n".join([
                                  "Please ensure plugins can be imported like:",
                                  "python3 ./path/to/plugin/file.py"]),
                              dbg_info=kwargs)
 
 
-class SpackException(CommonException):
-    pass
-
-
 class GitException(CommonException):
-    pass
+    class BadEntryError(GenericException):
+        pass
+

@@ -6,6 +6,7 @@ from ruamel.yaml import YAML, YAMLError
 
 import pcvs
 from pcvs import NAME_BUILDIR, PATH_INSTDIR
+from pcvs.io import Verbosity
 from pcvs.helpers import git, pm
 from pcvs.helpers.exceptions import CommonException, ValidationException
 
@@ -67,9 +68,7 @@ class ValidationScheme:
             jsonschema.validate(instance=content, schema=self._scheme)
         except jsonschema.exceptions.ValidationError as e:
             raise ValidationException.FormatError(
-                "Scheme '{}' failed to verify the following file:\n{}".format(
-                    self._name, filepath),
-                reason=e.message)
+                reason="Failed to validate input file: {}".format(e.message), file=filepath, scheme=self._scheme)
         except jsonschema.exceptions.SchemaError as e:
             raise ValidationException.SchemeError(
                 name=self._name,
@@ -328,7 +327,7 @@ class MetaConfig(MetaDict):
         subtree = self.bootstrap_generic('validation', node)
 
         # Initialize default values when not set by user or default files
-        subtree.set_nosquash('verbose', 0)
+        subtree.set_nosquash('verbose', Verbosity.COMPACT)
         subtree.set_nosquash('print_level', 'none')
         subtree.set_nosquash('color', True)
         subtree.set_nosquash('default_profile', 'default')

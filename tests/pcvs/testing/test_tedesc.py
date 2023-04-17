@@ -117,7 +117,7 @@ def test_tedesc_regular():
         print(i.command)
 
     
-    with pytest.raises(exceptions.TestException.TDFormatError):
+    with pytest.raises(exceptions.TestException.TestExpressionError):
         tested.TEDescriptor("te_name", 
             "bad_type",
             "label", 

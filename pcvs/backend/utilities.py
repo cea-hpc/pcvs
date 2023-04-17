@@ -7,6 +7,7 @@ import tempfile
 from ruamel.yaml import YAML, YAMLError
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
+from pcvs.testing.testfile import TestFile
 from pcvs.backend import config, profile, run
 from pcvs.helpers import system, utils
 from pcvs.helpers.exceptions import ValidationException
@@ -251,7 +252,6 @@ def process_check_directory(dir, pf_name="default"):
             dflt = None
             err = None
             try:
-                from pcvs.testing.testfile import TestFile
                 cur = TestFile(file_in="", path_out="", label="", prefix=subprefix)
                 cur.load_from_str(data)
                 converted = not(cur.validate())

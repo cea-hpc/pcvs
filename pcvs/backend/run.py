@@ -15,7 +15,7 @@ from pcvs import (NAME_BUILD_CONF_FN, NAME_BUILD_CACHEDIR, NAME_BUILD_SCRATCH,
 from pcvs.backend import bank as pvBank
 from pcvs.backend import spack as pvSpack
 from pcvs.helpers import communications, criterion, utils
-from pcvs.helpers.exceptions import RunException
+from pcvs.helpers.exceptions import TestException, RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.orchestration import Orchestrator
 from pcvs.orchestration.publishers import BuildDirectoryManager
@@ -98,7 +98,6 @@ def process_main_workflow(the_session=None):
     valcfg = global_config.validation
     rc = 0
 
-    io.console.set_logfile(valcfg.runlog is not None, valcfg.runlog)
     valcfg.sid = the_session.id
     build_manager = BuildDirectoryManager(build_dir=valcfg.output)
     MetaConfig.root.set_internal('build_manager', build_manager)
@@ -329,10 +328,10 @@ def process_files():
     errors += process_static_yaml_files(yaml_files)
 
     if len(errors):
-        io.console.error("\n".join(["Test-suites failed to be parsed, with the following errors:"] +
-                         ["\t-{}: {}".format(e[0], e[1]) for e in errors]
-                         ))
-        raise RunException.TestUnfoldError("Errors found while parsing files")
+        #**{e[0]: e[1] for e in errors}
+        raise TestException.TestExpressionError(
+                        reason="Test-suites failed to be parsed.",
+                        **{e[0]: e[1].dbg for e in errors})
 
 
 def process_spack():

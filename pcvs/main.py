@@ -47,7 +47,9 @@ i = 0
 @click.group(context_settings=CONTEXT_SETTINGS, name="cli")
 @click.option("-v", "--verbose", "verbose", show_envvar=True,
               count=True, default=0,
-              help="Enable PCVS debug verbosity (cumulative)")
+              help="Enable PCVS verbosity (cumulative)")
+@click.option("-d", "--debug", show_envvar=True, default=False,
+              help="Enable Debug mode (implies `-vvv`)", is_flag=True)
 @click.option("-c", "--color/--no-color", "color",
               default=True, is_flag=True, show_envvar=True,
               help="Use colors to beautify the output")
@@ -70,10 +72,10 @@ i = 0
 @click.pass_context
 @io.capture_exception(PluginException.NotFoundError)
 @io.capture_exception(PluginException.LoadError)
-def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins, tui):
+def cli(ctx, verbose, color, encoding, exec_path, width, plugin_path, select_plugins, tui, debug):
     """PCVS main program."""
     ctx.ensure_object(dict)
-    ctx.obj['verbose'] = verbose
+    ctx.obj['verbose'] = verbose if not debug else 10
     ctx.obj['color'] = color
     ctx.obj['encode'] = encoding
     ctx.obj['exec'] = exec_path

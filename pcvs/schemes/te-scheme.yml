@@ -109,6 +109,7 @@ patternProperties:
                 OneOf:
                 - {type: array, items: {type: string}}
                 - {type: string}
+            additionalProperties: false
         additionalProperties: false
       run:
         type: object

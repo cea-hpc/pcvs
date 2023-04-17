@@ -82,7 +82,7 @@ class Orchestrator:
             self.start_new_runner()
 
         self._manager.resolve_deps()
-        if io.console.verbose:
+        if io.console.verb_debug:
             self._manager.print_dep_graph(outfile="./graph.dat")
 
         nb_nodes = self._max_res
