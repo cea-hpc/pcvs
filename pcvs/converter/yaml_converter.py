@@ -333,12 +333,14 @@ def main(ctx, color, encoding, verbose, kind, input_file, out, scheme, template,
     io.console.print_item("Process the data")
     final_data = process(data_to_convert, warn_if_missing=not(skip_unknown))
 
+    # remove appended kind (if any)
+    final_data = final_data.get(kind, final_data)
     # remove template key from the output to avoid polluting the caller
     io.console.print_item("Pruning templates from the final data")
-    invalid_nodes = [k for k in final_data.get(kind, final_data).keys() if k.startswith('pcvst_')]
+    invalid_nodes = [k for k in final_data.keys() if k.startswith('pcvst_')]
     io.console.info(["Prune the following:", "{}".format(
         pprint.pformat(invalid_nodes))])
-    [final_data.get(kind, final_data).pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
+    [final_data.pop(x, None) for x in invalid_nodes + ["pcvs_missing"]]
 
     io.console.info(
         ["Final layout:", "{}".format(pprint.pformat(final_data))])
