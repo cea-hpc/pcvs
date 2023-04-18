@@ -232,7 +232,7 @@ class ConfigurationBlock:
         self.load_from_disk()
         return MetaDict(self._details).to_dict()
 
-    def check(self) -> None:
+    def check(self, allow_conversion=True) -> None:
         """Validate a single configuration block according to its scheme."""
         system.ValidationScheme(self._kind).validate(
             self._details, filepath=self.full_name)

@@ -117,8 +117,11 @@ def exec(ctx, output, argument, gen_list, display, pcmd, penv, pmod, pout, pall)
               help="Check correctness for all registered profiles")
 @click.option("--profile-model", "-p", "pf_name", default="default",
               help="Custom profile to use when checking pcvs.setup scripts")
+@click.option("--conversion/--no-conversion", "-t/-T", "conversion",
+              is_flag=True, default=True,
+              help="Enable/Disable auto-conversion through `pcvs_convert`")
 @click.pass_context
-def check(ctx, dir, encoding, color, configs, profiles, pf_name):
+def check(ctx, dir, encoding, color, configs, profiles, pf_name, conversion):
     """Global input/output analyzer, validating configuration, profiles &
     terminal supports."""
     io.console.print_banner()
@@ -146,11 +149,11 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
 
     if configs:
         io.console.print_header("Configurations")
-        errors = {**errors, **pvUtils.process_check_configs()}
+        errors = {**errors, **pvUtils.process_check_configs(conversion=conversion)}
 
     if profiles:
         io.console.print_header("Profile(s)")
-        errors = {**errors, **pvUtils.process_check_profiles()}
+        errors = {**errors, **pvUtils.process_check_profiles(conversion=conversion)}
 
     if dir:
         io.console.print_header("Test directories")
@@ -160,7 +163,7 @@ def check(ctx, dir, encoding, color, configs, profiles, pf_name):
         cfg_val = settings.bootstrap_validation({})
         cfg_val.set_ifdef('output', "/tmp/test")
         errors = {**errors, **
-                  pvUtils.process_check_directory(os.path.abspath(dir), pf_name)}
+                  pvUtils.process_check_directory(os.path.abspath(dir), pf_name, conversion=conversion)}
 
     table = Table("Count", "Type of error",
                   title="Classification of errors", expand=True)

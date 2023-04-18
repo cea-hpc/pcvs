@@ -75,7 +75,7 @@ def get_logged_output(prefix, testname):
     return s
 
 
-def process_check_configs():
+def process_check_configs(conversion=True):
     """Analyse available configurations to ensure their correctness relatively
     to their respective schemes.
 
@@ -93,7 +93,7 @@ def process_check_configs():
                 obj.load_from_disk()
 
                 try:
-                    obj.check()
+                    obj.check(allow_legacy=conversion)
                     token = io.console.utf('succ')
                 except ValidationException.FormatError as e:
                     err_msg = base64.b64encode(str(e.dbg).encode('utf-8'))
@@ -106,7 +106,7 @@ def process_check_configs():
     return errors
 
 
-def process_check_profiles():
+def process_check_profiles(conversion=True):
     """Analyse availables profiles and check their correctness relatively to the
     base scheme.
 
@@ -121,7 +121,7 @@ def process_check_profiles():
             obj = profile.Profile(blob[0], scope)
             obj.load_from_disk()
             try:
-                obj.check(allow_legacy=False)
+                obj.check(allow_legacy=conversion)
                 token = io.console.utf('succ')
             except ValidationException.FormatError as e:
                 err_msg = base64.b64encode(str(e.dbg).encode('utf-8'))
@@ -199,7 +199,7 @@ def __set_token(token, nset=None) -> str:
         return "[red bold]{}[/]".format(io.console.utf("fail"))
 
 
-def process_check_directory(dir, pf_name="default"):
+def process_check_directory(dir, pf_name="default", conversion=True):
     """Analyze a directory to ensure defined test files are valid.
 
     :param dir: the directory to process.
@@ -214,6 +214,7 @@ def process_check_directory(dir, pf_name="default"):
         pf.load_template()
     else:
         pf.load_from_disk()
+        pf.check(allow_legacy=conversion)
     system.MetaConfig.root = system.MetaConfig()
     system.MetaConfig.root.bootstrap_from_profile(pf.dump())
     system.MetaConfig.root.validation.output = "/tmp"
@@ -254,7 +255,7 @@ def process_check_directory(dir, pf_name="default"):
             try:
                 cur = TestFile(file_in="", path_out="", label="", prefix=subprefix)
                 cur.load_from_str(data)
-                converted = not(cur.validate())
+                converted = not(cur.validate(allow_conversion=conversion))
                 nb_nodes = cur.nb_descs
                 total_nodes += nb_nodes
                 success=True
