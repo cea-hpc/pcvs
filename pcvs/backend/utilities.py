@@ -134,7 +134,7 @@ def process_check_profiles(conversion=True):
     return errors
 
 
-def process_check_setup_file(filename, prefix, run_configuration):
+def process_check_setup_file(root, prefix, run_configuration):
     """Check if a given pcvs.setup could be parsed if used in a regular process.
 
     :param filename: the pcvs.setup filepath
@@ -152,15 +152,15 @@ def process_check_setup_file(filename, prefix, run_configuration):
     try:
         tdir = tempfile.mkdtemp()
         with utils.cwd(tdir):
-            env['pcvs_src'] = os.path.dirname(filename).replace(prefix, "")
+            env['pcvs_src'] = root
             env['pcvs_testbuild'] = tdir
-
+            
             if not os.path.isdir(os.path.join(tdir, prefix)):
                 os.makedirs(os.path.join(tdir, prefix))
             if not prefix:
                 prefix = ''
             proc = subprocess.Popen(
-                [filename, prefix], env=env, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+                [os.path.join(root, prefix, "pcvs.setup"), prefix], env=env, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
             fdout, fderr = proc.communicate()
 
             if proc.returncode != 0:
@@ -242,7 +242,7 @@ def process_check_directory(dir, pf_name="default", conversion=True):
 
         if f.endswith("pcvs.setup"):
             err, data = process_check_setup_file(
-                os.path.join(dir, subprefix, f), subprefix, buildenv)
+                dir, subprefix, buildenv)
             setup_ok = __set_token(err is None)
         else:
             with open(os.path.join(dir, subprefix, f), 'r') as fh:

@@ -193,7 +193,7 @@ class TestFile:
             converted_data = YAML(typ='safe').load(fds[0].decode('utf-8'))
             #keep only TE conversion
             # anything else is dropped when converting on-the-fly
-            self._raw = converted_data['te']
+            self._raw = converted_data
             self.validate(allow_conversion=False)
             io.console.warning("\t--> Legacy syntax for: {}".format(self._in))
             io.console.warning("Please consider updating it with `pcvs_convert -k te`")
