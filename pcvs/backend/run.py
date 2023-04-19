@@ -409,9 +409,9 @@ def process_dyn_setup_scripts(setup_files):
     err = []
     io.console.info("Convert configuration to Shell variables")
     env = os.environ.copy()
-    env.update()
     env_config = build_env_from_configuration(MetaConfig.root)
-
+    env.update(env_config)
+    
     with open(os.path.join(MetaConfig.root.validation.output, NAME_BUILD_CONF_SH), 'w') as fh:
         fh.write(utils.str_dict_as_envvar(env_config))
         fh.close()
@@ -425,7 +425,6 @@ def process_dyn_setup_scripts(setup_files):
         # 1. setup the env
         env['pcvs_src'] = base_src
         env['pcvs_testbuild'] = base_build
-        out_file = None
 
         if not os.path.isdir(cur_build):
             os.makedirs(cur_build)
