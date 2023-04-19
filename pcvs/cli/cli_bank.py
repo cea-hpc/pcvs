@@ -133,8 +133,10 @@ def bank_destroy(ctx, name, symlink):
 @bank.command(name="save", short_help="Save a new run to the datastore")
 @click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
 @click.argument("path", nargs=1, required=True, type=click.Path(exists=True))
+@click.option('--message', "-m", "msg", default=None,
+              help="Use a custom Run() message")
 @click.pass_context
-def bank_save_run(ctx, name, path):
+def bank_save_run(ctx, name, path, msg):
     """Create a backup from a previously generated build directory. NAME will be
     the target bank name, PATH the build directory"""
 
@@ -147,10 +149,10 @@ def bank_save_run(ctx, name, path):
 
     b.connect()
     if os.path.isfile(path):
-        b.save_from_archive(project, path)
+        b.save_from_archive(project, path, msg=msg)
     elif os.path.isdir(path):
         path = utils.find_buildir_from_prefix(path)
-        b.save_from_buildir(project, path)
+        b.save_from_buildir(project, path, msg=msg)
 
 
 @bank.command(name="load", short_help="Extract infos from the datastore")

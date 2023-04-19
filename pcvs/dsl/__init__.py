@@ -217,9 +217,10 @@ class Serie:
                     res.append(Run(repo=self._repo, cid=elt))
         return res
 
-    def commit(self, run, msg="Commit from Serie", metadata={}, timestamp=None):
+    def commit(self, run, msg=None, metadata={}, timestamp=None):
         assert (isinstance(run, Run))
         root_tree = None
+        msg = "New run" if not msg else msg
         try:
             raw_metadata = json.dumps(metadata)
         except:

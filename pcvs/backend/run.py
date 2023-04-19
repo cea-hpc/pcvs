@@ -525,9 +525,8 @@ def anonymize_archive():
         not the actual build directory.
     """
     config = MetaConfig.root.validation
-    archive_prefix = os.path.join(config.output, 'save_for_export')
     outdir = config.output
-    for root, _, files in os.walk(archive_prefix):
+    for root, _, files in os.walk(config.output):
         for f in files:
             if not f.endswith(('.xml', '.json', '.yml',
                                '.txt', '.md', '.html')):
@@ -542,42 +541,6 @@ def anonymize_archive():
                             .replace(os.environ['HOME'], '${HOME}')
                             .replace(os.environ['USER'], '${USER}'),
                         end='')
-
-
-def save_for_export(f, dest=None):
-    """Add a resource to the archive to be exported.
-
-    Copy a source file to a destination prefix. The root build directory is
-    replaced with $buildir/save_for_export, the relative subtree is preserved.
-
-    If 'dest' is set, the default target directory may be changed.
-
-    :param f: the source file to be saved (absolute path)
-    :type f: str
-    :param dest: the destination directory, defaults to None
-    :type dest: str, optional
-    :raises UnclassifiableError: input file is not a file or a directory
-    :raises NotFoundError: source or target resource cannot be determined
-    """
-    config = MetaConfig.root.validation
-    # if dest is not given, 'dest' will be the same dirtree with
-    # extra 'safe_for_export' sudir below 'outdir'
-    # otherwise, just use the given dest instead of replacing
-    if dest is None:
-        dest = f
-    dest = dest.replace(config.output, os.path.join(
-        config.output, 'save_for_export'))
-    os.makedirs(os.path.dirname(dest), exist_ok=True)
-
-    try:
-        if os.path.isfile(f):
-            shutil.copyfile(f, dest)
-        elif os.path.isdir(f):
-            shutil.copytree(f, dest)
-        else:
-            raise RunException.UnclassifiableError("{}".format(f))
-    except FileNotFoundError as e:
-        raise RunException.NotFoundError(e, f)
 
 
 def terminate():

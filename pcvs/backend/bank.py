@@ -204,7 +204,7 @@ class Bank(dsl.Bank):
         with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
             self._config = MetaDict(YAML(typ='safe').load(fh))
 
-    def save_from_buildir(self, tag: str, buildpath: str) -> None:
+    def save_from_buildir(self, tag: str, buildpath: str, msg: str=None) -> None:
         """Extract results from the given build directory & store into the bank.
 
         :param tag: overridable default project (if different)
@@ -212,9 +212,11 @@ class Bank(dsl.Bank):
         :param buildpath: the directory where PCVS stored results
         :type buildpath: str
         """
-        self.load_config_from_file(buildpath)
-        rawdata_dir = os.path.join(buildpath, NAME_BUILD_RESDIR)
-
+        hdl = BuildDirectoryManager(buildpath)
+        hdl.load_config()
+        hdl.init_results()
+        self._config = hdl.config
+        
         seriename = self.build_target_branch_name(tag)
         serie = self.get_serie(seriename)
 
@@ -224,20 +226,11 @@ class Bank(dsl.Bank):
         run = dsl.Run(from_serie=serie)
         metadata = {'cnt': {}}
 
-        for result_file in os.listdir(rawdata_dir):
-            d = {}
-            with open(os.path.join(rawdata_dir, result_file), 'r') as fh:
-                data = MetaDict(json.load(fh))
-                # TODO: validate
-            for elt in data['tests']:
-                name = elt['id']['fq_name']
-                state = str(elt['result']['state'])
-                metadata['cnt'].setdefault(state, 0)
-                metadata['cnt'][state] += 1
-                d[name] = elt
-
-            run.update_flatdict(d)
-
+        for job in hdl.results.browse_tests():
+            metadata['cnt'].setdefault(str(job.state), 0)
+            metadata['cnt'][str(job.state)] += 1
+            run.update(job.name, job)
+            
         self.set_id(
             an=self._config.validation.author.name,
             am=self._config.validation.author.email,
@@ -245,10 +238,10 @@ class Bank(dsl.Bank):
             cm=git.get_current_usermail()
         )
 
-        serie.commit(run, metadata=metadata, timestamp=int(
+        serie.commit(run, metadata=metadata, msg=msg, timestamp=int(
             self._config.validation.datetime.timestamp()))
 
-    def save_from_archive(self, tag: str, archivepath: str) -> None:
+    def save_from_archive(self, tag: str, archivepath: str, msg: str=None) -> None:
         """Extract results from the archive, if used to export results.
 
         This is basically the same as :func:`BanK.save_from_buildir` except
@@ -263,8 +256,9 @@ class Bank(dsl.Bank):
 
         with tempfile.TemporaryDirectory() as tarpath:
             tarfile.open(os.path.join(archivepath)).extractall(tarpath)
-            self.save_from_buildir(
-                tag, os.path.join(tarpath, "save_for_export"))
+            d = [x for x in os.listdir(tarpath) if x.startswith("pcvsrun_")]
+            assert(len(d) == 1)
+            self.save_from_buildir(tag, os.path.join(tarpath, d[0]), msg=msg)
             
     def save_new_run_from_instance(self, target_project: str, hdl: BuildDirectoryManager) -> None:
         """
