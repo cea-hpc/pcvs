@@ -171,8 +171,8 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     if print_level and print_level != "none":
         # any --print option will imply to disable packed rich console view
         # --> enable verbose mode
-        ctx.obj['verbose'] = Verbosity.DETAILED
-        io.console.verbose = ctx.obj['verbose']
+        io.console.verbose = Verbosity.DETAILED
+        ctx.obj['verbose'] = str(io.console.verbose)
 
     global_config = system.MetaConfig()
     system.MetaConfig.root = global_config

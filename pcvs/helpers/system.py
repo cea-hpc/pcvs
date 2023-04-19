@@ -327,7 +327,7 @@ class MetaConfig(MetaDict):
         subtree = self.bootstrap_generic('validation', node)
 
         # Initialize default values when not set by user or default files
-        subtree.set_nosquash('verbose', Verbosity.COMPACT)
+        subtree.set_nosquash('verbose', str(Verbosity.COMPACT))
         subtree.set_nosquash('print_level', 'none')
         subtree.set_nosquash('color', True)
         subtree.set_nosquash('default_profile', 'default')

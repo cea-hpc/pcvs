@@ -57,8 +57,8 @@ class Verbosity(enum.IntEnum):
     NB_LEVELS = enum.auto()
     
     def __str__(self):
-        return str()
-
+        return self.name
+    
 class TheConsole(Console):
 
     def __init__(self, *args, **kwargs):
@@ -152,7 +152,7 @@ class TheConsole(Console):
         if icon is not None:
             icon = self.utf(icon)
 
-        if self._verbose >= 1:
+        if self._verbose >= Verbosity.DETAILED:
             self.print("[{} bold]   {} {:8.2f}s{}{:7}{}{}".format(
                 colorname,
                 icon,
@@ -338,7 +338,7 @@ class TheConsole(Console):
         sys.exit(42)
 
     def exception(self, e: BaseException, *args, **kwargs):
-        if self._verbose >= 2:
+        if self._verbose >= Verbosity.INFO:
             self.print_exception(suppress=['click'])
         self._loghdl.exception(e)
 
