@@ -229,7 +229,7 @@ class Bank(dsl.Bank):
         for job in hdl.results.browse_tests():
             metadata['cnt'].setdefault(str(job.state), 0)
             metadata['cnt'][str(job.state)] += 1
-            run.update(job.name, job)
+            run.update(job.name, job.to_json())
             
         self.set_id(
             an=self._config.validation.author.name,
