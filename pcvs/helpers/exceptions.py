@@ -181,6 +181,16 @@ class RunException(CommonException):
                                  "You may also use --override or --output to change default build directory"]),
                              dbg_info=kwargs)
 
+    class NonZeroSetupScript(GenericException):
+        """a setup script (=pcvs.setup) completed but returned non-zero exit code."""
+
+        def __init__(self, reason="A setup script failed to complete", **kwargs):
+            """Updated constructor"""
+            super().__init__(reason=reason,
+                             help_msg="\n".join([
+                                 "Try to run manually the setup script below."]),
+                             dbg_info=kwargs)
+
     class ProgramError(GenericException):
         """The given program cannot be found."""
 

@@ -441,19 +441,19 @@ def process_dyn_setup_scripts(setup_files):
             fdout, fderr = fds.communicate()
 
             if fds.returncode != 0:
-                raise subprocess.CalledProcessError(fds.returncode, '')
+                raise RunException.NonZeroSetupScript(rc=fds.returncode, err=fderr, file=f)
 
             #### should be enabled only in debug mode
             # flush the output to $BUILD/pcvs.yml
             #out_file = os.path.join(cur_build, 'pcvs.yml')
             #with open(out_file, 'w') as fh:
                 #fh.write(fdout.decode('utf-8'))
-        except CalledProcessError:
-            if fds.returncode != 0:
-                err.append((f, "(exit {}): {}".format(
-                    fds.returncode, fderr.decode('utf-8'))))
-                io.console.info("EXEC FAILED: {}: {}".format(
-                    f, fderr.decode('utf-8')))
+        except CalledProcessError as e:
+            err.append((f, RunException.ProgramError(file=f)))
+            continue
+        except RunException.NonZeroSetupScript as e:
+            err.append((f, e))
+            io.console.info("Setup Failed ({}): {}".format(f, e.dbg['err'].decode('utf-8')))
             continue
         
         out = fdout.decode('utf-8')
