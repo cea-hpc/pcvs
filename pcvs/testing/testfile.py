@@ -261,13 +261,15 @@ if test -n "{simulated}"; then
     PCVS_SHOW_CMD=1
 fi
 
-if test -n "$PCVS_SHOW_MOD"; then
+if test -z "$PCVS_SHOW"; then
+eval "{pm_string}"
+elif test -n "$PCVS_SHOW_MOD"; then
 test -n "$PCVS_VERBOSE" && echo "## MODULE LOADED FROM PROFILE ##"
 cat<<EOF
 {pm_string}
 EOF
-else
-eval "{pm_string}"
+#else... SHOW but not this option --> nothing to do
+
 fi
 
 for arg in "$@"; do case $arg in
@@ -287,29 +289,31 @@ for arg in "$@"; do case $arg in
         esac
     done
     
-    if test -n "$PCVS_SHOW_MOD"; then
-        test -n "$PCVS_VERBOSE" && echo "#### MODULE LOADED ####"
+    if test -z "$PCVS_SHOW"; then
+        eval "${{pcvs_load}}" || exit "$?"
+        eval "${{pcvs_env}}" || exit "$?"
+        eval "${{pcvs_cmd}}" || exit "$?"
+        exit $?
+    else   
+        if test -n "$PCVS_SHOW_MOD"; then
+            test -n "$PCVS_VERBOSE" && echo "#### MODULE LOADED ####"
 cat<<EOF
 ${{pcvs_load}}
 EOF
-    else
-        eval "${{pcvs_load}}" || exit "$?"
-    fi
-    if test -n "$PCVS_SHOW_ENV"; then
-    test -n "$PCVS_VERBOSE" && echo "###### SETUP ENV ######"
+        fi
+        
+        if test -n "$PCVS_SHOW_ENV"; then
+        test -n "$PCVS_VERBOSE" && echo "###### SETUP ENV ######"
 cat<<EOF
 ${{pcvs_env}}
 EOF
-    else
-        eval "${{pcvs_env}}" || exit "$?"
-    fi
-    if test -n "$PCVS_SHOW_CMD"; then
-    test -n "$PCVS_VERBOSE" && echo "##### RUN COMMAND #####"
+        fi
+        if test -n "$PCVS_SHOW_CMD"; then
+        test -n "$PCVS_VERBOSE" && echo "##### RUN COMMAND #####"
 cat<<EOF
 ${{pcvs_cmd}}
 EOF
-    else
-        eval "${{pcvs_cmd}}" || exit "$?"
+        fi
     fi
     exit $?\n""".format(list_of_tests="\n".join([
                 t.name
