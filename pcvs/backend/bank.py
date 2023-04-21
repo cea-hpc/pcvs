@@ -272,7 +272,7 @@ class Bank(dsl.Bank):
         """
         seriename = self.build_target_branch_name(target_project)
         serie = self.get_serie(seriename)
-        metadata = {}
+        metadata = {'cnt': {}}
         
         if serie is None:
             serie = self.new_serie(seriename)
