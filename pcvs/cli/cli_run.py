@@ -130,6 +130,8 @@ def handle_build_lockfile(exc=None):
               help="Purge the results from sensitive data (HOME, USER...)")
 @click.option("-b", "--bank", "bank", default=None, shell_complete=cli_bank.compl_bank_projects,
               help="Which bank will store the run in addition to the archive")
+@click.option("-m", "--message", "msg", default=None,
+              help="Message to store the run (if bank is enabled)")
 @click.option("--duplicate", "dup", default=None,
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
@@ -153,7 +155,7 @@ def handle_build_lockfile(exc=None):
 @io.capture_exception(Exception, handle_build_lockfile)
 @io.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
-        generate_only, spack_recipe, print_level, simulated, bank, dup,
+        generate_only, spack_recipe, print_level, simulated, bank, msg, dup,
         dirs, enable_report, report_addr, timeout) -> None:
     """
     Execute a validation suite from a given PROFILE.
@@ -201,6 +203,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('reused_build', dup)
     val_cfg.set_ifdef('default_profile', profilename)
     val_cfg.set_ifdef('target_bank', bank)
+    val_cfg.set_ifdef('message', msg)
     val_cfg.set_ifdef('enable_report', enable_report)
     val_cfg.set_ifdef('report_addr', report_addr)
     val_cfg.set_ifdef('timeout', timeout)

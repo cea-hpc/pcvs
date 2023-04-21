@@ -260,7 +260,7 @@ class Bank(dsl.Bank):
             assert(len(d) == 1)
             self.save_from_buildir(tag, os.path.join(tarpath, d[0]), msg=msg)
             
-    def save_new_run_from_instance(self, target_project: str, hdl: BuildDirectoryManager) -> None:
+    def save_new_run_from_instance(self, target_project: str, hdl: BuildDirectoryManager, msg: str=None) -> None:
         """
         Create a new node into the bank for the given project, based on the open
         result handler.
@@ -300,7 +300,7 @@ class Bank(dsl.Bank):
             cm=git.get_current_usermail()
         )
         
-        serie.commit(run, metadata={}, timestamp=int(
+        serie.commit(run, metadata={}, msg=msg, timestamp=int(
             self._config.validation.datetime.timestamp()))
 
     def save_new_run(self, target_project: str, path: str) -> None:

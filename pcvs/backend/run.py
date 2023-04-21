@@ -152,7 +152,7 @@ def process_main_workflow(the_session=None):
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
             bank.load_config_from_dict(MetaConfig.root)
-            bank.save_new_run_from_instance(None, build_hdl)
+            bank.save_new_run_from_instance(None, build_hdl, msg=valcfg.get('message', None))
             #bank.save_from_buildir(
             #    None,
             #    os.path.join(valcfg.output)
