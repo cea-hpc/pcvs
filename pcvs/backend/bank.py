@@ -272,6 +272,7 @@ class Bank(dsl.Bank):
         """
         seriename = self.build_target_branch_name(target_project)
         serie = self.get_serie(seriename)
+        metadata = {}
         
         if serie is None:
             serie = self.new_serie(seriename)
@@ -290,6 +291,8 @@ class Bank(dsl.Bank):
         d = dict()
         for job in hdl.results.browse_tests():
             d[job.name] = job.to_json()
+            metadata['cnt'].setdefault(str(job.state), 0)
+            metadata['cnt'][str(job.state)] += 1
     
         run.update_flatdict(d)
         
@@ -300,7 +303,7 @@ class Bank(dsl.Bank):
             cm=git.get_current_usermail()
         )
         
-        serie.commit(run, metadata={}, msg=msg, timestamp=int(
+        serie.commit(run, metadata=metadata, msg=msg, timestamp=int(
             self._config.validation.datetime.timestamp()))
 
     def save_new_run(self, target_project: str, path: str) -> None:
