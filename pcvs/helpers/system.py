@@ -309,7 +309,7 @@ class MetaConfig(MetaDict):
                     "Error(s) found while loading (}".format(filepath))
 
         # some post-actions
-        for field in ["output", "reused_build", "runlog"]:
+        for field in ["output", "reused_build"]:
             if field in node:
                 node[field] = os.path.abspath(node[field])
 
@@ -336,7 +336,6 @@ class MetaConfig(MetaDict):
         subtree.set_nosquash('override', False)
         subtree.set_nosquash('dirs', None)
         subtree.set_nosquash("spack_recipe", None)
-        subtree.set_nosquash('runlog', os.path.join(subtree.output, 'out.log'))
         subtree.set_nosquash('simulated', False)
         subtree.set_nosquash('anonymize', False)
         subtree.set_nosquash('onlygen', False)
@@ -428,10 +427,12 @@ class MetaConfig(MetaDict):
         """Export the whole configuration as a dict. Prune any __internal node
         beforehand.
         """
-        not_exported = self.__internal_config
-        del self.__internal_config
+        if self.__internal_config:
+            not_exported = self.__internal_config
+            del self.__internal_config
+            res = MetaDict(self.to_dict())
+            self.__internal_config = not_exported
+        else:
+            res = self
 
-        res = self.to_dict()
-        self.__internal_config = not_exported
-
-        return MetaDict(res).to_dict()
+        return res.to_dict()

@@ -15,6 +15,7 @@ NAME_BUILD_CACHEDIR = "cache"
 NAME_BUILD_CONTEXTDIR = os.path.join(NAME_BUILD_CACHEDIR, "runner_ctx")
 
 NAME_DEBUG_FILE = "pcvs-debug.log"
+NAME_LOG_FILE = "pcvs-out.log"
 
 PATH_INSTDIR = os.path.dirname(__file__)
 PATH_HOMEDIR = click.get_app_dir('pcvs', force_posix=True)

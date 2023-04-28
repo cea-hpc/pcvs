@@ -208,7 +208,6 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('report_addr', report_addr)
     val_cfg.set_ifdef('timeout', timeout)
     val_cfg.set_ifdef('spack_recipe', spack_recipe)
-    val_cfg.set_ifdef('runlog', os.path.join(val_cfg.output, 'out.log'))
     val_cfg.set_ifdef('buildcache', os.path.join(val_cfg.output, 'cache'))
 
     # if dirs not set by config file nor CLI
@@ -282,12 +281,10 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
         global_config.bootstrap_from_profile(pf.dump())
 
     the_session = pvSession.Session(val_cfg.datetime, val_cfg.output)
-    the_session.register_callback(callback=pvRun.process_main_workflow,
-                                  io_file=val_cfg.runlog)
+    the_session.register_callback(callback=pvRun.process_main_workflow)
 
     io.console.info("PRE-RUN: Session to be started")
     if val_cfg.background:
-        io.detach_console(logfile=val_cfg.runlog)
         sid = the_session.run_detached(the_session)
         print(
             "Session successfully started, ID {}".format(sid))

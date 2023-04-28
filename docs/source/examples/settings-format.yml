@@ -6,7 +6,6 @@
 
 # does pcvs return a non-zero exit code if at least a test failed
 fail_on_error: true
-runlog: "path/to/runlog/file.log"
 output: "build/directory"
 # True = detached sessions
 background: false 
