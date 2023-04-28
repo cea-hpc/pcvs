@@ -322,7 +322,8 @@ class Session:
         # this dict is then flushed to the session.yml
         self._session_infos = {
             "path": path,
-            "io": None,
+            "log": io.console.logfile,
+            "io": io.console.outfile,
             "progress": 0,
             "state": Session.State.WAITING,
             "started": date,
@@ -340,27 +341,14 @@ class Session:
         self._sid = sid
         self._session_infos = data
 
-    def register_callback(self, callback, io_file=None):
+    def register_callback(self, callback):
         """Register the callback used as main function once the session is
         started.
 
         :param callback: function to invoke
         :type callback: Callable
-        :param io_file: Where I/O will be redirected once session is started
-        :type io_file: str, optional
         """
         self._func = callback
-        self.register_io_file(io_file)
-
-    def register_io_file(self, pathfile=None):
-        """Register the I/O file when stdout/stderr will be flushed once the
-        session is started.
-
-        :param pathfile: the path to redirect I/Os, may be None
-        :type pathfile: str, optional
-        """
-        self._session_infos['io'] = pathfile
-        self._io_file = pathfile
 
     def run_detached(self, *args, **kwargs):
         """Run the session is detached mode.
@@ -374,6 +362,9 @@ class Session:
         :return: the Session id created for this run.
         :rtype: int
         """
+        io.detach_console()
+        self._session_infos['io'] = io.console.outfile
+
         if self._func is not None:
             # some sessions can have their starting time set directly when
             # initializing the object.

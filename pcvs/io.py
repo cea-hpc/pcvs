@@ -92,6 +92,13 @@ class TheConsole(Console):
             self.encoding.startswith('utf')))
 
     @property
+    def logfile(self):
+        return os.path.abspath(self._debugfile.name)
+    
+    @property
+    def outfile(self):
+        return os.path.abspath(self.file.name)
+    @property
     def verbose(self):
         return self._verbose
 
@@ -304,14 +311,6 @@ class TheConsole(Console):
 
         self.print("\n".join(banner))
 
-    def set_logfile(self, *args, **kwargs):
-        self.warning("this function should be removed")
-        pass
-
-    def set_tty(self, *args, **kwargs):
-        self.warning("this function should be removed")
-        pass
-
     def info(self, fmt, *args, **kwargs):
         self._loghdl.info(fmt, *args, **kwargs)
 
@@ -323,8 +322,8 @@ class TheConsole(Console):
 
     def warn(self, fmt, *args, **kwargs):
         self.warning(fmt, *args, **kwargs)
-        self.print(
-            "[warning]WARN: {}[/warning]".format(fmt.format(*args, **kwargs)))
+        #self.print(
+        #    "[warning]WARN: {}[/warning]".format(fmt.format(*args, **kwargs)), )
 
     def error(self, fmt, *args, **kwargs):
         self._loghdl.error(fmt, *args, **kwargs)
@@ -354,13 +353,11 @@ def init(color=True, verbose=0, *args, **kwargs):
     console = TheConsole(color=color, verbose=verbose, *args, **kwargs)
 
 
-def detach_console(logfile=None):
+def detach_console():
     global console
-    if logfile:
-        console.file = open(logfile, "w")
-    else:
-        console.file = sys.stdout
-
+    logfile = os.path.join(os.path.dirname(console.logfile), pcvs.NAME_LOG_FILE)
+    console.file = open(logfile, 'w')
+    
 
 def capture_exception(e_type, user_func=None):
     """wraps functions to capture unhandled exceptions for high-level
