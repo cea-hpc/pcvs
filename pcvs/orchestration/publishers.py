@@ -302,7 +302,7 @@ class ResultFileManager:
 
             self._current_file = curfile
 
-    def reconstruct_map_data(self) -> None:
+    def build_bidir_map_data(self) -> None:
         """
         Rebuild global views from partial storage on disk.
         
@@ -315,6 +315,32 @@ class ResultFileManager:
         for fic, jobs in self._mapdata.items():
             for job in jobs:
                 self._mapdata_rev[job] = fic
+
+    def reconstruct_map_data(self) -> None:
+        for job in self.browse_tests():
+            self._mapdata_rev[job.id] = job.output_info['file']
+            self._mapdata.setdefault(job.output_info['file'], list())
+            self._mapdata[job.output_info['file']].append(id)
+    
+    def reconstruct_view_data(self) -> None:
+        for job in self.browse_tests():
+            state = str(job.state)
+            id = job.jid
+            self._viewdata['status'][state].append(id)
+            for tag in job.tags:
+                if tag not in self._viewdata['tags']:
+                    self.register_view_item(view='tags', item=tag)
+                self._viewdata['tags'][tag][state].append(id)
+
+            self.register_view_item('tree', job.label)
+            self._viewdata['tree'][job.label][state].append(id)
+            if job.subtree:
+                nodes = job.subtree.split('/')
+                nb_nodes = len(nodes)
+                for i in range(1, nb_nodes+1):
+                    name = "/".join([job.label] + nodes[:i])
+                    self.register_view_item('tree', name)
+                    self._viewdata['tree'][name][state].append(id)
 
     def __init__(self, prefix=".", per_file_max_ent=0, per_file_max_sz=0) -> None:
         """
@@ -364,7 +390,7 @@ class ResultFileManager:
         self._max_entries = per_file_max_ent
         self._max_size = per_file_max_sz
 
-        self.reconstruct_map_data()
+        self.build_bidir_map_data()
         
         self.discover_result_files()
         if not self._current_file:
@@ -408,8 +434,9 @@ class ResultFileManager:
         state = str(job.state)
         self._viewdata['status'][state].append(id)
         for tag in job.tags:
-            if tag in self._viewdata['tags']:
-                self._viewdata['tags'][tag][state].append(id)
+            if tag not in self._viewdata['tags']:
+                self.register_view_item(view='tags', item=tag)
+            self._viewdata['tags'][tag][state].append(id)
 
         self.register_view_item('tree', job.label)
         self._viewdata['tree'][job.label][state].append(id)
@@ -677,6 +704,7 @@ class BuildDirectoryManager:
         self._path = build_dir
         self._extras = list()
         self._results = None
+        self._config = None
         self._scratch = os.path.join(build_dir, pcvs.NAME_BUILD_SCRATCH)
         old_archive_dir = os.path.join(build_dir, pcvs.NAME_BUILD_ARCHIVE_DIR)
 

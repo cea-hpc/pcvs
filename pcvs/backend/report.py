@@ -36,6 +36,7 @@ def upload_buildir_results(buildir) -> None:
         'dirs': conf_yml.validation.dirs
     })
     for test in man.results.browse_tests():
+        hdl.save(test)
         dataman.insert_test(sid, test)
 
     dataman.close_session(sid, {'state': Session.State.COMPLETED})
@@ -87,6 +88,7 @@ class Report:
         hdl = self.__create_build_handler(path)
         hdl.load_config()
         hdl.init_results()
+        hdl.results.reconstruct_view_data()
         self._sessions[hdl.sid] = hdl
 
     def load_alive_sessions(self) -> None:
