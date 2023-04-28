@@ -23,9 +23,8 @@ class BankValidationPlugin(Plugin):
 
             self._bank_hdl = bank.Bank(path=None, token=bankname)
             self._bank_hdl.connect()
-            self._bank_hdl.load_config_from_dict(MetaConfig.root)
         self._serie = self._bank_hdl.get_serie(
-            self._bank_hdl.build_target_branch_name())
+            self._bank_hdl.build_target_branch_name(hash=MetaConfig.root.validation.pf_hash))
         if not self._serie:
             # no history, stop !
             return None

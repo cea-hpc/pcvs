@@ -53,7 +53,11 @@ class Branch(Reference):
 
     def __init__(self, repo, name='master'):
         super().__init__(repo)
-        self.name = name
+        self._name = name
+    
+    @property
+    def name(self):
+        return self._name
 
 
 class Commit(Reference):

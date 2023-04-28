@@ -71,16 +71,21 @@ def bank_list(ctx):
 
 @bank.command(name="show", short_help="Display data stored in a repo.")
 @click.argument("name", nargs=1, required=True, type=str, shell_complete=compl_list_banks)
+@click.option("-p", "--path", "path", is_flag=True, default=False,
+              help="Display bank location")
 @click.pass_context
-def bank_show(ctx, name):
+def bank_show(ctx, name, path):
     """Display all data stored into NAME repository"""
-    io.console.print_header("Bank View")
-
     b = pvBank.Bank(token=name)
     if not b.exists():
         raise click.BadArgumentUsage("'{}' does not exist".format(name))
     else:
         b.connect()
+    
+    if path:
+        print(b.path)
+    else:
+        io.console.print_header("Bank View")
         b.show()
 
 

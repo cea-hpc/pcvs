@@ -117,7 +117,7 @@ class Run:
             data = data.to_json()
 
         if isinstance(data, dict):
-            data = json.dumps(data)
+            data = json.dumps(data, default=lambda x: "Invalid type: {}".format(type(x)))
 
         self._stage[prefix] = data
 
@@ -323,5 +323,5 @@ class Bank:
         :return: A list of available projects
         :rtype: list of str
         """
-        projects = [elt.name.split('/')[0] for elt in self._repo.branches]
+        projects = [elt.name.split('/')[0] for elt in self._repo.branches if elt.name != "master"]
         return list(set(projects))
