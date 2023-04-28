@@ -90,8 +90,11 @@ def test_save_run(mock_repo_fs, dummy_run, capsys):
     obj.connect()
     prefix = utils.find_buildir_from_prefix(dummy_run)
     obj.save_from_buildir("override-tag", prefix)
+    assert(obj.get_count() == 1)
+    
     obj.save_from_buildir(None, prefix)
-    assert(len(obj.list_projects()) == 3)
+    assert(obj.get_count() == 2)
+    
     assert(len(obj.list_series("override-tag")) == 1)
     assert(len(obj.list_series("original-tag")) == 1)
     obj.show()

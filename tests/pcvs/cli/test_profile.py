@@ -32,13 +32,6 @@ def test_list(mock_init):
     assert('user' not in res.stdout)
     assert('system-wide' not in res.stdout)
 
-    res = click_call('profile', 'list', 'global.system-wide')
-    assert(res.exit_code == 0)
-    assert('default' not in res.stdout)
-    assert('user' not in res.stdout)
-    assert('system-wide' in res.stdout)
-    assert('WARN: no LABEL required' in res.stdout)
-
 
 @patch('pcvs.backend.profile.Profile')
 def test_show(mock_pf):

@@ -8,7 +8,7 @@ from click.testing import CliRunner
 
 import pcvs
 from pcvs.backend import run as tested
-from pcvs.helpers.exceptions import ValidationException
+from pcvs.helpers.exceptions import ValidationException, RunException
 from pcvs.helpers.system import MetaConfig, MetaDict
 from pcvs.plugins import Collection
 
@@ -73,7 +73,7 @@ def test_process_bad_setup_script(mock_config):
     err = tested.process_dyn_setup_scripts([("L1", "subtree", "pcvs.setup")])
     assert(len(err) == 1)
     assert(err[0][0] == f)
-    assert("exit 42" in err[0][1])
+    assert(isinstance(err[0][1], RunException.NonZeroSetupScript))
     
 
 def test_process_wrong_setup_script(mock_config):
