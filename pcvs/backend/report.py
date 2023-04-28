@@ -88,7 +88,6 @@ class Report:
         hdl = self.__create_build_handler(path)
         hdl.load_config()
         hdl.init_results()
-        hdl.results.reconstruct_view_data()
         self._sessions[hdl.sid] = hdl
 
     def load_alive_sessions(self) -> None:

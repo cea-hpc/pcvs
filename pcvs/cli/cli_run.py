@@ -144,6 +144,8 @@ def handle_build_lockfile(exc=None):
               help="Rebuild the test-base, populating resources for `pcvs exec`")
 @click.option('-t', "--timeout", "timeout", show_envvar=True, type=int,
               help="PCVS process timeout")
+@click.option("-S", "--successful", "only_success", is_flag=True, default=False,
+              help="Return non-zero exit code if a single test has failed")
 @click.option("-s", "--spack-recipe", "spack_recipe", type=str, multiple=True,
               help="Build test-suites based on Spack recipes")
 @click.option("-P", "--print", "print_level", type=click.Choice(['none', 'errors', 'all']),
@@ -156,7 +158,7 @@ def handle_build_lockfile(exc=None):
 @io.capture_exception(KeyboardInterrupt, handle_build_lockfile)
 def run(ctx, profilename, output, detach, override, anon, settings_file,
         generate_only, spack_recipe, print_level, simulated, bank, msg, dup,
-        dirs, enable_report, report_addr, timeout) -> None:
+        dirs, enable_report, report_addr, only_success, timeout) -> None:
     """
     Execute a validation suite from a given PROFILE.
 
@@ -292,5 +294,6 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     else:
         sid = the_session.run(the_session)
         utils.unlock_file(buildfile)
-
-    sys.exit(the_session.rc)
+       
+    final_rc = the_session.rc if only_success else 0
+    sys.exit(final_rc)
