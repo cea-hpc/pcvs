@@ -784,9 +784,14 @@ class BuildDirectoryManager:
         :param config: config
         :type config: class:`MetaConfig`
         """
+        if not isinstance(config, MetaConfig):
+            config = MetaConfig(config)
         self._config = config
         with open(os.path.join(self._path, pcvs.NAME_BUILD_CONF_FN), 'w') as fh:
-            YAML(typ='safe').dump(config, fh)
+            h = YAML(typ='safe')
+            h.default_flow_style = None
+            h.dump(config.dump_for_export(), fh)
+    
 
     def get_config(self) -> dict:
         """

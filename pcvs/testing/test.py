@@ -525,6 +525,10 @@ class Test:
     @property
     def output(self) -> str:
         return self.get_raw_output(encoding='utf-8')
+    
+    @property
+    def output_info(self) -> dict:
+        return self._output_info
 
     @property
     def time(self):

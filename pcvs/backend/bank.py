@@ -63,7 +63,6 @@ class Bank(dsl.Bank):
         """
         self._dflt_proj: Optional[str] = None
         self._name: Optional[str] = None
-        self._config: Optional[MetaDict] = None
         self._path: str = path
 
         global BANKS
@@ -93,7 +92,7 @@ class Bank(dsl.Bank):
         :return: the project name (as a Ref branch)
         :rtype: str
         """
-        return "unkwown" if not self._dflt_proj else self._dflt_proj
+        return "unknown" if not self._dflt_proj else self._dflt_proj
 
     @property
     def prefix(self) -> Optional[str]:
@@ -179,31 +178,6 @@ class Bank(dsl.Bank):
             self._name = os.path.basename(self._path).lower()
         add_banklink(self._name, self._path)
 
-    def load_config_from_str(self, s: str) -> None:
-        """Load the configuration data associated with the archive to process.
-
-        :param s: the configuration data
-        :type s: str
-        """
-        self._config = MetaDict(YAML(typ='safe').load(s))
-
-    def load_config_from_dict(self, s: dict) -> None:
-        """Load the configuration data associated with the archive to process.
-
-        :param s: the configuration data
-        :type s: dict
-        """
-        self._config = MetaDict(s)
-
-    def load_config_from_file(self, path: str) -> None:
-        """Load the configuration file associated with the archive to process.
-
-        :param path: the configuration file path
-        :type path: str
-        """
-        with open(os.path.join(path, NAME_BUILD_CONF_FN), 'r') as fh:
-            self._config = MetaDict(YAML(typ='safe').load(fh))
-
     def save_from_buildir(self, tag: str, buildpath: str, msg: str=None) -> None:
         """Extract results from the given build directory & store into the bank.
 
@@ -215,12 +189,10 @@ class Bank(dsl.Bank):
         hdl = BuildDirectoryManager(buildpath)
         hdl.load_config()
         hdl.init_results()
-        self._config = hdl.config
         
-        seriename = self.build_target_branch_name(tag)
+        seriename = self.build_target_branch_name(tag, hdl.config.validation.pf_hash)
         serie = self.get_serie(seriename)
-
-        if not serie:
+        if serie is None:
             serie = self.new_serie(seriename)
 
         run = dsl.Run(from_serie=serie)
@@ -232,14 +204,16 @@ class Bank(dsl.Bank):
             run.update(job.name, job.to_json())
             
         self.set_id(
-            an=self._config.validation.author.name,
-            am=self._config.validation.author.email,
+            an=hdl.config.validation.author.name,
+            am=hdl.config.validation.author.email,
             cn=git.get_current_username(),
             cm=git.get_current_usermail()
         )
+        
+        run.update(".pcvs-cache/conf.json", hdl.config.dump_for_export())
 
         serie.commit(run, metadata=metadata, msg=msg, timestamp=int(
-            self._config.validation.datetime.timestamp()))
+            hdl.config.validation.datetime.timestamp()))
 
     def save_from_archive(self, tag: str, archivepath: str, msg: str=None) -> None:
         """Extract results from the archive, if used to export results.
@@ -270,7 +244,7 @@ class Bank(dsl.Bank):
         :param hdl: the result build directory handler
         :type hdl: class:`BuildDirectoryManager`
         """
-        seriename = self.build_target_branch_name(target_project)
+        seriename = self.build_target_branch_name(target_project, hdl.config.validation.pf_hash)
         serie = self.get_serie(seriename)
         metadata = {'cnt': {}}
         
@@ -297,14 +271,16 @@ class Bank(dsl.Bank):
         run.update_flatdict(d)
         
         self.set_id(
-            an=self._config.validation.author.name,
-            am=self._config.validation.author.email,
+            an=hdl.config.validation.author.name,
+            am=hdl.config.validation.author.email,
             cn=git.get_current_username(),
             cm=git.get_current_usermail()
         )
         
+        run.update(".pcvs-cache/conf.json", hdl.config)
+        
         serie.commit(run, metadata=metadata, msg=msg, timestamp=int(
-            self._config.validation.datetime.timestamp()))
+            hdl.config.validation.datetime.timestamp()))
 
     def save_new_run(self, target_project: str, path: str) -> None:
         if not utils.check_is_build_or_archive(path):
@@ -319,8 +295,8 @@ class Bank(dsl.Bank):
             hdl = BuildDirectoryManager.load_from_archive(path)
         else:
             hdl = BuildDirectoryManager(build_dir=path)
-            
-        self.load_config_from_file(path)
+            hdl.load_config()
+
         self.save_new_run_from_instance(target_project, hdl)
         
     def build_target_branch_name(self, tag: str = None, hash: str = None) -> str:
@@ -340,8 +316,6 @@ class Bank(dsl.Bank):
         # TODO: compute the proper name for the current test-suite
         if tag is None:
             tag = self.default_project
-        if hash is None:
-            hash = self._config.validation.pf_hash
         return "{}/{}".format(tag, hash)
 
     def __repr__(self) -> dict:

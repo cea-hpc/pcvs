@@ -106,6 +106,7 @@ def process_main_workflow(the_session=None):
     io.console.print_header("Initialization")
     # prepare PCVS and third-party tools
     prepare()
+    assert(build_manager.config)
 
     if valcfg.reused_build is not None:
         io.console.print_section("Reusing previously generated inputs")
@@ -144,15 +145,14 @@ def process_main_workflow(the_session=None):
     bank_token = valcfg.target_bank
     if bank_token is not None:
         bank = pvBank.Bank(token=bank_token)
-        build_hdl = MetaConfig.root.get_internal('build_manager')
         pref_proj = bank.default_project
         if bank.exists():
             io.console.print_item("Upload results to bank: '{}{}'".format(
                 bank.name.upper(),
                 " (@{})".format(pref_proj) if pref_proj else ""
             ))
-            bank.load_config_from_dict(MetaConfig.root)
-            bank.save_new_run_from_instance(None, build_hdl, msg=valcfg.get('message', None))
+
+            bank.save_new_run_from_instance(None, build_manager, msg=valcfg.get('message', None))
             #bank.save_from_buildir(
             #    None,
             #    os.path.join(valcfg.output)
@@ -249,11 +249,7 @@ def prepare():
     MetaConfig.root.set_internal('orchestrator', Orchestrator())
 
     io.console.print_item("Save Configurations into {}".format(valcfg.output))
-    conf_file = os.path.join(valcfg.output, NAME_BUILD_CONF_FN)
-    with open(conf_file, 'w') as conf_fh:
-        handler = YAML(typ='safe')
-        handler.default_flow_style = None
-        handler.dump(MetaConfig.root.dump_for_export(), conf_fh)
+    build_man.save_config(MetaConfig.root)
 
 
 def find_files_to_process(path_dict):
