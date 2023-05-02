@@ -90,6 +90,8 @@ class RunnerAdapter(threading.Thread):
         elif set.execmode == Set.ExecMode.BATCH:
             jobman_cfg = MetaConfig.root.machine.job_manager.batch
 
+        parallel = MetaConfig.root.validation.scheduling.get("parallel", 1)
+        
         #TODO: Prepare exec context
         wrapper = jobman_cfg.get('wrapper', "")
         env = os.environ.copy()
@@ -101,9 +103,10 @@ class RunnerAdapter(threading.Thread):
         updated_env['PCVS_SET_CMD_ARGS'] = jobman_cfg.args if jobman_cfg.args else ""
         env.update(updated_env)
         
-        cmd = "{script} pcvs remote-run -c {ctx}".format(
+        cmd = "{script} pcvs remote-run -c {ctx} -p {parallel}".format(
             script=wrapper,
-            ctx=ctx_path
+            ctx=ctx_path,
+            parallel=parallel
         )
         try:
             ctx = RemoteContext(ctx_path)
@@ -123,6 +126,21 @@ class RunnerAdapter(threading.Thread):
                 reason="Fail to start a remote Runner",
                 dbg_info={'cmd': cmd})
 
+
+def progress_jobs(q, ctx, ev):
+    local_cnt = 0
+    while local_cnt < ctx.cnt:
+        try:
+            item = q.get(block=False, timeout=5)
+            for job in item.content:
+                ctx.save_result_to_disk(job)
+                local_cnt += 1
+        except queue.Empty:
+            continue
+        except Exception as e:
+            raise e
+    ev.set()
+
 class RunnerRemote:
     
     def __init__(self, ctx_path):
@@ -132,14 +150,33 @@ class RunnerRemote:
         self._ctx = RemoteContext(self._ctx_path)
         self._set = self._ctx.load_input_from_disk()
     
-    def run(self):
+    def run(self, parallel=1):
+        
         self._ctx.mark_as_not_completed()
-        r = RunnerAdapter(self._ctx_path)
-        r.local_exec(self._set)
+        thr_list = list()
+        rq = queue.Queue()
+        pq = queue.Queue()
+        ev = threading.Event()
+        
+        progress = threading.Thread(target=progress_jobs, args=(pq, self._ctx, ev))
+        progress.start()
+        
+        for _ in range(0, parallel):
+            thr = RunnerAdapter(self._ctx_path, ready=rq, complete=pq)
+            thr.start()
+            thr_list.append(thr)
         
         for job in self._set.content:
-            self._ctx.save_result_to_disk(job)
-            
+            s = Set(execmode=Set.ExecMode.LOCAL)
+            s.add(job)
+            rq.put(s)
+        
+        while not ev.is_set():
+            time.sleep(1)
+        
+        RunnerAdapter.sched_in_progress = False
+        for thr in thr_list:
+            thr.join()
         self._ctx.mark_as_completed()
 
 
@@ -149,6 +186,8 @@ class RemoteContext:
     
     def __init__(self, prefix, set=None):
         self._path = prefix
+        self._cnt = 0
+        
         if set:
             self._path = os.path.join(self._path, str(set.id))
         self._completed_file = os.path.join(prefix, ".completed")
@@ -160,6 +199,10 @@ class RemoteContext:
         #outputs are stored incrementally to avoid data losses
         self._outfile = None
         
+    @property
+    def cnt(self):
+        return self._cnt
+
     def save_input_to_disk(self, set):
         with open(os.path.join(self._path, "input.json"), "w") as f:
             f.write(json.dumps(list(map(lambda x: x.to_minimal_json(), set.content))))
@@ -181,6 +224,7 @@ class RemoteContext:
                 cur = Test()
                 cur.from_minimal_json(job)
                 set.add(cur)
+                self._cnt += 1
         return set
     
     def save_result_to_disk(self, job: Test):
