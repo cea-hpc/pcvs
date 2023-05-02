@@ -85,7 +85,7 @@ class Orchestrator:
         if io.console.verb_debug:
             self._manager.print_dep_graph(outfile="./graph.dat")
 
-        nb_nodes = self._max_res
+        nb_res = self._max_res
         last_progress = 0
         pending_list = list()
         io.console.info("ORCH: start job scheduling")
@@ -96,11 +96,11 @@ class Orchestrator:
                 new_set: Set = not None
                 while new_set is not None:
                     # create a new set, if not possible, returns None
-                    new_set = self._manager.create_subset(nb_nodes)
+                    new_set = self._manager.create_subset(nb_res)
                     if new_set is not None:
-                        assert(isinstance(nb_nodes, int))
+                        assert(isinstance(nb_res, int))
                         # schedule the set asynchronously
-                        nb_nodes -= new_set.dim
+                        nb_res -= new_set.dim
                         io.console.debug("ORCH: send Set to queue (#{}, sz:{})".format(
                             new_set.id, new_set.size))
                         self._ready_q.put(new_set)
@@ -112,7 +112,7 @@ class Orchestrator:
                     set = self._complete_q.get(block=False, timeout=2)
                     io.console.debug("ORCH: recv Set from queue (#{}, sz:{})".format(
                         set.id, set.size))
-                    nb_nodes += set.dim
+                    nb_res += set.dim
                     self._manager.merge_subset(set)
                 except queue.Empty:
                     self._manager.prune_non_runnable_jobs()

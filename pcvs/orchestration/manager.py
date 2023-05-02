@@ -39,6 +39,7 @@ class Manager:
         """
         self._comman = MetaConfig.root.get_internal('comman')
         self._plugin = MetaConfig.root.get_internal('pColl')
+        self._concurrent_level = MetaConfig.root.machine.get('concurrent_run', 1)
 
         self._dims = dict()
         self._max_size = max_size
@@ -227,7 +228,8 @@ class Manager:
             the_set = self._plugin.invoke_plugins(
                 Plugin.Step.SCHED_SET_EVAL,
                 jobman=self,
-                max_dim=max_dim
+                max_dim=max_dim,
+                max_job_limit=int(self._count.total / self._concurrent_level)
             )
         else:
             for k in sorted(self._dims.keys(), reverse=True):

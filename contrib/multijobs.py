@@ -29,14 +29,15 @@ class SchedMultiJobs(Plugin):
 
     def run(self, *args, **kwargs):
         jobman = kwargs['jobman']
+        max_dim_allowed = kwargs.get('max_dim', jobman.nb_dims)
+        job_limit = kwargs.get('max_job_limit', None)
 
         if self.first_run_with_compilation:
             self.first_run_with_compilation = not self.first_run_with_compilation
             return self.first_allocation(jobman)
         else:
             the_set = None
-            count = 0
-            for dim in range(jobman.nb_dims, 0, -1):
+            for dim in range(max_dim_allowed, 0, -1):
                 per_res_list = jobman.get_dim(dim)
                 list_count = len(per_res_list)
                 # avoid iterating & push/pop from the same list
@@ -48,8 +49,7 @@ class SchedMultiJobs(Plugin):
                             the_set = Set(execmode=Set.ExecMode.ALLOC)
                         the_set.add(job)
                         job.pick()
-                        count += 1
-                        if count >= 10:
+                        if job_limit is not None and the_set.size >= job_limit:
                             break
                     else:
                         per_res_list.append(job)
