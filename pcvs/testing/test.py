@@ -123,9 +123,11 @@ class Test:
             'analysis': kwargs.get('analysis'),
             'script': kwargs.get('valscript'),
             'expect_rc': kwargs.get('rc', 0),
-            'time': kwargs.get('time', 0),
+            'time': kwargs.get('time', -1),
             'delta': kwargs.get('delta', 0),
         }
+        
+        self._timeout = kwargs.get('kill_after', None)
 
         self._mod_deps = kwargs.get("mod_deps", [])
         self._depnames = kwargs.get('job_deps', [])
@@ -336,11 +338,17 @@ class Test:
         :return: an integer if a timeout is defined, None otherwise
         :rtype: int or NoneType
         """
-        if self._validation['time'] == 0:
-            if MetaConfig.root.validation.job_timeout == 0:
-                return None
+        
+        # timeout is (in order):
+        # 1. explicitly defined
+        # 2. OR extrapolated from defined result.mean
+        # 3. set by default (MetaConfig.root.validation.job_timeout)
+        if self._timeout:
+            return self._timeout
+        elif self._validation['time'] > 0:
+            return (self._validation['time'] + self._validation['delta']) * 1.5
+        else:
             return MetaConfig.root.validation.job_timeout
-        return self._validation['time'] + self._validation['delta']
 
     def get_dim(self, unit="n_node"):
         """Return the orch-dimension value for this test.
@@ -357,7 +365,7 @@ class Test:
         """
         return self._dim
 
-    def save_final_result(self, rc=0, time=0.0, out=b'', state=None):
+    def save_final_result(self, rc=0, time=None, out=b'', state=None):
         """Build the final Test result node.
 
         :param rc: return code, defaults to 0

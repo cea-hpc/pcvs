@@ -106,7 +106,7 @@ def handle_build_lockfile(exc=None):
 
 
 @click.command(name="run", short_help="Run a validation")
-@click.option("-p", "--profile", "profilename", default="default",
+@click.option("-p", "--profile", "profilename", default=None,
               shell_complete=cli_profile.compl_list_token,
               type=str, show_envvar=True,
               help="Existing and valid profile supporting this run")
@@ -136,20 +136,20 @@ def handle_build_lockfile(exc=None):
               type=click.Path(exists=True, file_okay=False), required=False,
               help="Reuse old test directories (no DIRS required)")
 @click.option("-r", "--report", "enable_report", show_envvar=True,
-              is_flag=True, default=False,
+              is_flag=True, default=None,
               help="Attach a webview server to the current session run.")
 @click.option("--report-uri", "report_addr", default=None, type=str,
               help="Override default Server address")
 @click.option("-g", "--generate-only", "generate_only", is_flag=True, default=None,
               help="Rebuild the test-base, populating resources for `pcvs exec`")
-@click.option('-t', "--timeout", "timeout", show_envvar=True, type=int,
+@click.option('-t', "--timeout", "timeout", show_envvar=True, type=int, default=None,
               help="PCVS process timeout")
-@click.option("-S", "--successful", "only_success", is_flag=True, default=False,
+@click.option("-S", "--successful", "only_success", is_flag=True, default=None,
               help="Return non-zero exit code if a single test has failed")
 @click.option("-s", "--spack-recipe", "spack_recipe", type=str, multiple=True,
               help="Build test-suites based on Spack recipes")
 @click.option("-P", "--print", "print_level", type=click.Choice(['none', 'errors', 'all']),
-              help="Enable test output to be printed depending on its status")
+              default=None, help="Enable test output to be printed depending on its status")
 @click.argument("dirs", nargs=-1,
                 type=str, callback=iterate_dirs)
 @click.pass_context
@@ -210,6 +210,7 @@ def run(ctx, profilename, output, detach, override, anon, settings_file,
     val_cfg.set_ifdef('report_addr', report_addr)
     val_cfg.set_ifdef('timeout', timeout)
     val_cfg.set_ifdef('spack_recipe', spack_recipe)
+    val_cfg.set_ifdef('only_success', only_success)
     val_cfg.set_ifdef('buildcache', os.path.join(val_cfg.output, 'cache'))
 
     # if dirs not set by config file nor CLI

@@ -152,14 +152,8 @@ class Config(MetaDict):
         :type k: str
         :param v: value to add
         :type v: str"""
-        if not self.isset(k):
+        if k not in self:
             self[k] = v
-
-    def isset(self, k):
-        """check key existence in config dict
-        :param k: name of param to check
-        :type k: str"""
-        return k in self
 
     def to_dict(self):
         """Convert the Config() to regular dict."""
@@ -318,6 +312,11 @@ class MetaConfig(MetaDict):
 
         return self.bootstrap_validation(node)
 
+    def bootstrap_subnode(root_node, *default_subnode_dict):
+        for k, v in default_subnode_dict:
+            if k not in root_node:
+                root_node[k] = v
+
     def bootstrap_validation(self, node):
         """"Specific initialize for validation config block
         :param node: validation block to initialize
@@ -343,7 +342,9 @@ class MetaConfig(MetaDict):
         subtree.set_nosquash('target_bank', None)
         subtree.set_nosquash('reused_build', None)
         subtree.set_nosquash('webreport', None)
-        subtree.set_nosquash('job_timeout', None)
+        subtree.set_nosquash("only_success", False)
+        subtree.set_nosquash("enable_report", False)
+        subtree.set_nosquash('job_timeout', 86400)
         subtree.set_nosquash('per_result_file_sz', 10 * 1024 * 1024)
         subtree.set_nosquash(
             'buildcache', os.path.join(subtree.output, 'cache'))

@@ -1,19 +1,38 @@
 ---
 type: object
 properties:
-  fail_on_error:
+  anonymize: {type: boolean}
+  author:
+    properties:
+      email: {type: string}
+      name: {type: string}
+  background: {type: boolean}
+  buildcache: {type: string}
+  color: {type: boolean}
+  datetime: {type: string, format: "date"}
+  default_profile: {type: string}
+  enable_report: {type: boolean}
+  onlygen: {type: boolean}
+  output: {type: string}
+  override: {type: boolean}
+  pf_hash: {type: string}
+  pf_name: {type: string}
+  print_level: {type: string}
+  reused_build: {type: boolean}
+  sid: {type: integer}
+  simulated: {type: boolean}
+  spack_recipe: {type: array, items: {type: string}}
+  target_bank: {type: string}
+  timeout: {type: integer}
+  verbose: {type: integer}
+  
+  only_success:
     type: boolean
-  tee:
-    type: boolean
-  verbose:
-    OneOf:
-      - type: boolean
-      - type: integer
-        minimum: 0
-        maximum: 3
   scheduling:
     type: object
     properties:
+      parallel:
+        type: integer
       model:
         type: integer
         minimum: 0
