@@ -151,7 +151,8 @@ class Report:
             yield {'sid': sid,
                         'state': str(state),
                         'count': counts,
-                        'path': sdata.prefix}
+                        'path': sdata.prefix,
+                        'info': sdata.config.validation.get('message', 'No message')}
         
     def single_session_config(self, sid) -> dict:
         assert sid in self._sessions

@@ -23,6 +23,7 @@ function init_the_table(){
 			responsive: true,
 			order: [[0, 'desc']],
 			paging: true,
+			pageLength: -1,
 			lengthMenu: [10, 50, 100, -1],
 			data: resp,
 			columnDefs: [
@@ -38,7 +39,7 @@ function init_the_table(){
 				{"responsivePriority": 5, "title": "Successes", "data": 'count', "render": function(d, t, s){return d["SUCCESS"];}},
 				{"responsivePriority": 3, "title": "Failures", "data": 'count', "render": function(d, t, s){return d["FAILURE"];}},
 				{"responsivePriority": 6, "title": "Other", "data": 'count', "render": function(d, t, s){return d["ERR_DEP"]+d["ERR_OTHER"];}},
-				{"responsivePriority": 4, "title": "Build path", "data": 'path'},
+				{"responsivePriority": 4, "title": "Info", "data": 'info'},
 			]
 			});
 			
