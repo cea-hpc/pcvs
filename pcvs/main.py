@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import pkg_resources
-from trogon import tui
 from pcvs import io
 from pcvs.backend import bank, config, profile
 from pcvs.cli import (cli_bank, cli_config, cli_profile, cli_report, cli_run,

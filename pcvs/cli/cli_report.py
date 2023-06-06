@@ -2,7 +2,7 @@ import os
 
 from pcvs import NAME_BUILDFILE, NAME_BUILDIR, io
 from pcvs.backend import report as pvReport
-from pcvs.ui.textual import report as gui
+from pcvs.ui.textual import textual_avail
 from pcvs.helpers import utils
 
 try:
@@ -37,6 +37,10 @@ def report(ctx, path_list, static):
                 '{} is not a build directory.'.format(prefix))
     
     if ctx.obj['tui']:
+        if not textual_avail:
+            raise click.BadOptionUsage("--tui", "Textual is not available.")
+
+        from pcvs.ui.textual import report as gui
         return gui.start_app(inputs)
     
     if static:
