@@ -23,8 +23,6 @@ def report(ctx, path_list, static):
     if not path_list:
         path_list = [os.getcwd()]
 
-    if ctx.obj['tui']:
-        return viewer.start_job_viewer_app(path_list[0] if path_list else None)
     inputs = list()
     for prefix in path_list:
         # if a dir is given BU does not point to a valid build dir,

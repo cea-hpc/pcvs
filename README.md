@@ -1,8 +1,6 @@
 PCVS Documentation
 ==================
 
-## About
-
 Parallel Computing Validation System (PCVS) is a Validation Orchestrator
 designed by and for software at scale. Its primary target is HPC applications &
 runtimes but can flawlessly address smaller use cases. PCVS can help users to
@@ -15,26 +13,22 @@ reduce the time-to-result overall. Through basic YAML-based configuration files,
 PCVS handles more than hundreds of thousands of tests and helps developers to
 ensure code production is moving forward.
 
-PCVS is documented through ReStructuredText. which can be found under the
-`/docs` directory. A built version can be found at (https://pcvs.readthedocs.io)
-
 
 ## Quick installation guide
 
 A more detailed guide to install PCVS can be found in the appropriate
 documentation, here is a quick overview to set up and test the framework.
 
-.. code-block:: bash
+    # considering python3.7+
+    $ pip3 install -r requirements.txt
+    # for dev/testing purposes, use:
+    $ pip3 install -r requirements-dev.txt
+    $ pip3 install pcvs
+    # basic tests:
+    $ tox
+    # OR
+    $ coverage run
 
-	# considering python3.5+
-	$ pip3 install -r requirements.txt
-	# for dev/testing purposes, use:
-	$ pip3 install -r requirements-dev.txt
-	$ pip3 install pcvs
-	# basic tests:
-	$ tox
-	# OR
-	$ coverage run
 
 ## Complete documentation
 
@@ -47,14 +41,7 @@ Multiple documentation can be generated from this repo:
   should be installed manually). Note that these manpages may not contain more
   information than the content of each ``--help`` command.
 * The general documentation (readthedocs.io-formatted) through ``sphinx``, able
-  to generate multiple formats:
-
-.. code-block:: bash
-
-	$ pip3 install -r requirements-dev.txt
-	$ make -C docs/source # will list available doc formats
-	$ make -C docs/source man  # global documentation as man pages (not CLI)
-	$ make -C docs/source html  # readthedocs-based
+  to generate multiple formats. A built version can be found [here](https://pcvs.readthedocs.io).
 
 ## Contributions
 
@@ -67,9 +54,9 @@ This work is currently supported by the French Alternative Energies and Atomic
 Energy Commission (CEA). For any question and/or remarks, please contact :
 
 * Julien JAEGER <julien.jaeger@cea.fr>
+* Julien ADAM <julien.adam@paratools.com>
 
-
-## License
+## Licensing
 
 PCVS is released under the [CeCILL-C Free Software
-License.](https://cecill.info/licences/Licence_CeCILL-C_V1-en.txt)
+License.](https://cecill.info/licences/Licence_CeCILL-C_V1-en.txt).
