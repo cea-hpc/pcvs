@@ -1,7 +1,8 @@
 # add -dirty if staged area is not empty
 import os
+import setuptools
 loc = {}
-with open(os.path.join("pcvs/__init__.py")) as fh:
+with open(os.path.join("pcvs/version.py")) as fh:
     exec(fh.read(), None, loc)
 version = loc['__version__']
 

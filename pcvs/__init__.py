@@ -23,4 +23,3 @@ PATH_SESSION = os.path.join(PATH_HOMEDIR, "session.yml")
 PATH_BANK = os.path.join(PATH_HOMEDIR, "bank.yml")
 PATH_VALCFG = os.path.join(PATH_HOMEDIR, "validation.yml")
 
-__version__ = "0.7.0.dev0"
