@@ -786,7 +786,7 @@ class BuildDirectoryManager:
         :return: the session ID
         :rtype: int
         """
-        if self._config.validation.sid:
+        if 'sid' in self._config.validation:
             return self._config.validation.sid
         else:
             return None
