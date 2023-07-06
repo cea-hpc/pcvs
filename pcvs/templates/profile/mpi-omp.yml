@@ -3,6 +3,7 @@ compiler:
   cxx: {program: mpicxx, variants: *var}
   f77: {program: mpif77, variants: *var}
   f90: {program: mpif90, variants: *var}
+  f08: {program: mpifort, variants: *var}
   fc: {program: mpif90, variants: *var}
 criterion:
   n_mpi:

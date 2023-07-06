@@ -3,7 +3,8 @@ compiler:
   cxx: {program: mpicxx}
   f77: {program: mpif77}
   f90: {program: mpif90}
-  fc: {program: mpif90}
+  f08: {program: mpifort}
+  fc: {program: mpifort}
 criterion:
   n_node:
       subtitle: N
