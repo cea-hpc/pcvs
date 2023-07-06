@@ -382,7 +382,9 @@ class Test:
 
         self.save_raw_run(rc=rc, out=out, time=time)
         self.save_status(state)
+        self.save_artifacts()
 
+    def save_artifacts(self):
         for elt_k, elt_v in self._data['artifacts'].items():
             if os.path.isfile(elt_v):
                 with open(elt_v, 'rb') as fh:

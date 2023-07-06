@@ -322,6 +322,7 @@ class Manager:
         for job in set.content:
             if job.been_executed():
                 job.extract_metrics()
+                job.save_artifacts()
                 job.evaluate()
                 self.publish_job(job, publish_args=None)
                 job.display()
