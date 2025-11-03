@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.backend.config &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.backend.config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.backend.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml</span><span class="w"> </span><span class="kn">import</span> <span class="n">YAML</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_INSTDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">system</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigException</span>
+
+<span class="n">CONFIG_BLOCKS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">,</span> <span class="s2">&quot;runtime&quot;</span><span class="p">,</span> <span class="s2">&quot;machine&quot;</span><span class="p">,</span> <span class="s2">&quot;criterion&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">]</span>
+<span class="n">CONFIG_EXISTING</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="init"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.init">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load configuration tree available on disk.</span>
+
+<span class="sd">    This function is called when PCVS starts to load 3-scope configuration</span>
+<span class="sd">    trees.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="k">global</span> <span class="n">CONFIG_EXISTING</span>
+    <span class="n">CONFIG_EXISTING</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># this first loop defines configuration order</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">CONFIG_BLOCKS</span><span class="p">:</span>
+        <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="n">block</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">priority_paths</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">storage_order</span><span class="p">()</span>
+        <span class="n">priority_paths</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">priority_paths</span><span class="p">:</span>  <span class="c1"># reverse order (overriding)</span>
+            <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="n">token</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">config_file</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">STORAGES</span><span class="p">[</span><span class="n">token</span><span class="p">],</span> <span class="n">block</span><span class="p">,</span> <span class="s2">&quot;*.yml&quot;</span><span class="p">)):</span>
+                <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="n">block</span><span class="p">][</span><span class="n">token</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">config_file</span><span class="p">)[:</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span> <span class="n">config_file</span><span class="p">)</span>
+                <span class="p">)</span>
+    <span class="n">init</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="list_blocks"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.list_blocks">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">list_blocks</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get available configuration blocks, as present on disk.</span>
+
+<span class="sd">    :param kind: configBlock kind (see ``CONFIG_BLOCKS`` for possible values)</span>
+<span class="sd">    :type kind: str, one of ``CONFIG_BLOCKS`` values</span>
+<span class="sd">    :param scope: where the configblocks is located, defaults to None</span>
+<span class="sd">    :type scope: &#39;user&#39;, &#39;global&#39; or &#39;local&#39;, optional</span>
+<span class="sd">    :return: list blocks with specified kind, restricted by scope (if any)</span>
+<span class="sd">    :rtype: dict of config blocks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">CONFIG_BLOCKS</span>
+    <span class="k">assert</span> <span class="n">scope</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">STORAGES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="n">kind</span><span class="p">][</span><span class="n">scope</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="list_templates"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.list_templates">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">list_templates</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List available templates to be used for bootstrapping config. blocks.</span>
+
+<span class="sd">    :return: a list of valid templates.</span>
+<span class="sd">    :rtype: list&quot;&quot;&quot;</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_INSTDIR</span><span class="p">,</span> <span class="s2">&quot;templates/config&quot;</span><span class="p">)):</span>
+        <span class="n">array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">array</span></div>
+
+
+<div class="viewcode-block" id="check_valid_kind"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.check_valid_kind">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_valid_kind</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Assert the parameter is a valid kind.</span>
+
+<span class="sd">    Kind are defined by ``CONFIG_BLOCKS`` module attribute.</span>
+
+<span class="sd">    :param s: the kind to validate</span>
+<span class="sd">    :type s: str</span>
+<span class="sd">    :raises BadTokenError: Kind is None</span>
+<span class="sd">    :raises BadTokenError: Kind is not in allowed values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConfigException</span><span class="o">.</span><span class="n">BadTokenError</span><span class="p">(</span><span class="s2">&quot;no &#39;kind&#39; specified&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CONFIG_BLOCKS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConfigException</span><span class="o">.</span><span class="n">BadTokenError</span><span class="p">(</span><span class="s2">&quot;invalid &#39;kind&#39;: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ConfigurationBlock"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ConfigurationBlock</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handle the basic configuration block, smallest part of a profile.</span>
+
+<span class="sd">    From a user persperctive, a basic block is a dict, gathering in a Python</span>
+<span class="sd">    object information relative to the configuration of a single component.</span>
+<span class="sd">    In PCVS, there is 5 types of components:</span>
+
+<span class="sd">    * Compiler-oriented (defining compiler commands)</span>
+<span class="sd">    * Runtime-oriented (setting runtime &amp; parametrization)</span>
+<span class="sd">    * Machine-oriented (Defining resources used for execution)</span>
+<span class="sd">    * Group-oriented (used a templates to globally describe tests)</span>
+<span class="sd">    * Criterion-oriented (range of parameters used to run a test-suite)</span>
+
+<span class="sd">    This class helps to manage any of these config blocks above. The</span>
+<span class="sd">    distinction between them is carried over by an instance attribute</span>
+<span class="sd">    ``_kind``.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        This object can easily be confused with :class:`system.Config`.</span>
+<span class="sd">        While ConfigurationBlocks are from a user perspective,</span>
+<span class="sd">        system.Config handles the internal configuration tree, on which runs</span>
+<span class="sd">        rely. Nonetheless, both could be merged into a single representation</span>
+<span class="sd">        in later versions.</span>
+
+<span class="sd">    :param str _kind: which component this object describes</span>
+<span class="sd">    :param str _name: block name</span>
+<span class="sd">    :param dict details: block content</span>
+<span class="sd">    :param str _scope: block scope, may be None</span>
+<span class="sd">    :param str _file: absolute path for the block on disk</span>
+<span class="sd">    :param bool _exists: True if the block exist on disk</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor method</span>
+
+<span class="sd">        :param kind: which component to initialize this basicblock with</span>
+<span class="sd">        :type kind: str, one of ``CONFIG_BLOCKS`` values</span>
+<span class="sd">        :param name: block name</span>
+<span class="sd">        :type name: str</span>
+<span class="sd">        :param scope: block scope, defaults to &#39;local&#39;</span>
+<span class="sd">        :type scope: str, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">init</span><span class="p">()</span>
+
+        <span class="n">check_valid_kind</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">check_valid_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ConfigurationBlock.retrieve_file"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.retrieve_file">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Associate the actual filepath to the config block.</span>
+
+<span class="sd">        From the stored kind, scope, name, attempt to detect configuration</span>
+<span class="sd">        block on the file system (i.e. detected during module init())</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span> <span class="ow">in</span> <span class="n">CONFIG_BLOCKS</span>
+        <span class="n">scopes</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">storage_order</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">scopes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">CONFIG_EXISTING</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">][</span><span class="n">sc</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">==</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="n">sc</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">return</span>
+
+        <span class="c1"># default file position when not found</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span> <span class="o">=</span> <span class="s2">&quot;local&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">STORAGES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">+</span> <span class="s2">&quot;.yml&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.is_found"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.is_found">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_found</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the current config block is present on fs.</span>
+
+<span class="sd">        :return: True if it exists</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return complete block label (scope + kind + name).</span>
+
+<span class="sd">        :return: the fully-qualified name.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ref_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return filepath associated with current config block.</span>
+
+<span class="sd">        :return: the filepath, may be None</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return block scope.</span>
+
+<span class="sd">        :return: the scope, resolved if needed.</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">short_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the block label only.</span>
+
+<span class="sd">        :return: the short name (may conflict with other config block)</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kind</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the block kind only.</span>
+
+<span class="sd">        :return: the kind of config</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all the class details.</span>
+
+<span class="sd">        :return: the _details attribute.</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span>
+
+<div class="viewcode-block" id="ConfigurationBlock.fill"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.fill">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the block content with parameters.</span>
+
+<span class="sd">        :param raw: the data to fill.</span>
+<span class="sd">        :type raw: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">raw</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.dump"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.dump">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the configuration Block to a regular dict.</span>
+
+<span class="sd">        This function first load the last version, to ensure being in sync.</span>
+
+<span class="sd">        :return: a regular dict() representing the config blocK</span>
+<span class="sd">        :rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_from_disk</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.check"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.check">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate a single configuration block according to its scheme.</span>
+
+<span class="sd">        :raises: ValidationException.SchemeError, ValidationException.FormatError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">system</span><span class="o">.</span><span class="n">ValidationScheme</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">full_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.load_from_disk"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_from_disk">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_from_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;load the configuration file to populate the current object.</span>
+
+<span class="sd">        :raises BadTokenError: the scope/kind/name tuple does not refer to a</span>
+<span class="sd">            valid file.</span>
+<span class="sd">        :raises ConfigException.NotFoundError: The target file does not exist</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigException</span><span class="o">.</span><span class="n">BadTokenError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not defined as &#39;</span><span class="si">{}</span><span class="s2">&#39; kind&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConfigException</span><span class="o">.</span><span class="n">NotFoundError</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.load_template"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_template">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        load from the specific template, to create a new config block</span>
+
+<span class="sd">        :param name: template name, defaults to None</span>
+<span class="sd">        :type name: str, optional</span>
+<span class="sd">        :raises ConfigException.NotFoundError: template not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span> <span class="o">+</span> <span class="s2">&quot;.default&quot;</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_INSTDIR</span><span class="p">,</span> <span class="s2">&quot;templates/config/</span><span class="si">{}</span><span class="s2">.yml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConfigException</span><span class="o">.</span><span class="n">NotFoundError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.flush_to_disk"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.flush_to_disk">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">flush_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;write the configuration block to disk&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file</span><span class="p">()</span>
+
+        <span class="c1"># just in case the block subprefix does not exist yet</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span><span class="p">:</span>
+            <span class="n">prefix_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">prefix_file</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">prefix_file</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">yml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span>
+            <span class="n">yml</span><span class="o">.</span><span class="n">default_flow_style</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">yml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exists</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.clone"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.clone">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clone</span><span class="p">:</span> <span class="s2">&quot;ConfigurationBlock&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Copy the current object to create an identical one.</span>
+
+<span class="sd">        Mainly used to mirror two objects from different scopes.</span>
+
+<span class="sd">        :param clone: the object to mirror</span>
+<span class="sd">        :type clone: :class:`ConfigurationBlock`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clone</span><span class="p">,</span> <span class="n">ConfigurationBlock</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">clone</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_found</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">clone</span><span class="o">.</span><span class="n">is_found</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Compute target prefix: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">clone</span><span class="o">.</span><span class="n">details</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.delete"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.delete">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a configuration block from disk&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_found</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;remove </span><span class="si">{}</span><span class="s2"> from &#39;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.display"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.display">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configuration block pretty printer&quot;&quot;&quot;</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_header</span><span class="p">(</span><span class="s2">&quot;Configuration display&quot;</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="s2">&quot;Scope: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()))</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="s2">&quot;Path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">))</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="s2">&quot;Details:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_item</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ConfigurationBlock.edit"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Open the current block for edition.</span>
+
+<span class="sd">        :raises Exception: Something occurred on the edited version.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">edited_stream</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.yml&quot;</span><span class="p">,</span> <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edited_stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edited_yaml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">edited_stream</span><span class="p">)</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">ValidationScheme</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">edited_yaml</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">edited_yaml</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flush_to_disk</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span></div>
+
+    <span class="c1"># TODO: refactoring, this function is a duplicate of profile.py:edit_plugin</span>
+<div class="viewcode-block" id="ConfigurationBlock.edit_plugin"><a class="viewcode-back" href="../../../api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit_plugin">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">edit_plugin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Special case to handle &#39;plugin&#39; key for &#39;runtime&#39; blocks.</span>
+
+<span class="sd">        This allows to edit a de-serialized version of the &#39;plugin&#39; field. By</span>
+<span class="sd">        default, data are stored as a base64 string. In order to let user edit</span>
+<span class="sd">        the code, the string need to be decoded first.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span> <span class="o">!=</span> <span class="s2">&quot;runtime&quot;</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">stream_yaml</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">stream_yaml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;plugin&quot;</span> <span class="ow">in</span> <span class="n">stream_yaml</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">plugin_code</span> <span class="o">=</span> <span class="n">stream_yaml</span><span class="p">[</span><span class="s2">&quot;plugin&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plugin_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;import math</span>
+<span class="s2">from pcvs.plugins import Plugin</span>
+
+<span class="s2">class MyPlugin(Plugin):</span>
+<span class="s2">    step = Plugin.Step.TEST_EVAL</span>
+<span class="s2">    def run(self, *args, **kwargs):</span>
+<span class="s2">    # this dict maps keys (it name) with values (it value)</span>
+<span class="s2">    # returns True if the combination should be used</span>
+<span class="s2">    return True</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+        <span class="n">edited_code</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span><span class="n">plugin_code</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s2">&quot;.py&quot;</span><span class="p">,</span> <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">edited_code</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stream_yaml</span><span class="p">[</span><span class="s2">&quot;plugin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edited_code</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+                <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">stream_yaml</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

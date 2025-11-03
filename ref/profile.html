@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profiles &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sessions" href="session.html" />
+    <link rel="prev" title="Configuration basic blocks" href="config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Profiles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generalities">Generalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scope">Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-a-new-profile">Building a new Profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#building-a-profile-with-existing-configuration-blocks">Building a profile with existing configuration blocks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#in-the-cli">In the CLI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#with-the-interactive-mode">With the interactive mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#managing-profiles">Managing Profiles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Profiles</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ref/profile.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="profiles">
+<h1>Profiles<a class="headerlink" href="#profiles" title="Permalink to this heading"></a></h1>
+<section id="generalities">
+<h2>Generalities<a class="headerlink" href="#generalities" title="Permalink to this heading"></a></h2>
+<p>A PCVS profile defines a configuration in which PCVS will launch. This
+configuration is divided in nodes, and it can be customized within pcvs or in
+yaml files that can be imported/exported via the command line interface.</p>
+<p>This configuration is separated in 5 nodes :</p>
+<ul class="simple">
+<li><p>compiler</p></li>
+<li><p>criterion</p></li>
+<li><p>group</p></li>
+<li><p>machine</p></li>
+<li><p>runtimes</p></li>
+</ul>
+<p>Each node is separated in subnodes and can be defined separately in multiple
+ways. As files, profiles are written with the yml syntax.</p>
+</section>
+<section id="scope">
+<span id="profile-scope"></span><h2>Scope<a class="headerlink" href="#scope" title="Permalink to this heading"></a></h2>
+<p>Profiles can have different scopes depending on which user should have access or
+which project should be affected by it. The 3 scopes are the following :</p>
+<ul class="simple">
+<li><p>Local : The profile is only seeable from a specific folder</p></li>
+<li><p>User : The profile is seeable from everywhere in an userspace.</p></li>
+<li><p>Global : The profile is accessible to everyone and from everywhere.</p></li>
+</ul>
+</section>
+<section id="building-a-new-profile">
+<h2>Building a new Profile<a class="headerlink" href="#building-a-new-profile" title="Permalink to this heading"></a></h2>
+<p>To create a blank
+profile, one can use the command :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>example_profile
+</pre></div>
+</div>
+<p>To export this profile in a file format, use the command :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>profile<span class="w"> </span><span class="nb">export</span><span class="w"> </span>example_profile<span class="w"> </span>example_profile.yml
+</pre></div>
+</div>
+<p>This profile is fully customizable with any text editor, to import the profile
+back into PCVS use the command :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>profile<span class="w"> </span>import<span class="w"> </span>example_profile<span class="w"> </span>example_profile.yml
+</pre></div>
+</div>
+<p>Without arguments, the <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">profile</span> <span class="pre">create</span></code> command builds blocks as default,
+but a profile can be built with custom configuration blocks.</p>
+<section id="building-a-profile-with-existing-configuration-blocks">
+<h3>Building a profile with existing configuration blocks<a class="headerlink" href="#building-a-profile-with-existing-configuration-blocks" title="Permalink to this heading"></a></h3>
+<p>Building a profile based on configuration blocks can be done in two ways :</p>
+<ul class="simple">
+<li><p>in the CLI</p></li>
+<li><p>with the interactive mode</p></li>
+</ul>
+<section id="in-the-cli">
+<h4>In the CLI<a class="headerlink" href="#in-the-cli" title="Permalink to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>example_profile<span class="w"> </span>-b<span class="w"> </span><span class="o">[</span>scope<span class="o">]</span>.<span class="o">[</span>block-name<span class="o">]</span>.<span class="o">[</span>block-type<span class="o">]</span>
+</pre></div>
+</div>
+<p>This command has to include either 0 or 5 <code class="docutils literal notranslate"><span class="pre">-b</span></code> blocks (default or complete
+configuration).</p>
+</section>
+<section id="with-the-interactive-mode">
+<h4>With the interactive mode<a class="headerlink" href="#with-the-interactive-mode" title="Permalink to this heading"></a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>-i
+</pre></div>
+</div>
+<p>For the configuration blocks setting please refer to the Configuration
+blocks section.</p>
+</section>
+</section>
+</section>
+<section id="managing-profiles">
+<h2>Managing Profiles<a class="headerlink" href="#managing-profiles" title="Permalink to this heading"></a></h2>
+<p>Besides being built, exported or imported, profiles can be altered or destroyed
+with the corresponding commands.</p>
+<p>Use pcvs profile list to see every available profiles.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">profile</span> <span class="pre">edit</span> <span class="pre">[profile]</span></code> launches a text editor in order to manually
+change the profile. PCVS scans editors to give a choice to users.
+<code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">profile</span> <span class="pre">edit</span> <span class="pre">-p</span> <span class="pre">[profile]</span></code> to edit the plugin inside the profile.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">profile</span> <span class="pre">destroy</span> <span class="pre">[profile]</span></code> deletes a profile.</p>
+<p>Profiles are used at runtime, they are specified with the <code class="docutils literal notranslate"><span class="pre">-p</span></code> option.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pcvs<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span>example_profile
+pcvs<span class="w"> </span>run<span class="w"> </span>--profile-path<span class="w"> </span>/path/to/not/imported/profile
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config.html" class="btn btn-neutral float-left" title="Configuration basic blocks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="session.html" class="btn btn-neutral float-right" title="Sessions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

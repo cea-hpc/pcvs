@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installation Guide &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Basic usage" href="basic-use.html" />
+    <link rel="prev" title="Getting Started" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-prerequisites">System Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-from-sources-recommended">Installation from sources (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-from-pypi">Installation from PyPI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dealing-with-offline-networks">Dealing with offline networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#important-note">Important note</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/basics/installation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installation-guide">
+<span id="id1"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this heading"></a></h1>
+<section id="system-prerequisites">
+<h2>System Prerequisites<a class="headerlink" href="#system-prerequisites" title="Permalink to this heading"></a></h2>
+<p>PCVS requires <strong>python3.5+</strong> before being installed. We encourage users to use
+virtual environment before installing PCVS, especially if targeting a
+single-user usage. To create a virtual environment, create &amp; actiate it
+<strong>before</strong> using pip3. Please check
+<a class="reference external" href="https://docs.python.org/3/library/venv.html">venv</a> (native, recommended),
+<a class="reference external" href="https://virtualenv.pypa.io/en/stable/">virtualenv</a> (external package) or even
+<a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a> (third-party tool) to manage them.</p>
+<p>Here some quickstarts for each approach:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>./env/
+<span class="c1"># to use it:</span>
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>env/bin/activate
+<span class="c1"># Work in virtual environment</span>
+$<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># install first:</span>
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>virtualenv
+$<span class="w"> </span>virtualenv<span class="w"> </span>./env/
+<span class="c1"># to use it:</span>
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>./env/bin/activate
+<span class="c1"># work...</span>
+$<span class="w"> </span>deactivate
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># install first:</span>
+$<span class="w"> </span>curl<span class="w"> </span>https://pyenv.run<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+$<span class="w"> </span>pyenv<span class="w"> </span>virtualenv<span class="w"> </span>my_project
+<span class="c1"># to use it:</span>
+$<span class="w"> </span>pyenv<span class="w"> </span>activate<span class="w"> </span>my_project
+<span class="c1"># work...</span>
+$<span class="w"> </span>pyenv<span class="w"> </span>deactivate
+</pre></div>
+</div>
+</section>
+<section id="installation-from-sources-recommended">
+<h2>Installation from sources (recommended)<a class="headerlink" href="#installation-from-sources-recommended" title="Permalink to this heading"></a></h2>
+<p>The source code is available on GitHub. To checkout the latest release:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>./pcvs
+<span class="c1"># OR for dev env</span>
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;./pcvs[dev]&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="installation-from-pypi">
+<h2>Installation from PyPI<a class="headerlink" href="#installation-from-pypi" title="Permalink to this heading"></a></h2>
+<p>An other way to install PCVS is through <strong>PyPI</strong> repositories.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>pcvs
+<span class="c1"># OR</span>
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>pcvs&lt;<span class="o">=</span><span class="m">0</span>.8.0
+</pre></div>
+</div>
+<section id="dealing-with-offline-networks">
+<h3>Dealing with offline networks<a class="headerlink" href="#dealing-with-offline-networks" title="Permalink to this heading"></a></h3>
+<p>In some scenarios, it may not be possible to access PyPI mirrors to download
+dependencies (or even PCVS itself). Procedures below will describe how
+to download dep archives locally on a machine with internet access and then make them
+available for installation once manually moved to the ‘offline’ network. It
+consists in two steps. First, download the deps and create and archive
+(considering the project is already cloned locally):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>pcvs<span class="w"> </span><span class="c1"># if not already done</span>
+$<span class="w"> </span>pip3<span class="w"> </span>download<span class="w"> </span>.<span class="w"> </span>-d<span class="w"> </span>./pcvs_deps
+<span class="c1"># OR, for devloppent environment</span>
+$<span class="w"> </span>pip3<span class="w"> </span>download<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span><span class="w"> </span>-d<span class="w"> </span>./pcvs_deps
+$<span class="w"> </span>tar<span class="w"> </span>czf<span class="w"> </span>pcvs_deps.tar.gz<span class="w"> </span>./pcvs_deps
+</pre></div>
+</div>
+<p>Once the archive moved to the offline network (=where one wants to install
+PCVS), we are still considering PCVS is cloned locally:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tar<span class="w"> </span>xf<span class="w"> </span>./pcvs_deps.tar.gz
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>.<span class="w"> </span>--find-links<span class="w"> </span>./pcvs_deps<span class="w"> </span>--no-index
+<span class="c1"># or</span>
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;.[dev]&#39;</span><span class="w"> </span>--find-links<span class="w"> </span>./pcvs_deps<span class="w"> </span>--no-index
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Please use extra caution when using this method with different architectures
+between source &amp; destination. By default, pip will download
+source-compatible wheel/source package, which may not be suited for the
+target machine.</p>
+</div>
+<p>pip provides options to select a given platform/target python version, which
+differ from the current one.
+Note in that case no intermediate source package will be used,
+only distributed versions (compiled one). To ‘accept’ it, you must specify
+<code class="docutils literal notranslate"><span class="pre">--only-binary=:all:</span></code> to force downloading distribution packages (but will
+fail if not provided) or <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> to exclude any dependencies to be
+download (and should be taken care manually):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>download<span class="w"> </span>.<span class="w"> </span>-d<span class="w"> </span>...<span class="w"> </span>--platform<span class="w"> </span>x86_64<span class="w"> </span>--python-version<span class="w"> </span><span class="m">3</span>.5.4<span class="w"> </span><span class="o">[</span>--only-binary<span class="o">=</span>:all:<span class="p">|</span>--no-deps<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="important-note">
+<h3>Important note<a class="headerlink" href="#important-note" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>PCVS requires Click &gt;= 8.0, latest versions changed a critical keyword (to
+support completion) not backward compatible. Furthermore, Flask also have a
+dep to Click&gt;7.1.</p></li>
+<li><p>Banks are managed through Git repositories. Thus, PCVS relies on <a class="reference external" href="https://www.pygit2.org/">pygit2</a>. One major issue is when pygit2 deployment requires
+to be rebuilt, as a strong dep to libgit2 development headers is required and
+may not be always provided. As a workaround for now:</p>
+<ul>
+<li><p>Install a more recent pip version, able to work with wheel package
+(&gt;20.x). This way, the pygit2 package won’t have to be reinstalled.</p></li>
+<li><p>install libgit2 headers manually</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A quick fix to install pygit2/libgit2 is to rely on <a class="reference external" href="https://spack.io/">Spack</a>. Both are available for installation: <code class="docutils literal notranslate"><span class="pre">libgit2</span></code> &amp;
+<code class="docutils literal notranslate"><span class="pre">py-pygit2</span></code>. Be sure to take a proper version above <strong>1.x</strong>.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="basic-use.html" class="btn btn-neutral float-right" title="Basic usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,656 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.helpers.utils &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.helpers.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.helpers.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">fcntl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">SameFileError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAME_BUILDFILE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAME_BUILDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAME_SRCDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_HOMEDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_INSTDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">CommonException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">LockException</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunException</span>
+
+<span class="c1"># ###################################</span>
+<span class="c1"># #    STORAGE SCOPE MANAGEMENT    ##</span>
+<span class="c1"># ###################################</span>
+<span class="n">STORAGES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;global&quot;</span><span class="p">:</span> <span class="n">PATH_INSTDIR</span><span class="p">,</span>
+    <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">PATH_HOMEDIR</span><span class="p">,</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">NAME_SRCDIR</span><span class="p">)),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="create_home_dir"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.create_home_dir">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">create_home_dir</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a home directory&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">PATH_HOMEDIR</span><span class="p">):</span>
+        <span class="c1"># exist_ok=True is important here to avoid race condition</span>
+        <span class="c1"># when launching multiples tests in parallel</span>
+        <span class="c1"># with a gitlab runner for example.</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">PATH_HOMEDIR</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="storage_order"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.storage_order">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">storage_order</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return scopes in order of searching.</span>
+
+<span class="sd">    :return: a list of scopes</span>
+<span class="sd">    :rtype: list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;global&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="check_valid_scope"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_valid_scope">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_valid_scope</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if argument is a valid scope (local, user, global).</span>
+
+<span class="sd">    :param s: scope to check</span>
+<span class="sd">    :type s: str</span>
+<span class="sd">    :raises CommonException.BadTokenError: the argument is not a valid scope</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">storage_order</span><span class="p">()</span> <span class="ow">and</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">CommonException</span><span class="o">.</span><span class="n">BadTokenError</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extract_infos_from_token"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.extract_infos_from_token">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">extract_infos_from_token</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pair</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">single</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract fields from tokens (a, b, c) from user&#39;s string.</span>
+
+<span class="sd">    :param s: the input string</span>
+<span class="sd">    :type s: str</span>
+<span class="sd">    :param pair: padding side when only 2 tokens found, defaults to &quot;right&quot;</span>
+<span class="sd">    :type pair: str, optional</span>
+<span class="sd">    :param single: padding side when only 1 token found, defaults to &quot;right&quot;</span>
+<span class="sd">    :type single: str, optional</span>
+<span class="sd">    :param maxsplit: maximum split number for s, defaults to 3</span>
+<span class="sd">    :type maxsplit: int, optional</span>
+<span class="sd">    :return: 3-string-tuple: mapping (scope, kind, name), any of them may be null</span>
+<span class="sd">    :rtype: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">array</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">maxsplit</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">maxsplit</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:]))</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># two cases: a.b or b.c</span>
+        <span class="k">if</span> <span class="n">pair</span> <span class="o">==</span> <span class="s2">&quot;left&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">pair</span> <span class="o">==</span> <span class="s2">&quot;span&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">single</span> <span class="o">==</span> <span class="s2">&quot;left&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">single</span> <span class="o">==</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__determine_local_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search for the ``local`` storage in the current (or parent) directory.</span>
+
+<span class="sd">    :param path: ``local`` storage</span>
+<span class="sd">    :type path: os.path, str</span>
+<span class="sd">    :param prefix: prefix for ``local`` storage</span>
+<span class="sd">    :type prefix: os.path, str</span>
+<span class="sd">    :return: complete path to ``local`` storage</span>
+<span class="sd">    :rtype: os.path, str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)):</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+        <span class="c1"># Reach &#39;/&#39; and not found</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="o">==</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="k">break</span>
+        <span class="c1"># else, look for parent</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span>
+
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">prefix</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="set_local_path"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.set_local_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">set_local_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the prefix for the ``local`` storage.</span>
+
+<span class="sd">    :param path: path of the ``local`` storage</span>
+<span class="sd">    :type path: os.path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># no update is required, do not touch defaults</span>
+    <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">__determine_local_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">NAME_SRCDIR</span><span class="p">)</span>
+
+    <span class="c1"># if local is the same as user path, discard</span>
+    <span class="k">if</span> <span class="n">found</span> <span class="ow">in</span> <span class="n">STORAGES</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">NAME_SRCDIR</span><span class="p">)</span>
+    <span class="n">STORAGES</span><span class="p">[</span><span class="s2">&quot;local&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">found</span></div>
+
+
+<span class="c1"># ###################################</span>
+<span class="c1"># ###     PATH MANIPULATION      ####</span>
+<span class="c1"># ###################################</span>
+
+
+<div class="viewcode-block" id="create_or_clean_path"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.create_or_clean_path">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">create_or_clean_path</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a path or cleans it if it already exists.</span>
+
+<span class="sd">    :param prefix: prefix of the path to create</span>
+<span class="sd">    :type prefix: os.path, str</span>
+<span class="sd">    :param directory: True if the path is a directory, defaults to False</span>
+<span class="sd">    :type directory: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">directory</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="c1"># else, a previous path exists</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cwd"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.cwd">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cwd</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Change the working directory.</span>
+
+<span class="sd">    :param path: new working directory</span>
+<span class="sd">    :type path: os.path, str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">oldpwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">oldpwd</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="copy_file"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.copy_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">copy_file</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Copy a source file into a destination directory.</span>
+
+<span class="sd">    :param src: source file to copy.</span>
+<span class="sd">    :type src: str</span>
+<span class="sd">    :param dest: destination directory, may not exist yet.</span>
+<span class="sd">    :type dest: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">dest</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">SameFileError</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<span class="c1"># ###################################</span>
+<span class="c1"># ###           MISC.            ####</span>
+<span class="c1"># ###################################</span>
+
+
+<div class="viewcode-block" id="check_valid_program"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_valid_program">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_valid_program</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">succ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_on_fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if p is a valid program, using the ``which`` function.</span>
+
+<span class="sd">    :param p: program to check</span>
+<span class="sd">    :type p: str</span>
+<span class="sd">    :param succ: function to call in case of success, defaults to None</span>
+<span class="sd">    :type succ: optional</span>
+<span class="sd">    :param fail: function to call in case of failure, defaults to None</span>
+<span class="sd">    :type fail: optional</span>
+<span class="sd">    :param raise_on_fail: Raise an exception in case of failure, defaults to True</span>
+<span class="sd">    :type raise_on_fail: bool, optional</span>
+<span class="sd">    :raises RunException.ProgramError: p is not a valid program</span>
+<span class="sd">    :return: True if p is a program, False otherwise</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">p</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># which() can return None</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">succ</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">succ</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s2">&#39; found at &#39;</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fail</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&#39; not found or not an executable&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">raise_on_fail</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RunException</span><span class="o">.</span><span class="n">ProgramError</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="find_buildir_from_prefix"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.find_buildir_from_prefix">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">find_buildir_from_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the build directory from the ``path`` prefix.</span>
+
+<span class="sd">    :param path: path to search the build directory from</span>
+<span class="sd">    :type path: os.path, str</span>
+<span class="sd">    :raises CommonException.NotFoundError: the build directory is not found</span>
+<span class="sd">    :return: the path of the build directory</span>
+<span class="sd">    :rtype: os.path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># three scenarios:</span>
+    <span class="c1"># - path = $PREFIX (being a buildir) -&gt; use as build dir</span>
+    <span class="c1"># - path = $PREFIX (containing a buildir) - &gt; join(.pcvs-build)</span>
+    <span class="c1"># - otherwise, raise a path error</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">NAME_BUILDFILE</span><span class="p">)):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">NAME_BUILDIR</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">NAME_BUILDFILE</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">CommonException</span><span class="o">.</span><span class="n">NotFoundError</span><span class="p">(</span><span class="s2">&quot;build-dir in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="get_lockfile_name"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.get_lockfile_name">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_lockfile_name</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;From a file to mutex, return the file lock name associated with it.</span>
+
+<span class="sd">    For instance for /a/b.yml, the lock file name will be /a/.b.yml.lck</span>
+
+<span class="sd">    :param f: the file to mutex</span>
+<span class="sd">    :type f: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># hide lock file if original file isn&#39;t</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">filename</span>
+
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.lck&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="unlock_file"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.unlock_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">unlock_file</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove lock from a directory.</span>
+
+<span class="sd">    :param f: file locking the directory</span>
+<span class="sd">    :type f: os.path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lf_name</span> <span class="o">=</span> <span class="n">get_lockfile_name</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">lf_name</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">lf_name</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lf_name</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">fcntl</span><span class="o">.</span><span class="n">flock</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_UN</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unlock </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lf_name</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Issue unlocking </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lf_name</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="lock_file"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.lock_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">lock_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">reentrant</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Try to lock a directory.</span>
+
+<span class="sd">    :param f: name of lock</span>
+<span class="sd">    :type f: os.path</span>
+<span class="sd">    :param reentrant: True if this process may have locked this file before,</span>
+<span class="sd">        defaults to False</span>
+<span class="sd">    :type reentrant: bool, optional</span>
+<span class="sd">    :param timeout: time before timeout, defaults to None</span>
+<span class="sd">    :type timeout: int (seconds), optional</span>
+<span class="sd">    :raises LockException.TimeoutError: timeout is reached before the directory</span>
+<span class="sd">        is locked</span>
+<span class="sd">    :return: True if the file is reached, False otherwise</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Attempt locking </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+        <span class="n">unlock_file</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">locked</span> <span class="o">=</span> <span class="n">trylock_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">reentrant</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">locked</span><span class="p">:</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">LockException</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">locked</span> <span class="o">=</span> <span class="n">trylock_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">reentrant</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">locked</span></div>
+
+
+<div class="viewcode-block" id="trylock_file"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.trylock_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">trylock_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">reentrant</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Try to lock a file (used in lock_file).</span>
+
+<span class="sd">    :param f: name of lock</span>
+<span class="sd">    :type f: os.path</span>
+<span class="sd">    :param reentrant: True if this process may have locked this file before,</span>
+<span class="sd">        defaults to False</span>
+<span class="sd">    :type reentrant: bool, optional</span>
+<span class="sd">    :return: True if the file is reached, False otherwise</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lockfile_name</span> <span class="o">=</span> <span class="n">get_lockfile_name</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># touch the file if not exist, not care about FileExists.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">lockfile_name</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">lockfile_name</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># attempt to acquire the lock</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lockfile_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">fcntl</span><span class="o">.</span><span class="n">flock</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_EX</span> <span class="o">|</span> <span class="n">fcntl</span><span class="o">.</span><span class="n">LOCK_NB</span><span class="p">)</span>
+            <span class="c1"># from here, lock is taken</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">||</span><span class="si">{}</span><span class="s2">||</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">42</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Trylock </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lockfile_name</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hostname</span><span class="p">,</span> <span class="n">pid</span> <span class="o">=</span> <span class="n">get_lock_owner</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">hostname</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span> <span class="ow">and</span> <span class="n">reentrant</span><span class="p">:</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Already locked </span><span class="si">{}</span><span class="s2"> for this process&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lockfile_name</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="p">:</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Not locked, owned by </span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">pid</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># return False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_locked"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.is_locked">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">is_locked</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Is the given file locked somewhere else ?</span>
+
+<span class="sd">    :param f: the file to test</span>
+<span class="sd">    :type f: str</span>
+<span class="sd">    :return: a boolean indicating whether the lock is hold or not.</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lf_name</span> <span class="o">=</span> <span class="n">get_lockfile_name</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lf_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_lock_owner"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.get_lock_owner">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_lock_owner</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The lock file will contain the process ID owning the lock. This function</span>
+<span class="sd">    returns it.</span>
+
+<span class="sd">    :param f: the original file to mutex</span>
+<span class="sd">    :type f: str</span>
+<span class="sd">    :return: the process ID</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lf_name</span> <span class="o">=</span> <span class="n">get_lockfile_name</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lf_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;||&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">==</span> <span class="mi">42</span>
+        <span class="k">return</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="program_timeout"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.program_timeout">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">program_timeout</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Timeout handler, called when a SIGALRM is received.</span>
+
+<span class="sd">    :param sig: signal number</span>
+<span class="sd">    :type sig: int</span>
+<span class="sd">    :raises CommonException.TimeoutError: timeout is reached</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">sig</span> <span class="o">==</span> <span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span>
+    <span class="k">raise</span> <span class="n">CommonException</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Timeout reached&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="start_autokill"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.start_autokill">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">start_autokill</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a new time to automatically stop the</span>
+<span class="sd">    current process once time is expired.</span>
+
+<span class="sd">    :param timeout: value in seconds before the autokill will be raised</span>
+<span class="sd">    :type timeout: positive integer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_item</span><span class="p">(</span><span class="s2">&quot;Setting timeout to </span><span class="si">{}</span><span class="s2"> second(s)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGALRM</span><span class="p">,</span> <span class="n">program_timeout</span><span class="p">)</span>
+
+        <span class="n">signal</span><span class="o">.</span><span class="n">alarm</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Program"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Program</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple class to encapsulate process management.</span>
+
+<span class="sd">    This is better and should be preferred as importing subprocess everywhere.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cmd</span> <span class="o">=</span> <span class="n">cmd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rc</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_except</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Program.run"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program.run">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_input</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the given program and capture I/Os</span>
+
+<span class="sd">        :param input: raw data to be used as stdin</span>
+<span class="sd">        :type input: str</span>
+<span class="sd">        :param shell: is the provided command to be run within a shell</span>
+<span class="sd">        :type shell: boolean</span>
+<span class="sd">        :param timeout: allowed time before automatically killing the process</span>
+<span class="sd">        :type timeout: positive integer</span>
+<span class="sd">        :return: zero if the process started successfully, non-zero</span>
+<span class="sd">            otherwise.</span>
+<span class="sd">        :rtype: integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">process_input</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rc</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">returncode</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_except</span> <span class="o">=</span> <span class="n">e</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter to actual execution output.</span>
+
+<span class="sd">        :return: stderr/stdout combined</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter, effective return code.</span>
+
+<span class="sd">        :return: return code</span>
+<span class="sd">        :rtype: integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter, raised exception (for any reason)</span>
+
+<span class="sd">        :return: an Exception-derived object</span>
+<span class="sd">        :rtype: Exception</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_except</span></div>
+
+
+<div class="viewcode-block" id="str_dict_as_envvar"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.str_dict_as_envvar">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">str_dict_as_envvar</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a dict to a list of shell-compliant variable strings.</span>
+
+<span class="sd">    The final result is a regular multiline str, each line being an entry.</span>
+
+<span class="sd">    :param d: the dict containing env vars to serialize</span>
+<span class="sd">    :type d: dict</span>
+<span class="sd">    :return: the str, containing multiple lines, each of them being a var.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=&#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">())])</span></div>
+
+
+<div class="viewcode-block" id="check_is_buildir"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_is_buildir">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_is_buildir</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">NAME_BUILDFILE</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_is_archive"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_is_archive">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_is_archive</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;pcvsrun_&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_is_build_or_archive"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_is_build_or_archive">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">check_is_build_or_archive</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">check_is_buildir</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="n">check_is_archive</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="list_valid_buildirs_in_dir"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.list_valid_buildirs_in_dir">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">list_valid_buildirs_in_dir</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="n">check_is_buildir</span><span class="p">(</span><span class="n">p</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="list_valid_archive_in_dir"><a class="viewcode-back" href="../../../api/pcvs.helpers.utils.html#pcvs.helpers.utils.list_valid_archive_in_dir">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">list_valid_archive_in_dir</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">if</span> <span class="n">check_is_archive</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

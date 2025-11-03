@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.backend.session module &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pcvs.backend.utilities module" href="pcvs.backend.utilities.html" />
+    <link rel="prev" title="pcvs.backend.run module" href="pcvs.backend.run.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="pcvs.backend.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html#module-pcvs.backend">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.backend.html">pcvs.backend package</a></li>
+      <li class="breadcrumb-item active">pcvs.backend.session module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pcvs.backend.session.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pcvs.backend.session">
+<span id="pcvs-backend-session-module"></span><h1>pcvs.backend.session module<a class="headerlink" href="#module-pcvs.backend.session" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object representing a running validation (detached or not).</p>
+<p>Despite the fact it is designed for manage concurrent runs,  it takes a
+callback and can be derived for other needs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_func</strong> (<em>Callable</em>) – user function to be called once the session starts</p></li>
+<li><p><strong>_sid</strong> (<em>int</em>) – session id, automatically generated</p></li>
+<li><p><strong>_session_infos</strong> (<em>dict</em>) – session infos dict</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">State</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.State"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.State" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
+<p>Enum of possible Session states.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#pcvs.backend.session.Session.State.COMPLETED" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.ERROR">
+<span class="sig-name descname"><span class="pre">ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#pcvs.backend.session.Session.State.ERROR" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.IN_PROGRESS">
+<span class="sig-name descname"><span class="pre">IN_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#pcvs.backend.session.Session.State.IN_PROGRESS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.WAITING">
+<span class="sig-name descname"><span class="pre">WAITING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pcvs.backend.session.Session.State.WAITING" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.from_yaml">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constructor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.State.from_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.State.from_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a <a class="reference internal" href="#pcvs.backend.session.Session.State" title="pcvs.backend.session.Session.State"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session.State</span></code></a> from its YAML representation.</p>
+<p>Relies on the fact the node contains a ‘Session.State’ tag.
+:type constructor: 
+:param constructor: the YAML loader
+:type constructor: <code class="xref py py-class docutils literal notranslate"><span class="pre">yaml.FullLoader</span></code>
+:type node: 
+:param node: the YAML representation
+:type node: Any
+:return: The session State as an object
+:rtype: <a class="reference internal" href="#pcvs.backend.session.Session.State" title="pcvs.backend.session.Session.State"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session.State</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.State.to_yaml">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">representer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.State.to_yaml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.State.to_yaml" title="Permalink to this definition"></a></dt>
+<dd><p>Convert a Test.State to a valid YAML representation.</p>
+<p>A new tag is created: ‘Session.State’ as a scalar (str).
+:type representer: 
+:param representer: the YAML dumper object
+:type representer: <code class="xref py py-class docutils literal notranslate"><span class="pre">YAML().dumper</span></code>
+:type data: 
+:param data: the object to represent
+:type data: class:<cite>Session.State</cite>
+:return: the YAML representation
+:rtype: Any</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#pcvs.backend.session.Session.id" title="Permalink to this definition"></a></dt>
+<dd><p>Getter to session id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>session id</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.infos">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">infos</span></span><a class="headerlink" href="#pcvs.backend.session.Session.infos" title="Permalink to this definition"></a></dt>
+<dd><p>Getter to session infos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>session infos</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.load_from">
+<span class="sig-name descname"><span class="pre">load_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.load_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.load_from" title="Permalink to this definition"></a></dt>
+<dd><p>Update the current object with session infos read from global file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sid</strong> (<em>int</em>) – session id read from file</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – session infos read from file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.property">
+<span class="sig-name descname"><span class="pre">property</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.property" title="Permalink to this definition"></a></dt>
+<dd><p>Access specific data from the session stored info session.yml.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kw</strong> (<em>str</em>) – the information to retrieve. kw must be a valid key</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the requested session infos if exist</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.rc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rc</span></span><a class="headerlink" href="#pcvs.backend.session.Session.rc" title="Permalink to this definition"></a></dt>
+<dd><p>Gett to final RC.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rc</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.register_callback">
+<span class="sig-name descname"><span class="pre">register_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.register_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.register_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Register the callback used as main function once the session is
+started.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>callback</strong> (<em>Callable</em>) – function to invoke</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.run" title="Permalink to this definition"></a></dt>
+<dd><p>Run the session normally, without detaching the focus.</p>
+<p>Arguments are user function ones. This function is also in charge of
+redirecting I/O properly (stdout, file, logs)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>tuple</em>) – user function positional arguments</p></li>
+<li><p><strong>kwargs</strong> (<em>tuple</em>) – user function keyword-based arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the session ID for this run</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.run_detached">
+<span class="sig-name descname"><span class="pre">run_detached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#Session.run_detached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.Session.run_detached" title="Permalink to this definition"></a></dt>
+<dd><p>Run the session is detached mode.</p>
+<p>Arguments are for user function only.
+:type args: 
+:param args: user function positional arguments
+:type args: tuple
+:param kwargs user function keyword-based arguments.
+:type kwargs: tuple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the Session id created for this run.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.backend.session.Session.state">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">state</span></span><a class="headerlink" href="#pcvs.backend.session.Session.state" title="Permalink to this definition"></a></dt>
+<dd><p>Getter to session status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>session status</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.list_alive_sessions">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">list_alive_sessions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#list_alive_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.list_alive_sessions" title="Permalink to this definition"></a></dt>
+<dd><p>Load and return the complete dict from session.yml file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the session dict</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.main_detached_session">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">main_detached_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#main_detached_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.main_detached_session" title="Permalink to this definition"></a></dt>
+<dd><p>Main function processed when running in detached mode.</p>
+<p>This function is called by Session.run_detached() and is launched from
+cloned process (same global env, new main function).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – any error occurring during the main process is re-raised.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>sid</strong> – the session id</p></li>
+<li><p><strong>user_func</strong> – the Python function used as the new main()</p></li>
+<li><p><strong>args</strong> (<em>tuple</em>) – user_func() arguments</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em>) – user_func() arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.remove_session_from_file">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">remove_session_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#remove_session_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.remove_session_from_file" title="Permalink to this definition"></a></dt>
+<dd><p>clear a session from logs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sid</strong> (<em>int</em>) – the session id to remove.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.session_file_hash">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">session_file_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_infos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#session_file_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.session_file_hash" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.store_session_to_file">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">store_session_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#store_session_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.store_session_to_file" title="Permalink to this definition"></a></dt>
+<dd><p>Save a new session into the session file (in HOME dir).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>dict</em>) – session infos to store</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the sid associated to new create session id.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.backend.session.update_session_from_file">
+<span class="sig-prename descclassname"><span class="pre">pcvs.backend.session.</span></span><span class="sig-name descname"><span class="pre">update_session_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/session.html#update_session_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.session.update_session_from_file" title="Permalink to this definition"></a></dt>
+<dd><p>Update data from a running session from the global file.</p>
+<p>This only add/replace keys present in argument dict. Other keys remain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sid</strong> (<em>int</em>) – the session id</p></li>
+<li><p><strong>update</strong> – the keys to update. If already existing, content is replaced</p></li>
+</ul>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pcvs.backend.run.html" class="btn btn-neutral float-left" title="pcvs.backend.run module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.backend.utilities.html" class="btn btn-neutral float-right" title="pcvs.backend.utilities module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

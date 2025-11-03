@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation setup &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration basic blocks" href="config.html" />
+    <link rel="prev" title="Common workflow" href="../basics/workflow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Validation setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generalities">Generalities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup-files">Setup files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure">Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#build">Build</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run">Run</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validate">Validate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#group">Group</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tag">Tag</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#artifact">Artifact</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#setup-file">Setup file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Validation setup</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ref/test-file.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="validation-setup">
+<h1>Validation setup<a class="headerlink" href="#validation-setup" title="Permalink to this heading"></a></h1>
+<section id="generalities">
+<h2>Generalities<a class="headerlink" href="#generalities" title="Permalink to this heading"></a></h2>
+<section id="setup-files">
+<h3>Setup files<a class="headerlink" href="#setup-files" title="Permalink to this heading"></a></h3>
+<p>Like profiles, setup configurations have nodes to describe different steps of
+the process. These nodes are split into subnodes to describe the course of
+the run.</p>
+<p>The validation configuration is specified using setup files. These files can be
+in the yml format (<code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code>), or be an executable files (<code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code>)
+generating a yml configuration in stdout.
+The information of this configuration are crossed with the profile information
+to run the tests.</p>
+<p>When PCVS is launched in a directory, it browses every subdirectory to find any
+<code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file and launches itself with the corresponding
+configuration.</p>
+<section id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>exampletree/
+├── subdir1
+│   └── pcvs.yml
+└── subdir2
+    └── pcvs.yml
+</pre></div>
+</div>
+<p>Launching <code class="docutils literal notranslate"><span class="pre">`pcvs</span> <span class="pre">run</span> <span class="pre">exampletree</span></code> will generate tests for subdir1/pcvs.yml
+<strong>and</strong> for subdir2/pcvs.yml. There is no need to put a setup configuration in
+the root of <code class="docutils literal notranslate"><span class="pre">exampletree</span></code>, but it is possible to add a setup here.</p>
+</section>
+</section>
+</section>
+<section id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this heading"></a></h2>
+<p>The yml input must have one node per test. Each test can describe the following
+configurations :</p>
+<ul class="simple">
+<li><p>build</p></li>
+<li><p>run</p></li>
+<li><p>validate</p></li>
+<li><p>group</p></li>
+<li><p>tag</p></li>
+<li><p>artifact</p></li>
+</ul>
+<section id="build">
+<h3>Build<a class="headerlink" href="#build" title="Permalink to this heading"></a></h3>
+<p>The build node describe how a binary file should be built depending on its
+sources. It contains the following subndoes :</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path/to/the/file/to/build</span>
+<span class="w">    </span><span class="nt">sources</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">binary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name of the binary to be built (if necessary)</span>
+<span class="w">        </span><span class="nt">cflags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">extra cflags</span>
+<span class="w">        </span><span class="nt">ldflags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">extra ldflags</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;list</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">test</span><span class="nv"> </span><span class="s">names</span><span class="nv"> </span><span class="s">it</span><span class="nv"> </span><span class="s">depends</span><span class="nv"> </span><span class="s">on&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">directory where the binary should be built</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of variants (CF Configuration basic blocks -&gt; compiler</span>
+<span class="w">    </span><span class="nv">node)</span><span class="p p-Indicator">]</span>
+
+<span class="w">    </span><span class="nt">autotools</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of options for autotools</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">cmake</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of options for cmake</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">make</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">target for make command</span>
+<span class="w">        </span><span class="nt">jobs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">make -j n option</span>
+</pre></div>
+</div>
+</section>
+<section id="run">
+<h3>Run<a class="headerlink" href="#run" title="Permalink to this heading"></a></h3>
+<p>The run node describes how a binary file should be launched. It contains the
+following nodes :</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">run</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">path to build directory</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of tests on which it depends</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">spack</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of spack dependencies used by this test</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">module</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of installed modules this test needs</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name of the binary file</span>
+</pre></div>
+</div>
+<p>The run node owns the <code class="docutils literal notranslate"><span class="pre">iterate</span></code> subnode which can contain custom iterators
+described in the <code class="docutils literal notranslate"><span class="pre">criterion</span></code> node in the selected profile. Moreover, the
+<code class="docutils literal notranslate"><span class="pre">run.iterate</span></code> node can define custom iterators without defining them in
+<code class="docutils literal notranslate"><span class="pre">criterion</span></code> by writing them in the run.iterate.program node.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">run</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">iterate</span><span class="p">:</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">iterator_described_in_&#39;profile.runtime.criterion&#39;</span><span class="p p-Indicator">:</span>
+<span class="w">            </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of values for the corresponding iterator</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">program</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">custom_iterator</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">numeric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true/false</span>
+<span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;argument&quot;</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">or &quot;environment&quot;</span>
+<span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">list of values taken by the iterator</span><span class="p p-Indicator">]</span>
+<span class="w">                </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string chosen to identify this iterator</span>
+</pre></div>
+</div>
+</section>
+<section id="validate">
+<h3>Validate<a class="headerlink" href="#validate" title="Permalink to this heading"></a></h3>
+<p>The validate node describes the expected test behaviour, including exit, time
+and matching output.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">validate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">expect_exit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">expected exit code (integer)</span>
+<span class="w">    </span><span class="nt">time</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mean: expected time to compute the test (seconds / float) tolerance</span><span class="p">:</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">standard deviation for expected time (seconds / float)</span>
+<span class="w">        </span><span class="nt">hard_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximum time after which process has to be killed (seconds / float)</span>
+<span class="w">        </span><span class="nt">soft_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximum time after which the test is considered failed (but can still finish, so you can run test correctness locally without testing optimisation (even on your slow computer))</span>
+<span class="w">    </span><span class="nt">match</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">label</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">expr</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">expect</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">script</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Path to a validating script</span>
+<span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name of the function in the plugin you  are using</span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">list of arguments for thefunction (see example below)</span>
+<span class="w">    </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;not_longer_than_previous_runs&#39;</span><span class="w"> </span><span class="c1"># check previous run in database</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">history_depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1</span><span class="w"> </span><span class="c1"># look at n previous run (-1 for all)</span>
+<span class="w">            </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"> </span><span class="c1"># time can be 10% slower than the fastest of all previous runs</span>
+</pre></div>
+</div>
+</section>
+<section id="group">
+<h3>Group<a class="headerlink" href="#group" title="Permalink to this heading"></a></h3>
+<p>Groups are described in profiles. They can contain <code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">run</span></code>, <code class="docutils literal notranslate"><span class="pre">tag</span></code>,
+<code class="docutils literal notranslate"><span class="pre">validate</span></code>, and <code class="docutils literal notranslate"><span class="pre">artifact</span></code> subnodes. Once a group is defined in the used
+profile it can be called in the validation setup file.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name of the group defined in the profile</span>
+</pre></div>
+</div>
+</section>
+<section id="tag">
+<h3>Tag<a class="headerlink" href="#tag" title="Permalink to this heading"></a></h3>
+<p>Tags get in the results and tests can be sorted tag-wise. A test can have
+multiple tags and tags do not have to be defined upstream.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tag</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tag1</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tag2</span>
+</pre></div>
+</div>
+</section>
+<section id="artifact">
+<h3>Artifact<a class="headerlink" href="#artifact" title="Permalink to this heading"></a></h3>
+<p>The artifact node contains anything the output should have in addition to the
+results of tests.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">artifact</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">obj1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/obj1&quot;</span>
+<span class="w">    </span><span class="nt">obj2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path/to/obj2&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="setup-file">
+<h2>Setup file<a class="headerlink" href="#setup-file" title="Permalink to this heading"></a></h2>
+<p>When using a <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file, the file will be executed, and stdout should be
+a valid yaml file that respect <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> file structure as describe above.</p>
+<p>When running the script, some environment variables are availables to ease configuration.
+The complete list of environment variables can be obtained by running <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">-vvv</span> <span class="pre">run</span> <span class="pre">...</span></code>.</p>
+<dl class="simple">
+<dt>The list is composed of:</dt><dd><ul class="simple">
+<li><p>Compilers environment variables starting with: <code class="docutils literal notranslate"><span class="pre">PCVS_CMP</span></code>.</p></li>
+<li><p>Criterions environment variables starting with: <code class="docutils literal notranslate"><span class="pre">PCVS_CRIT</span></code>.</p></li>
+<li><p>Other environment variables set in profile at <code class="docutils literal notranslate"><span class="pre">compiler.compilers.&lt;x&gt;.envs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example of availables environment variables: (will depends on your profile file)</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PCVS_CMP_CC=&#39;gcc&#39;
+PCVS_CMP_CC_ARGS=&#39;&#39;
+PCVS_CMP_CC_VAR_OPENMP=&#39;gcc&#39;
+PCVS_CMP_CC_VAR_OPENMP_ARGS=&#39;-fopenmp&#39;
+PCVS_CMP_CUDA=&#39;nvcc&#39;
+PCVS_CMP_CUDA_ARGS=&#39;&#39;
+PCVS_CMP_CXX=&#39;g++&#39;
+PCVS_CMP_CXX_ARGS=&#39;&#39;
+PCVS_CMP_CXX_VAR_OPENMP=&#39;g++&#39;
+PCVS_CMP_CXX_VAR_OPENMP_ARGS=&#39;-fopenmp&#39;
+PCVS_CMP_FC=&#39;gfortran&#39;
+PCVS_CMP_FC_ARGS=&#39;&#39;
+PCVS_CMP_FC_VAR_OPENMP=&#39;gfortran&#39;
+PCVS_CMP_FC_VAR_OPENMP_ARGS=&#39;-fopenmp&#39;
+PCVS_CMP_HIP=&#39;hipcc&#39;
+PCVS_CMP_HIP_ARGS=&#39;&#39;
+
+PCVS_CRIT_N_CORE=&#39;1&#39;
+PCVS_CRIT_N_MPI=&#39;1 2 4&#39;
+PCVS_CRIT_N_NODE=&#39;1 2&#39;
+PCVS_CRIT_N_OMP=&#39;1 4&#39;
+PCVS_CRIT_N_PROC=&#39;1 4 8&#39;
+
+PCVS_CC=&#39;gcc&#39;
+PCVS_CXX=&#39;g++&#39;
+PCVS_FC=&#39;gfortran&#39;
+PCVS_HIPCC=&#39;hipcc&#39;
+PCVS_NVCC=&#39;nvcc&#39;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../basics/workflow.html" class="btn btn-neutral float-left" title="Common workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration basic blocks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

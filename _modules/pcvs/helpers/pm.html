@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.helpers.pm &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.helpers.pm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.helpers.pm</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="identify"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.identify">[docs]</a><span></span><span class="k">def</span><span class="w"> </span><span class="nf">identify</span><span class="p">(</span><span class="n">pm_node</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;identifies where</span>
+
+<span class="sd">    :param pm_node: [description]</span>
+<span class="sd">    :type pm_node: [type]</span>
+<span class="sd">    :return: [description]</span>
+<span class="sd">    :rtype: [type]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;spack&quot;</span> <span class="ow">in</span> <span class="n">pm_node</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpackManager</span><span class="p">(</span><span class="n">elt</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="s2">&quot;module&quot;</span> <span class="ow">in</span> <span class="n">pm_node</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;module&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;module&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;module&quot;</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">pm_node</span><span class="p">[</span><span class="s2">&quot;module&quot;</span><span class="p">]:</span>
+            <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ModuleManager</span><span class="p">(</span><span class="n">elt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="PManager"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;generic Package Manager&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;constructor for PManager object</span>
+
+<span class="sd">        :param spec: specifications for this Package Manager, defaults to None</span>
+<span class="sd">        :type spec: str, optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PManager.get"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager.get">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="p">,</span> <span class="n">install</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get specified packages for this manager</span>
+
+<span class="sd">        :param load: True to load the package</span>
+<span class="sd">        :type load: bool</span>
+<span class="sd">        :param install: True to install the package</span>
+<span class="sd">        :type install: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="PManager.install"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager.install">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;install specified packages&quot;&quot;&quot;</span>
+        <span class="k">return</span></div></div>
+
+
+<div class="viewcode-block" id="SpackManager"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.SpackManager">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SpackManager</span><span class="p">(</span><span class="n">PManager</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;handles Spack package manager&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;constructor for SpackManager object</span>
+
+<span class="sd">        :param spec: specifications for Spack manager</span>
+<span class="sd">        :type spec: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span>
+
+<div class="viewcode-block" id="SpackManager.get"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.SpackManager.get">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get the commands to install the specified package</span>
+
+<span class="sd">        :param load: load the specified package, defaults to True</span>
+<span class="sd">        :type load: bool, optional</span>
+<span class="sd">        :param install: install the specified package, defaults to True</span>
+<span class="sd">        :type install: bool, optional</span>
+<span class="sd">        :return: command to install/load the package</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">install</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;spack location -i </span><span class="si">{}</span><span class="s2"> &gt; /dev/null 2&gt;&amp;1&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">))</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;test &quot;$?&quot; != &quot;0&quot; &amp;&amp; spack install </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;eval `spack load --sh </span><span class="si">{}</span><span class="s2">`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ModuleManager"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.ModuleManager">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ModuleManager</span><span class="p">(</span><span class="n">PManager</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;handles Module package manager&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;constructor for Module package manager</span>
+
+<span class="sd">        :param spec: specifications for Module manager</span>
+<span class="sd">        :type spec: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span>
+
+<div class="viewcode-block" id="ModuleManager.get"><a class="viewcode-back" href="../../../api/pcvs.helpers.pm.html#pcvs.helpers.pm.ModuleManager.get">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">install</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;get the command to install the specified package</span>
+
+<span class="sd">        :param load: load the specified package, defaults to True</span>
+<span class="sd">        :type load: bool, optional</span>
+<span class="sd">        :param install: install the specified package, defaults to False</span>
+<span class="sd">        :type install: bool, optional</span>
+<span class="sd">        :return: command to install/load the package</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="c1"># &#39;install&#39; does not mean anything here</span>
+        <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;module load </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuration basic blocks &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Profiles" href="profile.html" />
+    <link rel="prev" title="Validation setup" href="test-file.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration basic blocks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#generalities">Generalities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scope">Scope</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#blocks-description">Blocks description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#compilers-node">compilers node</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#compilers-node-example">compilers node example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variants">variants</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#criterion-node">criterion node</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#group-node">Group node</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#machine-node">machine node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#runtime-node">runtime node</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuration basic blocks</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ref/config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuration-basic-blocks">
+<h1>Configuration basic blocks<a class="headerlink" href="#configuration-basic-blocks" title="Permalink to this heading"></a></h1>
+<section id="generalities">
+<h2>Generalities<a class="headerlink" href="#generalities" title="Permalink to this heading"></a></h2>
+<p>Configuration blocks define settings for PCVS. There are 5 configurable blocks
+which are :</p>
+<ul class="simple">
+<li><p>compiler</p></li>
+<li><p>criterion</p></li>
+<li><p>group</p></li>
+<li><p>machine</p></li>
+<li><p>runtime</p></li>
+</ul>
+<p>The configuration block is a virtual object, it doesn’t exist per se,
+configuration blocks are used to build profiles which can be imported/exported.
+It is possible however to share configuration blocks by addressing them in a
+scope that is large enough to reach other users.</p>
+<p>Each configuration block contains sub-blocks in order to isolate and classify
+information.</p>
+</section>
+<section id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Permalink to this heading"></a></h2>
+<p>PCVS allows 3 scopes :</p>
+<ul class="simple">
+<li><p><strong>global</strong> for everyone on the machine having access to the PCVS installation</p></li>
+<li><p><strong>user</strong> accessible from everywhere for the corresponding user</p></li>
+<li><p><strong>local</strong> accessible only from a directory</p></li>
+</ul>
+</section>
+<section id="blocks-description">
+<h2>Blocks description<a class="headerlink" href="#blocks-description" title="Permalink to this heading"></a></h2>
+<section id="compilers-node">
+<h3>compilers node<a class="headerlink" href="#compilers-node" title="Permalink to this heading"></a></h3>
+<p>The compiler node describes how to use a compiler, it include the following nodes:
+* <code class="docutils literal notranslate"><span class="pre">program</span></code>: the name of the program to execute
+* <code class="docutils literal notranslate"><span class="pre">envs</span></code>: the env to export at build time for that compiler, useful if you are using a Makefile
+* <code class="docutils literal notranslate"><span class="pre">extension</span></code>: the source code extension match by the compilers.
+* <code class="docutils literal notranslate"><span class="pre">variants</span></code>: different version of the same compiler configuration entry.</p>
+<section id="compilers-node-example">
+<h4>compilers node example<a class="headerlink" href="#compilers-node-example" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">compiler.compilers</span></code> block contains a collection of compiler configurations.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compilers</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cc</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpicc</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PCVS_CC=mpicc</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\\.(h|H|i|I|s|S|c|c90|c99|c11)$&quot;</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;openmp</span>
+<span class="w">      </span><span class="nt">openmp</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-fopenmp</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">cxx</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpicxx</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PCVS_CXX=mpicxx</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\\.(hpp|C|cc|cxx|cpp|c\\+\\+)$&quot;</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="nv">*openmp</span>
+<span class="w">  </span><span class="nt">f77</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpif77</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PCVS_FC=mpif77</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\\.(f|F)(77)?$&quot;</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="nv">*openmp</span>
+<span class="w">  </span><span class="nt">f90</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpif90</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PCVS_FC=mpif90</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\\.(f|F)(90)?$&quot;</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="nv">*openmp</span>
+<span class="w">  </span><span class="nt">fc</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpifort</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PCVS_FC=mpifort</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;\\.(f|F)(95|(20)?(03|08)|c)?$&quot;</span>
+<span class="w">    </span><span class="nt">variants</span><span class="p">:</span><span class="w"> </span><span class="nv">*openmp</span>
+</pre></div>
+</div>
+</section>
+<section id="variants">
+<h4>variants<a class="headerlink" href="#variants" title="Permalink to this heading"></a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">variants</span></code> block can contain any custom variant.
+The variant must have a <strong>name</strong>, and <strong>arguments</strong> as such:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">example_variant</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">additional arguments for the example variant</span>
+<span class="nt">openmp</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-fopenmp</span>
+<span class="nt">strict</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-Werror -Wall -Wextra</span>
+</pre></div>
+</div>
+<p>In this example the variants “example_variant”, “openmp”, and “strict” have to be
+specified in the validation setup where the user wants to use them.</p>
+</section>
+</section>
+<section id="criterion-node">
+<h3>criterion node<a class="headerlink" href="#criterion-node" title="Permalink to this heading"></a></h3>
+<p>The criterion node contains a collection of iterators that describe the tests.
+PCVS can iterate over custom parameters as such :</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">iterators </span><span class="p">:</span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">n_[iterator]</span><span class="w"> </span><span class="p p-Indicator">:</span>
+<span class="w">        </span><span class="nt">**subtitle** </span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string used to indicate the number of [iterator] in the test description</span>
+<span class="w">        </span><span class="nt">**values** </span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">values that [iterator] allowed to take</span>
+</pre></div>
+</div>
+<section id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h4>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">iterators</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_core</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">C</span>
+<span class="w">        </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>In this case the program has to iterate on the core number and has to take the
+values 1 and 2. The name <code class="docutils literal notranslate"><span class="pre">n_core</span></code> is arbitrary and has to be put in the
+validation setup file.</p>
+</section>
+</section>
+<section id="group-node">
+<h3>Group node<a class="headerlink" href="#group-node" title="Permalink to this heading"></a></h3>
+<p>The group node contains group definitions that describe tests. A group
+description can contain any node present in the Configuration basic blocks (CF
+<cite>Validation Setup</cite> section).</p>
+<section id="id1">
+<h4>Example<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h4>
+<p>The following example allow you to disable the <code class="docutils literal notranslate"><span class="pre">n_omp</span></code> criterion of the group <code class="docutils literal notranslate"><span class="pre">GRPMPI</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">GRPMPI</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">iterate</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">n_omp</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">**values**</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="machine-node">
+<h3>machine node<a class="headerlink" href="#machine-node" title="Permalink to this heading"></a></h3>
+<p>The machine node describes the constraints of the physical machine.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">machine</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number of accessible nodes</span>
+<span class="w">    </span><span class="nt">cores_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number of accessible cores per node</span>
+<span class="w">    </span><span class="nt">concurrent_run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximum number of processes that can coexist</span>
+</pre></div>
+</div>
+</section>
+<section id="runtime-node">
+<h3>runtime node<a class="headerlink" href="#runtime-node" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">program</span></code> specify a wrapper for runtime tests, such as <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> for example.
+The <code class="docutils literal notranslate"><span class="pre">compiling.wrapper</span></code> specify a wrapper for test compilation.
+It can be use to run the compilation on an other node using <code class="docutils literal notranslate"><span class="pre">srun</span></code> for example.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">criterions</span></code> node contains arguments passed to the launching command.
+For example, if <code class="docutils literal notranslate"><span class="pre">prterun</span></code> takes the “-np” argument, which corresponds
+to the number of MPI threads, let’s say <code class="docutils literal notranslate"><span class="pre">n_mpi</span></code>,
+we will get the following runtime profile:</p>
+<p><code class="docutils literal notranslate"><span class="pre">plugins</span></code> specify a python plugin that will be loaded and use to filter
+available criterions. <code class="docutils literal notranslate"><span class="pre">defaultplugin</span></code> specify the name of one of the default
+plugin to use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">args</span></code> specify static arguments to <code class="docutils literal notranslate"><span class="pre">program</span></code>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">program</span><span class="p">:</span>
+<span class="nt">compiling</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">wrapper</span><span class="p">:</span>
+<span class="nt">args</span><span class="p">:</span>
+<span class="nt">plugin</span><span class="p">:</span>
+<span class="nt">defaultplugin</span><span class="p">:</span>
+<span class="nt">criterions</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">n_mpi</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">numeric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">option</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-np&quot;</span>
+<span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">argument</span>
+<span class="w">        </span><span class="nt">aliases</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">[</span><span class="nv">dictionary of aliases for the option</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="test-file.html" class="btn btn-neutral float-left" title="Validation setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="profile.html" class="btn btn-neutral float-right" title="Profiles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

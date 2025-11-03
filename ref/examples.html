@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Examples &mdash; PCVS 0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contribution Guide" href="../dev/contribution.html" />
+    <link rel="prev" title="Utilities" href="utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PCVS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Input Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#te-nodes-the-complete-list">TE nodes: The complete list</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Input Examples</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ref/examples.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-examples">
+<h1>Input Examples<a class="headerlink" href="#input-examples" title="Permalink to this heading"></a></h1>
+<section id="te-nodes-the-complete-list">
+<span id="te-format"></span><h2>TE nodes: The complete list<a class="headerlink" href="#te-nodes-the-complete-list" title="Permalink to this heading"></a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="nn">---</span>
+<span class="linenos">  2</span><span class="c1"># This node will be ignored while unrolling tests</span>
+<span class="linenos">  3</span><span class="c1"># as node name starts with a dot &quot;.&quot;</span>
+<span class="linenos">  4</span><span class="nt">.this_is_a_job</span><span class="p">:</span>
+<span class="linenos">  5</span><span class="w">  </span><span class="c1"># A node can reference a &quot;group&quot;, a profile-wide template to propagate multiple</span>
+<span class="linenos">  6</span><span class="w">  </span><span class="c1"># TE keys to different YAML files at once</span>
+<span class="linenos">  7</span><span class="w">  </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;GRPSERIAL&quot;</span>
+<span class="linenos">  8</span><span class="w">  </span><span class="c1"># A tag is a label to classify jobs when displaying results</span>
+<span class="linenos">  9</span><span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;a&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 10</span><span class="w">  </span><span class="c1"># Build rules =&gt; how to build the benchmark</span>
+<span class="linenos"> 11</span><span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="linenos"> 12</span><span class="w">    </span><span class="c1"># Files used to build this node</span>
+<span class="linenos"> 13</span><span class="w">    </span><span class="c1"># it can be a source file, a makefile...</span>
+<span class="linenos"> 14</span><span class="w">    </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;@SRCPATH@/*.c&quot;</span>
+<span class="linenos"> 15</span><span class="w">    </span><span class="c1"># ===== FOR ANY BUILD SYSTEM</span>
+<span class="linenos"> 16</span><span class="w">    </span><span class="c1"># args: arguments forwarded to the build system</span>
+<span class="linenos"> 17</span><span class="w">    </span><span class="c1"># envs: environment variables exported to the target shell.</span>
+<span class="linenos"> 18</span><span class="w">    </span><span class="c1"># Only one build system is expected to be used at once among the following:</span>
+<span class="linenos"> 19</span>
+<span class="linenos"> 20</span><span class="w">    </span><span class="nt">autotools</span><span class="p">:</span>
+<span class="linenos"> 21</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;--disable-bootstrap&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 22</span><span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="linenos"> 23</span><span class="w">    </span><span class="nt">cmake</span><span class="p">:</span>
+<span class="linenos"> 24</span><span class="w">      </span><span class="c1"># &quot;vars&quot; is a shortcut to &quot;args: [&quot;-D&lt;var&gt;&quot;]&quot;</span>
+<span class="linenos"> 25</span><span class="w">      </span><span class="nt">vars</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;CMAKE_VERBOSE_MAKEFILE=ON&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 26</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="linenos"> 27</span><span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="linenos"> 28</span><span class="w">    </span><span class="nt">make</span><span class="p">:</span>
+<span class="linenos"> 29</span><span class="w">      </span><span class="c1"># default makefile target to invoke</span>
+<span class="linenos"> 30</span><span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;all&quot;</span>
+<span class="linenos"> 31</span><span class="w">      </span><span class="c1"># a list of macros can be used as placeholder to be replaced when</span>
+<span class="linenos"> 32</span><span class="w">      </span><span class="c1"># unrolling. A list is available at the end of this file.</span>
+<span class="linenos"> 33</span><span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;MPICC=@COMPILER_CC@&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 34</span><span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="linenos"> 35</span><span class="w">    </span><span class="nt">sources</span><span class="p">:</span>
+<span class="linenos"> 36</span><span class="w">      </span><span class="c1"># program binary (if needed)</span>
+<span class="linenos"> 37</span><span class="w">      </span><span class="nt">binary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;a.out&quot;</span>
+<span class="linenos"> 38</span><span class="w">      </span><span class="c1"># extra cflags</span>
+<span class="linenos"> 39</span><span class="w">      </span><span class="nt">cflags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;extra</span><span class="nv"> </span><span class="s">cflags&quot;</span>
+<span class="linenos"> 40</span><span class="w">      </span><span class="c1"># extra ldflags</span>
+<span class="linenos"> 41</span><span class="w">      </span><span class="nt">ldflags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;extra</span><span class="nv"> </span><span class="s">ldflags&quot;</span>
+<span class="linenos"> 42</span><span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="linenos"> 43</span><span class="w">      </span><span class="c1"># force explicit language if PCVS has trouble to autodetect</span>
+<span class="linenos"> 44</span><span class="w">      </span><span class="nt">lang</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;cc&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;cxx&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;fc&#39;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 45</span><span class="w">    </span><span class="nt">custom</span><span class="p">:</span>
+<span class="linenos"> 46</span><span class="w">      </span><span class="c1"># Really complex build scenario PCVS may not be able to handle</span>
+<span class="linenos"> 47</span><span class="w">      </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;myscript.sh&quot;</span>
+<span class="linenos"> 48</span><span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;VAR1=value&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;VAR2=value&quot;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 49</span><span class="w">    </span><span class="nt">validate</span><span class="p">:</span>
+<span class="linenos"> 50</span><span class="w">      </span><span class="c1"># same as validate node bellow but to validate the build process</span>
+<span class="linenos"> 51</span><span class="w">      </span><span class="c1"># instead of the run.</span>
+<span class="linenos"> 52</span><span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 53</span><span class="w">    </span><span class="c1"># dependency scheme. This can be:</span>
+<span class="linenos"> 54</span><span class="w">    </span><span class="c1"># a fully expanded test name</span>
+<span class="linenos"> 55</span><span class="w">    </span><span class="c1"># a TE node (like &quot;.this_is_a_job&quot; for the current node).</span>
+<span class="linenos"> 56</span><span class="w">    </span><span class="c1"># A circular detection is run.</span>
+<span class="linenos"> 57</span><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;this_is_another_test&quot;</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 58</span><span class="w">    </span><span class="c1"># directory where program should be built</span>
+<span class="linenos"> 59</span><span class="w">    </span><span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dir/to/build&quot;</span>
+<span class="linenos"> 60</span><span class="w">    </span><span class="c1"># variants required from profiles to run this job</span>
+<span class="linenos"> 61</span><span class="w">    </span><span class="c1"># IF these variants are not satisfied, jobs will be discarded.</span>
+<span class="linenos"> 62</span><span class="w">    </span><span class="c1"># it indicates not support for a specific variant.</span>
+<span class="linenos"> 63</span><span class="w">    </span><span class="c1"># There is no preset variants, all of them can be declared by the profile.</span>
+<span class="linenos"> 64</span><span class="w">    </span><span class="c1"># It can be found under compiler.$LANG.variants</span>
+<span class="linenos"> 65</span><span class="w">    </span><span class="nt">variants</span><span class="p">:</span>
+<span class="linenos"> 66</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmp</span>
+<span class="linenos"> 67</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">accel</span>
+<span class="linenos"> 68</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi</span>
+<span class="linenos"> 69</span><span class="w">    </span><span class="c1"># PM interaction, allow loading package/module BEFORE running jobs</span>
+<span class="linenos"> 70</span><span class="w">    </span><span class="c1"># This load will be done for every job, it may create overhead.</span>
+<span class="linenos"> 71</span><span class="w">    </span><span class="c1"># currently, only spack recipes &amp; module will be allowed.</span>
+<span class="linenos"> 72</span><span class="w">    </span><span class="c1"># If a spack recipe is not available, it will be installed first.</span>
+<span class="linenos"> 73</span><span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span>
+<span class="linenos"> 74</span><span class="w">      </span><span class="nt">spack</span><span class="p">:</span>
+<span class="linenos"> 75</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">protobuf@3.1.1</span>
+<span class="linenos"> 76</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@7.3.0</span>
+<span class="linenos"> 77</span><span class="w">      </span><span class="nt">module</span><span class="p">:</span>
+<span class="linenos"> 78</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">protobuf</span>
+<span class="linenos"> 79</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gnu/gcc/7.3.0</span>
+<span class="linenos"> 80</span>
+<span class="linenos"> 81</span><span class="w">  </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="nl">&amp;run_part</span>
+<span class="linenos"> 82</span><span class="w">    </span><span class="c1"># path to program (defaults to build.sources.binary if not set)</span>
+<span class="linenos"> 83</span><span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./a.out&quot;</span>
+<span class="linenos"> 84</span><span class="w">    </span><span class="c1"># Scale the benchmark to build test scenarios.</span>
+<span class="linenos"> 85</span><span class="w">    </span><span class="nt">iterate</span><span class="p">:</span>
+<span class="linenos"> 86</span><span class="w">      </span><span class="c1"># subnodes are parsed relatively to the profile configuration.</span>
+<span class="linenos"> 87</span><span class="w">      </span><span class="c1"># There are expected to be declared to profiles, under &quot;criterion&quot;</span>
+<span class="linenos"> 88</span><span class="w">      </span><span class="c1"># only intersected values with profiles will be kept.</span>
+<span class="linenos"> 89</span><span class="w">      </span><span class="nt">n_mpi</span><span class="p">:</span>
+<span class="linenos"> 90</span><span class="w">        </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 91</span><span class="w">      </span><span class="nt">n_omp</span><span class="p">:</span>
+<span class="linenos"> 92</span><span class="w">        </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
+<span class="linenos"> 93</span><span class="w">      </span><span class="c1"># Special key to declare program-scope parameter matrix.</span>
+<span class="linenos"> 94</span><span class="w">      </span><span class="c1"># One can use as many parameters to run the given program.</span>
+<span class="linenos"> 95</span><span class="w">      </span><span class="c1"># criterion name will be given by the key</span>
+<span class="linenos"> 96</span><span class="w">      </span><span class="c1"># criterion values will be given by the &quot;values&quot; field</span>
+<span class="linenos"> 97</span><span class="w">      </span><span class="c1"># criterion label (used to generate test-name) will be given by &quot;subtitle&quot;</span>
+<span class="linenos"> 98</span><span class="w">      </span><span class="c1"># parameter position will be given by &quot;type&quot;: &quot;argument&quot; or &quot;environment&quot;</span>
+<span class="linenos"> 99</span><span class="w">      </span><span class="c1"># numeric attributes allow using sequence to generate values.</span>
+<span class="linenos">100</span><span class="w">      </span><span class="c1"># for instance, to generate only power of 2 values:</span>
+<span class="linenos">101</span><span class="w">      </span><span class="c1">#  =&gt; values: [{from: 0; to: 100, op: &quot;mul&quot;: of: 2}]</span>
+<span class="linenos">102</span><span class="w">      </span><span class="nt">program</span><span class="p">:</span>
+<span class="linenos">103</span><span class="w">        </span><span class="nt">give_it_a_name</span><span class="p">:</span>
+<span class="linenos">104</span><span class="w">          </span><span class="nt">numeric</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">105</span><span class="w">          </span><span class="c1"># false send the argument to the wrapper of the program</span>
+<span class="linenos">106</span><span class="w">          </span><span class="c1"># true (default) send the argument to the program itself</span>
+<span class="linenos">107</span><span class="w">          </span><span class="nt">local</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">108</span><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;argument&quot;</span>
+<span class="linenos">109</span><span class="w">          </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;-iter</span><span class="nv"> </span><span class="s">1000&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;-fast&quot;</span><span class="p p-Indicator">]</span>
+<span class="linenos">110</span><span class="w">          </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;lol&quot;</span>
+<span class="linenos">111</span><span class="w">    </span><span class="c1"># directory where program should be built</span>
+<span class="linenos">112</span><span class="w">    </span><span class="nt">cwd</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dir/to/build&quot;</span>
+<span class="linenos">113</span><span class="w">    </span><span class="c1"># dependency scheme, same rules as build.depends_on.</span>
+<span class="linenos">114</span><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;this_is_another_run_test_in_the_same_file&quot;</span><span class="p p-Indicator">]</span>
+<span class="linenos">115</span><span class="w">    </span><span class="c1"># PM interaction, same as build.package_manager</span>
+<span class="linenos">116</span><span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span>
+<span class="linenos">117</span><span class="w">      </span><span class="nt">spack</span><span class="p">:</span>
+<span class="linenos">118</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">protobuf@3.1.1</span>
+<span class="linenos">119</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@7.3.0</span>
+<span class="linenos">120</span><span class="w">      </span><span class="nt">module</span><span class="p">:</span>
+<span class="linenos">121</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">protobuf</span>
+<span class="linenos">122</span><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gnu/gcc/7.3.0</span>
+<span class="linenos">123</span><span class="w">  </span><span class="c1"># How to validate jobs generated from this specification ?</span>
+<span class="linenos">124</span><span class="w">  </span><span class="c1"># each of these subkeys are cumulative, all of them has to be true to</span>
+<span class="linenos">125</span><span class="w">  </span><span class="c1"># mark the job as a success</span>
+<span class="linenos">126</span><span class="w">  </span><span class="nt">validate</span><span class="p">:</span>
+<span class="linenos">127</span><span class="w">    </span><span class="c1"># expected return code</span>
+<span class="linenos">128</span><span class="w">    </span><span class="nt">expect_exit</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="linenos">129</span><span class="w">    </span><span class="c1"># time limit</span>
+<span class="linenos">130</span><span class="w">    </span><span class="nt">time</span><span class="p">:</span>
+<span class="linenos">131</span><span class="w">      </span><span class="c1"># max execution time the job should not exceed to succeed</span>
+<span class="linenos">132</span><span class="w">      </span><span class="nt">mean</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.0</span>
+<span class="linenos">133</span><span class="w">      </span><span class="c1"># time measurement may vary. Some tolerance is allowed (only upper-bound)</span>
+<span class="linenos">134</span><span class="w">      </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="linenos">135</span><span class="w">      </span><span class="c1"># After this time, job will be automatically stopped and marked as failed</span>
+<span class="linenos">136</span><span class="w">      </span><span class="c1"># note that PCVS cannot be able to handle every job kill mechanism.</span>
+<span class="linenos">137</span><span class="w">      </span><span class="c1"># Our approach is to terminate the process which spawned the test on</span>
+<span class="linenos">138</span><span class="w">      </span><span class="c1"># resources. With some batch-managers, it may lead to leaks.</span>
+<span class="linenos">139</span><span class="w">      </span><span class="nt">hard_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40</span>
+<span class="linenos">140</span><span class="w">      </span><span class="c1"># Mark the job as failed without killing it.</span>
+<span class="linenos">141</span><span class="w">      </span><span class="c1"># This allow you to run the test for code correctness on a slow machine</span>
+<span class="linenos">142</span><span class="w">      </span><span class="c1"># without testing for speed.</span>
+<span class="linenos">143</span><span class="w">      </span><span class="nt">soft_timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<span class="linenos">144</span><span class="w">    </span><span class="c1"># Output formatting compliance</span>
+<span class="linenos">145</span><span class="w">    </span><span class="c1"># It is based on rule definition as regex. These regexs has to be matched (or</span>
+<span class="linenos">146</span><span class="w">    </span><span class="c1"># not) to pass.</span>
+<span class="linenos">147</span><span class="w">    </span><span class="nt">match</span><span class="p">:</span>
+<span class="linenos">148</span><span class="w">      </span><span class="c1"># rule name</span>
+<span class="linenos">149</span><span class="w">      </span><span class="nt">label</span><span class="p">:</span>
+<span class="linenos">150</span><span class="w">        </span><span class="c1"># the regex</span>
+<span class="linenos">151</span><span class="w">        </span><span class="nt">expr</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;^\d+(\.\d+)</span><span class="nv"> </span><span class="s">received$&#39;</span>
+<span class="linenos">152</span><span class="w">        </span><span class="c1"># Is the pattern allowed or forbidden in the output.</span>
+<span class="linenos">153</span><span class="w">        </span><span class="c1"># True: The regex MUST match to success</span>
+<span class="linenos">154</span><span class="w">        </span><span class="c1"># False: The regex MUST NOT match to success</span>
+<span class="linenos">155</span><span class="w">        </span><span class="c1"># default: True</span>
+<span class="linenos">156</span><span class="w">        </span><span class="nt">expect</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true|false</span>
+<span class="linenos">157</span><span class="w">      </span><span class="nt">label2</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Total</span><span class="nv"> </span><span class="s">Elapsed:</span><span class="nv"> </span><span class="s">\d+\.\d+</span><span class="nv"> </span><span class="s">sec.$&#39;</span>
+<span class="linenos">158</span><span class="w">    </span><span class="c1"># Analysis method</span>
+<span class="linenos">159</span><span class="w">    </span><span class="c1"># based on dedicated Python module (builtin or user-made) to be run on every</span>
+<span class="linenos">160</span><span class="w">    </span><span class="c1"># jobs to select the final status</span>
+<span class="linenos">161</span><span class="w">    </span><span class="c1"># use-case: mark job status depending on its execution history over past</span>
+<span class="linenos">162</span><span class="w">    </span><span class="c1"># runs.</span>
+<span class="linenos">163</span><span class="w">    </span><span class="nt">analysis</span><span class="p">:</span>
+<span class="linenos">164</span><span class="w">      </span><span class="nt">method</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&lt;method&gt;&quot;</span>
+<span class="linenos">165</span><span class="w">    </span><span class="c1"># Generic scenario, not handled by PCVS.</span>
+<span class="linenos">166</span><span class="w">    </span><span class="c1"># Job info &amp; output are provided to the script, returning 0 in case of</span>
+<span class="linenos">167</span><span class="w">    </span><span class="c1"># success, non-zero otherwise.</span>
+<span class="linenos">168</span><span class="w">    </span><span class="nt">script</span><span class="p">:</span>
+<span class="linenos">169</span><span class="w">      </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/path/to/script&quot;</span>
+<span class="linenos">170</span>
+<span class="linenos">171</span><span class="w">  </span><span class="c1"># Post execution rules.</span>
+<span class="linenos">172</span><span class="w">  </span><span class="c1"># artifacts can be stored to the final results to store job-specific data.</span>
+<span class="linenos">173</span><span class="w">  </span><span class="c1"># Currently, artifacts only supports filesystem</span>
+<span class="linenos">174</span><span class="w">  </span><span class="nt">artifact</span><span class="p">:</span>
+<span class="linenos">175</span><span class="w">    </span><span class="c1"># relative to $BUILDPATH</span>
+<span class="linenos">176</span><span class="w">    </span><span class="nt">obj1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./path/1&quot;</span>
+<span class="linenos">177</span><span class="w">    </span><span class="nt">obj2</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;./path/2&quot;</span>
+<span class="linenos">178</span>
+<span class="linenos">179</span><span class="w">  </span><span class="c1"># From the output, extract data to be stored as results.</span>
+<span class="linenos">180</span><span class="w">  </span><span class="c1"># A regex is used to capture the metric from the standard output and is stored</span>
+<span class="linenos">181</span><span class="w">  </span><span class="c1"># to the final result JSON file for later reference.</span>
+<span class="linenos">182</span><span class="w">  </span><span class="nt">metrics</span><span class="p">:</span>
+<span class="linenos">183</span><span class="w">    </span><span class="c1"># metric name</span>
+<span class="linenos">184</span><span class="w">    </span><span class="nt">metric1</span><span class="p">:</span>
+<span class="linenos">185</span><span class="w">      </span><span class="c1"># regex to match</span>
+<span class="linenos">186</span><span class="w">      </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;regex&quot;</span>
+<span class="linenos">187</span><span class="w">    </span><span class="nt">metric2</span><span class="p">:</span>
+<span class="linenos">188</span><span class="w">      </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;regex&quot;</span>
+<span class="linenos">189</span><span class="w">      </span><span class="nt">attributes</span><span class="p">:</span>
+<span class="linenos">190</span><span class="w">        </span><span class="c1"># if multiple occurrences of the regex are found, only keep the first</span>
+<span class="linenos">191</span><span class="w">        </span><span class="c1"># match. (default: false)</span>
+<span class="linenos">192</span><span class="w">        </span><span class="nt">unique</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">193</span>
+<span class="linenos">194</span><span class="w">  </span><span class="c1"># A list of properties to enable specific features.</span>
+<span class="linenos">195</span><span class="w">  </span><span class="c1"># These attributes are common to build/run configurations</span>
+<span class="linenos">196</span><span class="w">  </span><span class="c1"># if a different set of attributes are required for build &amp; run a single TE,</span>
+<span class="linenos">197</span><span class="w">  </span><span class="c1"># feel free to create TWO nodes, with a dep on &quot;build&quot;.</span>
+<span class="linenos">198</span><span class="w">  </span><span class="nt">attributes</span><span class="p">:</span>
+<span class="linenos">199</span><span class="w">    </span><span class="c1"># control if the current benchmark program should be prefixed by</span>
+<span class="linenos">200</span><span class="w">    </span><span class="c1"># the runtime.program command (default: true)</span>
+<span class="linenos">201</span><span class="w">    </span><span class="c1"># True: ./a.out -&gt; mpirun ./a.out</span>
+<span class="linenos">202</span><span class="w">    </span><span class="c1"># False: ./a.out -&gt; ./a.out</span>
+<span class="linenos">203</span><span class="w">    </span><span class="nt">command_wrap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">204</span><span class="w">    </span><span class="c1"># controls if the relative path defined by this TE should be converted to</span>
+<span class="linenos">205</span><span class="w">    </span><span class="c1"># absolute path to avoid PATH resolution. (default: true)</span>
+<span class="linenos">206</span><span class="w">    </span><span class="c1"># True: ./a.out -&gt; @BUILDIR@/./a.out</span>
+<span class="linenos">207</span><span class="w">    </span><span class="c1"># False: spack install -&gt; spack install</span>
+<span class="linenos">208</span><span class="w">    </span><span class="nt">path_resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="linenos">209</span><span class="w">    </span><span class="c1"># duplicates inputs defined by this TE for any generated test.</span>
+<span class="linenos">210</span><span class="w">    </span><span class="c1"># For instance, if the current build directory provide a non-shareable</span>
+<span class="linenos">211</span><span class="w">    </span><span class="c1"># resource, it may run into trouble when running concurrent tests from this</span>
+<span class="linenos">212</span><span class="w">    </span><span class="c1"># specification. A dedicated directory is built for each subtest.</span>
+<span class="linenos">213</span><span class="w">    </span><span class="c1"># (default: false)</span>
+<span class="linenos">214</span><span class="w">    </span><span class="nt">copy_input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="linenos">215</span><span class="w">    </span><span class="c1"># duplicates outputs defined by this TE for any generated test.</span>
+<span class="linenos">216</span><span class="w">    </span><span class="c1"># This is the opposite of copy_input, to allow generating concurrent artifacts</span>
+<span class="linenos">217</span><span class="w">    </span><span class="c1"># from this single specification (default: false)</span>
+<span class="linenos">218</span><span class="w">    </span><span class="nt">copy_output</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="linenos">219</span>
+<span class="linenos">220</span>
+<span class="linenos">221</span><span class="c1">#########################################################</span>
+<span class="linenos">222</span>
+<span class="linenos">223</span><span class="c1"># depicts an inheritance mechanism.</span>
+<span class="linenos">224</span><span class="c1"># a key is defined as &amp;key, as put on the &quot;run&quot; node above.</span>
+<span class="linenos">225</span><span class="c1"># It can then be referred with &quot;*key&quot;. Any subkeys are copied</span>
+<span class="linenos">226</span><span class="c1"># to under the target node.</span>
+<span class="linenos">227</span><span class="c1"># This can be used to factor keys among multiples job descriptions</span>
+<span class="linenos">228</span><span class="nt">real_test</span><span class="p">:</span>
+<span class="linenos">229</span><span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="linenos">230</span><span class="w">    </span><span class="nt">make</span><span class="p">:</span>
+<span class="linenos">231</span><span class="w">      </span><span class="nt">target</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="linenos">232</span><span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="linenos">233</span><span class="w">    </span><span class="nt">&lt;&lt;</span><span class="p">:</span><span class="w"> </span><span class="nv">*run_part</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="utils.html" class="btn btn-neutral float-left" title="Utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../dev/contribution.html" class="btn btn-neutral float-right" title="Contribution Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
