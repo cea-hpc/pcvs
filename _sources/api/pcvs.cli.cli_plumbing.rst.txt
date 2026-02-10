@@ -1,0 +1,7 @@
+pcvs.cli.cli\_plumbing module
+=============================
+
+.. automodule:: pcvs.cli.cli_plumbing
+   :members:
+   :show-inheritance:
+   :undoc-members:

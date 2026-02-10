@@ -1,0 +1,7 @@
+pcvs.cli.cli\_graph module
+==========================
+
+.. automodule:: pcvs.cli.cli_graph
+   :members:
+   :show-inheritance:
+   :undoc-members:

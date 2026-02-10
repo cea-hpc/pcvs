@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.cli.cli_session module &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.cli.cli_session module &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="pcvs.cli.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html#module-pcvs.cli">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
           <li class="breadcrumb-item"><a href="pcvs.cli.html">pcvs.cli package</a></li>
       <li class="breadcrumb-item active">pcvs.cli.cli_session module</li>
       <li class="wy-breadcrumbs-aside">
@@ -112,29 +117,40 @@
            <div itemprop="articleBody">
              
   <section id="module-pcvs.cli.cli_session">
-<span id="pcvs-cli-cli-session-module"></span><h1>pcvs.cli.cli_session module<a class="headerlink" href="#module-pcvs.cli.cli_session" title="Permalink to this heading"></a></h1>
+<span id="pcvs-cli-cli-session-module"></span><h1>pcvs.cli.cli_session module<a class="headerlink" href="#module-pcvs.cli.cli_session" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.cli.cli_session.compl_session_token">
-<span class="sig-prename descclassname"><span class="pre">pcvs.cli.cli_session.</span></span><span class="sig-name descname"><span class="pre">compl_session_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incomplete</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/cli/cli_session.html#compl_session_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.cli.cli_session.compl_session_token" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.cli.cli_session.</span></span><span class="sig-name descname"><span class="pre">compl_session_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ctx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incomplete</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/cli/cli_session.html#compl_session_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.cli.cli_session.compl_session_token" title="Link to this definition"></a></dt>
 <dd><p>Session name completion function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ctx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Click.Context</span></code>) – Click context</p></li>
-<li><p><strong>args</strong> (<em>str</em>) – the option/argument requesting completion.</p></li>
-<li><p><strong>incomplete</strong> (<em>str</em>) – the user input</p></li>
+<li><p><strong>ctx</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></span>) – Click context</p></li>
+<li><p><strong>param</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameter</span></code></span>) – the option/argument requesting completion.</p></li>
+<li><p><strong>incomplete</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the user input</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the completed session token</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.cli.cli_session.print_sessions">
-<span class="sig-prename descclassname"><span class="pre">pcvs.cli.cli_session.</span></span><span class="sig-name descname"><span class="pre">print_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sessions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/cli/cli_session.html#print_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.cli.cli_session.print_sessions" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.cli.cli_session.</span></span><span class="sig-name descname"><span class="pre">print_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sessions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/cli/cli_session.html#print_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.cli.cli_session.print_sessions" title="Link to this definition"></a></dt>
 <dd><p>List detached sessions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sessions</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</span>) – dict of sessions id, and sessions data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -150,7 +166,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

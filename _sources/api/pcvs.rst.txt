@@ -1,5 +1,5 @@
-Package Documentation
-=====================
+pcvs package
+============
 
 Subpackages
 -----------
@@ -7,12 +7,16 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   pcvs.analysis
    pcvs.backend
    pcvs.cli
-   pcvs.testing
    pcvs.converter
+   pcvs.dsl
    pcvs.helpers
    pcvs.orchestration
+   pcvs.plugins
+   pcvs.testing
+   pcvs.ui
    pcvs.webview
 
 Submodules
@@ -21,6 +25,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   pcvs.io
    pcvs.main
 
 Module contents
@@ -28,5 +33,5 @@ Module contents
 
 .. automodule:: pcvs
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

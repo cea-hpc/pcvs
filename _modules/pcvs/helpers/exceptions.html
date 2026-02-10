@@ -1,21 +1,21 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.helpers.exceptions &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.helpers.exceptions &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -29,8 +29,9 @@
 
           
           
-          <a href="../../../index.html" class="icon icon-home">
-            PCVS
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -52,8 +53,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
@@ -61,7 +62,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -89,89 +90,91 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pcvs.helpers.exceptions</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="GenericException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException">[docs]</a><span></span><span class="k">class</span><span class="w"> </span><span class="nc">GenericException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic error (custom errors will inherit of this).&quot;&quot;&quot;</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<div class="viewcode-block" id="PCVSException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PCVSException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic PCVS error (custom errors will inherit of this).&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Unknown error&quot;</span><span class="p">,</span>
-        <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;Please check pcvs --help for more information.&quot;</span><span class="p">,</span>
-        <span class="n">dbg_info</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">help_msg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dbg_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for generic errors.</span>
-<span class="sd">        :param *args: unused</span>
-<span class="sd">        :param **kwargs: messages for the error.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for generic errors.</span>
+
+<span class="sd">        :param reason: the main error messages</span>
+<span class="sd">        :param help_msg: a help message for the user</span>
+<span class="sd">        :param dbg_info: a list of additional debug info</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reason</span> <span class="o">=</span> <span class="n">reason</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_help_msg</span> <span class="o">=</span> <span class="n">help_msg</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span> <span class="o">=</span> <span class="n">dbg_info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">dbg_info</span> <span class="k">if</span> <span class="n">dbg_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stringify an exception for pretty-printing.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stringify an exception for pretty-printing.</span>
 
 <span class="sd">        :return: the string.</span>
-<span class="sd">        :type: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dbg_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="p">:</span>
-            <span class="n">dbg_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Additional notes:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbg_str</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_help_msg</span><span class="p">,</span> <span class="n">dbg_str</span><span class="p">)</span>
+        <span class="n">name_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_reason</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">help_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;    Help: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_help_msg</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_help_msg</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">dbg_info</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;    Additional notes:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__dbg_str</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span> <span class="o">!=</span> <span class="p">{}</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">from_msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;    From previous error:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__cause__</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cause__</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name_msg</span><span class="si">}{</span><span class="n">help_msg</span><span class="si">}{</span><span class="n">dbg_info</span><span class="si">}{</span><span class="n">from_msg</span><span class="si">}</span><span class="s2">&quot;</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">err</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the error part of the exceptions.</span>
+<div class="viewcode-block" id="PCVSException.add_dbg">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException.add_dbg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_dbg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">info</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add debug info to the current exception.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span></div>
 
-<span class="sd">        :return: only the error part</span>
-<span class="sd">        :rtype: str</span>
+
+<div class="viewcode-block" id="PCVSException.set_dbg">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException.set_dbg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_dbg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbg_infos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set all debugs infos.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span> <span class="o">=</span> <span class="n">dbg_infos</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__dbg_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stringify the debug infos. These infos are stored as a dict initially.</span>
+
+<span class="sd">        :return: a itemized string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">help</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the help part of the exceptions.</span>
-
-<span class="sd">        :return: only the help part</span>
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_help_msg</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">dbg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the extra infos of the exceptions (if any).</span>
-
-<span class="sd">        :return: only the debug infos.</span>
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span>
-
-<div class="viewcode-block" id="GenericException.add_dbg"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.add_dbg">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_dbg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">dbg_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stringify the debug infos. These infos are stored as a dict</span>
-<span class="sd">        initially.</span>
-
-<span class="sd">                :return: a itemized string.</span>
-<span class="sd">                :rtype: str&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s2">&quot; - None&quot;</span>
-        <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; - {:&lt;</span><span class="si">{w}</span><span class="s2">}: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;      - </span><span class="si">{</span><span class="n">k</span><span class="si">:</span><span class="s2">&lt;</span><span class="si">{</span><span class="n">w</span><span class="si">}}</span><span class="s2">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dbg_info</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span></div>
 
 
-<div class="viewcode-block" id="CommonException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CommonException</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CommonException</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gathers exceptions commonly encountered by more specific namespaces.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CommonException.NotPCVSRelated"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotPCVSRelated">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">NotPCVSRelated</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="CommonException.NotPCVSRelated">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotPCVSRelated">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">NotPCVSRelated</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="CommonException.AlreadyExistError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.AlreadyExistError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">AlreadyExistError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException.AlreadyExistError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.AlreadyExistError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">AlreadyExistError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The content already exist as it should.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Already Exist&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Already Exist&quot;</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
@@ -181,150 +184,242 @@
                         <span class="s2">&quot;verified through `pcvs check [-C|-P|-D &lt;path&gt;]`&quot;</span><span class="p">,</span>
                     <span class="p">]</span>
                 <span class="p">),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CommonException.UnclassifiableError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.UnclassifiableError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">UnclassifiableError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException.UnclassifiableError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.UnclassifiableError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">UnclassifiableError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Unable to classify this common error.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.NotFoundError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotFoundError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">NotFoundError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException.NotFoundError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotFoundError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">NotFoundError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Content haven&#39;t been found based on specifications.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.IOError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.IOError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">IOError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException.IOError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.IOError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">IOError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Communication error (FS, process) while processing data.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.BadTokenError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.BadTokenError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">BadTokenError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Badly formatted string, unable to parse.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.WIPError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.WIPError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">WIPError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="CommonException.WIPError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.WIPError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">WIPError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Work in Progress, not a real error.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.TimeoutError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.TimeoutError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">TimeoutError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CommonException.TimeoutError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.TimeoutError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">TimeoutError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The parent class timeout error.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="CommonException.NotImplementedError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotImplementedError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">NotImplementedError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Missing implementation for this particular feature.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="CommonException.NotImplementedError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotImplementedError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">NotImplementedError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Missing implementation for this particular feature.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="BankException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">BankException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BankException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BankException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
     <span class="s2">&quot;Bank-specific exceptions.&quot;</span> <span class="s2">&quot;&quot;</span>
 
-<div class="viewcode-block" id="BankException.NotFoundError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.NotFoundError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">NotFoundError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="BankException.NotFoundError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.NotFoundError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">NotFoundError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Bank not Found.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="BankException.ProjectNameError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.ProjectNameError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">ProjectNameError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;name is not a valid project under the given bank.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="BankException.ProjectNameError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.ProjectNameError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ProjectNameError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;name is not a valid project under the given bank.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ConfigException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ConfigException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ConfigException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ConfigException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ConfigException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Config-specific exceptions.&quot;&quot;&quot;</span></div>
 
 
-<div class="viewcode-block" id="ProfileException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ProfileException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ProfileException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProfileException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Profile-specific exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ProfileException.IncompleteError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException.IncompleteError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">IncompleteError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A configuration block is missing to build the profile.&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="ProfileException.IncompleteError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException.IncompleteError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">IncompleteError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A configuration block is missing to build the profile.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="ValidationException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">ValidationException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ValidationException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValidationException</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validation-specific exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ValidationException.FormatError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.FormatError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">FormatError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="ValidationException.YamlError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.YamlError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">YamlError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An error ocured when parsing an Invalid yaml structure.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated Constructor&quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Fail to load the following yaml&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;yaml file path&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;raw yaml&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ValidationException.SetupError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.SetupError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">SetupError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An error ocured when run pcvs.setup file.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Fail to run the following setup file&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;setup file path&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ValidationException.FormatError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.FormatError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">FormatError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The content does not comply the required format (schemes).&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Invalid format&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Invalid format&quot;</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;Input files may be checked with `pcvs check`&quot;</span><span class="p">]),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ValidationException.WrongTokenError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.WrongTokenError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">WrongTokenError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ValidationException.WrongTokenError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.WrongTokenError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">WrongTokenError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A unknown token is found in valided content&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Invalid token(s) used as Placeholders&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">invalid_tokens</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Invalid token(s) used as Placeholders&quot;</span>
+        <span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
                 <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;A list of valid tokens is available in the documentation&quot;</span><span class="p">]),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;invalid_tokens&quot;</span><span class="p">,</span> <span class="n">invalid_tokens</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ValidationException.SchemeError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.SchemeError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">SchemeError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ValidationException.InvalidSchemeError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.InvalidSchemeError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">InvalidSchemeError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The schema used to verify the template is not a valid YAML file.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Invalid Scheme provided&quot;</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ValidationException.SchemeError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.SchemeError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">SchemeError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The content is not a valid format (scheme).&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Invalid Scheme provided&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Fail to verify schema&quot;</span>
+        <span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="s2">&quot;Provided schemes should be static. If code haven&#39;t be&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;changed, please report this error.&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;Provided schemes should be static. If code haven&#39;t been&quot;</span>
+                <span class="s2">&quot;changed, please report this error.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;schema&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;yaml&quot;</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RunException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RunException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run-specific exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RunException.InProgressError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.InProgressError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">InProgressError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="RunException.InProgressError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.InProgressError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">InProgressError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A run is currently occurring in the given dir.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Build directory currently used by another instance&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">lockfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">owner_pid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Build directory currently used by another instance&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="s2">&quot;Please Wait for previous executions to complete.&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;You may also use --override or --output to change default build directory&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div>
+                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;Please Wait for previous executions to complete.&quot;</span>
+                <span class="s2">&quot;You may also use --override or --output to change default build directory&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;output path&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;lockfile&quot;</span><span class="p">,</span> <span class="n">lockfile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;owner pid&quot;</span><span class="p">,</span> <span class="n">owner_pid</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RunException.NonZeroSetupScript"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.NonZeroSetupScript">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">NonZeroSetupScript</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunException.NonZeroSetupScript">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.NonZeroSetupScript">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">NonZeroSetupScript</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;a setup script (=pcvs.setup) completed but returned non-zero exit code.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;A setup script failed to complete&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">rc</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;A setup script failed to complete&quot;</span>
+        <span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;Try to run manually the setup script below.&quot;</span><span class="p">]),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span> <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;Try to run manually the setup script&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;script exit code&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">rc</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;script stderr&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_dbg</span><span class="p">(</span><span class="s2">&quot;script file path&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RunException.ProgramError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.ProgramError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">ProgramError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunException.ProgramError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.ProgramError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ProgramError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The given program cannot be found.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;A program cannot be found&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;A program cannot be found&quot;</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
-                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="s2">&quot;A program/binary defined in loaded profile cannot&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;be found in $PATH or spack/module. Please report&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;if this is a false warning.&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                <span class="p">),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+                <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;A program/binary defined in loaded profile cannot &quot;</span>
+                <span class="s2">&quot;be found in $PATH or spack/module. Please report &quot;</span>
+                <span class="s2">&quot;if this is a false warning.&quot;</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="TestException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">TestException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Test-specific exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestException.TestExpressionError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException.TestExpressionError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">TestExpressionError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="TestException.TestExpressionError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException.TestExpressionError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">TestExpressionError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Test description is wrongly formatted.&quot;&quot;&quot;</span>
 
         <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">input_files</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Issue(s) while parsing a Test Descriptor&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">input_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Issue(s) while parsing a Test Descriptor&quot;</span>
         <span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -332,61 +427,105 @@
                 <span class="n">help_msg</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="p">[</span><span class="s2">&quot;Please check input files with `pcvs check`&quot;</span><span class="p">,</span> <span class="s2">&quot;Invalid files are:&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_files</span><span class="p">)),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="OrchestratorException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">OrchestratorException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="OrchestratorException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrchestratorException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execution-specific errors.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="OrchestratorException.UndefDependencyError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">UndefDependencyError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="OrchestratorException.UndefDependencyError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">UndefDependencyError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Declared job dep cannot be fully qualified, not defined.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="OrchestratorException.CircularDependencyError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">CircularDependencyError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Circular dep detected while processing job dep tree.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="OrchestratorException.CircularDependencyError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">CircularDependencyError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Circular dep detected while processing job dep tree.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="RunnerException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunnerException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RunnerException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="RunnerException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunnerException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RunnerException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;RunnerException&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RunnerException.LaunchError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunnerException.LaunchError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">LaunchError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unable to run a remote container&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="RunnerException.LaunchError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunnerException.LaunchError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">LaunchError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unable to run a remote container&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="PublisherException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PublisherException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PublisherException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;PublisherException&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PublisherException.BadMagicTokenError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.BadMagicTokenError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">BadMagicTokenError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="PublisherException.BadMagicTokenError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.BadMagicTokenError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">BadMagicTokenError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Issue with token stored to file to check consistency&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="PublisherException.UnknownJobError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.UnknownJobError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">UnknownJobError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PublisherException.UnknownJobError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.UnknownJobError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">UnknownJobError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Unable to identify a job by its ID&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="PublisherException.AlreadyExistJobError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.AlreadyExistJobError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">AlreadyExistJobError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A single ID leads to multiple jobs.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="PublisherException.AlreadyExistJobError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PublisherException.AlreadyExistJobError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">AlreadyExistJobError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A single ID leads to multiple jobs.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="LockException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LockException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LockException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LockException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lock-specific exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LockException.BadOwnerError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.BadOwnerError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">BadOwnerError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="LockException.BadOwnerError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.BadOwnerError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">BadOwnerError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to manipulate the lock while the current process is not the</span>
 <span class="sd">        owner.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="LockException.TimeoutError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.TimeoutError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">TimeoutError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Timeout reached before lock.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="LockException.TimeoutError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.TimeoutError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">TimeoutError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Timeout reached before lock.&quot;&quot;&quot;</span></div>
+</div>
 
 
-<div class="viewcode-block" id="PluginException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PluginException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PluginException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PluginException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plugin-related exceptions.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="PluginException.BadStepError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException.BadStepError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">BadStepError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+<div class="viewcode-block" id="PluginException.BadStepError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException.BadStepError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">BadStepError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;targeted pass does not exist.&quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="PluginException.LoadError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException.LoadError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">LoadError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PluginException.LoadError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException.LoadError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">LoadError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Unable to load plugin directory.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Issue(s) while loading plugin&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Issue(s) while loading plugin&quot;</span><span class="p">):</span>
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Updated constructor&quot;&quot;&quot;</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
@@ -396,15 +535,22 @@
                         <span class="s2">&quot;python3 ./path/to/plugin/file.py&quot;</span><span class="p">,</span>
                     <span class="p">]</span>
                 <span class="p">),</span>
-                <span class="n">dbg_info</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
+</div>
 
 
-<div class="viewcode-block" id="GitException"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">GitException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GitException">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GitException</span><span class="p">(</span><span class="n">CommonException</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;GitException&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GitException.BadEntryError"><a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException.BadEntryError">[docs]</a>    <span class="k">class</span><span class="w"> </span><span class="nc">BadEntryError</span><span class="p">(</span><span class="n">GenericException</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;BadEntryError&quot;&quot;&quot;</span></div></div>
+<div class="viewcode-block" id="GitException.BadEntryError">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException.BadEntryError">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">BadEntryError</span><span class="p">(</span><span class="n">PCVSException</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;BadEntryError&quot;&quot;&quot;</span></div>
+</div>
+
 </pre></div>
 
            </div>
@@ -414,7 +560,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

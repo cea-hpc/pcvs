@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Parallel Computing Validation System &mdash; PCVS 0.8.0 documentation</title>
+  <title>Parallel Computing Validation System &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="_static/pcvs_favicon.ico"/>
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=6a14807c"></script>
-      <script src="_static/doctools.js?v=888ff710"></script>
-      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -31,8 +31,9 @@
 
           
           
-          <a href="#" class="icon icon-home">
-            PCVS
+          <a href="#">
+            
+              <img src="_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -54,8 +55,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/examples.html">Input Examples</a></li>
@@ -63,7 +64,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -91,7 +92,7 @@
            <div itemprop="articleBody">
              
   <section id="parallel-computing-validation-system">
-<h1>Parallel Computing Validation System<a class="headerlink" href="#parallel-computing-validation-system" title="Permalink to this heading"></a></h1>
+<h1>Parallel Computing Validation System<a class="headerlink" href="#parallel-computing-validation-system" title="Link to this heading"></a></h1>
 <p><strong>Parallel Computing Validation System</strong> (shorten to <strong>PCVS</strong>) is a Validation
 Orchestrator designed by and for software at scale. Its primary target is HPC
 applications &amp; runtimes but can flawlessly address smaller use cases. PCVS can
@@ -151,8 +152,8 @@ inside already-existing projects.</p>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/examples.html">Input Examples</a></li>
@@ -162,7 +163,7 @@ inside already-existing projects.</p>
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">pcvs</a></li>
 </ul>
 </div>
 </section>
@@ -177,7 +178,7 @@ inside already-existing projects.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

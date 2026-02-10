@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.helpers.exceptions module &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.helpers.exceptions module &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="pcvs.helpers.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html#module-pcvs.helpers">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
           <li class="breadcrumb-item"><a href="pcvs.helpers.html">pcvs.helpers package</a></li>
       <li class="breadcrumb-item active">pcvs.helpers.exceptions module</li>
       <li class="wy-breadcrumbs-aside">
@@ -112,371 +117,713 @@
            <div itemprop="articleBody">
              
   <section id="module-pcvs.helpers.exceptions">
-<span id="pcvs-helpers-exceptions-module"></span><h1>pcvs.helpers.exceptions module<a class="headerlink" href="#module-pcvs.helpers.exceptions" title="Permalink to this heading"></a></h1>
+<span id="pcvs-helpers-exceptions-module"></span><h1>pcvs.helpers.exceptions module<a class="headerlink" href="#module-pcvs.helpers.exceptions" title="Link to this heading"></a></h1>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.BankException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">BankException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">BankException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Bank-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.BankException.NotFoundError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException.NotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException.NotFoundError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException.NotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException.NotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Bank not Found.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.BankException.ProjectNameError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProjectNameError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException.ProjectNameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException.ProjectNameError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ProjectNameError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#BankException.ProjectNameError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.BankException.ProjectNameError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>name is not a valid project under the given bank.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">CommonException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseException</span></code></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">CommonException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Gathers exceptions commonly encountered by more specific namespaces.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.AlreadyExistError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AlreadyExistError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Already</span> <span class="pre">Exist'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.AlreadyExistError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.AlreadyExistError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">AlreadyExistError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Already</span> <span class="pre">Exist'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.AlreadyExistError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.AlreadyExistError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>The content already exist as it should.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.BadTokenError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadTokenError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.BadTokenError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.BadTokenError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
-<p>Badly formatted string, unable to parse.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.IOError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IOError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.IOError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.IOError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IOError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.IOError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.IOError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Communication error (FS, process) while processing data.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.NotFoundError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotFoundError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Content haven’t been found based on specifications.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.NotImplementedError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotImplementedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotImplementedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotImplementedError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NotImplementedError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotImplementedError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotImplementedError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Missing implementation for this particular feature.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.NotPCVSRelated">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotPCVSRelated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotPCVSRelated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotPCVSRelated" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NotPCVSRelated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.NotPCVSRelated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.NotPCVSRelated" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.TimeoutError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.TimeoutError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.TimeoutError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>The parent class timeout error.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.UnclassifiableError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnclassifiableError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.UnclassifiableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.UnclassifiableError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">UnclassifiableError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.UnclassifiableError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.UnclassifiableError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Unable to classify this common error.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.CommonException.WIPError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WIPError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.WIPError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.WIPError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">WIPError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#CommonException.WIPError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.CommonException.WIPError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Work in Progress, not a real error.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ConfigException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ConfigException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ConfigException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ConfigException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ConfigException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ConfigException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ConfigException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Config-specific exceptions.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">GenericException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GenericException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Generic error (custom errors will inherit of this).</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException.add_dbg">
-<span class="sig-name descname"><span class="pre">add_dbg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GenericException.add_dbg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException.add_dbg" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException.dbg">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dbg</span></span><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException.dbg" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the extra infos of the exceptions (if any).</p>
+<p>Constructor for generic errors.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>only the debug infos.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException.dbg_str">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dbg_str</span></span><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException.dbg_str" title="Permalink to this definition"></a></dt>
-<dd><p>Stringify the debug infos. These infos are stored as a dict
-initially.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">return<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a itemized string.</p>
-</dd>
-<dt class="field-even">rtype<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException.err">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">err</span></span><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException.err" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the error part of the exceptions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>only the error part</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.exceptions.GenericException.help">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">help</span></span><a class="headerlink" href="#pcvs.helpers.exceptions.GenericException.help" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the help part of the exceptions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>only the help part</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.GitException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">GitException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GitException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GitException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">GitException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GitException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GitException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.GitException.BadEntryError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadEntryError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GitException.BadEntryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GitException.BadEntryError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BadEntryError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#GitException.BadEntryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.GitException.BadEntryError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.LockException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">LockException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">LockException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Lock-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.LockException.BadOwnerError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadOwnerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException.BadOwnerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException.BadOwnerError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BadOwnerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException.BadOwnerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException.BadOwnerError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Attempt to manipulate the lock while the current process is not the
 owner.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.LockException.TimeoutError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException.TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException.TimeoutError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TimeoutError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#LockException.TimeoutError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.LockException.TimeoutError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Timeout reached before lock.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.OrchestratorException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">OrchestratorException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">OrchestratorException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Execution-specific errors.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CircularDependencyError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException.CircularDependencyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CircularDependencyError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException.CircularDependencyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Circular dep detected while processing job dep tree.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UndefDependencyError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException.UndefDependencyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">UndefDependencyError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#OrchestratorException.UndefDependencyError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Declared job dep cannot be fully qualified, not defined.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.PCVSException">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">PCVSException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PCVSException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PCVSException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Generic PCVS error (custom errors will inherit of this).</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.PCVSException.add_dbg">
+<span class="sig-name descname"><span class="pre">add_dbg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PCVSException.add_dbg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PCVSException.add_dbg" title="Link to this definition"></a></dt>
+<dd><p>Add debug info to the current exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.PCVSException.set_dbg">
+<span class="sig-name descname"><span class="pre">set_dbg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbg_infos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PCVSException.set_dbg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PCVSException.set_dbg" title="Link to this definition"></a></dt>
+<dd><p>Set all debugs infos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PluginException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">PluginException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">PluginException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Plugin-related exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PluginException.BadStepError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadStepError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException.BadStepError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException.BadStepError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BadStepError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException.BadStepError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException.BadStepError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>targeted pass does not exist.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PluginException.LoadError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LoadError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Issue(s)</span> <span class="pre">while</span> <span class="pre">loading</span> <span class="pre">plugin'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException.LoadError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException.LoadError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LoadError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Issue(s)</span> <span class="pre">while</span> <span class="pre">loading</span> <span class="pre">plugin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PluginException.LoadError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PluginException.LoadError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Unable to load plugin directory.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ProfileException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ProfileException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ProfileException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ProfileException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ProfileException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ProfileException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ProfileException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Profile-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ProfileException.IncompleteError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IncompleteError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ProfileException.IncompleteError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ProfileException.IncompleteError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">IncompleteError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ProfileException.IncompleteError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ProfileException.IncompleteError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>A configuration block is missing to build the profile.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PublisherException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">PublisherException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">PublisherException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PublisherException.AlreadyExistJobError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AlreadyExistJobError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.AlreadyExistJobError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.AlreadyExistJobError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">AlreadyExistJobError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.AlreadyExistJobError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.AlreadyExistJobError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>A single ID leads to multiple jobs.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PublisherException.BadMagicTokenError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadMagicTokenError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.BadMagicTokenError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.BadMagicTokenError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BadMagicTokenError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.BadMagicTokenError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.BadMagicTokenError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Issue with token stored to file to check consistency</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.PublisherException.UnknownJobError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnknownJobError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.UnknownJobError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.UnknownJobError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">UnknownJobError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#PublisherException.UnknownJobError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.PublisherException.UnknownJobError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Unable to identify a job by its ID</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">RunException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">RunException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Run-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunException.InProgressError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InProgressError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Build</span> <span class="pre">directory</span> <span class="pre">currently</span> <span class="pre">used</span> <span class="pre">by</span> <span class="pre">another</span> <span class="pre">instance'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.InProgressError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.InProgressError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">InProgressError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lockfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_pid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Build</span> <span class="pre">directory</span> <span class="pre">currently</span> <span class="pre">used</span> <span class="pre">by</span> <span class="pre">another</span> <span class="pre">instance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.InProgressError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.InProgressError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>A run is currently occurring in the given dir.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunException.NonZeroSetupScript">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NonZeroSetupScript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A</span> <span class="pre">setup</span> <span class="pre">script</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">complete'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.NonZeroSetupScript"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.NonZeroSetupScript" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NonZeroSetupScript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A</span> <span class="pre">setup</span> <span class="pre">script</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">complete'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.NonZeroSetupScript"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.NonZeroSetupScript" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>a setup script (=pcvs.setup) completed but returned non-zero exit code.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunException.ProgramError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProgramError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A</span> <span class="pre">program</span> <span class="pre">cannot</span> <span class="pre">be</span> <span class="pre">found'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.ProgramError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.ProgramError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ProgramError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A</span> <span class="pre">program</span> <span class="pre">cannot</span> <span class="pre">be</span> <span class="pre">found'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunException.ProgramError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunException.ProgramError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>The given program cannot be found.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunnerException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">RunnerException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunnerException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunnerException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">RunnerException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunnerException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunnerException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.RunnerException.LaunchError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LaunchError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Unknown</span> <span class="pre">error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Please</span> <span class="pre">check</span> <span class="pre">pcvs</span> <span class="pre">--help</span> <span class="pre">for</span> <span class="pre">more</span> <span class="pre">information.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunnerException.LaunchError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunnerException.LaunchError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LaunchError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#RunnerException.LaunchError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.RunnerException.LaunchError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Unable to run a remote container</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.TestException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">TestException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#TestException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.TestException" title="Permalink to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">TestException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#TestException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.TestException" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
 <p>Test-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.TestException.TestExpressionError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TestExpressionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Issue(s)</span> <span class="pre">while</span> <span class="pre">parsing</span> <span class="pre">a</span> <span class="pre">Test</span> <span class="pre">Descriptor'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#TestException.TestExpressionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.TestException.TestExpressionError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TestExpressionError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Issue(s)</span> <span class="pre">while</span> <span class="pre">parsing</span> <span class="pre">a</span> <span class="pre">Test</span> <span class="pre">Descriptor'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#TestException.TestExpressionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.TestException.TestExpressionError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Test description is wrongly formatted.</p>
+<p>Updated constructor</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ValidationException</span></span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.CommonException" title="pcvs.helpers.exceptions.CommonException"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.exceptions.</span></span><span class="sig-name descname"><span class="pre">ValidationException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbg_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>Validation-specific exceptions.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.FormatError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FormatError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">format'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.FormatError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.FormatError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FormatError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">format'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.FormatError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.FormatError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>The content does not comply the required format (schemes).</p>
+<p>Updated constructor</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.InvalidSchemeError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">InvalidSchemeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">Scheme</span> <span class="pre">provided'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.InvalidSchemeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.InvalidSchemeError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
+<p>The schema used to verify the template is not a valid YAML file.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the main error messages</p></li>
+<li><p><strong>help_msg</strong> – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.SchemeError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SchemeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">Scheme</span> <span class="pre">provided'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.SchemeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.SchemeError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SchemeError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Fail</span> <span class="pre">to</span> <span class="pre">verify</span> <span class="pre">schema'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.SchemeError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.SchemeError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>The content is not a valid format (scheme).</p>
+<p>Updated constructor</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.SetupError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SetupError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.SetupError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.SetupError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
+<p>An error ocured when run pcvs.setup file.</p>
+<p>Constructor for generic errors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reason</strong> – the main error messages</p></li>
+<li><p><strong>help_msg</strong> – a help message for the user</p></li>
+<li><p><strong>dbg_info</strong> – a list of additional debug info</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.WrongTokenError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WrongTokenError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">token(s)</span> <span class="pre">used</span> <span class="pre">as</span> <span class="pre">Placeholders'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.WrongTokenError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.WrongTokenError" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.GenericException" title="pcvs.helpers.exceptions.GenericException"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericException</span></code></a></p>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">WrongTokenError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invalid_tokens</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Invalid</span> <span class="pre">token(s)</span> <span class="pre">used</span> <span class="pre">as</span> <span class="pre">Placeholders'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.WrongTokenError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.WrongTokenError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
 <p>A unknown token is found in valided content</p>
+<p>Updated constructor</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="pcvs.helpers.exceptions.ValidationException.YamlError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">YamlError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/exceptions.html#ValidationException.YamlError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.exceptions.ValidationException.YamlError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pcvs.helpers.exceptions.PCVSException" title="pcvs.helpers.exceptions.PCVSException"><code class="xref py py-class docutils literal notranslate"><span class="pre">PCVSException</span></code></a></p>
+<p>An error ocured when parsing an Invalid yaml structure.</p>
+<p>Updated Constructor</p>
 </dd></dl>
 
 </dd></dl>
@@ -494,7 +841,7 @@ owner.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

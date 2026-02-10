@@ -4,11 +4,12 @@ properties:
   id:
     type: object
     properties:
+      jid: {"type": "string"}
+      fq_name: {"type": "string"}
+      te_name: {"type": "string"}
       label: {"type": "string"}
       subtree: {"OneOf": [{"type": "string"}, {"type": null}]}
-      te_name: {"type": "string"}
-      fq_name: {"type": "string"}
-      jid: {"type": "string"}
+      suffix: {"type": "string"}
       comb:
         OneOf:
           - type: null

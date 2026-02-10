@@ -1,27 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.backend package &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.backend package &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pcvs.backend.bank module" href="pcvs.backend.bank.html" />
-    <link rel="prev" title="Package Documentation" href="pcvs.html" /> 
+    <link rel="prev" title="pcvs.analysis.graph module" href="pcvs.analysis.graph.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pcvs.backend package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pcvs.backend">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pcvs.backend package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
       <li class="breadcrumb-item active">pcvs.backend package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/pcvs.backend.rst.txt" rel="nofollow"> View page source</a>
@@ -111,85 +116,59 @@
            <div itemprop="articleBody">
              
   <section id="pcvs-backend-package">
-<h1>pcvs.backend package<a class="headerlink" href="#pcvs-backend-package" title="Permalink to this heading"></a></h1>
+<h1>pcvs.backend package<a class="headerlink" href="#pcvs-backend-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.bank.html">pcvs.backend.bank module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.config.html">pcvs.backend.config module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.check"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.check()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.clone"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.clone()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.delete"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.delete()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.details"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.details</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.display"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.display()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.dump"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.dump()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.edit()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit_plugin"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.edit_plugin()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.fill"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.fill()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.flush_to_disk"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.flush_to_disk()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.full_name"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.full_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.is_found"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.is_found()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.kind"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.kind</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_from_disk"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.load_from_disk()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_template"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.load_template()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.ref_file"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.ref_file</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.retrieve_file"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.retrieve_file()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.scope"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.scope</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.short_name"><code class="docutils literal notranslate"><span class="pre">ConfigurationBlock.short_name</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.Config.set_ifdef"><code class="docutils literal notranslate"><span class="pre">Config.set_ifdef()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.Config.to_dict"><code class="docutils literal notranslate"><span class="pre">Config.to_dict()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.check_valid_kind"><code class="docutils literal notranslate"><span class="pre">check_valid_kind()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.init"><code class="docutils literal notranslate"><span class="pre">init()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.list_blocks"><code class="docutils literal notranslate"><span class="pre">list_blocks()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.config.html#pcvs.backend.config.list_templates"><code class="docutils literal notranslate"><span class="pre">list_templates()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="pcvs.backend.profile.html">pcvs.backend.profile module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile"><code class="docutils literal notranslate"><span class="pre">Profile</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.check"><code class="docutils literal notranslate"><span class="pre">Profile.check()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.clone"><code class="docutils literal notranslate"><span class="pre">Profile.clone()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.compiler"><code class="docutils literal notranslate"><span class="pre">Profile.compiler</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.criterion"><code class="docutils literal notranslate"><span class="pre">Profile.criterion</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.delete"><code class="docutils literal notranslate"><span class="pre">Profile.delete()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.details"><code class="docutils literal notranslate"><span class="pre">Profile.details</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.display"><code class="docutils literal notranslate"><span class="pre">Profile.display()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.dump"><code class="docutils literal notranslate"><span class="pre">Profile.dump()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.edit"><code class="docutils literal notranslate"><span class="pre">Profile.edit()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.edit_plugin"><code class="docutils literal notranslate"><span class="pre">Profile.edit_plugin()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.fill"><code class="docutils literal notranslate"><span class="pre">Profile.fill()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.flush_to_disk"><code class="docutils literal notranslate"><span class="pre">Profile.flush_to_disk()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.full_name"><code class="docutils literal notranslate"><span class="pre">Profile.full_name</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.get_unique_id"><code class="docutils literal notranslate"><span class="pre">Profile.get_unique_id()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.group"><code class="docutils literal notranslate"><span class="pre">Profile.group</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.is_found"><code class="docutils literal notranslate"><span class="pre">Profile.is_found()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.load_from_disk"><code class="docutils literal notranslate"><span class="pre">Profile.load_from_disk()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.load_template"><code class="docutils literal notranslate"><span class="pre">Profile.load_template()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.machine"><code class="docutils literal notranslate"><span class="pre">Profile.machine</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.runtime"><code class="docutils literal notranslate"><span class="pre">Profile.runtime</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.scope"><code class="docutils literal notranslate"><span class="pre">Profile.scope</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.Profile.split_into_configs"><code class="docutils literal notranslate"><span class="pre">Profile.split_into_configs()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcvs.backend.configfile.html">pcvs.backend.configfile module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile"><code class="docutils literal notranslate"><span class="pre">ConfigFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.delete"><code class="docutils literal notranslate"><span class="pre">ConfigFile.delete()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.descriptor"><code class="docutils literal notranslate"><span class="pre">ConfigFile.descriptor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.display"><code class="docutils literal notranslate"><span class="pre">ConfigFile.display()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.edit"><code class="docutils literal notranslate"><span class="pre">ConfigFile.edit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.exist"><code class="docutils literal notranslate"><span class="pre">ConfigFile.exist</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.flush_to_disk"><code class="docutils literal notranslate"><span class="pre">ConfigFile.flush_to_disk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.from_str"><code class="docutils literal notranslate"><span class="pre">ConfigFile.from_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.full_name"><code class="docutils literal notranslate"><span class="pre">ConfigFile.full_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.load_from_disk"><code class="docutils literal notranslate"><span class="pre">ConfigFile.load_from_disk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.loaded"><code class="docutils literal notranslate"><span class="pre">ConfigFile.loaded</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.to_str"><code class="docutils literal notranslate"><span class="pre">ConfigFile.to_str()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.validate"><code class="docutils literal notranslate"><span class="pre">ConfigFile.validate()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.init"><code class="docutils literal notranslate"><span class="pre">init()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.list_profiles"><code class="docutils literal notranslate"><span class="pre">list_profiles()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.profile.html#pcvs.backend.profile.list_templates"><code class="docutils literal notranslate"><span class="pre">list_templates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile"><code class="docutils literal notranslate"><span class="pre">Profile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.CONFIGS_KINDS"><code class="docutils literal notranslate"><span class="pre">Profile.CONFIGS_KINDS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.compiler"><code class="docutils literal notranslate"><span class="pre">Profile.compiler</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.criterion"><code class="docutils literal notranslate"><span class="pre">Profile.criterion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.group"><code class="docutils literal notranslate"><span class="pre">Profile.group</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.machine"><code class="docutils literal notranslate"><span class="pre">Profile.machine</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.runtime"><code class="docutils literal notranslate"><span class="pre">Profile.runtime</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile"><code class="docutils literal notranslate"><span class="pre">YmlConfigFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.config"><code class="docutils literal notranslate"><span class="pre">YmlConfigFile.config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.from_dict"><code class="docutils literal notranslate"><span class="pre">YmlConfigFile.from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.to_dict"><code class="docutils literal notranslate"><span class="pre">YmlConfigFile.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.configfile.html#pcvs.backend.configfile.get_conf"><code class="docutils literal notranslate"><span class="pre">get_conf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pcvs.backend.metaconfig.html">pcvs.backend.metaconfig module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.report.html">pcvs.backend.report module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.run.html">pcvs.backend.run module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.session.html">pcvs.backend.session module</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session"><code class="docutils literal notranslate"><span class="pre">Session</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State"><code class="docutils literal notranslate"><span class="pre">Session.State</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.COMPLETED"><code class="docutils literal notranslate"><span class="pre">Session.State.COMPLETED</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.ERROR"><code class="docutils literal notranslate"><span class="pre">Session.State.ERROR</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.IN_PROGRESS"><code class="docutils literal notranslate"><span class="pre">Session.State.IN_PROGRESS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.WAITING"><code class="docutils literal notranslate"><span class="pre">Session.State.WAITING</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.from_yaml"><code class="docutils literal notranslate"><span class="pre">Session.State.from_yaml()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.State.to_yaml"><code class="docutils literal notranslate"><span class="pre">Session.State.to_yaml()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.id"><code class="docutils literal notranslate"><span class="pre">Session.id</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.infos"><code class="docutils literal notranslate"><span class="pre">Session.infos</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.load_from"><code class="docutils literal notranslate"><span class="pre">Session.load_from()</span></code></a></li>
@@ -201,6 +180,15 @@
 <li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.Session.state"><code class="docutils literal notranslate"><span class="pre">Session.state</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState"><code class="docutils literal notranslate"><span class="pre">SessionState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.COMPLETED"><code class="docutils literal notranslate"><span class="pre">SessionState.COMPLETED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.ERROR"><code class="docutils literal notranslate"><span class="pre">SessionState.ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.IN_PROGRESS"><code class="docutils literal notranslate"><span class="pre">SessionState.IN_PROGRESS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.WAITING"><code class="docutils literal notranslate"><span class="pre">SessionState.WAITING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.from_yaml"><code class="docutils literal notranslate"><span class="pre">SessionState.from_yaml()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.SessionState.to_yaml"><code class="docutils literal notranslate"><span class="pre">SessionState.to_yaml()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.list_alive_sessions"><code class="docutils literal notranslate"><span class="pre">list_alive_sessions()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.main_detached_session"><code class="docutils literal notranslate"><span class="pre">main_detached_session()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.remove_session_from_file"><code class="docutils literal notranslate"><span class="pre">remove_session_from_file()</span></code></a></li>
@@ -209,12 +197,13 @@
 <li class="toctree-l2"><a class="reference internal" href="pcvs.backend.session.html#pcvs.backend.session.update_session_from_file"><code class="docutils literal notranslate"><span class="pre">update_session_from_file()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="pcvs.backend.spack.html">pcvs.backend.spack module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.backend.utilities.html">pcvs.backend.utilities module</a></li>
 </ul>
 </div>
 </section>
 <section id="module-pcvs.backend">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pcvs.backend" title="Permalink to this heading"></a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pcvs.backend" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -222,14 +211,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pcvs.html" class="btn btn-neutral float-left" title="Package Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.analysis.graph.html" class="btn btn-neutral float-left" title="pcvs.analysis.graph module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pcvs.backend.bank.html" class="btn btn-neutral float-right" title="pcvs.backend.bank module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

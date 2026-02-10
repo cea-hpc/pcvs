@@ -1,0 +1,18 @@
+pcvs.ui.textual.report package
+==============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pcvs.ui.textual.report.model
+
+Module contents
+---------------
+
+.. automodule:: pcvs.ui.textual.report
+   :members:
+   :show-inheritance:
+   :undoc-members:

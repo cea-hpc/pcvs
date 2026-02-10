@@ -111,6 +111,9 @@ described in the ``criterion`` node in the selected profile. Moreover, the
                     values: [list of values taken by the iterator]
                     subtitle: string chosen to identify this iterator
 
+
+.. _test-validation:
+
 Validate
 --------
 

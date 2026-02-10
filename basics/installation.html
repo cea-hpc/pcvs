@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation Guide &mdash; PCVS 0.8.0 documentation</title>
+  <title>Installation Guide &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -64,8 +65,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -73,7 +74,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -101,9 +102,9 @@
            <div itemprop="articleBody">
              
   <section id="installation-guide">
-<span id="id1"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading"></a></h1>
 <section id="system-prerequisites">
-<h2>System Prerequisites<a class="headerlink" href="#system-prerequisites" title="Permalink to this heading"></a></h2>
+<h2>System Prerequisites<a class="headerlink" href="#system-prerequisites" title="Link to this heading"></a></h2>
 <p>PCVS requires <strong>python3.5+</strong> before being installed. We encourage users to use
 virtual environment before installing PCVS, especially if targeting a
 single-user usage. To create a virtual environment, create &amp; actiate it
@@ -139,7 +140,7 @@ $<span class="w"> </span>pyenv<span class="w"> </span>deactivate
 </div>
 </section>
 <section id="installation-from-sources-recommended">
-<h2>Installation from sources (recommended)<a class="headerlink" href="#installation-from-sources-recommended" title="Permalink to this heading"></a></h2>
+<h2>Installation from sources (recommended)<a class="headerlink" href="#installation-from-sources-recommended" title="Link to this heading"></a></h2>
 <p>The source code is available on GitHub. To checkout the latest release:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs
 $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>./pcvs
@@ -149,7 +150,7 @@ $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </s
 </div>
 </section>
 <section id="installation-from-pypi">
-<h2>Installation from PyPI<a class="headerlink" href="#installation-from-pypi" title="Permalink to this heading"></a></h2>
+<h2>Installation from PyPI<a class="headerlink" href="#installation-from-pypi" title="Link to this heading"></a></h2>
 <p>An other way to install PCVS is through <strong>PyPI</strong> repositories.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>pcvs
 <span class="c1"># OR</span>
@@ -157,7 +158,7 @@ $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </s
 </pre></div>
 </div>
 <section id="dealing-with-offline-networks">
-<h3>Dealing with offline networks<a class="headerlink" href="#dealing-with-offline-networks" title="Permalink to this heading"></a></h3>
+<h3>Dealing with offline networks<a class="headerlink" href="#dealing-with-offline-networks" title="Link to this heading"></a></h3>
 <p>In some scenarios, it may not be possible to access PyPI mirrors to download
 dependencies (or even PCVS itself). Procedures below will describe how
 to download dep archives locally on a machine with internet access and then make them
@@ -198,7 +199,7 @@ download (and should be taken care manually):</p>
 </div>
 </section>
 <section id="important-note">
-<h3>Important note<a class="headerlink" href="#important-note" title="Permalink to this heading"></a></h3>
+<h3>Important note<a class="headerlink" href="#important-note" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>PCVS requires Click &gt;= 8.0, latest versions changed a critical keyword (to
 support completion) not backward compatible. Furthermore, Flask also have a
@@ -233,7 +234,7 @@ may not be always provided. As a workaround for now:</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

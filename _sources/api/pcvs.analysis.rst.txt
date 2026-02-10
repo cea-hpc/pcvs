@@ -1,0 +1,18 @@
+pcvs.analysis package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pcvs.analysis.graph
+
+Module contents
+---------------
+
+.. automodule:: pcvs.analysis
+   :members:
+   :show-inheritance:
+   :undoc-members:

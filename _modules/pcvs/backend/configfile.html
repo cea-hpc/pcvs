@@ -1,0 +1,558 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.backend.configfile &mdash; PCVS 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.backend.configfile</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.backend.configfile</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module for parsing configuration.</span>
+
+<span class="sd">- :class:`~ConfigFile`: a file on the disc, can be read, write, verify, edited, display ...</span>
+<span class="sd">- :class:`~YmlConfigFile`: inherite :class:`~ConfigFile` and add yaml parsing support.</span>
+<span class="sd">- :class:`~Profile`: A :class:`~YmlConfigFile` that also contain multiples</span>
+<span class="sd">  others :class:`~YmlConfigFile` that represent it&#39;s configuration.</span>
+
+<span class="sd">From a user persperctive, a :class:`~ConfigFile` is a file, gathered in a Python</span>
+<span class="sd">object information relative to the configuration of a single component.</span>
+<span class="sd">In PCVS, there is 7 types of components:</span>
+
+<span class="sd">- 5 basic blocks:</span>
+
+<span class="sd">  * Compiler (defining compiler commands)</span>
+<span class="sd">  * Runtime (setting runtime &amp; parametrization)</span>
+<span class="sd">  * Machine (Defining resources used for execution)</span>
+<span class="sd">  * Group (used a templates to globally describe tests)</span>
+<span class="sd">  * Criterion (range of parameters used to run a test-suite)</span>
+
+
+<span class="sd">- 2 special:</span>
+
+<span class="sd">  * Profile (a group of one of each the above configuration)</span>
+<span class="sd">  * Plugin (a python plugin)</span>
+
+<span class="sd">These classes helps to manage any of these config blocks above.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml</span><span class="w"> </span><span class="kn">import</span> <span class="n">YAML</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.backend.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigDesc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigKind</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigLocator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigScope</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.helpers.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationScheme</span>
+
+
+<div class="viewcode-block" id="ConfigFile">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigFile</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handle configuration file.</span>
+
+<span class="sd">    :ivar _raw: the content of the file</span>
+<span class="sd">    :vartype _raw: :py:obj:`str`</span>
+<span class="sd">    :ivar _descriptor: the  of the current file.</span>
+<span class="sd">    :vartype _descriptor: :class:`~pcvs.helpers.storage.ConfigDesc`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_desc</span><span class="p">:</span> <span class="n">ConfigDesc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a configuration file representation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">=</span> <span class="n">config_desc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exist</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_disk</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+
+    <span class="c1"># Private unguarded functions</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a config according to its scheme, look at super class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lower representation (str) -&gt; upper representation (yml).</span>
+
+<span class="sd">        This function only make sense when considering it&#39;s overrides.</span>
+
+<span class="sd">        :param raw: The content of the config file as a str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">=</span> <span class="n">raw</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Upper representation (yml) -&gt; lower representation (str).</span>
+
+<span class="sd">        This function only make sense when considering it&#39;s overrides.</span>
+
+<span class="sd">        :return: The content of the config file as a str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_from_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a file from disk, self._load is likely override by super class.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flush_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get raw string and write to disk, self._flush is likely override by super class.&quot;&quot;&quot;</span>
+        <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flush</span><span class="p">()</span>
+        <span class="c1"># create dir if it does not exist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="c1"># Public safe functions</span>
+
+    <span class="c1"># Property for Disk Loading &amp; ObjectFilling choerency management.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return if the config file exist on disk.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">exist</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return if the config is loaded in Object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Accessors</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the description of the config file.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return full name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">full_name</span>
+
+    <span class="c1"># Config IO from file</span>
+<div class="viewcode-block" id="ConfigFile.load_from_disk">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.load_from_disk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_from_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the configuration file to populate the current object.</span>
+
+<span class="sd">        Also verify the loaded content according to schema (for yml files).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">exist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_disk</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.flush_to_disk">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.flush_to_disk">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the configuration to disk.</span>
+
+<span class="sd">        Also check the configuration before writing it do disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flush_to_disk</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.delete">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete a configuration from disk.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">exist</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Remove </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">scope</span><span class="si">}</span><span class="s2">)&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.edit">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.edit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Open the current configuration for edition.</span>
+
+<span class="sd">        After eddition, the new file is loaded, check and then written to disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">exist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_disk</span><span class="p">()</span>
+        <span class="n">edited_stream</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">),</span> <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">edited_stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">edited_stream</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_flush_to_disk</span><span class="p">()</span></div>
+
+
+    <span class="c1"># Others</span>
+<div class="viewcode-block" id="ConfigFile.display">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.display">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pretty print Configuration block.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_header</span><span class="p">(</span><span class="s2">&quot;Configuration display&quot;</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scope: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print_section</span><span class="p">(</span><span class="s2">&quot;Details:&quot;</span><span class="p">)</span>
+
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_flush</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.validate">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a Config against it&#39;s shema.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.to_str">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.to_str">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get configuration as str.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flush</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.from_str">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.from_str">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set configuration from str.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="YmlConfigFile">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">YmlConfigFile</span><span class="p">(</span><span class="n">ConfigFile</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Yaml File Configuration.</span>
+
+<span class="sd">    :ivar _details: the yaml representation of the configuration.</span>
+<span class="sd">    :vartype _details: :py:obj:`dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_desc</span><span class="p">:</span> <span class="n">ConfigDesc</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Yaml configuration file representation.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">config_desc</span><span class="o">.</span><span class="n">kind</span> <span class="o">!=</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PLUGIN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_desc</span><span class="p">)</span>
+
+    <span class="c1"># Private unguarded functions</span>
+
+    <span class="c1"># Overrides of super methods</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a config according to its scheme.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+        <span class="n">ValidationScheme</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a raw config, the str representration is converted to a yml representation.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_str_to_yml</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flush</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Flush yml representation to str and return it.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_yml_to_str</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_flush</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_str_to_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert str representation to yml representation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_yml_to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert yml representation to str representation.&quot;&quot;&quot;</span>
+        <span class="n">yml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span>
+        <span class="n">yml</span><span class="o">.</span><span class="n">default_flow_style</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">yml</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">str_stream</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="n">yml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">,</span> <span class="n">str_stream</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span> <span class="o">=</span> <span class="n">str_stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="n">str_stream</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Public safe functions</span>
+
+    <span class="c1"># IO from obj</span>
+<div class="viewcode-block" id="YmlConfigFile.from_dict">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.from_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fill the config from the raw parameter.</span>
+
+<span class="sd">        Content of the dictionary is check to ensure it respect yaml template</span>
+<span class="sd">        associated with configuration file. File is *not* written to disk.</span>
+
+<span class="sd">        :param d: the dictionary to be impoted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_details</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flush</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="YmlConfigFile.to_dict">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the Config() to regular dict.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+    <span class="c1"># Others</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get config object associated with config file.</span>
+
+<span class="sd">        :return: the config object associated with the config file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_details</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Profile">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Profile</span><span class="p">(</span><span class="n">YmlConfigFile</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A profile represents the most complete object the user can provide.</span>
+
+<span class="sd">    It is built upon 5 configuration, one of each kind</span>
+<span class="sd">    (compiler, runtime, machine, criterion &amp; group) and plugins</span>
+<span class="sd">    and gathers all required information to start a validation process.</span>
+<span class="sd">    A profile object is the basic representation to be manipulated by the user.</span>
+
+<span class="sd">    :ivar _config_locator: the ConfigLocator use to locate the configurations referenced in the profile.</span>
+<span class="sd">    :vartype _config_locator: :class:`~pcvs.helpers.storage.ConfigLocator`</span>
+<span class="sd">    :ivar _innerconfigs: the Configuration referenced by the profile once loaded.</span>
+<span class="sd">    :vartype _innerconfigs: :py:obj:`dict[str, YmlConfigFile]`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">CONFIGS_KINDS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">,</span>
+        <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">,</span>
+        <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">,</span>
+        <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">,</span>
+        <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_desc</span><span class="p">:</span> <span class="n">ConfigDesc</span><span class="p">,</span> <span class="n">cl</span><span class="p">:</span> <span class="n">ConfigLocator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a profile.</span>
+
+<span class="sd">        :param config_desc: The config Descriptor for the profile file.</span>
+<span class="sd">        :param cl: A ConfigLocator Object used to locat config specify by Profile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">config_desc</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_locator</span> <span class="o">=</span> <span class="n">cl</span> <span class="k">if</span> <span class="n">cl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">ConfigLocator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ConfigKind</span><span class="p">,</span> <span class="n">YmlConfigFile</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_desc</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_sub_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sub configurations referenced by plugin.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">Profile</span><span class="o">.</span><span class="n">CONFIGS_KINDS</span><span class="p">:</span>
+            <span class="n">user_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="n">user_token</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">user_token</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ConfigScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">)</span><span class="si">}</span><span class="s2">:default&quot;</span>
+
+            <span class="n">cd</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config_locator</span><span class="o">.</span><span class="n">parse_full_raise</span><span class="p">(</span>
+                <span class="n">user_token</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">should_exist</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">c</span><span class="p">:</span> <span class="n">YmlConfigFile</span> <span class="o">=</span> <span class="n">YmlConfigFile</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the plugin and all sub configurations.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">Profile</span><span class="o">.</span><span class="n">CONFIGS_KINDS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load a profile from disk, then load all it&#39;s sub configurations.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_sub_configs</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compiler</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the &#39;compiler&#39; section.</span>
+
+<span class="sd">        :return: the &#39;compiler&#39; config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">criterion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the &#39;criterion&#39; section.</span>
+
+<span class="sd">        :return: the &#39;criterion&#39; config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">group</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the &#39;group&#39; section.</span>
+
+<span class="sd">        :return: the &#39;group&#39; config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">machine</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the &#39;machine&#39; section.</span>
+
+<span class="sd">        :return: the &#39;machine&#39; config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">]</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">runtime</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the &#39;runtime&#39; section.</span>
+
+<span class="sd">        :return: the &#39;runtime&#39; config</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_innerconfigs</span><span class="p">[</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">]</span><span class="o">.</span><span class="n">config</span></div>
+
+
+
+<span class="n">STD_CONFIG_KINDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">,</span>
+    <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">,</span>
+    <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">,</span>
+    <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">,</span>
+    <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_conf">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.get_conf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_conf</span><span class="p">(</span><span class="n">cd</span><span class="p">:</span> <span class="n">ConfigDesc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigFile</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get Appropriate ConfigFile Object from a :class:`~pcvs.helpers.storage.ConfigDesc`.&quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">cd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">cd</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Profile</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cd</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="n">STD_CONFIG_KINDS</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">YmlConfigFile</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ConfigFile</span><span class="p">(</span><span class="n">cd</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

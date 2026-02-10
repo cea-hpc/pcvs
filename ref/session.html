@@ -1,27 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sessions &mdash; PCVS 0.8.0 documentation</title>
+  <title>Sessions &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Utilities" href="utils.html" />
-    <link rel="prev" title="Profiles" href="profile.html" /> 
+    <link rel="prev" title="Banks" href="bank.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bank.html">Banks</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sessions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#about">About</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#start-a-new-session">Start a new session</a></li>
@@ -70,7 +71,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -98,26 +99,26 @@
            <div itemprop="articleBody">
              
   <section id="sessions">
-<h1>Sessions<a class="headerlink" href="#sessions" title="Permalink to this heading"></a></h1>
+<h1>Sessions<a class="headerlink" href="#sessions" title="Link to this heading"></a></h1>
 <section id="about">
-<h2>About<a class="headerlink" href="#about" title="Permalink to this heading"></a></h2>
+<h2>About<a class="headerlink" href="#about" title="Link to this heading"></a></h2>
 </section>
 <section id="start-a-new-session">
-<h2>Start a new session<a class="headerlink" href="#start-a-new-session" title="Permalink to this heading"></a></h2>
+<h2>Start a new session<a class="headerlink" href="#start-a-new-session" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>run<span class="w"> </span>&lt;...&gt;<span class="w"> </span><span class="c1"># start an interactive session</span>
 $<span class="w"> </span>pcvs<span class="w"> </span>run<span class="w"> </span>&lt;...&gt;<span class="w"> </span>--detach<span class="w"> </span><span class="c1"># start a background session</span>
 </pre></div>
 </div>
 </section>
 <section id="list-sessions">
-<h2>List sessions<a class="headerlink" href="#list-sessions" title="Permalink to this heading"></a></h2>
+<h2>List sessions<a class="headerlink" href="#list-sessions" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>session
 $<span class="w"> </span>pcvs<span class="w"> </span>session<span class="w"> </span>-l
 </pre></div>
 </div>
 </section>
 <section id="cleanup">
-<h2>Cleanup<a class="headerlink" href="#cleanup" title="Permalink to this heading"></a></h2>
+<h2>Cleanup<a class="headerlink" href="#cleanup" title="Link to this heading"></a></h2>
 <p>Only for background sessions:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>session<span class="w"> </span>--ack<span class="w"> </span>&lt;sid&gt;
 $<span class="w"> </span>pcvs<span class="w"> </span>session<span class="w"> </span>--ack-all<span class="w"> </span><span class="c1"># only completed sessions</span>
@@ -130,14 +131,14 @@ $<span class="w"> </span>pcvs<span class="w"> </span>session<span class="w"> </s
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="profile.html" class="btn btn-neutral float-left" title="Profiles" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="bank.html" class="btn btn-neutral float-left" title="Banks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="utils.html" class="btn btn-neutral float-right" title="Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

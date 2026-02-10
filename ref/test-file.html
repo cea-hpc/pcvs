@@ -1,26 +1,26 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Validation setup &mdash; PCVS 0.8.0 documentation</title>
+  <title>Validation setup &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Configuration basic blocks" href="config.html" />
+    <link rel="next" title="Configurations" href="config.html" />
     <link rel="prev" title="Common workflow" href="../basics/workflow.html" /> 
 </head>
 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -74,8 +75,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#setup-file">Setup file</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Input Examples</a></li>
@@ -83,7 +84,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -111,11 +112,11 @@
            <div itemprop="articleBody">
              
   <section id="validation-setup">
-<h1>Validation setup<a class="headerlink" href="#validation-setup" title="Permalink to this heading"></a></h1>
+<h1>Validation setup<a class="headerlink" href="#validation-setup" title="Link to this heading"></a></h1>
 <section id="generalities">
-<h2>Generalities<a class="headerlink" href="#generalities" title="Permalink to this heading"></a></h2>
+<h2>Generalities<a class="headerlink" href="#generalities" title="Link to this heading"></a></h2>
 <section id="setup-files">
-<h3>Setup files<a class="headerlink" href="#setup-files" title="Permalink to this heading"></a></h3>
+<h3>Setup files<a class="headerlink" href="#setup-files" title="Link to this heading"></a></h3>
 <p>Like profiles, setup configurations have nodes to describe different steps of
 the process. These nodes are split into subnodes to describe the course of
 the run.</p>
@@ -128,7 +129,7 @@ to run the tests.</p>
 <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file and launches itself with the corresponding
 configuration.</p>
 <section id="example">
-<h4>Example<a class="headerlink" href="#example" title="Permalink to this heading"></a></h4>
+<h4>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>exampletree/
 ├── subdir1
 │   └── pcvs.yml
@@ -143,7 +144,7 @@ the root of <code class="docutils literal notranslate"><span class="pre">example
 </section>
 </section>
 <section id="structure">
-<h2>Structure<a class="headerlink" href="#structure" title="Permalink to this heading"></a></h2>
+<h2>Structure<a class="headerlink" href="#structure" title="Link to this heading"></a></h2>
 <p>The yml input must have one node per test. Each test can describe the following
 configurations :</p>
 <ul class="simple">
@@ -155,7 +156,7 @@ configurations :</p>
 <li><p>artifact</p></li>
 </ul>
 <section id="build">
-<h3>Build<a class="headerlink" href="#build" title="Permalink to this heading"></a></h3>
+<h3>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h3>
 <p>The build node describe how a binary file should be built depending on its
 sources. It contains the following subndoes :</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">build</span><span class="p">:</span>
@@ -180,7 +181,7 @@ sources. It contains the following subndoes :</p>
 </div>
 </section>
 <section id="run">
-<h3>Run<a class="headerlink" href="#run" title="Permalink to this heading"></a></h3>
+<h3>Run<a class="headerlink" href="#run" title="Link to this heading"></a></h3>
 <p>The run node describes how a binary file should be launched. It contains the
 following nodes :</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">run</span><span class="p">:</span>
@@ -210,7 +211,7 @@ described in the <code class="docutils literal notranslate"><span class="pre">cr
 </div>
 </section>
 <section id="validate">
-<h3>Validate<a class="headerlink" href="#validate" title="Permalink to this heading"></a></h3>
+<span id="test-validation"></span><h3>Validate<a class="headerlink" href="#validate" title="Link to this heading"></a></h3>
 <p>The validate node describes the expected test behaviour, including exit, time
 and matching output.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">validate</span><span class="p">:</span>
@@ -236,7 +237,7 @@ and matching output.</p>
 </div>
 </section>
 <section id="group">
-<h3>Group<a class="headerlink" href="#group" title="Permalink to this heading"></a></h3>
+<h3>Group<a class="headerlink" href="#group" title="Link to this heading"></a></h3>
 <p>Groups are described in profiles. They can contain <code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">run</span></code>, <code class="docutils literal notranslate"><span class="pre">tag</span></code>,
 <code class="docutils literal notranslate"><span class="pre">validate</span></code>, and <code class="docutils literal notranslate"><span class="pre">artifact</span></code> subnodes. Once a group is defined in the used
 profile it can be called in the validation setup file.</p>
@@ -245,7 +246,7 @@ profile it can be called in the validation setup file.</p>
 </div>
 </section>
 <section id="tag">
-<h3>Tag<a class="headerlink" href="#tag" title="Permalink to this heading"></a></h3>
+<h3>Tag<a class="headerlink" href="#tag" title="Link to this heading"></a></h3>
 <p>Tags get in the results and tests can be sorted tag-wise. A test can have
 multiple tags and tags do not have to be defined upstream.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">tag</span><span class="p">:</span>
@@ -255,7 +256,7 @@ multiple tags and tags do not have to be defined upstream.</p>
 </div>
 </section>
 <section id="artifact">
-<h3>Artifact<a class="headerlink" href="#artifact" title="Permalink to this heading"></a></h3>
+<h3>Artifact<a class="headerlink" href="#artifact" title="Link to this heading"></a></h3>
 <p>The artifact node contains anything the output should have in addition to the
 results of tests.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">artifact</span><span class="p">:</span>
@@ -266,7 +267,7 @@ results of tests.</p>
 </section>
 </section>
 <section id="setup-file">
-<h2>Setup file<a class="headerlink" href="#setup-file" title="Permalink to this heading"></a></h2>
+<h2>Setup file<a class="headerlink" href="#setup-file" title="Link to this heading"></a></h2>
 <p>When using a <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file, the file will be executed, and stdout should be
 a valid yaml file that respect <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> file structure as describe above.</p>
 <p>When running the script, some environment variables are availables to ease configuration.
@@ -318,13 +319,13 @@ PCVS_NVCC=&#39;nvcc&#39;
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../basics/workflow.html" class="btn btn-neutral float-left" title="Common workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="config.html" class="btn btn-neutral float-right" title="Configuration basic blocks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="config.html" class="btn btn-neutral float-right" title="Configurations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

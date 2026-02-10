@@ -1,10 +1,18 @@
 pcvs.webview package
 ====================
 
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pcvs.webview.datalayer
+
 Module contents
 ---------------
 
 .. automodule:: pcvs.webview
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

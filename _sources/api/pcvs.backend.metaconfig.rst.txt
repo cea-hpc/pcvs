@@ -1,0 +1,7 @@
+pcvs.backend.metaconfig module
+==============================
+
+.. automodule:: pcvs.backend.metaconfig
+   :members:
+   :show-inheritance:
+   :undoc-members:

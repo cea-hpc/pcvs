@@ -24,4 +24,4 @@ before contributing:
 
 .. code-block:: bash
 
-   tox -e pcvs-coverage && tox -e pcvs-lint && tox -e doc
+   tox -e pcvs-lint && tox -e pcvs-coverage && tox -e doc-lint && tox -e doc-coverage && tox -e doc-build

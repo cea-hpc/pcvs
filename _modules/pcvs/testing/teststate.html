@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.testing.teststate &mdash; PCVS 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.testing.teststate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.testing.teststate</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+
+<div class="viewcode-block" id="TestState">
+<a class="viewcode-back" href="../../../api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide Status management, specifically for tests/jobs.</span>
+
+<span class="sd">    Defined as an enum, it represents different states a</span>
+<span class="sd">    :class:`~pcvs.testing.test`/:class:`~pcvs.dsl.Job` can take during</span>
+<span class="sd">    its lifetime. As tests are then serialized into a JSON file, there is</span>
+<span class="sd">    no need for construction/representation (as done for</span>
+<span class="sd">    :class:`~pcvs.backend.session.SessionState`).</span>
+
+<span class="sd">    :var int WAITING: Job is currently waiting to be scheduled</span>
+<span class="sd">    :var int IN_PROGRESS: A running Set() handle the job, and is scheduled</span>
+<span class="sd">        for run.</span>
+<span class="sd">    :var int EXECUTED: Job have been executed, but result status</span>
+<span class="sd">        has not been computed yet.</span>
+<span class="sd">    :var int SUCCESS: Job successfully run and passes all checks (rc,</span>
+<span class="sd">        matchers...)</span>
+<span class="sd">    :var int FAILURE: Job didn&#39;t succeed, at least one condition failed.</span>
+<span class="sd">    :var SOFT_TIMEOUT: Job has exceeded his soft time limit but pass.</span>
+<span class="sd">    :var HARD_TIMEOUT: Job has exceeded his hard time limit and got killed.</span>
+<span class="sd">    :var int ERR_DEP: Special cases to manage jobs unscheduled because at</span>
+<span class="sd">        least one of its dependencies have failed to complete.</span>
+<span class="sd">    :var int ERR_OTHER: Any other uncaught situation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__test__</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># prevent pytest from going roge</span>
+
+    <span class="n">WAITING</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">IN_PROGRESS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">EXECUTED</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SUCCESS</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">FAILURE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">SOFT_TIMEOUT</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">HARD_TIMEOUT</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">ERR_DEP</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">ERR_OTHER</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stringify to return the label.</span>
+
+<span class="sd">        :return: the enum name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Repr of TestState.</span>
+
+<span class="sd">        :return: a string of a tuple mapping the enum.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="TestState.from_str">
+<a class="viewcode-back" href="../../../api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.from_str">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_str</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert str to TestState.&quot;&quot;&quot;</span>
+        <span class="n">str_to_states</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">WAITING</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">WAITING</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">EXECUTED</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">EXECUTED</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">SUCCESS</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">FAILURE</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">FAILURE</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">SOFT_TIMEOUT</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">SOFT_TIMEOUT</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">HARD_TIMEOUT</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">HARD_TIMEOUT</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_DEP</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_DEP</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_OTHER</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_OTHER</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">str_to_states</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
+<div class="viewcode-block" id="TestState.bad_states">
+<a class="viewcode-back" href="../../../api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.bad_states">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bad_states</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;State that represent a FAILED test.&quot;&quot;&quot;</span>
+        <span class="n">bad_states</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_DEP</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_OTHER</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">FAILURE</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">HARD_TIMEOUT</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">bad_states</span>  <span class="c1"># type: ignore</span></div>
+
+
+<div class="viewcode-block" id="TestState.all_states">
+<a class="viewcode-back" href="../../../api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.all_states">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_states</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;All tests states.&quot;&quot;&quot;</span>
+        <span class="n">all_states</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">FAILURE</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_DEP</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">HARD_TIMEOUT</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">SOFT_TIMEOUT</span><span class="p">,</span>
+            <span class="n">TestState</span><span class="o">.</span><span class="n">ERR_OTHER</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">all_states</span>  <span class="c1"># type: ignore</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

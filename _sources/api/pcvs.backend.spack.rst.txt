@@ -1,0 +1,7 @@
+pcvs.backend.spack module
+=========================
+
+.. automodule:: pcvs.backend.spack
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -7,6 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   pcvs.converter.result_converter
    pcvs.converter.yaml_converter
 
 Module contents
@@ -14,5 +15,5 @@ Module contents
 
 .. automodule:: pcvs.converter
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

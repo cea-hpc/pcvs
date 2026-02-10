@@ -1,25 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bank management &mdash; PCVS 0.8.0 documentation</title>
+  <title>Banks &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sessions" href="session.html" />
+    <link rel="prev" title="Configurations" href="config.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -51,10 +54,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configurations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Banks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#create-manage-or-delete-a-bank">Create, Manage or Delete a bank</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feed-a-bank-with-results">Feed a bank with results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-validation">Test Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bank-graphs">Bank Graphs</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Input Examples</a></li>
@@ -62,7 +71,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -79,7 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Bank management</li>
+      <li class="breadcrumb-item active">Banks</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/ref/bank.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,28 +98,101 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="bank-management">
-<h1>Bank management<a class="headerlink" href="#bank-management" title="Permalink to this heading"></a></h1>
-<section id="about">
-<h2>About<a class="headerlink" href="#about" title="Permalink to this heading"></a></h2>
-</section>
-<section id="create-manage-delete-a-bank">
-<h2>Create/manage/delete a bank<a class="headerlink" href="#create-manage-delete-a-bank" title="Permalink to this heading"></a></h2>
+  <section id="banks">
+<h1>Banks<a class="headerlink" href="#banks" title="Link to this heading"></a></h1>
+<p>Banks save results of successive runs and retrieve themes.
+They can be used to compare tests durations and test results from run to run
+or to set dynamic validation time based on previous test to automatically catch performance regression.</p>
+<p>A bank, contain multiples project, with each project containing multiples PCVS run results.
+The project layer allows using the same bank for different PCVS run tests.
+You can specify a project and a bank together with <code class="docutils literal notranslate"><span class="pre">projectname&#64;bankname</span></code>.
+Banks are implemented as git repository, where each project is a git branch,
+each PCVS run results is a commit and each unique test result is a file in the git tree.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As bank are git repository, they can be pushed &amp; pull to be sync with a remote git repository.</p>
+</div>
+<section id="create-manage-or-delete-a-bank">
+<h2>Create, Manage or Delete a bank<a class="headerlink" href="#create-manage-or-delete-a-bank" title="Link to this heading"></a></h2>
+<p>To Create a bank, use the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="n">init</span> <span class="o">&lt;</span><span class="n">bankname</span><span class="o">&gt;</span> <span class="o">&lt;./</span><span class="n">bank</span><span class="o">/</span><span class="n">path</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the folder already exist and is a valid bank git repository, you can use <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">bank</span> <span class="pre">init</span></code> to import it.</p>
+</div>
+<p>To delete a bank, use the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="n">destroy</span> <span class="o">&lt;</span><span class="n">bankname</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bank in only unlinked by bank destroy, to delete the repository completely, remove the folder containing the bank manually.</p>
+</div>
+<p>To list existing banks, use the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="nb">list</span>
+</pre></div>
+</div>
+<p>To show a bank, list theirs projects and count theirs saved runs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="n">show</span> <span class="o">&lt;</span><span class="n">bankname</span><span class="o">&gt;</span>
+</pre></div>
+</div>
 </section>
 <section id="feed-a-bank-with-results">
-<h2>Feed a bank with results<a class="headerlink" href="#feed-a-bank-with-results" title="Permalink to this heading"></a></h2>
+<h2>Feed a bank with results<a class="headerlink" href="#feed-a-bank-with-results" title="Link to this heading"></a></h2>
+<p>To load a test result in a <code class="docutils literal notranslate"><span class="pre">.pcvs-build</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="n">load</span>
+</pre></div>
+</div>
+<p>To save a <code class="docutils literal notranslate"><span class="pre">.pcvs-build</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">bank</span> <span class="n">save</span> <span class="o">&lt;</span><span class="n">bankname</span><span class="o">&gt;</span>
+<span class="n">pcvs</span> <span class="n">bank</span> <span class="n">save</span> <span class="o">&lt;</span><span class="n">project</span><span class="nd">@bankname</span><span class="o">&gt;</span> <span class="c1"># to specify a project to save the data with</span>
+</pre></div>
+</div>
+<p>To run a test and directly save the result:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">run</span> <span class="o">--</span><span class="n">bank</span> <span class="o">&lt;</span><span class="n">project</span><span class="nd">@bankname</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="test-validation">
+<h2>Test Validation<a class="headerlink" href="#test-validation" title="Link to this heading"></a></h2>
+<p>To validate a test based on precedent runs results,
+use the analysis plugin with the <code class="docutils literal notranslate"><span class="pre">not_longer_than_previous_runs</span></code> method
+within a test description, see <a class="reference internal" href="test-file.html#test-validation"><span class="std std-ref">Validate</span></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validate</span><span class="p">:</span>
+  <span class="n">analysis</span><span class="p">:</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">not_longer_than_previous_runs</span>
+    <span class="n">args</span><span class="p">:</span>
+      <span class="n">history_depth</span><span class="p">:</span> <span class="c1"># nb of history to check in bank, default: 1</span>
+      <span class="n">tolerance</span><span class="p">:</span> <span class="c1"># tolerance compared to previous runs, in percent, default: 2%</span>
+</pre></div>
+</div>
+</section>
+<section id="bank-graphs">
+<h2>Bank Graphs<a class="headerlink" href="#bank-graphs" title="Link to this heading"></a></h2>
+<p>To plot graph of previous run, use the <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">graph</span></code> commands.
+See examples below, use <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">graph</span> <span class="pre">--help</span></code> for arguments details.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcvs</span> <span class="n">graph</span> <span class="n">project</span><span class="nd">@bank</span> <span class="o">--</span><span class="n">types</span> <span class="n">rate</span> <span class="o">--</span><span class="n">show</span>
+<span class="n">pcvs</span> <span class="n">graph</span> <span class="n">project</span><span class="nd">@bank</span> <span class="o">--</span><span class="n">types</span> <span class="nb">all</span> <span class="o">--</span><span class="n">path</span> <span class="o">./</span><span class="n">test_graph</span>
+<span class="n">pcvs</span> <span class="n">graph</span> <span class="n">project</span><span class="nd">@bank</span> <span class="o">--</span><span class="n">types</span> <span class="n">duration</span> <span class="o">--</span><span class="n">path</span> <span class="o">./</span><span class="n">test_graph2</span> <span class="o">--</span><span class="n">limit</span> <span class="mi">20</span> <span class="o">--</span><span class="n">ext</span> <span class="s2">&quot;png&quot;</span>
+</pre></div>
+</div>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="config.html" class="btn btn-neutral float-left" title="Configurations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="session.html" class="btn btn-neutral float-right" title="Sessions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

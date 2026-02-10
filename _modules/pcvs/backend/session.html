@@ -1,21 +1,21 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.backend.session &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.backend.session &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -29,8 +29,9 @@
 
           
           
-          <a href="../../../index.html" class="icon icon-home">
-            PCVS
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -52,8 +53,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
@@ -61,7 +62,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -94,9 +95,14 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml</span><span class="w"> </span><span class="kn">import</span> <span class="n">YAML</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml.constructor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constructor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">yaml_object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ruamel.yaml.representer</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoundTripRepresenter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_SESSION</span>
@@ -104,44 +110,50 @@
 <span class="n">yml</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="session_file_hash"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.session_file_hash">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">session_file_hash</span><span class="p">(</span><span class="n">session_infos</span><span class="p">):</span>
+<div class="viewcode-block" id="session_file_hash">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.session_file_hash">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">session_file_hash</span><span class="p">(</span><span class="n">session_infos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span>
         <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">session_infos</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">],</span> <span class="n">session_infos</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     <span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="store_session_to_file"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.store_session_to_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">store_session_to_file</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+
+<div class="viewcode-block" id="store_session_to_file">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.store_session_to_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">store_session_to_file</span><span class="p">(</span><span class="n">infos</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a new session into the session file (in HOME dir).</span>
 
-<span class="sd">    :param c: session infos to store</span>
-<span class="sd">    :type c: dict</span>
+<span class="sd">    :param infos: session infos to store</span>
+<span class="sd">    :raises IOError: When the session file can&#39;t be written to disk.</span>
 <span class="sd">    :return: the sid associated to new create session id.</span>
-<span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">yml</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">)</span>
 
-    <span class="n">shash</span> <span class="o">=</span> <span class="n">session_file_hash</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">shash</span> <span class="o">=</span> <span class="n">session_file_hash</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
     <span class="n">session_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.yml&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shash</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">session_file</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-            <span class="n">yml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">yml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">infos</span><span class="p">,</span> <span class="n">fh</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">e</span>
     <span class="k">return</span> <span class="n">shash</span></div>
 
 
-<div class="viewcode-block" id="update_session_from_file"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.update_session_from_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">update</span><span class="p">):</span>
+
+<div class="viewcode-block" id="update_session_from_file">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.update_session_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">update</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update data from a running session from the global file.</span>
 
 <span class="sd">    This only add/replace keys present in argument dict. Other keys remain.</span>
 
 <span class="sd">    :param sid: the session id</span>
-<span class="sd">    :type sid: int</span>
 <span class="sd">    :param update: the keys to update. If already existing, content is replaced</span>
-<span class="sd">    :type: dict</span>
+<span class="sd">    :return: if a session file was successfully modify (== if the session exist)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">yml</span>
 
@@ -149,7 +161,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">sid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)):</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
 
@@ -164,26 +176,31 @@
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="remove_session_from_file"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.remove_session_from_file">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">remove_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">):</span>
+
+<div class="viewcode-block" id="remove_session_from_file">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.remove_session_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;clear a session from logs.</span>
 
 <span class="sd">    :param sid: the session id to remove.</span>
-<span class="sd">    :type sid: int</span>
+<span class="sd">    :return: if the session was successfully removed. (== if the session exist)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">yml</span>
 
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">sid</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span></div>
 
 
-<div class="viewcode-block" id="list_alive_sessions"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.list_alive_sessions">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">list_alive_sessions</span><span class="p">():</span>
+
+<div class="viewcode-block" id="list_alive_sessions">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.list_alive_sessions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_alive_sessions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load and return the complete dict from session.yml file</span>
 
 <span class="sd">    :return: the session dict</span>
-<span class="sd">    :rtype: dict</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">yml</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">PATH_SESSION</span><span class="p">):</span>
@@ -202,20 +219,24 @@
     <span class="k">return</span> <span class="n">all_sessions</span></div>
 
 
-<div class="viewcode-block" id="main_detached_session"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.main_detached_session">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">main_detached_session</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">user_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main function processed when running in detached mode.</span>
+
+<div class="viewcode-block" id="main_detached_session">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.main_detached_session">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main_detached_session</span><span class="p">(</span><span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function processed when running in detached mode.</span>
 
 <span class="sd">    This function is called by Session.run_detached() and is launched from</span>
 <span class="sd">    cloned process (same global env, new main function).</span>
 
-<span class="sd">    :raises Exception: any error occurring during the main process is re-raised.</span>
+<span class="sd">    :raises Exception: Any error occurring during the main process is re-raised.</span>
 
 <span class="sd">    :param sid: the session id</span>
 <span class="sd">    :param user_func: the Python function used as the new main()</span>
 <span class="sd">    :param args: user_func() arguments</span>
-<span class="sd">    :type args: tuple</span>
 <span class="sd">    :param kwargs: user_func() arguments</span>
-<span class="sd">    :type kwargs: dict</span>
+
+<span class="sd">    :return: The return of the ``user_func`` function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># When calling a subprocess, the parent is attached to its child</span>
@@ -226,7 +247,7 @@
     <span class="c1"># a child (child2). When the process is run, the first child completes</span>
     <span class="c1"># immediately, releasing the parent.</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span>
+        <span class="k">return</span> <span class="mi">0</span>
 
     <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -235,204 +256,211 @@
         <span class="c1"># beware: this function should only raises exception to stop.</span>
         <span class="c1"># a sys.exit() will bypass the rest here.</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">user_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span> <span class="s2">&quot;ended&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()})</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="n">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">SessionState</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span> <span class="s2">&quot;ended&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()})</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="s2">&quot;ended&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()})</span>
+        <span class="n">update_session_from_file</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">SessionState</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="s2">&quot;ended&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()})</span>
         <span class="k">raise</span> <span class="n">e</span>
 
     <span class="k">return</span> <span class="n">ret</span></div>
 
 
-<div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">:</span>
+
+<div class="viewcode-block" id="SessionState">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.SessionState">[docs]</a>
+<span class="nd">@yaml_object</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum of possible Session states.&quot;&quot;&quot;</span>
+
+    <span class="n">WAITING</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">IN_PROGRESS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">COMPLETED</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="mi">3</span>
+
+<div class="viewcode-block" id="SessionState.to_yaml">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.SessionState.to_yaml">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">representer</span><span class="p">:</span> <span class="n">RoundTripRepresenter</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert a Test.State to a valid YAML representation.</span>
+
+<span class="sd">        A new tag is created: &#39;Session.State&#39; as a scalar (str).</span>
+<span class="sd">        :param representer: the YAML dumper object</span>
+<span class="sd">        :param data: the object to represent</span>
+<span class="sd">        :return: the YAML representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">representer</span><span class="o">.</span><span class="n">represent_scalar</span><span class="p">(</span><span class="s2">&quot;!State&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">||</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SessionState.from_yaml">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.SessionState.from_yaml">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">constructor</span><span class="p">:</span> <span class="n">Constructor</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a :class:`Session.State` from its YAML representation.</span>
+
+<span class="sd">        Relies on the fact the node contains a &#39;Session.State&#39; tag.</span>
+<span class="sd">        :param constructor: the YAML loader</span>
+<span class="sd">        :param node: the YAML representation</span>
+<span class="sd">        :return: The session State as an object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">constructor</span><span class="o">.</span><span class="n">construct_scalar</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;||&quot;</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">SessionState</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span>
+
+        <span class="k">return</span> <span class="n">obj</span>  <span class="c1"># type: ignore</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stringify the state.</span>
+
+<span class="sd">        :return: the enum name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+
+
+<div class="viewcode-block" id="Session">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Object representing a running validation (detached or not).</span>
 
 <span class="sd">    Despite the fact it is designed for manage concurrent runs,  it takes a</span>
 <span class="sd">    callback and can be derived for other needs.</span>
 
 <span class="sd">    :param _func: user function to be called once the session starts</span>
-<span class="sd">    :type _func: Callable</span>
 <span class="sd">    :param _sid: session id, automatically generated</span>
-<span class="sd">    :type _sid: int</span>
 <span class="sd">    :param _session_infos: session infos dict</span>
-<span class="sd">    :type _session_infos: dict</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Session.State"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.State">[docs]</a>    <span class="nd">@yaml_object</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
-    <span class="k">class</span><span class="w"> </span><span class="nc">State</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enum of possible Session states.&quot;&quot;&quot;</span>
-
-        <span class="n">WAITING</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">IN_PROGRESS</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">COMPLETED</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">ERROR</span> <span class="o">=</span> <span class="mi">3</span>
-
-<div class="viewcode-block" id="Session.State.to_yaml"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.State.to_yaml">[docs]</a>        <span class="nd">@classmethod</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">to_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">representer</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Convert a Test.State to a valid YAML representation.</span>
-
-<span class="sd">            A new tag is created: &#39;Session.State&#39; as a scalar (str).</span>
-<span class="sd">            :param representer: the YAML dumper object</span>
-<span class="sd">            :type representer: :class:`YAML().dumper`</span>
-<span class="sd">            :param data: the object to represent</span>
-<span class="sd">            :type data: class:`Session.State`</span>
-<span class="sd">            :return: the YAML representation</span>
-<span class="sd">            :rtype: Any</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">return</span> <span class="n">representer</span><span class="o">.</span><span class="n">represent_scalar</span><span class="p">(</span><span class="s2">&quot;!State&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">||</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="Session.State.from_yaml"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.State.from_yaml">[docs]</a>        <span class="nd">@classmethod</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">constructor</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Construct a :class:`Session.State` from its YAML representation.</span>
-
-<span class="sd">            Relies on the fact the node contains a &#39;Session.State&#39; tag.</span>
-<span class="sd">            :param constructor: the YAML loader</span>
-<span class="sd">            :type constructor: :class:`yaml.FullLoader`</span>
-<span class="sd">            :param node: the YAML representation</span>
-<span class="sd">            :type node: Any</span>
-<span class="sd">            :return: The session State as an object</span>
-<span class="sd">            :rtype: :class:`Session.State`</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="n">constructor</span><span class="o">.</span><span class="n">construct_scalar</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;||&quot;</span><span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-            <span class="k">assert</span> <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span>
-
-            <span class="k">return</span> <span class="n">obj</span></div>
-
-        <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Stringify the state.</span>
-
-<span class="sd">            :return: the enum name.</span>
-<span class="sd">            :rtype: str</span>
-<span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
-
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionState</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter to session status.</span>
 
 <span class="sd">        :return: session status</span>
-<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">SessionState</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter to session id.</span>
 
-<span class="sd">        :return: session id</span>
-<span class="sd">        :rtype: int</span>
+<span class="sd">        :return: session hash</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">rc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rc</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gett to final RC.</span>
 
 <span class="sd">        :return: rc</span>
-<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rc</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">infos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Getter to session infos.</span>
 
 <span class="sd">        :return: session infos</span>
-<span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span>
 
-<div class="viewcode-block" id="Session.property"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.property">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kw</span><span class="p">):</span>
+<div class="viewcode-block" id="Session.property">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.property">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kw</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Access specific data from the session stored info session.yml.</span>
 
 <span class="sd">        :param kw: the information to retrieve. kw must be a valid key</span>
-<span class="sd">        :type kw: str</span>
 <span class="sd">        :return: the requested session infos if exist</span>
-<span class="sd">        :rtype: Any</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;constructor method.</span>
 
 <span class="sd">        :param date: the start timestamp</span>
-<span class="sd">        :type date: datetime.datetime</span>
 <span class="sd">        :param path: the build directory</span>
-<span class="sd">        :type path: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_func</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rc</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># this dict is then flushed to the session.yml</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="p">,</span>
             <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">logfile</span><span class="p">,</span>
             <span class="s2">&quot;io&quot;</span><span class="p">:</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">outfile</span><span class="p">,</span>
             <span class="s2">&quot;progress&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">WAITING</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">SessionState</span><span class="o">.</span><span class="n">WAITING</span><span class="p">,</span>
             <span class="s2">&quot;started&quot;</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
             <span class="s2">&quot;ended&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
 
-<div class="viewcode-block" id="Session.load_from"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.load_from">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Session.load_from">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.load_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the current object with session infos read from global file.</span>
 
 <span class="sd">        :param sid: session id read from file</span>
-<span class="sd">        :type sid: int</span>
 <span class="sd">        :param data: session infos read from file</span>
-<span class="sd">        :type data: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="n">sid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span> <span class="o">=</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="Session.register_callback"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.register_callback">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">register_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Session.register_callback">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.register_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the callback used as main function once the session is</span>
 <span class="sd">        started.</span>
 
 <span class="sd">        :param callback: function to invoke</span>
-<span class="sd">        :type callback: Callable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_func</span> <span class="o">=</span> <span class="n">callback</span></div>
 
-<div class="viewcode-block" id="Session.run_detached"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.run_detached">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_detached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the session is detached mode.</span>
+
+<div class="viewcode-block" id="Session.run_detached">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.run_detached">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_detached</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the session in detached mode.</span>
 
 <span class="sd">        Arguments are for user function only.</span>
 <span class="sd">        :param args: user function positional arguments</span>
-<span class="sd">        :type args: tuple</span>
-<span class="sd">        :param kwargs user function keyword-based arguments.</span>
-<span class="sd">        :type kwargs: tuple</span>
+<span class="sd">        :param kwargs: user function keyword-based arguments.</span>
 
 <span class="sd">        :return: the Session id created for this run.</span>
-<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">io</span><span class="o">.</span><span class="n">detach_console</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;io&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">outfile</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># some sessions can have their starting time set directly when</span>
-            <span class="c1"># initializing the object.</span>
-            <span class="c1"># for instance for runs, elapsed time not session time but wall time&quot;&quot;&quot;</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-            <span class="c1"># flag it as running &amp; make the info public</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="n">store_session_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">)</span>
+        <span class="c1"># some sessions can have their starting time set directly when</span>
+        <span class="c1"># initializing the object.</span>
+        <span class="c1"># for instance for runs, elapsed time not session time but wall time&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-            <span class="c1"># run the new process</span>
-            <span class="n">child</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span>
-                <span class="n">target</span><span class="o">=</span><span class="n">main_detached_session</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span>
-            <span class="p">)</span>
+        <span class="c1"># flag it as running &amp; make the info public</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SessionState</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="n">store_session_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">)</span>
 
-            <span class="n">child</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1"># run the new process</span>
+        <span class="n">child</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span>
+            <span class="n">target</span><span class="o">=</span><span class="n">main_detached_session</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span>
+        <span class="p">)</span>
 
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span></div>
+        <span class="n">child</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Session.run"><a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.run">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span></div>
+
+
+<div class="viewcode-block" id="Session.run">
+<a class="viewcode-back" href="../../../api/pcvs.backend.session.html#pcvs.backend.session.Session.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run the session normally, without detaching the focus.</span>
 
@@ -440,18 +468,15 @@
 <span class="sd">        redirecting I/O properly (stdout, file, logs)</span>
 
 <span class="sd">        :param args: user function positional arguments</span>
-<span class="sd">        :type args: tuple</span>
 <span class="sd">        :param kwargs: user function keyword-based arguments.</span>
-<span class="sd">        :type kwargs: tuple</span>
 <span class="sd">        :return: the session ID for this run</span>
-<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># same as above, shifted starting time or not</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;started&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SessionState</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span> <span class="o">=</span> <span class="n">store_session_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_infos</span><span class="p">)</span>
 
             <span class="c1"># run the code</span>
@@ -462,7 +487,9 @@
                 <span class="c1"># is complete.</span>
                 <span class="n">remove_session_from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sid</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sid</span></div>
+</div>
+
 </pre></div>
 
            </div>
@@ -472,7 +499,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -1,0 +1,7 @@
+pcvs.orchestration.manager module
+=================================
+
+.. automodule:: pcvs.orchestration.manager
+   :members:
+   :show-inheritance:
+   :undoc-members:

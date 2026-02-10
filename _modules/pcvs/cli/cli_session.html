@@ -1,21 +1,21 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.cli.cli_session &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.cli.cli_session &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -29,8 +29,9 @@
 
           
           
-          <a href="../../../index.html" class="icon icon-home">
-            PCVS
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -52,8 +53,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
@@ -61,7 +62,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -105,34 +106,44 @@
 
     <span class="n">click</span><span class="o">.</span><span class="n">rich_click</span><span class="o">.</span><span class="n">SHOW_ARGUMENTS</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>  <span class="c1"># type: ignore</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">click.shell_completion</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompletionItem</span>
 
 
-<div class="viewcode-block" id="compl_session_token"><a class="viewcode-back" href="../../../api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.compl_session_token">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">compl_session_token</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">incomplete</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>  <span class="c1"># pylint: disable=unused-argument</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Session name completion function.</span>
+<div class="viewcode-block" id="compl_session_token">
+<a class="viewcode-back" href="../../../api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.compl_session_token">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compl_session_token</span><span class="p">(</span>
+    <span class="n">ctx</span><span class="p">:</span> <span class="n">click</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span> <span class="n">param</span><span class="p">:</span> <span class="n">click</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">incomplete</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Session name completion function.</span>
 
 <span class="sd">    :param ctx: Click context</span>
-<span class="sd">    :type ctx: :class:`Click.Context`</span>
-<span class="sd">    :param args: the option/argument requesting completion.</span>
-<span class="sd">    :type args: str</span>
+<span class="sd">    :param param: the option/argument requesting completion.</span>
 <span class="sd">    :param incomplete: the user input</span>
-<span class="sd">    :type incomplete: str</span>
+<span class="sd">    :return: the completed session token</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">sessions</span> <span class="o">=</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">list_alive_sessions</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">sessions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
     <span class="k">return</span> <span class="p">[</span>
-        <span class="n">CompletionItem</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">])))</span>
+        <span class="n">CompletionItem</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">])))</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sessions</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">incomplete</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
     <span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="print_sessions"><a class="viewcode-back" href="../../../api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.print_sessions">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">print_sessions</span><span class="p">(</span><span class="n">sessions</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;List detached sessions.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="print_sessions">
+<a class="viewcode-back" href="../../../api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.print_sessions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_sessions</span><span class="p">(</span><span class="n">sessions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    List detached sessions.</span>
+
+<span class="sd">    :param sessions: dict of sessions id, and sessions data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[italic bold]No sessions&quot;</span><span class="p">)</span>
         <span class="k">return</span>
@@ -144,20 +155,22 @@
     <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Location&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">sk</span><span class="p">,</span> <span class="n">sv</span> <span class="ow">in</span> <span class="n">sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">assert</span> <span class="n">sk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">sv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
         <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="n">sk</span><span class="p">,</span> <span class="n">sv</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Broken&quot;</span>
         <span class="n">duration</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">()</span>
         <span class="n">line_style</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
-        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">:</span>
             <span class="n">duration</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:3.2f}</span><span class="s2"> %&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;progress&quot;</span><span class="p">))</span>
             <span class="n">line_style</span> <span class="o">=</span> <span class="s2">&quot;yellow&quot;</span>
-        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
             <span class="n">duration</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;ended&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;100.00 %&quot;</span>
             <span class="n">line_style</span> <span class="o">=</span> <span class="s2">&quot;green bold&quot;</span>
-        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">WAITING</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">WAITING</span><span class="p">:</span>
             <span class="n">duration</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;started&quot;</span><span class="p">)</span>
             <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;Waiting&quot;</span>
             <span class="n">line_style</span> <span class="o">=</span> <span class="s2">&quot;yellow&quot;</span>
@@ -172,7 +185,8 @@
             <span class="p">),</span>
             <span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">]</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line_style</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">property</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">)),</span>
         <span class="p">)</span>
-    <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
+    <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">table</span><span class="p">))</span></div>
+
 
 
 <span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">short_help</span><span class="o">=</span><span class="s2">&quot;Manage multiple validations&quot;</span><span class="p">)</span>
@@ -180,7 +194,7 @@
     <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
     <span class="s2">&quot;--clear&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ack&quot;</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
     <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Clear a &#39;completed&#39; remote session, for removing from logs&quot;</span><span class="p">,</span>
 <span class="p">)</span>
@@ -200,24 +214,29 @@
     <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List detached sessions&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">ack</span><span class="p">,</span> <span class="n">list_sessions</span><span class="p">,</span> <span class="n">ack_all</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cli_session</span><span class="p">(</span>
+    <span class="n">ctx</span><span class="p">:</span> <span class="n">click</span><span class="o">.</span><span class="n">Context</span><span class="p">,</span>  <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">ack</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ack_all</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">list_sessions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Manage sessions by listing or acknowledging their completion.&quot;&quot;&quot;</span>
     <span class="n">sessions</span> <span class="o">=</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">list_alive_sessions</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">sessions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">sessions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">sessions</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">if</span> <span class="n">ack_all</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="n">sessions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">session_obj</span> <span class="ow">in</span> <span class="n">sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">session_obj</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">IN_PROGRESS</span><span class="p">:</span>
                 <span class="n">pvSession</span><span class="o">.</span><span class="n">remove_session_from_file</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
-                <span class="n">lockfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">],</span> <span class="n">NAME_BUILDFILE</span><span class="p">)</span>
+                <span class="n">lockfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">session_obj</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">],</span> <span class="n">NAME_BUILDFILE</span><span class="p">)</span>
                 <span class="n">utils</span><span class="o">.</span><span class="n">unlock_file</span><span class="p">(</span><span class="n">lockfile</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">ack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">ack</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sessions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">ack</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sessions</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">BadOptionUsage</span><span class="p">(</span><span class="s2">&quot;--ack&quot;</span><span class="p">,</span> <span class="s2">&quot;No such Session id (see pcvs session)&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">sessions</span><span class="p">[</span><span class="n">ack</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
-            <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
-            <span class="n">pvSession</span><span class="o">.</span><span class="n">Session</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+            <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="n">pvSession</span><span class="o">.</span><span class="n">SessionState</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
         <span class="p">]:</span>
             <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">BadOptionUsage</span><span class="p">(</span><span class="s2">&quot;--ack&quot;</span><span class="p">,</span> <span class="s2">&quot;This session is not completed yet&quot;</span><span class="p">)</span>
 
@@ -237,7 +256,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

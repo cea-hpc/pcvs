@@ -1,0 +1,7 @@
+pcvs.plugins.contrib.multijobs module
+=====================================
+
+.. automodule:: pcvs.plugins.contrib.multijobs
+   :members:
+   :show-inheritance:
+   :undoc-members:

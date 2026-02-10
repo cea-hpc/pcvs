@@ -1,0 +1,19 @@
+pcvs.plugins.contrib package
+============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pcvs.plugins.contrib.junit
+   pcvs.plugins.contrib.multijobs
+
+Module contents
+---------------
+
+.. automodule:: pcvs.plugins.contrib
+   :members:
+   :show-inheritance:
+   :undoc-members:

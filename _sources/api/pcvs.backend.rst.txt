@@ -9,10 +9,12 @@ Submodules
 
    pcvs.backend.bank
    pcvs.backend.config
-   pcvs.backend.profile
+   pcvs.backend.configfile
+   pcvs.backend.metaconfig
    pcvs.backend.report
    pcvs.backend.run
    pcvs.backend.session
+   pcvs.backend.spack
    pcvs.backend.utilities
 
 Module contents
@@ -20,5 +22,5 @@ Module contents
 
 .. automodule:: pcvs.backend
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

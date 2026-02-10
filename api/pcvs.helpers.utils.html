@@ -1,27 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.helpers.utils module &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.helpers.utils module &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pcvs.orchestration package" href="pcvs.orchestration.html" />
-    <link rel="prev" title="pcvs.helpers.system module" href="pcvs.helpers.system.html" /> 
+    <link rel="next" title="pcvs.helpers.validation module" href="pcvs.helpers.validation.html" />
+    <link rel="prev" title="pcvs.helpers.storage module" href="pcvs.helpers.storage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="pcvs.helpers.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html#module-pcvs.helpers">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
           <li class="breadcrumb-item"><a href="pcvs.helpers.html">pcvs.helpers package</a></li>
       <li class="breadcrumb-item active">pcvs.helpers.utils module</li>
       <li class="wy-breadcrumbs-aside">
@@ -112,400 +117,332 @@
            <div itemprop="articleBody">
              
   <section id="module-pcvs.helpers.utils">
-<span id="pcvs-helpers-utils-module"></span><h1>pcvs.helpers.utils module<a class="headerlink" href="#module-pcvs.helpers.utils" title="Permalink to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.Program">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">Program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#Program"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.Program" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Simple class to encapsulate process management.</p>
-<p>This is better and should be preferred as importing subprocess everywhere.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.Program.exception">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exception</span></span><a class="headerlink" href="#pcvs.helpers.utils.Program.exception" title="Permalink to this definition"></a></dt>
-<dd><p>Getter, raised exception (for any reason)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>an Exception-derived object</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Exception</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.Program.out">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">out</span></span><a class="headerlink" href="#pcvs.helpers.utils.Program.out" title="Permalink to this definition"></a></dt>
-<dd><p>Getter to actual execution output.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>stderr/stdout combined</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.Program.rc">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rc</span></span><a class="headerlink" href="#pcvs.helpers.utils.Program.rc" title="Permalink to this definition"></a></dt>
-<dd><p>Getter, effective return code.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>return code</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>integer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.Program.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#Program.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.Program.run" title="Permalink to this definition"></a></dt>
-<dd><p>Run the given program and capture I/Os</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input</strong> (<em>str</em>) – raw data to be used as stdin</p></li>
-<li><p><strong>shell</strong> (<em>boolean</em>) – is the provided command to be run within a shell</p></li>
-<li><p><strong>timeout</strong> (<em>positive integer</em>) – allowed time before automatically killing the process</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>zero if the process started successfully, non-zero
-otherwise.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>integer</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<span id="pcvs-helpers-utils-module"></span><h1>pcvs.helpers.utils module<a class="headerlink" href="#module-pcvs.helpers.utils" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.check_is_archive">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_archive" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_archive" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.check_is_build_or_archive">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_build_or_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_build_or_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_build_or_archive" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_build_or_archive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_build_or_archive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_build_or_archive" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.check_is_buildir">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_buildir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_buildir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_buildir" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_is_buildir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_is_buildir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_is_buildir" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.check_valid_program">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_valid_program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">succ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_on_fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_valid_program"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_valid_program" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_valid_program</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">succ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_on_fail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_valid_program"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_valid_program" title="Link to this definition"></a></dt>
 <dd><p>Check if p is a valid program, using the <code class="docutils literal notranslate"><span class="pre">which</span></code> function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<em>str</em>) – program to check</p></li>
-<li><p><strong>succ</strong> (<em>optional</em>) – function to call in case of success, defaults to None</p></li>
-<li><p><strong>fail</strong> (<em>optional</em>) – function to call in case of failure, defaults to None</p></li>
-<li><p><strong>raise_on_fail</strong> (<em>bool</em><em>, </em><em>optional</em>) – Raise an exception in case of failure, defaults to True</p></li>
+<li><p><strong>p</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – program to check</p></li>
+<li><p><strong>succ</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]</span>) – function to call in case of success, defaults to None</p></li>
+<li><p><strong>fail</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]</span>) – function to call in case of failure, defaults to None</p></li>
+<li><p><strong>raise_on_fail</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Raise an exception in case of failure, defaults to True</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException.ProgramError" title="pcvs.helpers.exceptions.RunException.ProgramError"><strong>RunException.ProgramError</strong></a> – p is not a valid program</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if p is a program, False otherwise</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.check_valid_scope">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">check_valid_scope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#check_valid_scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.check_valid_scope" title="Permalink to this definition"></a></dt>
-<dd><p>Check if argument is a valid scope (local, user, global).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>s</strong> (<em>str</em>) – scope to check</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.BadTokenError" title="pcvs.helpers.exceptions.CommonException.BadTokenError"><strong>CommonException.BadTokenError</strong></a> – the argument is not a valid scope</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if p is a program, False otherwise</p>
 </dd>
 </dl>
+<p># noqa: DAR401
+# noqa: DAR402</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.copy_file">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">copy_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#copy_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.copy_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">copy_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#copy_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.copy_file" title="Link to this definition"></a></dt>
 <dd><p>Copy a source file into a destination directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<em>str</em>) – source file to copy.</p></li>
-<li><p><strong>dest</strong> (<em>str</em>) – destination directory, may not exist yet.</p></li>
+<li><p><strong>src</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – source file to copy.</p></li>
+<li><p><strong>dest</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – destination directory, may not exist yet.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.create_home_dir">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">create_home_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#create_home_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.create_home_dir" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">create_home_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#create_home_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.create_home_dir" title="Link to this definition"></a></dt>
 <dd><p>Create a home directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.create_or_clean_path">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">create_or_clean_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#create_or_clean_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.create_or_clean_path" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">create_or_clean_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#create_or_clean_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.create_or_clean_path" title="Link to this definition"></a></dt>
 <dd><p>Create a path or cleans it if it already exists.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<em>os.path</em><em>, </em><em>str</em>) – prefix of the path to create</p></li>
-<li><p><strong>directory</strong> (<em>bool</em><em>, </em><em>optional</em>) – True if the path is a directory, defaults to False</p></li>
+<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – prefix of the path to create</p></li>
+<li><p><strong>directory</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – True if the path is a directory, defaults to False</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.cwd">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">cwd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#cwd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.cwd" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">cwd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#cwd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.cwd" title="Link to this definition"></a></dt>
 <dd><p>Change the working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>os.path</em><em>, </em><em>str</em>) – new working directory</p>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – new working directory</p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.extract_infos_from_token">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">extract_infos_from_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pair</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxsplit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#extract_infos_from_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.extract_infos_from_token" title="Permalink to this definition"></a></dt>
-<dd><p>Extract fields from tokens (a, b, c) from user’s string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> (<em>str</em>) – the input string</p></li>
-<li><p><strong>pair</strong> (<em>str</em><em>, </em><em>optional</em>) – padding side when only 2 tokens found, defaults to “right”</p></li>
-<li><p><strong>single</strong> (<em>str</em><em>, </em><em>optional</em>) – padding side when only 1 token found, defaults to “right”</p></li>
-<li><p><strong>maxsplit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum split number for s, defaults to 3</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>3-string-tuple: mapping (scope, kind, name), any of them may be null</p>
+<dt class="field-even">Yield<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new current working directory.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.find_buildir_from_prefix">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">find_buildir_from_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#find_buildir_from_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.find_buildir_from_prefix" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">find_buildir_from_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#find_buildir_from_prefix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.find_buildir_from_prefix" title="Link to this definition"></a></dt>
 <dd><p>Find the build directory from the <code class="docutils literal notranslate"><span class="pre">path</span></code> prefix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>os.path</em><em>, </em><em>str</em>) – path to search the build directory from</p>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – path to search the build directory from</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotFoundError" title="pcvs.helpers.exceptions.CommonException.NotFoundError"><strong>CommonException.NotFoundError</strong></a> – the build directory is not found</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>the path of the build directory</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>os.path</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the path of the build directory</p>
 </dd>
 </dl>
+<p># noqa: DAR401
+# noqa: DAR402</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.get_lock_owner">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">get_lock_owner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#get_lock_owner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.get_lock_owner" title="Permalink to this definition"></a></dt>
-<dd><p>The lock file will contain the process ID owning the lock. This function
-returns it.</p>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">get_lock_owner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#get_lock_owner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.get_lock_owner" title="Link to this definition"></a></dt>
+<dd><p>The lock file will contain the process ID owning the lock. This function returns it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>str</em>) – the original file to mutex</p>
+<dd class="field-odd"><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the original file to mutex</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the process ID</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the process ID</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.get_lockfile_name">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">get_lockfile_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#get_lockfile_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.get_lockfile_name" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">get_lockfile_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#get_lockfile_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.get_lockfile_name" title="Link to this definition"></a></dt>
 <dd><p>From a file to mutex, return the file lock name associated with it.</p>
 <p>For instance for /a/b.yml, the lock file name will be /a/.b.yml.lck</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>str</em>) – the file to mutex</p>
+<dd class="field-odd"><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the file to mutex</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The full path to the file.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.is_locked">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">is_locked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#is_locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.is_locked" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">is_locked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#is_locked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.is_locked" title="Link to this definition"></a></dt>
 <dd><p>Is the given file locked somewhere else ?</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>str</em>) – the file to test</p>
+<dd class="field-odd"><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the file to test</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a boolean indicating whether the lock is hold or not.</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a boolean indicating whether the lock is hold or not.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.list_valid_archive_in_dir">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">list_valid_archive_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#list_valid_archive_in_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.list_valid_archive_in_dir" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">list_valid_archive_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#list_valid_archive_in_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.list_valid_archive_in_dir" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.list_valid_buildirs_in_dir">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">list_valid_buildirs_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#list_valid_buildirs_in_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.list_valid_buildirs_in_dir" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">list_valid_buildirs_in_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#list_valid_buildirs_in_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.list_valid_buildirs_in_dir" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.lock_file">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">lock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reentrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#lock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.lock_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">lock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reentrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#lock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.lock_file" title="Link to this definition"></a></dt>
 <dd><p>Try to lock a directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>os.path</em>) – name of lock</p></li>
-<li><p><strong>reentrant</strong> (<em>bool</em><em>, </em><em>optional</em>) – True if this process may have locked this file before,
-defaults to False</p></li>
-<li><p><strong>timeout</strong> (<em>int</em><em> (</em><em>seconds</em><em>)</em><em>, </em><em>optional</em>) – time before timeout, defaults to None</p></li>
+<li><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of lock</p></li>
+<li><p><strong>reentrant</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – True if this process may have locked this file before, defaults to False</p></li>
+<li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – time before timeout, defaults to None</p></li>
+<li><p><strong>force</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Unlock the file if it is locked.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.TimeoutError" title="pcvs.helpers.exceptions.LockException.TimeoutError"><strong>LockException.TimeoutError</strong></a> – timeout is reached before the directory
-is locked</p>
+<dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.TimeoutError" title="pcvs.helpers.exceptions.CommonException.TimeoutError"><strong>CommonException.TimeoutError</strong></a> – timeout is reached before the directory is locked</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if the file is reached, False otherwise</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the file is reached, False otherwise</p>
 </dd>
 </dl>
+<p># noqa: DAR401
+# noqa: DAR402</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.program_timeout">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">program_timeout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#program_timeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.program_timeout" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">program_timeout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ft</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#program_timeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.program_timeout" title="Link to this definition"></a></dt>
 <dd><p>Timeout handler, called when a SIGALRM is received.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sig</strong> (<em>int</em>) – signal number</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – signal number</p></li>
+<li><p><strong>ft</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">FrameType</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – frame type</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.TimeoutError" title="pcvs.helpers.exceptions.CommonException.TimeoutError"><strong>CommonException.TimeoutError</strong></a> – timeout is reached</p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.set_local_path">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">set_local_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#set_local_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.set_local_path" title="Permalink to this definition"></a></dt>
-<dd><p>Set the prefix for the <code class="docutils literal notranslate"><span class="pre">local</span></code> storage.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>os.path</em>) – path of the <code class="docutils literal notranslate"><span class="pre">local</span></code> storage</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
+<p># noqa: DAR401
+# noqa: DAR402</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.start_autokill">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">start_autokill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#start_autokill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.start_autokill" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">start_autokill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#start_autokill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.start_autokill" title="Link to this definition"></a></dt>
 <dd><p>Initialize a new time to automatically stop the
 current process once time is expired.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>timeout</strong> (<em>positive integer</em>) – value in seconds before the autokill will be raised</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pcvs.helpers.utils.storage_order">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">storage_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#storage_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.storage_order" title="Permalink to this definition"></a></dt>
-<dd><p>Return scopes in order of searching.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>a list of scopes</p>
+<dd class="field-odd"><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – value in seconds before the autokill will be raised</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>list</p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.str_dict_as_envvar">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">str_dict_as_envvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#str_dict_as_envvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.str_dict_as_envvar" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">str_dict_as_envvar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#str_dict_as_envvar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.str_dict_as_envvar" title="Link to this definition"></a></dt>
 <dd><p>Convert a dict to a list of shell-compliant variable strings.</p>
 <p>The final result is a regular multiline str, each line being an entry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>d</strong> (<em>dict</em>) – the dict containing env vars to serialize</p>
+<dd class="field-odd"><p><strong>d</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – the dict containing env vars to serialize</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the str, containing multiple lines, each of them being a var.</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the str, containing multiple lines, each of them being a var.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.trylock_file">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">trylock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reentrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#trylock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.trylock_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">trylock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reentrant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#trylock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.trylock_file" title="Link to this definition"></a></dt>
 <dd><p>Try to lock a file (used in lock_file).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>os.path</em>) – name of lock</p></li>
-<li><p><strong>reentrant</strong> (<em>bool</em><em>, </em><em>optional</em>) – True if this process may have locked this file before,
-defaults to False</p></li>
+<li><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – name of lock</p></li>
+<li><p><strong>reentrant</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – True if this process may have locked this file before, defaults to False</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the file is reached, False otherwise</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if the file is reached, False otherwise</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.helpers.utils.unlock_file">
-<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">unlock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#unlock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.unlock_file" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.helpers.utils.</span></span><span class="sig-name descname"><span class="pre">unlock_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/helpers/utils.html#unlock_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.helpers.utils.unlock_file" title="Link to this definition"></a></dt>
 <dd><p>Remove lock from a directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>os.path</em>) – file locking the directory</p>
+<dd class="field-odd"><p><strong>f</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – file locking the directory</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -516,14 +453,14 @@ defaults to False</p></li>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pcvs.helpers.system.html" class="btn btn-neutral float-left" title="pcvs.helpers.system module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pcvs.orchestration.html" class="btn btn-neutral float-right" title="pcvs.orchestration package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pcvs.helpers.storage.html" class="btn btn-neutral float-left" title="pcvs.helpers.storage module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.helpers.validation.html" class="btn btn-neutral float-right" title="pcvs.helpers.validation module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

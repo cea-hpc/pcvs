@@ -71,7 +71,7 @@ frameworks).
 
    ref/test-file
    ref/config
-   ref/profile
+   ref/bank
    ref/session
    ref/utils
    ref/examples
@@ -93,7 +93,7 @@ frameworks).
    :caption: Development
 
    dev/contribution
-   api/pcvs
+   api/modules
 ..
    dev/overview
    dev/contribution

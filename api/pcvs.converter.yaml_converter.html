@@ -1,27 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.converter.yaml_converter module &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.converter.yaml_converter module &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pcvs.helpers package" href="pcvs.helpers.html" />
-    <link rel="prev" title="pcvs.converter package" href="pcvs.converter.html" /> 
+    <link rel="next" title="pcvs.dsl package" href="pcvs.dsl.html" />
+    <link rel="prev" title="pcvs.converter.result_converter module" href="pcvs.converter.result_converter.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="pcvs.converter.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html#module-pcvs.converter">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.testing.html">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
           <li class="breadcrumb-item"><a href="pcvs.converter.html">pcvs.converter package</a></li>
       <li class="breadcrumb-item active">pcvs.converter.yaml_converter module</li>
       <li class="wy-breadcrumbs-aside">
@@ -112,61 +117,97 @@
            <div itemprop="articleBody">
              
   <section id="module-pcvs.converter.yaml_converter">
-<span id="pcvs-converter-yaml-converter-module"></span><h1>pcvs.converter.yaml_converter module<a class="headerlink" href="#module-pcvs.converter.yaml_converter" title="Permalink to this heading"></a></h1>
+<span id="pcvs-converter-yaml-converter-module"></span><h1>pcvs.converter.yaml_converter module<a class="headerlink" href="#module-pcvs.converter.yaml_converter" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.check_if_key_matches">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">check_if_key_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#check_if_key_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.check_if_key_matches" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">check_if_key_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#check_if_key_matches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.check_if_key_matches" title="Link to this definition"></a></dt>
 <dd><p>list all matches for the current key in the new YAML description.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]</span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.compute_new_key">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">compute_new_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#compute_new_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.compute_new_key" title="Permalink to this definition"></a></dt>
-<dd><p>replace in ‘k’ any pattern found in ‘m’.
-‘k’ is a string with placeholders, while ‘m’ is a match result with groups
-named after placeholders.
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">compute_new_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#compute_new_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.compute_new_key" title="Link to this definition"></a></dt>
+<dd><p>Replace in ‘k’ any pattern found in ‘m’.
+‘k’ is a string with placeholders, while ‘m’ is a match result with groups named after placeholders.
 This function will also expand the placeholder if ‘call:’ token is used to
 execute python code on the fly (complex transformation)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The str to replace.</p></li>
+<li><p><strong>m</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Match</span></code></span>) – the match result ro replace in str.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The new computed key.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.convert">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_unknown</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.convert" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">convert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_unknown</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#convert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.convert" title="Link to this definition"></a></dt>
 <dd><p>Process the conversion from one YAML format to another.
 Conversion specifications are described by the SCHEME file.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_file</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The name of the input file to convert. (‘-’ for stdin).</p></li>
+<li><p><strong>kind</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The kind of conversion to execute profile/configuration.</p></li>
+<li><p><strong>template</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – YAML file containing aliases for conversion.</p></li>
+<li><p><strong>scheme</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The yaml scheme to convert against.</p></li>
+<li><p><strong>out</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the output file for the result after the conversion.</p></li>
+<li><p><strong>stdout</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Should stdout be use as output.</p></li>
+<li><p><strong>skip_unknown</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Skip unknown key.</p></li>
+<li><p><strong>in_place</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Set output to be the input file (override out).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>click.BadOptionUsage</strong> – When multiple conflicting output options are used.</p></li>
+<li><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.IOError" title="pcvs.helpers.exceptions.CommonException.IOError"><strong>CommonException.IOError</strong></a> – When we fail to load the template file.</p></li>
+</ul>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
+<p># noqa: DAR401
+# noqa: DAR402</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.flatten">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#flatten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.flatten" title="Permalink to this definition"></a></dt>
-<dd><p>make the n-depth dict ‘dd’ a “flat” version, where the successive keys
-are chained in a tuple. for instance:
-{‘a’: {‘b’: {‘c’: value}}} –&gt; {(‘a’, ‘b’, ‘c’): value}</p>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#flatten"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.flatten" title="Link to this definition"></a></dt>
+<dd><p>Make the n-depth dict ‘dd’ a “flat” version, where the successive key are chained in a tuple.
+for instance: {‘a’: {‘b’: {‘c’: value}}} –&gt; {(‘a’, ‘b’, ‘c’): value}</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dd</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – the dict to flatten</p></li>
+<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – a prefix to append to the key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The flatten dict.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.process">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_if_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.process" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warn_if_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.process" title="Link to this definition"></a></dt>
 <dd><p>Process YAML dict ‘data’ and return a transformed dict</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -177,41 +218,86 @@ are chained in a tuple. for instance:
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.process_modifiers">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">process_modifiers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#process_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.process_modifiers" title="Permalink to this definition"></a></dt>
-<dd><p>applies rules in-place for the data dict.
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">process_modifiers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#process_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.process_modifiers" title="Link to this definition"></a></dt>
+<dd><p>Applies rules in-place for the data dict.
 Rules are present in the desc_dict[‘first’] sub-dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span>) – the data to be process by the converter.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The processed data or itself if their is no process to do.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.replace_placeholder">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">replace_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#replace_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.replace_placeholder" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">replace_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#replace_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.replace_placeholder" title="Link to this definition"></a></dt>
 <dd><p>The given TMP should be a dict, where keys contain placeholders, wrapped
 with “&lt;&gt;”. Each placeholder will be replaced (i.e. key will be changed) by
 the associated value in refs.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tmp</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span>) – the dict of place holder to replace.</p></li>
+<li><p><strong>refs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span>) – the values to replace the place older with.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The dict after place older replace.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.separate_key_and_value">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">separate_key_and_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#separate_key_and_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.separate_key_and_value" title="Permalink to this definition"></a></dt>
-<dd><p>helper to split the key and value from a string</p>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">separate_key_and_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#separate_key_and_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.separate_key_and_value" title="Link to this definition"></a></dt>
+<dd><p>Helper to split the key and value from a string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the string to split.</p></li>
+<li><p><strong>c</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the char to split the string with.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a tuple of the separated key and value.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pcvs.converter.yaml_converter.set_with">
-<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">set_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#set_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.set_with" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">pcvs.converter.yaml_converter.</span></span><span class="sig-name descname"><span class="pre">set_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/converter/yaml_converter.html#set_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.converter.yaml_converter.set_with" title="Link to this definition"></a></dt>
 <dd><p>Add a value to a n-depth dict where the depth is declared as
 a list of intermediate keys. the ‘append’ flag indicates if the given
 ‘value’ should be appended or replace the original content</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span>) – the tree dict to append</p></li>
+<li><p><strong>klist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></span>) – the list of key used to walk down the tree dict.</p></li>
+<li><p><strong>val</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – the value to set at the end of the walk.</p></li>
+<li><p><strong>append</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – should the value be append to a list instead of replacing the dict value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – When the end of the walk is not a list and append is True.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -220,14 +306,14 @@ a list of intermediate keys. the ‘append’ flag indicates if the given
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pcvs.converter.html" class="btn btn-neutral float-left" title="pcvs.converter package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pcvs.helpers.html" class="btn btn-neutral float-right" title="pcvs.helpers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pcvs.converter.result_converter.html" class="btn btn-neutral float-left" title="pcvs.converter.result_converter module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.dsl.html" class="btn btn-neutral float-right" title="pcvs.dsl package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

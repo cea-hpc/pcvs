@@ -1,0 +1,608 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.helpers.storage &mdash; PCVS 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">pcvs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.helpers.storage</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.helpers.storage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Helper package to find configuration and plugin files in pcvs configuration directories.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Self</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">NAME_CONFIGDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_HOMEDIR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs</span><span class="w"> </span><span class="kn">import</span> <span class="n">PATH_INSTDIR</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rich_click</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">click</span>
+
+    <span class="n">click</span><span class="o">.</span><span class="n">rich_click</span><span class="o">.</span><span class="n">SHOW_ARGUMENTS</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">click</span>  <span class="c1"># type: ignore</span>
+
+
+<div class="viewcode-block" id="ConfigScope">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigScope</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Storage Scope Enumeration.</span>
+
+<span class="sd">    :var GLOBAL: pcvs installation path</span>
+<span class="sd">    :var USER: user Home directory</span>
+<span class="sd">    :var LOCAL: current testing directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">GLOBAL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">USER</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">LOCAL</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to str.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to str.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="ConfigScope.fromstr">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.fromstr">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fromstr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get Scope from user str.&quot;&quot;&quot;</span>
+        <span class="n">str_to_scope</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">,</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">USER</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">LOCAL</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">LOCAL</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">str_to_scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
+<div class="viewcode-block" id="ConfigScope.all_scopes">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.all_scopes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_scopes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all possible scopes.&quot;&quot;&quot;</span>
+        <span class="n">all_scopes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">LOCAL</span><span class="p">,</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">all_scopes</span>  <span class="c1"># type: ignore</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConfigKind">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigKind</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration types.</span>
+
+<span class="sd">    Associated with their config subdirectory and their default extension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PROFILE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">COMPILER</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RUNTIME</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MACHINE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">CRITERION</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">GROUP</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">PLUGIN</span> <span class="o">=</span> <span class="mi">6</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to str.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to str.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="ConfigKind.fromstr">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.fromstr">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fromstr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get Scope from user str.&quot;&quot;&quot;</span>
+        <span class="n">str_to_kind</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PLUGIN</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PLUGIN</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">str_to_kind</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kind</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div>
+
+
+<div class="viewcode-block" id="ConfigKind.all_kinds">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.all_kinds">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_kinds</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of all ConfigTypes.&quot;&quot;&quot;</span>
+        <span class="n">all_kinds</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PLUGIN</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">all_kinds</span>  <span class="c1"># type: ignore</span></div>
+
+
+<div class="viewcode-block" id="ConfigKind.get_file_ext">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.get_file_ext">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_ext</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ck</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get file type from ConfigType.&quot;&quot;&quot;</span>
+        <span class="n">config_extensions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PROFILE</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">COMPILER</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">RUNTIME</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">MACHINE</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">GROUP</span><span class="p">:</span> <span class="s2">&quot;.yml&quot;</span><span class="p">,</span>
+            <span class="n">ConfigKind</span><span class="o">.</span><span class="n">PLUGIN</span><span class="p">:</span> <span class="s2">&quot;.py&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">config_extensions</span><span class="p">[</span><span class="n">ck</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConfigDesc">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigDesc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An object to describe a config file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Config file object description.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">:</span> <span class="n">ConfigKind</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">:</span> <span class="n">ConfigScope</span> <span class="o">=</span> <span class="n">scope</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The name of the config (with file extension).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The path of the config.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kind</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigKind</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The type of the config.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kind</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scope</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigScope</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The scope of the config.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the full name of the config.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scope</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kind</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return if the file pointed by this config descriptor exist.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Equality check (used in tsets).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ConfigDesc</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">path</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">kind</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">scope</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Representation Method.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">,</span> <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigLocator">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigLocator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper to find and list config.&quot;&quot;&quot;</span>
+
+    <span class="n">EXEC_PATH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init a Config Locator.&quot;&quot;&quot;</span>
+        <span class="n">rel_exec_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXEC_PATH</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXEC_PATH</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_storage_scope_paths</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ConfigScope</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">PATH_INSTDIR</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">),</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">USER</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="n">PATH_HOMEDIR</span><span class="p">),</span>
+            <span class="n">ConfigScope</span><span class="o">.</span><span class="n">LOCAL</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_local_path</span><span class="p">(</span><span class="n">rel_exec_path</span><span class="p">)),</span>
+        <span class="p">}</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_local_path</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">subpath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">NAME_CONFIGDIR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute LOCAL Scope, get the first .pcvs directory in upper folders.&quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">subpath</span><span class="p">)):</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+            <span class="c1"># Reach &#39;/&#39; and not found</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="o">==</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">path</span>
+                <span class="k">break</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="c1"># if we are in home dir, correct path is current working dir</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">subpath</span><span class="p">)</span> <span class="o">==</span> <span class="n">PATH_HOMEDIR</span><span class="p">:</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">subpath</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConfigLocator.check_filename_ext">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.check_filename_ext">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_filename_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check of filename.&quot;&quot;&quot;</span>
+        <span class="c1"># check for missing extensions</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="n">extension</span><span class="p">:</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_name</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.parse_scope_and_kind_raise">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_scope_and_kind_raise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_scope_and_kind_raise</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse scope[:kind] token, raise on failure.&quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_scope_and_kind</span><span class="p">(</span><span class="n">user_token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">BadArgumentUsage</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.parse_scope_and_kind">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_scope_and_kind">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_scope_and_kind</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default_kind</span><span class="p">:</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse scope[:kind] token, return None on failure.&quot;&quot;&quot;</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">user_token</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">fromstr</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">default_kind</span>
+            <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">scope</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">fromstr</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid scope or kind, got &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;valid scope are: </span><span class="si">{</span><span class="n">ConfigScope</span><span class="o">.</span><span class="n">all_scopes</span><span class="p">()</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;and valid kind are: &#39;</span><span class="si">{</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">all_kinds</span><span class="p">()</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">default_kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">kind</span> <span class="o">!=</span> <span class="n">default_kind</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Invalude kind, &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&#39; specify, needs &#39;</span><span class="si">{</span><span class="n">default_kind</span><span class="si">}</span><span class="s2">&#39;, in &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+
+            <span class="k">return</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">fromstr</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">fromstr</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Invalid config scope, got &#39;</span><span class="si">{</span><span class="n">token</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;, valid scopes are: </span><span class="si">{</span><span class="n">ConfigScope</span><span class="o">.</span><span class="n">all_scopes</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Invalid config kind, got &#39;</span><span class="si">{</span><span class="n">token</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;, valid kinds are: </span><span class="si">{</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">all_kinds</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">default_kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">kind</span> <span class="o">!=</span> <span class="n">default_kind</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Invalude kind, &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&#39; specify, needs &#39;</span><span class="si">{</span><span class="n">default_kind</span><span class="si">}</span><span class="s2">&#39;, in &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Bad user token, token should be &#39;scope[:kind]&#39;, got &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.parse_full_raise">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_full_raise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_full_raise</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">should_exist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse use token and return and associated config file.&quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_full</span><span class="p">(</span><span class="n">user_token</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">should_exist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">click</span><span class="o">.</span><span class="n">BadArgumentUsage</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.parse_full">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_full">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_full</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">should_exist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># Config description and error</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse [scope:[kind:]]label token.&quot;&quot;&quot;</span>
+        <span class="c1"># check for config scope &amp; config kind</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">user_token</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># config does not exist yet, but scope is not provided</span>
+            <span class="k">if</span> <span class="n">should_exist</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">should_exist</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="s2">&quot;For a configuration that may not exist, specifying a scope is mendatory, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;error parsing: &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># kind not provided, neither by token nor by function</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Configuration kind not specify in user token: &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">user_token</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_scope_and_kind</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">token</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">kind</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">res</span>
+            <span class="n">scope</span><span class="p">,</span> <span class="n">kind</span> <span class="o">=</span> <span class="n">res</span>
+            <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">should_exist</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">should_exist</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span>
+                        <span class="s2">&quot;For a configuration that may not exist, specifying a scope is mendatory, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;error parsing: &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Fail to parse kind from token &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Fail to parse scope (and kind), too many &#39;:&#39; in path &#39;</span><span class="si">{</span><span class="n">user_token</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+
+        <span class="k">assert</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_filename_ext</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">should_exist</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_existing_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">should_exist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># May exist</span>
+            <span class="k">assert</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_may_exist_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">should_exist</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># should not exist</span>
+            <span class="k">assert</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_not_existing_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;Unreachable&quot;</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_existing_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a config, the config file must exist.&quot;&quot;&quot;</span>
+        <span class="n">exist_config</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exist_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Config &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39; does not exist !&quot;</span>
+        <span class="k">return</span> <span class="n">exist_config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_may_exist_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a config, the config file may exist.&quot;&quot;&quot;</span>
+        <span class="c1"># search for config</span>
+        <span class="n">may_exist_config</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_config</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">may_exist_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">may_exist_config</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_storage_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="n">no_config</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">=</span> <span class="n">ConfigDesc</span><span class="p">(</span><span class="n">config_path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">no_config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_not_existing_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a config, the config file should not exist.&quot;&quot;&quot;</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_storage_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="n">should_not_exist_config</span><span class="p">:</span> <span class="n">ConfigDesc</span> <span class="o">=</span> <span class="n">ConfigDesc</span><span class="p">(</span><span class="n">config_path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">should_not_exist_config</span><span class="o">.</span><span class="n">exist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Config, &#39;</span><span class="si">{</span><span class="n">should_not_exist_config</span><span class="o">.</span><span class="n">full_name</span><span class="si">}</span><span class="s2">&#39; already exist !&quot;</span>
+        <span class="k">return</span> <span class="n">should_not_exist_config</span>
+
+<div class="viewcode-block" id="ConfigLocator.get_storage_dir">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.get_storage_dir">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_storage_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config dir from config scope and config type.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">config_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_storage_scope_paths</span><span class="p">[</span><span class="n">scope</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">kind</span><span class="p">:</span>
+            <span class="n">config_dir</span> <span class="o">=</span> <span class="n">config_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">config_dir</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.get_storage_path">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.get_storage_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_storage_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get config path from config label name, config type and config scope.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_storage_dir</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config_path</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.find_config">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.find_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigDesc</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a config file description from it&#39;s name.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">scopes</span> <span class="o">=</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">all_scopes</span><span class="p">()</span> <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="n">scope</span><span class="p">]</span>
+        <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Searching config for &#39;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&#39;, of kind: &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&#39;, in scopes: &#39;</span><span class="si">{</span><span class="n">scopes</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">scopes</span><span class="p">:</span>
+            <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_storage_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">sc</span><span class="p">)</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Looking for &#39;</span><span class="si">{</span><span class="n">config_path</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="n">config_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_filename_ext</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">config_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">config_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span><span class="n">kind</span><span class="p">):</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found &#39;</span><span class="si">{</span><span class="n">config_path</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">ConfigDesc</span><span class="p">(</span><span class="n">config_path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">sc</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.list_configs">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.list_configs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ConfigKind</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConfigDesc</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List configs of type `ct` in scopes `cs`.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">scopes</span> <span class="o">=</span> <span class="n">ConfigScope</span><span class="o">.</span><span class="n">all_scopes</span><span class="p">()</span> <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="n">scope</span><span class="p">]</span>
+        <span class="n">configs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConfigDesc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="n">scopes</span><span class="p">:</span>
+            <span class="n">configs_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_storage_dir</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">configs_dir</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="n">config_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">config_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">config_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span>
+                        <span class="n">kind</span>
+                    <span class="p">):</span>
+                        <span class="n">configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ConfigDesc</span><span class="p">(</span><span class="n">config_path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">sc</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">configs</span></div>
+
+
+<div class="viewcode-block" id="ConfigLocator.list_all_configs">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.list_all_configs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list_all_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="n">ConfigScope</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConfigDesc</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List all configs types in all scopes.&quot;&quot;&quot;</span>
+        <span class="n">configs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConfigDesc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">ConfigKind</span><span class="o">.</span><span class="n">all_kinds</span><span class="p">():</span>
+            <span class="n">configs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_configs</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">configs</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="set_exec_path">
+<a class="viewcode-back" href="../../../api/pcvs.helpers.storage.html#pcvs.helpers.storage.set_exec_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_exec_path</span><span class="p">(</span><span class="n">exec_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set EXEC_PATH.&quot;&quot;&quot;</span>
+    <span class="n">ConfigLocator</span><span class="o">.</span><span class="n">EXEC_PATH</span> <span class="o">=</span> <span class="n">exec_path</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

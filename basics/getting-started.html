@@ -1,22 +1,22 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; PCVS 0.8.0 documentation</title>
+  <title>Getting Started &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -64,8 +65,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -73,7 +74,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -101,9 +102,9 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>The source code is available on GitHub. To checkout the latest release:
 (detailed documentation in <a class="reference internal" href="installation.html"><span class="doc">Installation Guide</span></a>):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs
@@ -124,9 +125,9 @@ $<span class="w"> </span><span class="nb">eval</span><span class="w"> </span><sp
 </div>
 </section>
 <section id="pcvs-formatted-test-suite">
-<h2>PCVS-formatted test-suite<a class="headerlink" href="#pcvs-formatted-test-suite" title="Permalink to this heading"></a></h2>
+<h2>PCVS-formatted test-suite<a class="headerlink" href="#pcvs-formatted-test-suite" title="Link to this heading"></a></h2>
 <section id="test-suite-layout">
-<span id="id2"></span><h3>Test-suite layout<a class="headerlink" href="#test-suite-layout" title="Permalink to this heading"></a></h3>
+<span id="id2"></span><h3>Test-suite layout<a class="headerlink" href="#test-suite-layout" title="Link to this heading"></a></h3>
 <p>While PCVS is highly customizable, it comes with templates to locally test it
 without any prior knowledge. Before using PCVS, let’s consider a provided
 test-suite as any <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory
@@ -183,26 +184,26 @@ to integrate tests to PCVS. For a complete list of nodes to be used in a
 </section>
 </section>
 <section id="execute-the-test-suite">
-<h2>Execute the test-suite<a class="headerlink" href="#execute-the-test-suite" title="Permalink to this heading"></a></h2>
+<h2>Execute the test-suite<a class="headerlink" href="#execute-the-test-suite" title="Link to this heading"></a></h2>
 <p>PCVS relies on (1) test specifications and (2) execution profile to create and
 execute a full benchmarks. Building a valid profile may be complex at first but
 offer a huge flexibility to solve complex validation scenarios. Still, most
 scenarios share similarities, like, in that case, running MPI programs. PCVS
 comes with default profiles for default scenarios. Here, we select the
 <cite>mpi</cite> base profile to build our own:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>profile<span class="w"> </span>create<span class="w"> </span>user.my-profile<span class="w"> </span>--base<span class="w"> </span>mpi
-$<span class="w"> </span>pcvs<span class="w"> </span>profile<span class="w"> </span>list
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>config<span class="w"> </span>create<span class="w"> </span>user:profile:default
+$<span class="w"> </span>pcvs<span class="w"> </span>config<span class="w"> </span>list
 </pre></div>
 </div>
-<p>By specifying <code class="docutils literal notranslate"><span class="pre">user.my-profile</span></code>, it will save the profile under <code class="docutils literal notranslate"><span class="pre">~/.pcvs/</span></code> and
+<p>By specifying <code class="docutils literal notranslate"><span class="pre">user:profile</span></code>, it will save the profile under <code class="docutils literal notranslate"><span class="pre">~/.pcvs/profile</span></code> and
 make it available for the whole <code class="docutils literal notranslate"><span class="pre">$USER</span></code>, no matter the current working
-directory used when running PCVS. To learn more about profile scope, please see <a class="reference internal" href="../ref/profile.html#profile-scope"><span class="std std-ref">Scope</span></a>.</p>
+directory used when running PCVS. To learn more about profile scope, please see <a class="reference internal" href="../ref/config.html#profile-scope"><span class="std std-ref">Profile</span></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>As this profile uses MPI, we need to source an MPI implementation in the
 environment. Please use the method suiting your needs (spack/module/source).
 If interested in autoloading spack-or-module-based MPI implementation,
-please read <a class="reference internal" href="../ref/profile.html"><span class="doc">Profiles</span></a>.</p>
+please read <a class="reference internal" href="../ref/config.html"><span class="doc">Configurations</span></a>.</p>
 </div>
 <p>Now, start PCVS. You must provide the profile &amp; the directory where tests are
 located:</p>
@@ -216,7 +217,7 @@ name ambiguity, PCVS will detect the proper scope.</p>
 </div>
 </section>
 <section id="access-the-results">
-<h2>Access the results<a class="headerlink" href="#access-the-results" title="Permalink to this heading"></a></h2>
+<h2>Access the results<a class="headerlink" href="#access-the-results" title="Link to this heading"></a></h2>
 <p>Results are stored in <code class="docutils literal notranslate"><span class="pre">$PWD/.pcvs-build/rawdata/*.json</span></code> by default. The
 default output directory may be changed with <cite>pcvs run –output</cite>. JSON files can
 directly process by third-party tools. The <a class="reference download internal" download="" href="../_downloads/adb2b1da40fcf36dbdc190080992a76d/test-result-scheme.yml"><code class="xref download docutils literal notranslate"><span class="pre">scheme</span></code></a> can be used to update the input
@@ -245,7 +246,7 @@ $<span class="w"> </span>pcvs<span class="w"> </span>report<span class="w"> </sp
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

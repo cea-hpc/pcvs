@@ -1,0 +1,18 @@
+pcvs.plugins.default package
+============================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pcvs.plugins.default.validation
+
+Module contents
+---------------
+
+.. automodule:: pcvs.plugins.default
+   :members:
+   :show-inheritance:
+   :undoc-members:

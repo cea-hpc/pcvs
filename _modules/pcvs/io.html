@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.io &mdash; PCVS 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../../_static/pcvs_favicon.ico"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">pcvs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pcvs.io</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pcvs.io</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich</span><span class="w"> </span><span class="kn">import</span> <span class="n">box</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.live</span><span class="w"> </span><span class="kn">import</span> <span class="n">Live</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">Panel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">BarColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">Progress</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpinnerColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskID</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeElapsedColumn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">track</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.style</span><span class="w"> </span><span class="kn">import</span> <span class="n">Style</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.table</span><span class="w"> </span><span class="kn">import</span> <span class="n">Column</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.table</span><span class="w"> </span><span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.theme</span><span class="w"> </span><span class="kn">import</span> <span class="n">Theme</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pcvs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pcvs.testing.teststate</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestState</span>
+
+
+<div class="viewcode-block" id="SpecialChar">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.SpecialChar">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpecialChar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class mapping special char display.</span>
+
+<span class="sd">    Enabled or disabled according to utf support.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">copy</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u00a9</span><span class="s2">&quot;</span>
+    <span class="n">item</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u27e2</span><span class="s2">&quot;</span>
+    <span class="n">sec</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u2756</span><span class="s2">&quot;</span>
+    <span class="n">hdr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u23bc</span><span class="s2">&quot;</span>
+    <span class="n">star</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u2605</span><span class="s2">&quot;</span>
+    <span class="n">fail</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u2718</span><span class="s2">&quot;</span>
+    <span class="n">succ</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u2714</span><span class="s2">&quot;</span>
+    <span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u2205</span><span class="s2">&quot;</span>
+    <span class="n">git</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u237f</span><span class="s2">&quot;</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\U0000231a</span><span class="s2">&quot;</span>
+    <span class="n">sep_v</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="se">\u237f</span><span class="s2"> &quot;</span>
+    <span class="n">sep_h</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\u23bc</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">utf_support</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a new char handler depending on utf support</span>
+
+<span class="sd">        :param utf_support: support for utf encoding, defaults to True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">utf_support</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">copy</span> <span class="o">=</span> <span class="s2">&quot;(c)&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">item</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sec</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdr</span> <span class="o">=</span> <span class="s2">&quot;=&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">star</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">succ</span> <span class="o">=</span> <span class="s2">&quot;V&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">none</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="s2">&quot;(git)&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="s2">&quot;(time)&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sep_v</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sep_h</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Verbosity">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.Verbosity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Verbosity</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum to map a verbosity level to a more</span>
+<span class="sd">    convenient label.</span>
+
+<span class="sd">    * COMPACT: compact way, jobs are displayed packed per input YAML file.</span>
+<span class="sd">    * DETAILED: each job will output result on a one-line manner.</span>
+<span class="sd">    * INFO: DETAILED &amp; INFO messages will be logged.</span>
+<span class="sd">    * LOG: DETAILED &amp; INFO &amp; LOG messages will be logged.</span>
+<span class="sd">    * DEBUG: DETAIL, INFO, LOG &amp; DEBUG messages, with more infos in stack traces.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COMPACT</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">DETAILED</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">INFO</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">LOG</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">NB_LEVELS</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert object to human-readable string</span>
+
+<span class="sd">        :return: a verbosity as printable string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+
+
+
+<div class="viewcode-block" id="PCVSConsole">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PCVSConsole</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main interface to print information to users.</span>
+
+<span class="sd">    Any output from the application should be handled by this Console.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a new Console:</span>
+<span class="sd">        - color: boolean (color support)</span>
+<span class="sd">        - verbose: boolean (verbose msg mode in log files)</span>
+<span class="sd">        Any other argument is considered a base class options.</span>
+
+<span class="sd">        :param color: should the console use color.</span>
+<span class="sd">        :param verbose: verbosity level of the console.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">:</span> <span class="n">Progress</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_singletask</span><span class="p">:</span> <span class="n">TaskID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_live</span><span class="p">:</span> <span class="n">Live</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="n">Verbosity</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">Verbosity</span><span class="o">.</span><span class="n">NB_LEVELS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="p">))</span>
+        <span class="c1"># self._debugfile = open(os.path.join(&quot;.&quot;, pcvs.NAME_DEBUG_FILE), &quot;w&quot;, encoding=&quot;utf-8&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">pcvs</span><span class="o">.</span><span class="n">NAME_DEBUG_FILE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_summary_data_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># https://rich.readthedocs.io/en/stable/appendix/colors.html#appendix-colors</span>
+        <span class="n">theme</span> <span class="o">=</span> <span class="n">Theme</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="n">Style</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">:</span> <span class="n">Style</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;info&quot;</span><span class="p">:</span> <span class="n">Style</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;bright_white&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="n">Style</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="s2">&quot;danger&quot;</span><span class="p">:</span> <span class="n">Style</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">color_system</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">color_system</span><span class="o">=</span><span class="n">color_system</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span> <span class="o">=</span> <span class="n">Console</span><span class="p">(</span><span class="n">color_system</span><span class="o">=</span><span class="n">color_system</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+        <span class="c1"># logging management for debug file:</span>
+        <span class="c1"># Create logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="p">:</span> <span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pcvs&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="c1"># Create formatter</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># File handler</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="c1"># TODO: replace rich logger with logging</span>
+        <span class="c1"># Console handler (optional)</span>
+        <span class="c1"># console_handler = logging.StreamHandler()</span>
+        <span class="c1"># console_handler.setLevel(logging.INFO)</span>
+        <span class="c1"># console_handler.setFormatter(formatter)</span>
+        <span class="c1"># Add handlers to logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+        <span class="c1"># logger.addHandler(console_handler)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chars</span> <span class="o">=</span> <span class="n">SpecialChar</span><span class="p">(</span><span class="n">utf_support</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;utf&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Activate when needed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sched_debug</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crit_debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># log file management</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the path to the logging file.</span>
+
+<span class="sd">        :return: the logging file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outfile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the path where the Console output is logged (disabled by default).</span>
+
+<span class="sd">        :return: the file path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PCVSConsole.setoutfile">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.setoutfile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setoutfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">IO</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">file</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.move_debug_file">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.move_debug_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_debug_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newdir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">newdir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debugfile_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">newdir</span><span class="p">,</span> <span class="n">pcvs</span><span class="o">.</span><span class="n">NAME_DEBUG_FILE</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No &#39;</span><span class="si">{}</span><span class="s2">&#39; file found for this Console&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pcvs</span><span class="o">.</span><span class="n">NAME_DEBUG_FILE</span><span class="p">))</span></div>
+
+
+    <span class="c1"># Verbosity</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the Verbosity level.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span>
+
+    <span class="nd">@verbosity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verbosity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Verbosity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set Verbosity level.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="c1"># Standard printers</span>
+
+<div class="viewcode-block" id="PCVSConsole.nodebug">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.nodebug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nodebug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Do nothing, place holder to remove debug print without deleting lines.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.debug">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print debug.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[debug]</span><span class="se">\\</span><span class="s2">[debug] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/debug]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.log">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.log">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print log.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">LOG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[debug]</span><span class="se">\\</span><span class="s2">[log] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/debug]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.info">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print info.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">INFO</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[info]</span><span class="se">\\</span><span class="s2">[info] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/info]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.warning">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.warning">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print warning.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[warning]</span><span class="se">\\</span><span class="s2">[warning] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/warning]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.warn">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.warn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Short for warning.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.error">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print an error messages.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[danger]</span><span class="se">\\</span><span class="s2">[error] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/danger]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.critical">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.critical">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a log critical error then exit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[danger]</span><span class="se">\\</span><span class="s2">[CRITICAL] </span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">[/danger]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.exception">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.exception">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print exceptions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print_exception</span><span class="p">(</span><span class="n">word_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_locals</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra_lines</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">LOG</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print_exception</span><span class="p">(</span><span class="n">extra_lines</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="s2">&quot;[warning]</span><span class="se">\\</span><span class="s2">[Exception] Stack trace hidden, to get a stack trace, &quot;</span>
+                <span class="s2">&quot;look at &#39;pcvs-debug-*.log&#39; or rerun pcvs with &#39;-vvv&#39; or &#39;-d&#39;.[/warning]&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stderr</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[danger]</span><span class="se">\\</span><span class="s2">[Exception] </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">[/danger]&quot;</span><span class="p">,</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.crit_debug">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.crit_debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">crit_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print &amp; log debug for pcvs criterions.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crit_debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[CRIT]</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.sched_debug">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.sched_debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sched_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print &amp; log debug for pcvs scheduler.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sched_debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[SCHED]</span><span class="si">{</span><span class="n">fmt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Logger</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get Logger.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span>
+
+    <span class="c1"># Other printers</span>
+
+<div class="viewcode-block" id="PCVSConsole.print">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a line to stdout.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[PRINT] </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_section">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_section">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print Section.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[yellow bold]</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">[/]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;sec&quot;</span><span class="p">),</span> <span class="n">txt</span><span class="p">),</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[DISPLAY] ======= </span><span class="si">%s</span><span class="s2"> ======&quot;</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_header">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_header">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print Header.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="s2">&quot;[green bold]</span><span class="si">{}</span><span class="s2">[/]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[DISPLAY] ------- </span><span class="si">%s</span><span class="s2"> ------&quot;</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_item">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_item">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print Item.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+            <span class="s2">&quot;[red bold]</span><span class="si">{}{}</span><span class="s2">[/] </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;item&quot;</span><span class="p">),</span> <span class="n">txt</span><span class="p">),</span> <span class="n">soft_wrap</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[DISPLAY] * </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">txt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_box">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_box">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">panel_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a Box.&quot;&quot;&quot;</span>
+        <span class="n">panel_box</span> <span class="o">=</span> <span class="n">Panel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">txt</span><span class="p">,</span> <span class="o">**</span><span class="n">panel_options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">panel_box</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[DISPLAY] BOX </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">panel_box</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_rich">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_rich">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_rich</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to_print</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print rich formatted object.&quot;&quot;&quot;</span>
+        <span class="c1"># logging to self._loghdl would be useless as we would just get python object ref.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">to_print</span><span class="p">)</span></div>
+
+
+    <span class="c1"># Others</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_display_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_jobs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the table to display for live update.</span>
+
+<span class="sd">        Include the progress bar, may include the job view table.</span>
+
+<span class="sd">        :param include_jobs: should the list of jobs be added to the progress table.</span>
+<span class="sd">        :return: Return the built table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_jobs</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_job_table</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Add spacing</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">()</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_job_table</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform the job data table into a job view table.&quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="n">box</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">TestState</span><span class="o">.</span><span class="n">all_states</span><span class="p">():</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">),</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">lvalue</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">job_summary_data_table</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">subtree</span><span class="p">,</span> <span class="n">svalue</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">lvalue</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">svalue</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="n">svalue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SUCCESS&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">colour</span> <span class="o">=</span> <span class="s2">&quot;green&quot;</span>
+                <span class="k">elif</span> <span class="n">svalue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAILURE&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">colour</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">colour</span> <span class="o">=</span> <span class="s2">&quot;yellow&quot;</span>
+                <span class="n">columns_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">colour</span><span class="si">}</span><span class="s2"> bold]</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">svalue</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">colour</span><span class="si">}</span><span class="s2"> bold]</span><span class="si">{</span><span class="n">label</span><span class="si">}{</span><span class="n">subtree</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">columns_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">table</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_insert_job_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">TestState</span><span class="p">,</span> <span class="n">test_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">test_subtree</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a job in the job data table.</span>
+
+<span class="sd">        This job table is display when running on low verbosity level</span>
+<span class="sd">        or at the end of the run.</span>
+
+<span class="sd">        :param state: The exit state of the test</span>
+<span class="sd">        :param test_label: The label of the test</span>
+<span class="sd">        :param test_subtree: The sub directory of the test</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_summary_data_table</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">test_label</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_summary_data_table</span><span class="p">[</span><span class="n">test_label</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+            <span class="n">test_subtree</span><span class="p">,</span>
+            <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">):</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">TestState</span><span class="o">.</span><span class="n">all_states</span><span class="p">()},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_summary_data_table</span><span class="p">[</span><span class="n">test_label</span><span class="p">][</span><span class="n">test_subtree</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">state</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="PCVSConsole.print_job">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_job">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_job</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">TestState</span><span class="p">,</span> <span class="n">tlabel</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tsubtree</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a Job.</span>
+
+<span class="sd">        If Verbosity level is equal or above Verbosity.DETAILED, print each tests.</span>
+<span class="sd">        Otherwise, print a summary block.</span>
+<span class="sd">        Optionally print raw test result content.</span>
+
+<span class="sd">        :param status: The status line indicating test information</span>
+<span class="sd">        :param state: The status of the printed test</span>
+<span class="sd">        :param tlabel: The label of the test.</span>
+<span class="sd">        :param tsubtree: Thr sub directory of the test</span>
+<span class="sd">        :param content: stdout/stderr of the test, if specify</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Update Job data table state.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_insert_job_table</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">tlabel</span><span class="p">,</span> <span class="n">tsubtree</span><span class="p">)</span>
+        <span class="c1"># Update progress bar state.</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_singletask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="o">.</span><span class="n">advance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_singletask</span><span class="p">)</span>
+        <span class="c1"># always log status to log file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loghdl</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">DETAILED</span><span class="p">:</span>
+            <span class="c1"># Print the test status line.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+                <span class="c1"># Print raw test output.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="c1"># Update the table/progressbar display.</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_live</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_live</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_display_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">&lt;=</span> <span class="n">Verbosity</span><span class="o">.</span><span class="n">COMPACT</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_job_summary">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_job_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_job_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print the job view table once.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_job_table</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.table_container">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.table_container">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">table_container</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Live</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The main pcvs run progress bar that may include job summary.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">Progress</span><span class="p">(</span>
+            <span class="n">TimeElapsedColumn</span><span class="p">(),</span>
+            <span class="s2">&quot;Progress&quot;</span><span class="p">,</span>
+            <span class="n">BarColumn</span><span class="p">(</span><span class="n">bar_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">complete_style</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="n">finished_style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">),</span>
+            <span class="n">TextColumn</span><span class="p">(</span><span class="s2">&quot;[progress.percentage]</span><span class="si">{task.percentage:&gt;3.1f}</span><span class="s2">%&quot;</span><span class="p">),</span>
+            <span class="n">SpinnerColumn</span><span class="p">(</span><span class="n">speed</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_singletask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="s2">&quot;Progress&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">total</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_live</span> <span class="o">=</span> <span class="n">Live</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_display_table</span><span class="p">(</span><span class="kc">False</span><span class="p">),</span> <span class="n">console</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_live</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.create_table">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.create_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Column</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Table</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and return a rich table.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Table</span><span class="p">(</span><span class="o">*</span><span class="n">cols</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.progress_iter">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.progress_iter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">progress_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">it</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print a progress bar using click.</span>
+
+<span class="sd">        :param it: iterable on which the progress bar has to iterate</span>
+<span class="sd">        :return: a click progress bar (iterable)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">track</span><span class="p">(</span>
+            <span class="n">it</span><span class="p">,</span>
+            <span class="n">transient</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">console</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="p">,</span>
+            <span class="n">complete_style</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span>
+            <span class="n">pulse_style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+            <span class="n">refresh_per_second</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;[red]In Progress...[red]&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.utf">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.utf">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">utf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the encoding supported by this session for the given key.</span>
+
+<span class="sd">        :param k: the key as defined by SpecialChar</span>
+<span class="sd">        :return: the associated printable sequence</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">char</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chars</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">char</span></div>
+
+
+<div class="viewcode-block" id="PCVSConsole.print_banner">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.PCVSConsole.print_banner">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_banner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the PCVS logo fitting with current terminal size</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logo_minimal</span> <span class="o">=</span> <span class="p">[</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green]{}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mi">19</span><span class="p">),</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[yellow]     -- PCVS --  &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red]{} CEA {} 2017-{} {}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green]{}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="mi">19</span><span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">logo_short</span> <span class="o">=</span> <span class="p">[</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]     ____    ______  _    __  _____&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]    / __ \  / ____/ | |  / / / ___/&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]   / /_/ / / /      | | / /  \__ \ &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[yellow ]  / ____/ / /___    | |/ /  ___/ / &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red    ] /_/      \____/    |___/  /____/  &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red    ]                                   &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default] Parallel Computing -- Validation System&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default] Copyright {} 2017-{} -- CEA&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+            <span class="p">),</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">logo</span> <span class="o">=</span> <span class="p">[</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]     ____                   ____     __   ______                            __  _             &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]    / __ \____ __________ _/ / /__  / /  / ____/___  ____ ___  ____  __  __/ /_(_)___  ____ _ &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]   / /_/ / __ `/ ___/ __ `/ / / _ \/ /  / /   / __ \/ __ `__ \/ __ \/ / / / __/ / __ \/ __ `/ &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]  / ____/ /_/ / /  / /_/ / / /  __/ /  / /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / / /_/ /  &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ] /_/    \__,_/_/   \__,_/_/_/\___/_/   \____/\____/_/ /_/ /_/ .___/\__,_/\__/_/_/ /_/\__, /   &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]                                                           /_/                     /____/     &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]                                            {} ([link=https://pcvs.io]PCVS[/link]) {}&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]    _    __      ___     __      __  _                _____            __                    &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]   | |  / /___ _/ (_)___/ /___ _/ /_(_)___  ____     / ___/__  _______/ /____  ____ ___      &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[green  ]   | | / / __ `/ / / __  / __ `/ __/ / __ \/ __ \    \__ \/ / / / ___/ __/ _ \/ __ `__ \     &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[yellow ]   | |/ / /_/ / / / /_/ / /_/ / /_/ / /_/ / / / /   ___/ / /_/ /__  / /_/  __/ / / / / /     &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red    ]   |___/\__,_/_/_/\__,_/\__,_/\__/_/\____/_/ /_/   /____/\__, /____/\__/\___/_/ /_/ /_/      &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red    ]                                                        /____/                               &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[red    ]                                                                                             &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]  Copyright {} 2017-{} Commissariat à l&#39;Énergie Atomique et aux Énergies Alternatives ([link=https://cea.fr]CEA[/link])&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">utf</span><span class="p">(</span><span class="s2">&quot;copy&quot;</span><span class="p">),</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+            <span class="p">),</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]                                                                                             &quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]  This program comes with ABSOLUTELY NO WARRANTY;&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]  This is free software, and you are welcome to redistribute it&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]  under certain conditions; Please see COPYING for details.&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;[default]                                                                                             &quot;&quot;&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">banner</span> <span class="o">=</span> <span class="n">logo</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">banner</span> <span class="o">=</span> <span class="n">logo_minimal</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;</span> <span class="mi">95</span><span class="p">:</span>
+            <span class="n">banner</span> <span class="o">=</span> <span class="n">logo_short</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">banner</span><span class="p">))</span>
+        <span class="n">pcvs_version</span> <span class="o">=</span> <span class="n">version</span><span class="p">(</span><span class="s2">&quot;pcvs&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stdout</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parallel Computing Validation System (pcvs) -- version </span><span class="si">{</span><span class="n">pcvs_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">console</span><span class="p">:</span> <span class="n">PCVSConsole</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore  # pylint: disable=invalid-name</span>
+
+
+<div class="viewcode-block" id="init">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.init">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="n">color</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Init the PCVS Console.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">console</span>
+    <span class="n">console</span> <span class="o">=</span> <span class="n">PCVSConsole</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="detach_console">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.detach_console">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">detach_console</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detach the PCVS Console.&quot;&quot;&quot;</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">console</span><span class="o">.</span><span class="n">logfile</span><span class="p">),</span> <span class="n">pcvs</span><span class="o">.</span><span class="n">NAME_LOG_FILE</span><span class="p">)</span>
+    <span class="n">console</span><span class="o">.</span><span class="n">setoutfile</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">logfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="capture_exception">
+<a class="viewcode-back" href="../../api/pcvs.io.html#pcvs.io.capture_exception">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">capture_exception</span><span class="p">(</span>
+    <span class="n">e_type</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">user_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="ne">Exception</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">doexit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wraps functions to capture unhandled exceptions for high-level function not to crash.</span>
+
+<span class="sd">    :param e_type: errors to be caught</span>
+<span class="sd">    :param user_func: Optional, a function to call to manage the exception</span>
+<span class="sd">    :param doexit: Optional, should pcvs exit after printing the error</span>
+<span class="sd">    :return: function handler to manage exception</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="o">...</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="o">...</span><span class="p">],</span> <span class="n">Any</span><span class="p">]:</span>  <span class="c1"># type: ignore</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;wrapper for inner function using try/except to avoid crashing</span>
+
+<span class="sd">        :param func: function to wrap</span>
+<span class="sd">        :return: wrapper</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;functools wrapping function</span>
+
+<span class="sd">            :param args: arguments forwarded to wrapped func</span>
+<span class="sd">            :param kwargs: arguments forwarded  to wrapped func</span>
+<span class="sd">            :return: result of wrapped function</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">e_type</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">user_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">console</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">doexit</span><span class="p">:</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">user_func</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">inner_function</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

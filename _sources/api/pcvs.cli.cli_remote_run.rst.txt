@@ -1,0 +1,7 @@
+pcvs.cli.cli\_remote\_run module
+================================
+
+.. automodule:: pcvs.cli.cli_remote_run
+   :members:
+   :show-inheritance:
+   :undoc-members:

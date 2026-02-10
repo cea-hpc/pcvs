@@ -107,10 +107,10 @@ comes with default profiles for default scenarios. Here, we select the
 
 .. code-block:: bash
 
-	$ pcvs profile create user.my-profile --base mpi
-	$ pcvs profile list
+    $ pcvs config create user:profile:default
+    $ pcvs config list
 
-By specifying ``user.my-profile``, it will save the profile under ``~/.pcvs/`` and
+By specifying ``user:profile``, it will save the profile under ``~/.pcvs/profile`` and
 make it available for the whole ``$USER``, no matter the current working
 directory used when running PCVS. To learn more about profile scope, please see :ref:`profile-scope`.
 
@@ -118,7 +118,7 @@ directory used when running PCVS. To learn more about profile scope, please see 
 	As this profile uses MPI, we need to source an MPI implementation in the
 	environment. Please use the method suiting your needs (spack/module/source).
 	If interested in autoloading spack-or-module-based MPI implementation,
-	please read :doc:`/ref/profile`.
+	please read :doc:`/ref/config`.
 
 Now, start PCVS. You must provide the profile & the directory where tests are
 located:

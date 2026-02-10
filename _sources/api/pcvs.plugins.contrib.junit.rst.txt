@@ -1,0 +1,7 @@
+pcvs.plugins.contrib.junit module
+=================================
+
+.. automodule:: pcvs.plugins.contrib.junit
+   :members:
+   :show-inheritance:
+   :undoc-members:

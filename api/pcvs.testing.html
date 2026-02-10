@@ -1,27 +1,27 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.testing package &mdash; PCVS 0.8.0 documentation</title>
+  <title>pcvs.testing package &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=6a14807c"></script>
-      <script src="../_static/doctools.js?v=888ff710"></script>
-      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pcvs.testing.tedesc module" href="pcvs.testing.tedesc.html" />
-    <link rel="prev" title="pcvs.cli.cli_utilities module" href="pcvs.cli.cli_utilities.html" /> 
+    <link rel="prev" title="pcvs.plugins.default.validation module" href="pcvs.plugins.default.validation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,8 +32,9 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
-            PCVS
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -55,8 +56,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
@@ -64,23 +65,26 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="pcvs.html">Package Documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pcvs.testing package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pcvs.testing">Module contents</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="pcvs.analysis.html">pcvs.analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.backend.html">pcvs.backend package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.cli.html">pcvs.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.dsl.html">pcvs.dsl package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.plugins.html">pcvs.plugins package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pcvs.testing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.ui.html">pcvs.ui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.converter.html">pcvs.converter package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.helpers.html">pcvs.helpers package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.orchestration.html">pcvs.orchestration package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pcvs.webview.html">pcvs.webview package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -99,7 +103,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="pcvs.html">Package Documentation</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
       <li class="breadcrumb-item active">pcvs.testing package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/pcvs.testing.rst.txt" rel="nofollow"> View page source</a>
@@ -111,51 +116,37 @@
            <div itemprop="articleBody">
              
   <section id="pcvs-testing-package">
-<h1>pcvs.testing package<a class="headerlink" href="#pcvs-testing-package" title="Permalink to this heading"></a></h1>
+<h1>pcvs.testing package<a class="headerlink" href="#pcvs-testing-package" title="Link to this heading"></a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.testing.tedesc.html">pcvs.testing.tedesc module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.testing.test.html">pcvs.testing.test module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pcvs.testing.testfile.html">pcvs.testing.testfile module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcvs.testing.teststate.html">pcvs.testing.teststate module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState"><code class="docutils literal notranslate"><span class="pre">TestState</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.ERR_DEP"><code class="docutils literal notranslate"><span class="pre">TestState.ERR_DEP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.ERR_OTHER"><code class="docutils literal notranslate"><span class="pre">TestState.ERR_OTHER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.EXECUTED"><code class="docutils literal notranslate"><span class="pre">TestState.EXECUTED</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.FAILURE"><code class="docutils literal notranslate"><span class="pre">TestState.FAILURE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.HARD_TIMEOUT"><code class="docutils literal notranslate"><span class="pre">TestState.HARD_TIMEOUT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.IN_PROGRESS"><code class="docutils literal notranslate"><span class="pre">TestState.IN_PROGRESS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.SOFT_TIMEOUT"><code class="docutils literal notranslate"><span class="pre">TestState.SOFT_TIMEOUT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.SUCCESS"><code class="docutils literal notranslate"><span class="pre">TestState.SUCCESS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.WAITING"><code class="docutils literal notranslate"><span class="pre">TestState.WAITING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.all_states"><code class="docutils literal notranslate"><span class="pre">TestState.all_states()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.bad_states"><code class="docutils literal notranslate"><span class="pre">TestState.bad_states()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.from_str"><code class="docutils literal notranslate"><span class="pre">TestState.from_str()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
 <section id="module-pcvs.testing">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pcvs.testing" title="Permalink to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pcvs.testing.generate_local_variables">
-<span class="sig-prename descclassname"><span class="pre">pcvs.testing.</span></span><span class="sig-name descname"><span class="pre">generate_local_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subprefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/testing.html#generate_local_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.testing.generate_local_variables" title="Permalink to this definition"></a></dt>
-<dd><p>Return directories from PCVS working tree :</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>the base source directory</p></li>
-<li><p>the current source directory</p></li>
-<li><p>the base build directory</p></li>
-<li><p>the current build directory</p></li>
-</ul>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> (<em>str</em>) – name of the object used to generate paths</p></li>
-<li><p><strong>subprefix</strong> (<em>str</em>) – path to the subdirectories in the base path</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotFoundError" title="pcvs.helpers.exceptions.CommonException.NotFoundError"><strong>CommonException.NotFoundError</strong></a> – the label is not recognized as to be
-validated</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>paths for PCVS working tree</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>tuple</p>
-</dd>
-</dl>
-</dd></dl>
-
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pcvs.testing" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -163,14 +154,14 @@ validated</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pcvs.cli.cli_utilities.html" class="btn btn-neutral float-left" title="pcvs.cli.cli_utilities module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.plugins.default.validation.html" class="btn btn-neutral float-left" title="pcvs.plugins.default.validation module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pcvs.testing.tedesc.html" class="btn btn-neutral float-right" title="pcvs.testing.tedesc module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

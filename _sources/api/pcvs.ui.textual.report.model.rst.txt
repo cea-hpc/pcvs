@@ -1,0 +1,7 @@
+pcvs.ui.textual.report.model module
+===================================
+
+.. automodule:: pcvs.ui.textual.report.model
+   :members:
+   :show-inheritance:
+   :undoc-members:

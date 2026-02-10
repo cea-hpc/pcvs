@@ -10,11 +10,12 @@ Submodules
    pcvs.testing.tedesc
    pcvs.testing.test
    pcvs.testing.testfile
+   pcvs.testing.teststate
 
 Module contents
 ---------------
 
 .. automodule:: pcvs.testing
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

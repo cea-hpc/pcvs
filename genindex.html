@@ -1,21 +1,21 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; PCVS 0.8.0 documentation</title>
+  <title>Index &mdash; PCVS 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="_static/pcvs_favicon.ico"/>
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=6a14807c"></script>
-      <script src="_static/doctools.js?v=888ff710"></script>
-      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -29,8 +29,9 @@
 
           
           
-          <a href="index.html" class="icon icon-home">
-            PCVS
+          <a href="index.html">
+            
+              <img src="_static/pcvs_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -52,8 +53,8 @@
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ref/test-file.html">Validation setup</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configuration basic blocks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ref/profile.html">Profiles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/session.html">Sessions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/utils.html">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/examples.html">Input Examples</a></li>
@@ -61,7 +62,7 @@
 <p class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dev/contribution.html">Contribution Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api/pcvs.html">Package Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">pcvs</a></li>
 </ul>
 
         </div>
@@ -100,6 +101,7 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -112,20 +114,31 @@
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
  
 </div>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.add_dbg">add_dbg() (pcvs.helpers.exceptions.GenericException method)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.activate_plugin">activate_plugin() (pcvs.plugins.Collection method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Tree.as_root">as_root() (pcvs.helpers.git.Tree class method)</a>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException.add_dbg">add_dbg() (pcvs.helpers.exceptions.PCVSException method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.all_kinds">all_kinds() (pcvs.helpers.storage.ConfigKind class method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.all_scopes">all_scopes() (pcvs.helpers.storage.ConfigScope class method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.ValidationScheme.avail_list">avail_list (pcvs.helpers.system.ValidationScheme attribute)</a>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.all_states">all_states() (pcvs.testing.teststate.TestState class method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.ValidationScheme.available_schemes">available_schemes() (pcvs.helpers.system.ValidationScheme class method)</a>
+      <li><a href="api/pcvs.helpers.resource_tracker.html#pcvs.helpers.resource_tracker.ResourceTracker.alloc">alloc() (pcvs.helpers.resource_tracker.ResourceTracker method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.resource_tracker.html#pcvs.helpers.resource_tracker.ResourceTracker.alloc_tracking_counter">alloc_tracking_counter (pcvs.helpers.resource_tracker.ResourceTracker attribute)</a>
+</li>
+      <li><a href="api/pcvs.helpers.validation.html#pcvs.helpers.validation.ValidationScheme.avail_list">avail_list (pcvs.helpers.validation.ValidationScheme attribute)</a>
+</li>
+      <li><a href="api/pcvs.helpers.validation.html#pcvs.helpers.validation.ValidationScheme.available_schemes">available_schemes() (pcvs.helpers.validation.ValidationScheme class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -133,56 +146,26 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.bad_states">bad_states() (pcvs.testing.teststate.TestState class method)</a>
+</li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException">BankException</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.NotFoundError">BankException.NotFoundError</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.BankException.ProjectNameError">BankException.ProjectNameError</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Blob">Blob (class in pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_compiler">bootstrap_compiler() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_criterion">bootstrap_criterion() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_from_profile">bootstrap_from_profile() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_generic">bootstrap_generic() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_group">bootstrap_group() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_machine">bootstrap_machine() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_runtime">bootstrap_runtime() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_validation">bootstrap_validation() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.bootstrap_validation_from_file">bootstrap_validation_from_file() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Branch">Branch (class in pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.branches">branches() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.branches">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.branches">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.check">check() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.check">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.capture_exception">capture_exception() (in module pcvs.io)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.check_filename_ext">check_filename_ext() (pcvs.helpers.storage.ConfigLocator method)</a>
+</li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.check_if_key_matches">check_if_key_matches() (in module pcvs.converter.yaml_converter)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_is_archive">check_is_archive() (in module pcvs.helpers.utils)</a>
@@ -191,48 +174,18 @@
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_is_buildir">check_is_buildir() (in module pcvs.helpers.utils)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.check_valid_kind">check_valid_kind() (in module pcvs.backend.config)</a>
-</li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_valid_program">check_valid_program() (in module pcvs.helpers.utils)</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.check_valid_scope">check_valid_scope() (in module pcvs.helpers.utils)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection">Collection (class in pcvs.plugins)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.clone">clone() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.clone">(pcvs.backend.profile.Profile method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.close">close() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.close">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.close">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Commit">Commit (class in pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.commit">commit() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.commit">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.commit">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException">CommonException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.AlreadyExistError">CommonException.AlreadyExistError</a>
-</li>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.BadTokenError">CommonException.BadTokenError</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.IOError">CommonException.IOError</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotFoundError">CommonException.NotFoundError</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotImplementedError">CommonException.NotImplementedError</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.NotPCVSRelated">CommonException.NotPCVSRelated</a>
@@ -243,35 +196,47 @@
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.CommonException.WIPError">CommonException.WIPError</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.compiler">compiler (pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.COMPACT">COMPACT (pcvs.io.Verbosity attribute)</a>
 </li>
-      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.compl_list_templates">compl_list_templates() (in module pcvs.cli.cli_config)</a>
-
-      <ul>
-        <li><a href="api/pcvs.cli.cli_profile.html#pcvs.cli.cli_profile.compl_list_templates">(in module pcvs.cli.cli_profile)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.compiler">compiler (pcvs.backend.configfile.Profile property)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.compl_list_token">compl_list_token() (in module pcvs.cli.cli_config)</a>
-
-      <ul>
-        <li><a href="api/pcvs.cli.cli_profile.html#pcvs.cli.cli_profile.compl_list_token">(in module pcvs.cli.cli_profile)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.COMPILER">COMPILER (pcvs.helpers.storage.ConfigKind attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.compl_list_configs">compl_list_configs() (in module pcvs.cli.cli_config)</a>
+</li>
+      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.compl_list_scope_kind">compl_list_scope_kind() (in module pcvs.cli.cli_config)</a>
+</li>
+      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.compl_list_user_configs">compl_list_user_configs() (in module pcvs.cli.cli_config)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.compl_session_token">compl_session_token() (in module pcvs.cli.cli_session)</a>
 </li>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.COMPLETED">COMPLETED (pcvs.backend.session.Session.State attribute)</a>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.COMPLETED">COMPLETED (pcvs.backend.session.SessionState attribute)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.compute_new_key">compute_new_key() (in module pcvs.converter.yaml_converter)</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config">Config (class in pcvs.helpers.system)</a>
+      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.Config">Config (class in pcvs.backend.config)</a>
 </li>
-      <li><a href="api/pcvs.cli.cli_config.html#pcvs.cli.cli_config.config_list_single_kind">config_list_single_kind() (in module pcvs.cli.cli_config)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.config">config (pcvs.backend.configfile.YmlConfigFile property)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc">ConfigDesc (class in pcvs.helpers.storage)</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ConfigException">ConfigException</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock">ConfigurationBlock (class in pcvs.backend.config)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile">ConfigFile (class in pcvs.backend.configfile)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind">ConfigKind (class in pcvs.helpers.storage)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator">ConfigLocator (class in pcvs.helpers.storage)</a>
+</li>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.CONFIGS_KINDS">CONFIGS_KINDS (pcvs.backend.configfile.Profile attribute)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope">ConfigScope (class in pcvs.helpers.storage)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.convert">convert() (in module pcvs.converter.yaml_converter)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.copy">copy (pcvs.io.SpecialChar attribute)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.copy_file">copy_file() (in module pcvs.helpers.utils)</a>
 </li>
@@ -279,7 +244,15 @@
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.create_or_clean_path">create_or_clean_path() (in module pcvs.helpers.utils)</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.criterion">criterion (pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.create_table">create_table() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.crit_debug">crit_debug() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.criterion">criterion (pcvs.backend.configfile.Profile property)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.CRITERION">CRITERION (pcvs.helpers.storage.ConfigKind attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.critical">critical() (pcvs.io.PCVSConsole method)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.cwd">cwd() (in module pcvs.helpers.utils)</a>
 </li>
@@ -289,45 +262,23 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.dbg">dbg (pcvs.helpers.exceptions.GenericException property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.DEBUG">DEBUG (pcvs.io.Verbosity attribute)</a>
 </li>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.dbg_str">dbg_str (pcvs.helpers.exceptions.GenericException property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.debug">debug() (pcvs.io.PCVSConsole method)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.delete">delete() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.delete">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.delete">delete() (pcvs.backend.configfile.ConfigFile method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.details">details (pcvs.backend.config.ConfigurationBlock property)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.details">(pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.descriptor">descriptor (pcvs.backend.configfile.ConfigFile property)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.diff_tree">diff_tree() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.diff_tree">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.diff_tree">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.display">display() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.display">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.detach_console">detach_console() (in module pcvs.io)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.dump">dump() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.dump">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.DETAILED">DETAILED (pcvs.io.Verbosity attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.dump_for_export">dump_for_export() (pcvs.helpers.system.MetaConfig method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.display">display() (pcvs.backend.configfile.ConfigFile method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.resource_tracker.html#pcvs.helpers.resource_tracker.ResourceTracker.do_alloc">do_alloc() (pcvs.helpers.resource_tracker.ResourceTracker method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -335,29 +286,35 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit">edit() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.edit">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.edit">edit() (pcvs.backend.configfile.ConfigFile method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.edit_plugin">edit_plugin() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.edit_plugin">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.END_AFTER">END_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.END_BEFORE">END_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.ERR_DEP">ERR_DEP (pcvs.testing.teststate.TestState attribute)</a>
+</li>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.ERR_OTHER">ERR_OTHER (pcvs.testing.teststate.TestState attribute)</a>
+</li>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.ERROR">ERROR (pcvs.backend.session.SessionState attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.elect_handler">elect_handler() (in module pcvs.helpers.git)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.error">error() (pcvs.io.PCVSConsole method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.err">err (pcvs.helpers.exceptions.GenericException property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.exception">exception() (pcvs.io.PCVSConsole method)</a>
 </li>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.ERROR">ERROR (pcvs.backend.session.Session.State attribute)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.EXEC_PATH">EXEC_PATH (pcvs.helpers.storage.ConfigLocator attribute)</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program.exception">exception (pcvs.helpers.utils.Program property)</a>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.EXECUTED">EXECUTED (pcvs.testing.teststate.TestState attribute)</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.extract_infos_from_token">extract_infos_from_token() (in module pcvs.helpers.utils)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.exist">exist (pcvs.backend.configfile.ConfigFile property)</a>
+
+      <ul>
+        <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.exist">(pcvs.helpers.storage.ConfigDesc property)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.exist_plugin">exist_plugin() (pcvs.plugins.Collection method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -365,34 +322,42 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.fill">fill() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.fill">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.fail">fail (pcvs.io.SpecialChar attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.FAILURE">FAILURE (pcvs.testing.teststate.TestState attribute)</a>
+</li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.find_buildir_from_prefix">find_buildir_from_prefix() (in module pcvs.helpers.utils)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.find_config">find_config() (pcvs.helpers.storage.ConfigLocator method)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.flatten">flatten() (in module pcvs.converter.yaml_converter)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.flush_to_disk">flush_to_disk() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.flush_to_disk">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.flush_to_disk">flush_to_disk() (pcvs.backend.configfile.ConfigFile method)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.helpers.resource_tracker.html#pcvs.helpers.resource_tracker.ResourceTracker.free">free() (pcvs.helpers.resource_tracker.ResourceTracker method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.from_dict">from_dict() (pcvs.helpers.system.Config method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.from_dict">from_dict() (pcvs.backend.configfile.YmlConfigFile method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.from_file">from_file() (pcvs.helpers.system.Config method)</a>
-</li>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.from_yaml">from_yaml() (pcvs.backend.session.Session.State class method)</a>
-</li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.full_name">full_name (pcvs.backend.config.ConfigurationBlock property)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.from_str">from_str() (pcvs.backend.configfile.ConfigFile method)</a>
 
       <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.full_name">(pcvs.backend.profile.Profile property)</a>
+        <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.from_str">(pcvs.testing.teststate.TestState class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.from_yaml">from_yaml() (pcvs.backend.session.SessionState class method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.fromstr">fromstr() (pcvs.helpers.storage.ConfigKind class method)</a>
+
+      <ul>
+        <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.fromstr">(pcvs.helpers.storage.ConfigScope class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.full_name">full_name (pcvs.backend.configfile.ConfigFile property)</a>
+
+      <ul>
+        <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.full_name">(pcvs.helpers.storage.ConfigDesc property)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -401,20 +366,6 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.gc">gc() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.gc">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.gc">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.generate_data_hash">generate_data_hash() (in module pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.testing.html#pcvs.testing.generate_local_variables">generate_local_variables() (in module pcvs.testing)</a>
-</li>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException">GenericException</a>
-</li>
       <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.ModuleManager.get">get() (pcvs.helpers.pm.ModuleManager method)</a>
 
       <ul>
@@ -423,59 +374,31 @@
         <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.SpackManager.get">(pcvs.helpers.pm.SpackManager method)</a>
 </li>
       </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.get_branch_from_str">get_branch_from_str() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.get_branch_from_str">(pcvs.helpers.git.GitByCLI method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.get_conf">get_conf() (in module pcvs.backend.configfile)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.get_current_usermail">get_current_usermail() (in module pcvs.helpers.git)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.get_file_ext">get_file_ext() (pcvs.helpers.storage.ConfigKind class method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.get_current_username">get_current_username() (in module pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.get_head">get_head() (pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Commit.get_info">get_info() (pcvs.helpers.git.Commit method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.get_internal">get_internal() (pcvs.helpers.system.MetaConfig method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.get_lock_owner">get_lock_owner() (in module pcvs.helpers.utils)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.get_lockfile_name">get_lockfile_name() (in module pcvs.helpers.utils)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.get_parents">get_parents() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.get_parents">(pcvs.helpers.git.GitByCLI method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.get_storage_dir">get_storage_dir() (pcvs.helpers.storage.ConfigLocator method)</a>
 </li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.get_parents">(pcvs.helpers.git.GitByGeneric method)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.get_storage_path">get_storage_path() (pcvs.helpers.storage.ConfigLocator method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.get_tree">get_tree() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.get_tree">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.get_tree">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.get_unique_id">get_unique_id() (pcvs.backend.profile.Profile method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI">GitByAPI (class in pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI">GitByCLI (class in pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric">GitByGeneric (class in pcvs.helpers.git)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.git">git (pcvs.io.SpecialChar attribute)</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException">GitException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GitException.BadEntryError">GitException.BadEntryError</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.GlobalConfig">GlobalConfig (class in pcvs.helpers.system)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.GLOBAL">GLOBAL (pcvs.helpers.storage.ConfigScope attribute)</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.group">group (pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.group">group (pcvs.backend.configfile.Profile property)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.GROUP">GROUP (pcvs.helpers.storage.ConfigKind attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -483,7 +406,13 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.GenericException.help">help (pcvs.helpers.exceptions.GenericException property)</a>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.HARD_TIMEOUT">HARD_TIMEOUT (pcvs.testing.teststate.TestState attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.has_enabled_step">has_enabled_step() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.hdr">hdr (pcvs.io.SpecialChar attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -495,59 +424,53 @@
 </li>
       <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.identify">identify() (in module pcvs.helpers.pm)</a>
 </li>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.IN_PROGRESS">IN_PROGRESS (pcvs.backend.session.Session.State attribute)</a>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.IN_PROGRESS">IN_PROGRESS (pcvs.backend.session.SessionState attribute)</a>
+
+      <ul>
+        <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.IN_PROGRESS">(pcvs.testing.teststate.TestState attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.INFO">INFO (pcvs.io.Verbosity attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.info">info() (pcvs.io.PCVSConsole method)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.infos">infos (pcvs.backend.session.Session property)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.init">init() (in module pcvs.backend.config)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.init">(in module pcvs.backend.profile)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.insert_tree">insert_tree() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.insert_tree">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.insert_tree">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager.install">install() (pcvs.helpers.pm.PManager method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.init">init() (in module pcvs.io)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.is_found">is_found() (pcvs.backend.config.ConfigurationBlock method)</a>
+      <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.ModuleManager.install">install() (pcvs.helpers.pm.ModuleManager method)</a>
 
       <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.is_found">(pcvs.backend.profile.Profile method)</a>
+        <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager.install">(pcvs.helpers.pm.PManager method)</a>
+</li>
+        <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.SpackManager.install">(pcvs.helpers.pm.SpackManager method)</a>
 </li>
       </ul></li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.INVALID">INVALID (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.invoke_plugins">invoke_plugins() (pcvs.plugins.Collection method)</a>
+</li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.is_locked">is_locked() (in module pcvs.helpers.utils)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.is_open">is_open() (pcvs.helpers.git.GitByAPI method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.item">item (pcvs.io.SpecialChar attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
 
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.is_open">(pcvs.helpers.git.GitByCLI method)</a>
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.plugins.contrib.junit.html#pcvs.plugins.contrib.junit.JUnit">JUnit (class in pcvs.plugins.contrib.junit)</a>
 </li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.is_open">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.iterate_over">iterate_over() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.iterate_over">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.iterate_over">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.kind">kind (pcvs.backend.config.ConfigurationBlock property)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.kind">kind (pcvs.helpers.storage.ConfigDesc property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -557,52 +480,24 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.list_alive_sessions">list_alive_sessions() (in module pcvs.backend.session)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.list_blocks">list_blocks() (in module pcvs.backend.config)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.list_all_configs">list_all_configs() (pcvs.helpers.storage.ConfigLocator method)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.list_commits">list_commits() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.list_commits">(pcvs.helpers.git.GitByCLI method)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.list_configs">list_configs() (pcvs.helpers.storage.ConfigLocator method)</a>
 </li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.list_commits">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.list_files">list_files() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.list_files">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.list_files">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.list_profiles">list_profiles() (in module pcvs.backend.profile)</a>
-</li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.list_templates">list_templates() (in module pcvs.backend.config)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.list_templates">(in module pcvs.backend.profile)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.list_valid_archive_in_dir">list_valid_archive_in_dir() (in module pcvs.helpers.utils)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.list_valid_buildirs_in_dir">list_valid_buildirs_in_dir() (in module pcvs.helpers.utils)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.load_from">load_from() (pcvs.backend.session.Session method)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_from_disk">load_from_disk() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.load_from_disk">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.load_from_disk">load_from_disk() (pcvs.backend.configfile.ConfigFile method)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.load_template">load_template() (pcvs.backend.config.ConfigurationBlock method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.load_template">(pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.loaded">loaded (pcvs.backend.configfile.ConfigFile property)</a>
 </li>
-      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.LOCAL">LOCAL (pcvs.helpers.storage.ConfigScope attribute)</a>
+</li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.lock_file">lock_file() (in module pcvs.helpers.utils)</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException">LockException</a>
@@ -611,17 +506,25 @@
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.LockException.TimeoutError">LockException.TimeoutError</a>
 </li>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.LOG">LOG (pcvs.io.Verbosity attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.log">log() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.logfile">logfile (pcvs.io.PCVSConsole property)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.logger">logger (pcvs.io.PCVSConsole property)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.machine">machine (pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.machine">machine (pcvs.backend.configfile.Profile property)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.MACHINE">MACHINE (pcvs.helpers.storage.ConfigKind attribute)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.main_detached_session">main_detached_session() (in module pcvs.backend.session)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig">MetaConfig (class in pcvs.helpers.system)</a>
 </li>
       <li>
     module
@@ -633,7 +536,7 @@
 </li>
         <li><a href="api/pcvs.backend.config.html#module-pcvs.backend.config">pcvs.backend.config</a>
 </li>
-        <li><a href="api/pcvs.backend.profile.html#module-pcvs.backend.profile">pcvs.backend.profile</a>
+        <li><a href="api/pcvs.backend.configfile.html#module-pcvs.backend.configfile">pcvs.backend.configfile</a>
 </li>
         <li><a href="api/pcvs.backend.session.html#module-pcvs.backend.session">pcvs.backend.session</a>
 </li>
@@ -641,7 +544,7 @@
 </li>
         <li><a href="api/pcvs.cli.cli_config.html#module-pcvs.cli.cli_config">pcvs.cli.cli_config</a>
 </li>
-        <li><a href="api/pcvs.cli.cli_profile.html#module-pcvs.cli.cli_profile">pcvs.cli.cli_profile</a>
+        <li><a href="api/pcvs.cli.cli_convert.html#module-pcvs.cli.cli_convert">pcvs.cli.cli_convert</a>
 </li>
         <li><a href="api/pcvs.cli.cli_session.html#module-pcvs.cli.cli_session">pcvs.cli.cli_session</a>
 </li>
@@ -653,20 +556,40 @@
 </li>
         <li><a href="api/pcvs.helpers.exceptions.html#module-pcvs.helpers.exceptions">pcvs.helpers.exceptions</a>
 </li>
-        <li><a href="api/pcvs.helpers.git.html#module-pcvs.helpers.git">pcvs.helpers.git</a>
-</li>
         <li><a href="api/pcvs.helpers.pm.html#module-pcvs.helpers.pm">pcvs.helpers.pm</a>
 </li>
-        <li><a href="api/pcvs.helpers.system.html#module-pcvs.helpers.system">pcvs.helpers.system</a>
+        <li><a href="api/pcvs.helpers.resource_tracker.html#module-pcvs.helpers.resource_tracker">pcvs.helpers.resource_tracker</a>
+</li>
+        <li><a href="api/pcvs.helpers.storage.html#module-pcvs.helpers.storage">pcvs.helpers.storage</a>
 </li>
         <li><a href="api/pcvs.helpers.utils.html#module-pcvs.helpers.utils">pcvs.helpers.utils</a>
 </li>
+        <li><a href="api/pcvs.helpers.validation.html#module-pcvs.helpers.validation">pcvs.helpers.validation</a>
+</li>
+        <li><a href="api/pcvs.io.html#module-pcvs.io">pcvs.io</a>
+</li>
+        <li><a href="api/pcvs.plugins.html#module-pcvs.plugins">pcvs.plugins</a>
+</li>
+        <li><a href="api/pcvs.plugins.contrib.html#module-pcvs.plugins.contrib">pcvs.plugins.contrib</a>
+</li>
+        <li><a href="api/pcvs.plugins.contrib.junit.html#module-pcvs.plugins.contrib.junit">pcvs.plugins.contrib.junit</a>
+</li>
+        <li><a href="api/pcvs.plugins.default.html#module-pcvs.plugins.default">pcvs.plugins.default</a>
+</li>
         <li><a href="api/pcvs.testing.html#module-pcvs.testing">pcvs.testing</a>
+</li>
+        <li><a href="api/pcvs.testing.teststate.html#module-pcvs.testing.teststate">pcvs.testing.teststate</a>
+</li>
+        <li><a href="api/pcvs.ui.html#module-pcvs.ui">pcvs.ui</a>
+</li>
+        <li><a href="api/pcvs.ui.textual.html#module-pcvs.ui.textual">pcvs.ui.textual</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.ModuleManager">ModuleManager (class in pcvs.helpers.pm)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.move_debug_file">move_debug_file() (pcvs.io.PCVSConsole method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -674,39 +597,33 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Branch.name">name (pcvs.helpers.git.Branch property)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.name">name (pcvs.helpers.storage.ConfigDesc property)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity.NB_LEVELS">NB_LEVELS (pcvs.io.Verbosity attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.new_branch">new_branch() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.new_branch">(pcvs.helpers.git.GitByCLI method)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.nb_plugins_for">nb_plugins_for() (pcvs.plugins.Collection method)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.nodebug">nodebug() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.none">none (pcvs.io.SpecialChar attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.open">open() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.open">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.open">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException">OrchestratorException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.CircularDependencyError">OrchestratorException.CircularDependencyError</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.OrchestratorException.UndefDependencyError">OrchestratorException.UndefDependencyError</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program.out">out (pcvs.helpers.utils.Program property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.outfile">outfile (pcvs.io.PCVSConsole property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -714,6 +631,16 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_full">parse_full() (pcvs.helpers.storage.ConfigLocator method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_full_raise">parse_full_raise() (pcvs.helpers.storage.ConfigLocator method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_scope_and_kind">parse_scope_and_kind() (pcvs.helpers.storage.ConfigLocator method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigLocator.parse_scope_and_kind_raise">parse_scope_and_kind_raise() (pcvs.helpers.storage.ConfigLocator method)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.path">path (pcvs.helpers.storage.ConfigDesc property)</a>
+</li>
       <li>
     pcvs
 
@@ -736,10 +663,10 @@
 </li>
       </ul></li>
       <li>
-    pcvs.backend.profile
+    pcvs.backend.configfile
 
       <ul>
-        <li><a href="api/pcvs.backend.profile.html#module-pcvs.backend.profile">module</a>
+        <li><a href="api/pcvs.backend.configfile.html#module-pcvs.backend.configfile">module</a>
 </li>
       </ul></li>
       <li>
@@ -764,10 +691,10 @@
 </li>
       </ul></li>
       <li>
-    pcvs.cli.cli_profile
+    pcvs.cli.cli_convert
 
       <ul>
-        <li><a href="api/pcvs.cli.cli_profile.html#module-pcvs.cli.cli_profile">module</a>
+        <li><a href="api/pcvs.cli.cli_convert.html#module-pcvs.cli.cli_convert">module</a>
 </li>
       </ul></li>
       <li>
@@ -806,15 +733,6 @@
 </li>
       </ul></li>
       <li>
-    pcvs.helpers.git
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#module-pcvs.helpers.git">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
     pcvs.helpers.pm
 
       <ul>
@@ -822,10 +740,17 @@
 </li>
       </ul></li>
       <li>
-    pcvs.helpers.system
+    pcvs.helpers.resource_tracker
 
       <ul>
-        <li><a href="api/pcvs.helpers.system.html#module-pcvs.helpers.system">module</a>
+        <li><a href="api/pcvs.helpers.resource_tracker.html#module-pcvs.helpers.resource_tracker">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.helpers.storage
+
+      <ul>
+        <li><a href="api/pcvs.helpers.storage.html#module-pcvs.helpers.storage">module</a>
 </li>
       </ul></li>
       <li>
@@ -836,12 +761,87 @@
 </li>
       </ul></li>
       <li>
+    pcvs.helpers.validation
+
+      <ul>
+        <li><a href="api/pcvs.helpers.validation.html#module-pcvs.helpers.validation">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.io
+
+      <ul>
+        <li><a href="api/pcvs.io.html#module-pcvs.io">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.plugins
+
+      <ul>
+        <li><a href="api/pcvs.plugins.html#module-pcvs.plugins">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    pcvs.plugins.contrib
+
+      <ul>
+        <li><a href="api/pcvs.plugins.contrib.html#module-pcvs.plugins.contrib">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.plugins.contrib.junit
+
+      <ul>
+        <li><a href="api/pcvs.plugins.contrib.junit.html#module-pcvs.plugins.contrib.junit">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.plugins.default
+
+      <ul>
+        <li><a href="api/pcvs.plugins.default.html#module-pcvs.plugins.default">module</a>
+</li>
+      </ul></li>
+      <li>
     pcvs.testing
 
       <ul>
         <li><a href="api/pcvs.testing.html#module-pcvs.testing">module</a>
 </li>
       </ul></li>
+      <li>
+    pcvs.testing.teststate
+
+      <ul>
+        <li><a href="api/pcvs.testing.teststate.html#module-pcvs.testing.teststate">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.ui
+
+      <ul>
+        <li><a href="api/pcvs.ui.html#module-pcvs.ui">module</a>
+</li>
+      </ul></li>
+      <li>
+    pcvs.ui.textual
+
+      <ul>
+        <li><a href="api/pcvs.ui.textual.html#module-pcvs.ui.textual">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole">PCVSConsole (class in pcvs.io)</a>
+</li>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException">PCVSException</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin">Plugin (class in pcvs.plugins)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.PLUGIN">PLUGIN (pcvs.helpers.storage.ConfigKind attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step">Plugin.Step (class in pcvs.plugins)</a>
+</li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException">PluginException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PluginException.BadStepError">PluginException.BadStepError</a>
@@ -850,23 +850,41 @@
 </li>
       <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.PManager">PManager (class in pcvs.helpers.pm)</a>
 </li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print">print() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_banner">print_banner() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_box">print_box() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_header">print_header() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_item">print_item() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_job">print_job() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_job_summary">print_job_summary() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_rich">print_rich() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.print_section">print_section() (pcvs.io.PCVSConsole method)</a>
+</li>
       <li><a href="api/pcvs.cli.cli_session.html#pcvs.cli.cli_session.print_sessions">print_sessions() (in module pcvs.cli.cli_session)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.process">process() (in module pcvs.converter.yaml_converter)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.process_modifiers">process_modifiers() (in module pcvs.converter.yaml_converter)</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile">Profile (class in pcvs.backend.profile)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile">Profile (class in pcvs.backend.configfile)</a>
 </li>
-      <li><a href="api/pcvs.cli.cli_profile.html#pcvs.cli.cli_profile.profile_interactive_select">profile_interactive_select() (in module pcvs.cli.cli_profile)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.PROFILE">PROFILE (pcvs.helpers.storage.ConfigKind attribute)</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException">ProfileException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ProfileException.IncompleteError">ProfileException.IncompleteError</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program">Program (class in pcvs.helpers.utils)</a>
-</li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.program_timeout">program_timeout() (in module pcvs.helpers.utils)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.progress_iter">progress_iter() (pcvs.io.PCVSConsole method)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.property">property() (pcvs.backend.session.Session method)</a>
 </li>
@@ -885,45 +903,35 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.rc">rc (pcvs.backend.session.Session property)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program.rc">(pcvs.helpers.utils.Program property)</a>
-</li>
-      </ul></li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.ref_file">ref_file (pcvs.backend.config.ConfigurationBlock property)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Reference">Reference (class in pcvs.helpers.git)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.register_callback">register_callback() (pcvs.backend.session.Session method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.register_default_plugins">register_default_plugins() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.register_plugin_by_dir">register_plugin_by_dir() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.register_plugin_by_file">register_plugin_by_file() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.register_plugin_by_module">register_plugin_by_module() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.register_plugin_by_package">register_plugin_by_package() (pcvs.plugins.Collection method)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.remove_session_from_file">remove_session_from_file() (in module pcvs.backend.session)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.replace_placeholder">replace_placeholder() (in module pcvs.converter.yaml_converter)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Reference.repo">repo (pcvs.helpers.git.Reference property)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.request_git_attr">request_git_attr() (in module pcvs.helpers.git)</a>
-</li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.retrieve_file">retrieve_file() (pcvs.backend.config.ConfigurationBlock method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.revparse">revparse() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.revparse">(pcvs.helpers.git.GitByCLI method)</a>
-</li>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.revparse">(pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.GlobalConfig.root">root (pcvs.helpers.system.GlobalConfig attribute)</a>
+      <li><a href="api/pcvs.helpers.resource_tracker.html#pcvs.helpers.resource_tracker.ResourceTracker">ResourceTracker (class in pcvs.helpers.resource_tracker)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.run">run() (pcvs.backend.session.Session method)</a>
 
       <ul>
-        <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.Program.run">(pcvs.helpers.utils.Program method)</a>
+        <li><a href="api/pcvs.plugins.contrib.junit.html#pcvs.plugins.contrib.junit.JUnit.run">(pcvs.plugins.contrib.junit.JUnit method)</a>
+</li>
+        <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.run">(pcvs.plugins.Plugin method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.run_detached">run_detached() (pcvs.backend.session.Session method)</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunException">RunException</a>
@@ -938,7 +946,9 @@
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.RunnerException.LaunchError">RunnerException.LaunchError</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.runtime">runtime (pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.Profile.runtime">runtime (pcvs.backend.configfile.Profile property)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigKind.RUNTIME">RUNTIME (pcvs.helpers.storage.ConfigKind attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -946,59 +956,87 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.scope">scope (pcvs.backend.config.ConfigurationBlock property)</a>
-
-      <ul>
-        <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.scope">(pcvs.backend.profile.Profile property)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_AFTER">SCHED_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_BEFORE">SCHED_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.sched_debug">sched_debug() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_JOB_EVAL">SCHED_JOB_EVAL (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_PUBLISH_AFTER">SCHED_PUBLISH_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_PUBLISH_BEFORE">SCHED_PUBLISH_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_PUBLISH_WRITE">SCHED_PUBLISH_WRITE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_SET_AFTER">SCHED_SET_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_SET_BEFORE">SCHED_SET_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.SCHED_SET_EVAL">SCHED_SET_EVAL (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigDesc.scope">scope (pcvs.helpers.storage.ConfigDesc property)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.sec">sec (pcvs.io.SpecialChar attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.sep_h">sep_h (pcvs.io.SpecialChar attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.sep_v">sep_v (pcvs.io.SpecialChar attribute)</a>
+</li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.separate_key_and_value">separate_key_and_value() (in module pcvs.converter.yaml_converter)</a>
 </li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session">Session (class in pcvs.backend.session)</a>
 </li>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State">Session.State (class in pcvs.backend.session)</a>
-</li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.session_file_hash">session_file_hash() (in module pcvs.backend.session)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByAPI.set_branch">set_branch() (pcvs.helpers.git.GitByAPI method)</a>
-
-      <ul>
-        <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByCLI.set_branch">(pcvs.helpers.git.GitByCLI method)</a>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState">SessionState (class in pcvs.backend.session)</a>
 </li>
-      </ul></li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.set_head">set_head() (pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.set_identity">set_identity() (pcvs.helpers.git.GitByGeneric method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.set_ifdef">set_ifdef() (pcvs.helpers.system.Config method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.set_internal">set_internal() (pcvs.helpers.system.MetaConfig method)</a>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.PCVSException.set_dbg">set_dbg() (pcvs.helpers.exceptions.PCVSException method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.set_local_path">set_local_path() (in module pcvs.helpers.utils)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.set_exec_path">set_exec_path() (in module pcvs.helpers.storage)</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.set_nosquash">set_nosquash() (pcvs.helpers.system.Config method)</a>
-</li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.GitByGeneric.set_path">set_path() (pcvs.helpers.git.GitByGeneric method)</a>
+      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.Config.set_ifdef">set_ifdef() (pcvs.backend.config.Config method)</a>
 </li>
       <li><a href="api/pcvs.converter.yaml_converter.html#pcvs.converter.yaml_converter.set_with">set_with() (in module pcvs.converter.yaml_converter)</a>
 </li>
-      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.ConfigurationBlock.short_name">short_name (pcvs.backend.config.ConfigurationBlock property)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.setoutfile">setoutfile() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.show_enabled_plugins">show_enabled_plugins() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.show_plugins">show_plugins() (pcvs.plugins.Collection method)</a>
+</li>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.SOFT_TIMEOUT">SOFT_TIMEOUT (pcvs.testing.teststate.TestState attribute)</a>
 </li>
       <li><a href="api/pcvs.helpers.pm.html#pcvs.helpers.pm.SpackManager">SpackManager (class in pcvs.helpers.pm)</a>
 </li>
-      <li><a href="api/pcvs.backend.profile.html#pcvs.backend.profile.Profile.split_into_configs">split_into_configs() (pcvs.backend.profile.Profile method)</a>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar">SpecialChar (class in pcvs.io)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.star">star (pcvs.io.SpecialChar attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.START_AFTER">START_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.start_autokill">start_autokill() (in module pcvs.helpers.utils)</a>
 </li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.START_BEFORE">START_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.state">state (pcvs.backend.session.Session property)</a>
 </li>
-      <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.storage_order">storage_order() (in module pcvs.helpers.utils)</a>
+      <li><a href="api/pcvs.plugins.contrib.junit.html#pcvs.plugins.contrib.junit.JUnit.step">step (pcvs.plugins.contrib.junit.JUnit attribute)</a>
+
+      <ul>
+        <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.step">(pcvs.plugins.Plugin attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.store_session_to_file">store_session_to_file() (in module pcvs.backend.session)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.str_dict_as_envvar">str_dict_as_envvar() (in module pcvs.helpers.utils)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.succ">succ (pcvs.io.SpecialChar attribute)</a>
+</li>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.SUCCESS">SUCCESS (pcvs.testing.teststate.TestState attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1006,17 +1044,41 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.table_container">table_container() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TDESC_AFTER">TDESC_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TDESC_BEFORE">TDESC_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TEST_EVAL">TEST_EVAL (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TEST_RESULT_EVAL">TEST_RESULT_EVAL (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException">TestException</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.TestException.TestExpressionError">TestException.TestExpressionError</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.to_dict">to_dict() (pcvs.helpers.system.Config method)</a>
+      <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState">TestState (class in pcvs.testing.teststate)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.to_yaml">to_yaml() (pcvs.backend.session.Session.State class method)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TFILE_AFTER">TFILE_AFTER (pcvs.plugins.Plugin.Step attribute)</a>
 </li>
-      <li><a href="api/pcvs.helpers.git.html#pcvs.helpers.git.Tree">Tree (class in pcvs.helpers.git)</a>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Plugin.Step.TFILE_BEFORE">TFILE_BEFORE (pcvs.plugins.Plugin.Step attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.SpecialChar.time">time (pcvs.io.SpecialChar attribute)</a>
+</li>
+      <li><a href="api/pcvs.backend.config.html#pcvs.backend.config.Config.to_dict">to_dict() (pcvs.backend.config.Config method)</a>
+
+      <ul>
+        <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile.to_dict">(pcvs.backend.configfile.YmlConfigFile method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.to_str">to_str() (pcvs.backend.configfile.ConfigFile method)</a>
+</li>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.to_yaml">to_yaml() (pcvs.backend.session.SessionState class method)</a>
+</li>
+      <li><a href="api/pcvs.plugins.html#pcvs.plugins.Collection.try_invoke_plugins">try_invoke_plugins() (pcvs.plugins.Collection method)</a>
 </li>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.trylock_file">trylock_file() (in module pcvs.helpers.utils)</a>
 </li>
@@ -1028,9 +1090,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.utils.html#pcvs.helpers.utils.unlock_file">unlock_file() (in module pcvs.helpers.utils)</a>
 </li>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.update_session_from_file">update_session_from_file() (in module pcvs.backend.session)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.update_session_from_file">update_session_from_file() (in module pcvs.backend.session)</a>
+      <li><a href="api/pcvs.helpers.storage.html#pcvs.helpers.storage.ConfigScope.USER">USER (pcvs.helpers.storage.ConfigScope attribute)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.utf">utf() (pcvs.io.PCVSConsole method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1038,25 +1104,33 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.Config.validate">validate() (pcvs.helpers.system.Config method)</a>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.validate">validate() (pcvs.backend.configfile.ConfigFile method)</a>
 
       <ul>
-        <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.ValidationScheme.validate">(pcvs.helpers.system.ValidationScheme method)</a>
+        <li><a href="api/pcvs.helpers.validation.html#pcvs.helpers.validation.ValidationScheme.validate">(pcvs.helpers.validation.ValidationScheme method)</a>
 </li>
       </ul></li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.MetaConfig.validation_default_file">validation_default_file (pcvs.helpers.system.MetaConfig attribute)</a>
-</li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException">ValidationException</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.FormatError">ValidationException.FormatError</a>
+</li>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.InvalidSchemeError">ValidationException.InvalidSchemeError</a>
 </li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.SchemeError">ValidationException.SchemeError</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.SetupError">ValidationException.SetupError</a>
+</li>
       <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.WrongTokenError">ValidationException.WrongTokenError</a>
 </li>
-      <li><a href="api/pcvs.helpers.system.html#pcvs.helpers.system.ValidationScheme">ValidationScheme (class in pcvs.helpers.system)</a>
+      <li><a href="api/pcvs.helpers.exceptions.html#pcvs.helpers.exceptions.ValidationException.YamlError">ValidationException.YamlError</a>
+</li>
+      <li><a href="api/pcvs.helpers.validation.html#pcvs.helpers.validation.ValidationScheme">ValidationScheme (class in pcvs.helpers.validation)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.Verbosity">Verbosity (class in pcvs.io)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.verbosity">verbosity (pcvs.io.PCVSConsole property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1064,7 +1138,25 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.Session.State.WAITING">WAITING (pcvs.backend.session.Session.State attribute)</a>
+      <li><a href="api/pcvs.backend.session.html#pcvs.backend.session.SessionState.WAITING">WAITING (pcvs.backend.session.SessionState attribute)</a>
+
+      <ul>
+        <li><a href="api/pcvs.testing.teststate.html#pcvs.testing.teststate.TestState.WAITING">(pcvs.testing.teststate.TestState attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.warn">warn() (pcvs.io.PCVSConsole method)</a>
+</li>
+      <li><a href="api/pcvs.io.html#pcvs.io.PCVSConsole.warning">warning() (pcvs.io.PCVSConsole method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pcvs.backend.configfile.html#pcvs.backend.configfile.YmlConfigFile">YmlConfigFile (class in pcvs.backend.configfile)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1078,7 +1170,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020-2025, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

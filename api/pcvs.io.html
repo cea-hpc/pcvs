@@ -1,0 +1,668 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pcvs.io module &mdash; PCVS 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pcvs.main module" href="pcvs.main.html" />
+    <link rel="prev" title="pcvs.webview.datalayer module" href="pcvs.webview.datalayer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pcvs</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="pcvs.html">pcvs package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="pcvs.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">pcvs.io module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pcvs.main.html">pcvs.main module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pcvs.html#module-pcvs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">pcvs</a></li>
+          <li class="breadcrumb-item"><a href="pcvs.html">pcvs package</a></li>
+      <li class="breadcrumb-item active">pcvs.io module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/pcvs.io.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pcvs.io">
+<span id="pcvs-io-module"></span><h1>pcvs.io module<a class="headerlink" href="#module-pcvs.io" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">PCVSConsole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main interface to print information to users.</p>
+<p>Any output from the application should be handled by this Console.</p>
+<p>Build a new Console:
+- color: boolean (color support)
+- verbose: boolean (verbose msg mode in log files)
+Any other argument is considered a base class options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – should the console use color.</p></li>
+<li><p><strong>verbose</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – verbosity level of the console.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.create_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.create_table" title="Link to this definition"></a></dt>
+<dd><p>Create and return a rich table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.crit_debug">
+<span class="sig-name descname"><span class="pre">crit_debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.crit_debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.crit_debug" title="Link to this definition"></a></dt>
+<dd><p>Print &amp; log debug for pcvs criterions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.critical">
+<span class="sig-name descname"><span class="pre">critical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.critical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.critical" title="Link to this definition"></a></dt>
+<dd><p>Print a log critical error then exit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.debug" title="Link to this definition"></a></dt>
+<dd><p>Print debug.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.error">
+<span class="sig-name descname"><span class="pre">error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.error" title="Link to this definition"></a></dt>
+<dd><p>Print an error messages.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.exception">
+<span class="sig-name descname"><span class="pre">exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.exception" title="Link to this definition"></a></dt>
+<dd><p>Print exceptions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.info" title="Link to this definition"></a></dt>
+<dd><p>Print info.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.log">
+<span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.log" title="Link to this definition"></a></dt>
+<dd><p>Print log.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.logfile">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">logfile</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pcvs.io.PCVSConsole.logfile" title="Link to this definition"></a></dt>
+<dd><p>Get the path to the logging file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the logging file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.logger">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">logger</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Logger</span></span><a class="headerlink" href="#pcvs.io.PCVSConsole.logger" title="Link to this definition"></a></dt>
+<dd><p>Get Logger.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.move_debug_file">
+<span class="sig-name descname"><span class="pre">move_debug_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">newdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.move_debug_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.move_debug_file" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.nodebug">
+<span class="sig-name descname"><span class="pre">nodebug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.nodebug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.nodebug" title="Link to this definition"></a></dt>
+<dd><p>Do nothing, place holder to remove debug print without deleting lines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.outfile">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">outfile</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#pcvs.io.PCVSConsole.outfile" title="Link to this definition"></a></dt>
+<dd><p>Get the path where the Console output is logged (disabled by default).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the file path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print">
+<span class="sig-name descname"><span class="pre">print</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print" title="Link to this definition"></a></dt>
+<dd><p>Print a line to stdout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_banner">
+<span class="sig-name descname"><span class="pre">print_banner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_banner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_banner" title="Link to this definition"></a></dt>
+<dd><p>Print the PCVS logo fitting with current terminal size</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_box">
+<span class="sig-name descname"><span class="pre">print_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">panel_options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_box" title="Link to this definition"></a></dt>
+<dd><p>Print a Box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_header">
+<span class="sig-name descname"><span class="pre">print_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_header" title="Link to this definition"></a></dt>
+<dd><p>Print Header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_item">
+<span class="sig-name descname"><span class="pre">print_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_item" title="Link to this definition"></a></dt>
+<dd><p>Print Item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_job">
+<span class="sig-name descname"><span class="pre">print_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tlabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tsubtree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_job"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_job" title="Link to this definition"></a></dt>
+<dd><p>Print a Job.</p>
+<p>If Verbosity level is equal or above Verbosity.DETAILED, print each tests.
+Otherwise, print a summary block.
+Optionally print raw test result content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>status</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The status line indicating test information</p></li>
+<li><p><strong>state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="pcvs.testing.teststate.html#pcvs.testing.teststate.TestState" title="pcvs.testing.teststate.TestState"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestState</span></code></a></span>) – The status of the printed test</p></li>
+<li><p><strong>tlabel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The label of the test.</p></li>
+<li><p><strong>tsubtree</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Thr sub directory of the test</p></li>
+<li><p><strong>content</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – stdout/stderr of the test, if specify</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_job_summary">
+<span class="sig-name descname"><span class="pre">print_job_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_job_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_job_summary" title="Link to this definition"></a></dt>
+<dd><p>Print the job view table once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_rich">
+<span class="sig-name descname"><span class="pre">print_rich</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_print</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_rich"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_rich" title="Link to this definition"></a></dt>
+<dd><p>Print rich formatted object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.print_section">
+<span class="sig-name descname"><span class="pre">print_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.print_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.print_section" title="Link to this definition"></a></dt>
+<dd><p>Print Section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.progress_iter">
+<span class="sig-name descname"><span class="pre">progress_iter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">it</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.progress_iter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.progress_iter" title="Link to this definition"></a></dt>
+<dd><p>Print a progress bar using click.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>it</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></span>) – iterable on which the progress bar has to iterate</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a click progress bar (iterable)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.sched_debug">
+<span class="sig-name descname"><span class="pre">sched_debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.sched_debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.sched_debug" title="Link to this definition"></a></dt>
+<dd><p>Print &amp; log debug for pcvs scheduler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.setoutfile">
+<span class="sig-name descname"><span class="pre">setoutfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.setoutfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.setoutfile" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.table_container">
+<span class="sig-name descname"><span class="pre">table_container</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.table_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.table_container" title="Link to this definition"></a></dt>
+<dd><p>The main pcvs run progress bar that may include job summary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Live</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.utf">
+<span class="sig-name descname"><span class="pre">utf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.utf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.utf" title="Link to this definition"></a></dt>
+<dd><p>Return the encoding supported by this session for the given key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the key as defined by SpecialChar</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the associated printable sequence</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.verbosity">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">verbosity</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#pcvs.io.PCVSConsole.verbosity" title="Link to this definition"></a></dt>
+<dd><p>Return the Verbosity level.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.warn">
+<span class="sig-name descname"><span class="pre">warn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.warn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.warn" title="Link to this definition"></a></dt>
+<dd><p>Short for warning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.io.PCVSConsole.warning">
+<span class="sig-name descname"><span class="pre">warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#PCVSConsole.warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.PCVSConsole.warning" title="Link to this definition"></a></dt>
+<dd><p>Print warning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">SpecialChar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">utf_support</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#SpecialChar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.SpecialChar" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class mapping special char display.</p>
+<p>Enabled or disabled according to utf support.</p>
+<p>Initialize a new char handler depending on utf support</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>utf_support</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</span>) – support for utf encoding, defaults to True</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'©'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.fail">
+<span class="sig-name descname"><span class="pre">fail</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'✘'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.fail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.git">
+<span class="sig-name descname"><span class="pre">git</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'⍿'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.git" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.hdr">
+<span class="sig-name descname"><span class="pre">hdr</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'⎼'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.hdr" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.item">
+<span class="sig-name descname"><span class="pre">item</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'⟢'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.item" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.none">
+<span class="sig-name descname"><span class="pre">none</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'∅'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.none" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.sec">
+<span class="sig-name descname"><span class="pre">sec</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'❖'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.sec" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.sep_h">
+<span class="sig-name descname"><span class="pre">sep_h</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'⎼'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.sep_h" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.sep_v">
+<span class="sig-name descname"><span class="pre">sep_v</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'</span> <span class="pre">⍿</span> <span class="pre">'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.sep_v" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.star">
+<span class="sig-name descname"><span class="pre">star</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'★'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.star" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.succ">
+<span class="sig-name descname"><span class="pre">succ</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'✔'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.succ" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.SpecialChar.time">
+<span class="sig-name descname"><span class="pre">time</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'⌚'</span></span><a class="headerlink" href="#pcvs.io.SpecialChar.time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">Verbosity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#Verbosity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.Verbosity" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></p>
+<p>Enum to map a verbosity level to a more
+convenient label.</p>
+<ul class="simple">
+<li><p>COMPACT: compact way, jobs are displayed packed per input YAML file.</p></li>
+<li><p>DETAILED: each job will output result on a one-line manner.</p></li>
+<li><p>INFO: DETAILED &amp; INFO messages will be logged.</p></li>
+<li><p>LOG: DETAILED &amp; INFO &amp; LOG messages will be logged.</p></li>
+<li><p>DEBUG: DETAIL, INFO, LOG &amp; DEBUG messages, with more infos in stack traces.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.COMPACT">
+<span class="sig-name descname"><span class="pre">COMPACT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#pcvs.io.Verbosity.COMPACT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.DEBUG">
+<span class="sig-name descname"><span class="pre">DEBUG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#pcvs.io.Verbosity.DEBUG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.DETAILED">
+<span class="sig-name descname"><span class="pre">DETAILED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#pcvs.io.Verbosity.DETAILED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.INFO">
+<span class="sig-name descname"><span class="pre">INFO</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#pcvs.io.Verbosity.INFO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.LOG">
+<span class="sig-name descname"><span class="pre">LOG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#pcvs.io.Verbosity.LOG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pcvs.io.Verbosity.NB_LEVELS">
+<span class="sig-name descname"><span class="pre">NB_LEVELS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#pcvs.io.Verbosity.NB_LEVELS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.io.capture_exception">
+<span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">capture_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doexit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#capture_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.capture_exception" title="Link to this definition"></a></dt>
+<dd><p>Wraps functions to capture unhandled exceptions for high-level function not to crash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>e_type</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span>) – errors to be caught</p></li>
+<li><p><strong>user_func</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code>], <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]]</span>) – Optional, a function to call to manage the exception</p></li>
+<li><p><strong>doexit</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Optional, should pcvs exit after printing the error</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function handler to manage exception</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.io.detach_console">
+<span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">detach_console</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#detach_console"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.detach_console" title="Link to this definition"></a></dt>
+<dd><p>Detach the PCVS Console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pcvs.io.init">
+<span class="sig-prename descclassname"><span class="pre">pcvs.io.</span></span><span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/io.html#init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.io.init" title="Link to this definition"></a></dt>
+<dd><p>Init the PCVS Console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pcvs.webview.datalayer.html" class="btn btn-neutral float-left" title="pcvs.webview.datalayer module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pcvs.main.html" class="btn btn-neutral float-right" title="pcvs.main module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
