@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.backend.configfile module &mdash; PCVS 1.0.0 documentation</title>
+  <title>pcvs.backend.configfile module &mdash; PCVS 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -46,16 +46,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/tuto.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Full Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Test Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
@@ -121,7 +118,7 @@
 <p>Module for parsing configuration.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#pcvs.backend.configfile.ConfigFile" title="pcvs.backend.configfile.ConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFile</span></code></a>: a file on the disc, can be read, write, verify, edited, display …</p></li>
-<li><p><a class="reference internal" href="#pcvs.backend.configfile.YmlConfigFile" title="pcvs.backend.configfile.YmlConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YmlConfigFile</span></code></a>: inherite <a class="reference internal" href="#pcvs.backend.configfile.ConfigFile" title="pcvs.backend.configfile.ConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFile</span></code></a> and add yaml parsing support.</p></li>
+<li><p><a class="reference internal" href="#pcvs.backend.configfile.YmlConfigFile" title="pcvs.backend.configfile.YmlConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YmlConfigFile</span></code></a>: inherit <a class="reference internal" href="#pcvs.backend.configfile.ConfigFile" title="pcvs.backend.configfile.ConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFile</span></code></a> and add yaml parsing support.</p></li>
 <li><p><a class="reference internal" href="#pcvs.backend.configfile.Profile" title="pcvs.backend.configfile.Profile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Profile</span></code></a>: A <a class="reference internal" href="#pcvs.backend.configfile.YmlConfigFile" title="pcvs.backend.configfile.YmlConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YmlConfigFile</span></code></a> that also contain multiples
 others <a class="reference internal" href="#pcvs.backend.configfile.YmlConfigFile" title="pcvs.backend.configfile.YmlConfigFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">YmlConfigFile</span></code></a> that represent it’s configuration.</p></li>
 </ul>
@@ -184,6 +181,20 @@ In PCVS, there is 7 types of components:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pcvs.backend.configfile.ConfigFile.do_import">
+<span class="sig-name descname"><span class="pre">do_import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/configfile.html#ConfigFile.do_import"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.configfile.ConfigFile.do_import" title="Link to this definition"></a></dt>
+<dd><p>Import a config from a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_str</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – the config to import</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -267,7 +278,7 @@ In PCVS, there is 7 types of components:</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pcvs.backend.configfile.ConfigFile.validate">
 <span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pcvs/backend/configfile.html#ConfigFile.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pcvs.backend.configfile.ConfigFile.validate" title="Link to this definition"></a></dt>
-<dd><p>Validate a Config against it’s shema.</p>
+<dd><p>Validate a Config against it’s schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>

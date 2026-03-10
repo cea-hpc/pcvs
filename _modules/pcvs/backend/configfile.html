@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.backend.configfile &mdash; PCVS 1.0.0 documentation</title>
+  <title>pcvs.backend.configfile &mdash; PCVS 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -43,16 +43,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../basics/features.html">Feature Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basics/getting-started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Installation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/tuto.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../basics/installation.html">Full Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../basics/issues.html">Known issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basics/workflow.html">Common workflow</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ref/test-file.html">Test Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ref/session.html">Sessions</a></li>
@@ -94,7 +91,7 @@
 <span class="sd">Module for parsing configuration.</span>
 
 <span class="sd">- :class:`~ConfigFile`: a file on the disc, can be read, write, verify, edited, display ...</span>
-<span class="sd">- :class:`~YmlConfigFile`: inherite :class:`~ConfigFile` and add yaml parsing support.</span>
+<span class="sd">- :class:`~YmlConfigFile`: inherit :class:`~ConfigFile` and add yaml parsing support.</span>
 <span class="sd">- :class:`~Profile`: A :class:`~YmlConfigFile` that also contain multiples</span>
 <span class="sd">  others :class:`~YmlConfigFile` that represent it&#39;s configuration.</span>
 
@@ -267,10 +264,50 @@
         <span class="n">edited_stream</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">),</span> <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_rejected_file_name</span><span class="p">(</span><span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">scope</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;rejected_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="n">edited_stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">edited_stream</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_flush_to_disk</span><span class="p">()</span></div>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">edited_stream</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_flush_to_disk</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">get_rejected_file_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">path</span> <span class="o">=</span> <span class="n">get_rejected_file_name</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">edited_stream</span><span class="p">)</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to verify edited configuration, rejected configuration saved at </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigFile.do_import">
+<a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.do_import">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Import a config from a string.</span>
+
+<span class="sd">        :param config_str: the config to import</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="n">config_str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flush_to_disk</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">io</span><span class="o">.</span><span class="n">console</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
 
 
     <span class="c1"># Others</span>
@@ -290,7 +327,7 @@
 <div class="viewcode-block" id="ConfigFile.validate">
 <a class="viewcode-back" href="../../../api/pcvs.backend.configfile.html#pcvs.backend.configfile.ConfigFile.validate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a Config against it&#39;s shema.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a Config against it&#39;s schema.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check</span><span class="p">()</span></div>
 

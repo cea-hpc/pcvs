@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial &mdash; PCVS 1.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Full Installation Guide" href="installation.html" />
+    <link rel="prev" title="Parallel Computing Validation System" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/pcvs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-install">Quick Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-tests-descriptions">Create tests descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-configuration-profile">Create a configuration profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execute-the-tests">Execute the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#access-the-results">Access the results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Full Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="issues.html">Known issues</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Test Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/examples.html">Input Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/contribution.html">Contribution Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">pcvs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PCVS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/basics/tuto.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tutorial">
+<span id="tuto"></span><h1>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading"></a></h1>
+<section id="quick-install">
+<h2>Quick Install<a class="headerlink" href="#quick-install" title="Link to this heading"></a></h2>
+<p>The source code is available on GitHub. To check out the latest release:
+(detailed documentation in <a class="reference internal" href="installation.html"><span class="doc">Full Installation Guide</span></a>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs
+$<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>./pcvs
+$<span class="w"> </span>pcvs
+Usage:<span class="w"> </span>pcvs<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+
+PCVS<span class="w"> </span>main<span class="w"> </span>program.
+...
+</pre></div>
+</div>
+<p>Full completion (options &amp; arguments) is provided and can be activated with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ZSH support</span>
+$<span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nv">_PCVS_COMPLETE</span><span class="o">=</span>zsh_source<span class="w"> </span>pcvs<span class="k">)</span><span class="s2">&quot;</span>
+<span class="c1"># BASH support</span>
+$<span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span><span class="nv">_PCVS_COMPLETE</span><span class="o">=</span>bash_source<span class="w"> </span>pcvs<span class="k">)</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Once PCVS is installed, the <code class="docutils literal notranslate"><span class="pre">pcvs</span></code> executable is available in <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.
+This program is the only entry point to PCVS:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs
+
+Usage:<span class="w"> </span>pcvs<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+
+PCVS<span class="w"> </span>main<span class="w"> </span>program.
+
+<span class="w">  </span>Options
+<span class="w"> </span>--verbose<span class="w">           </span>-v<span class="w">        </span>INTEGER<span class="w"> </span>RANGE<span class="w">  </span>Enable<span class="w"> </span>PCVS<span class="w"> </span>verbosity<span class="w"> </span><span class="o">(</span>cumulative<span class="o">)</span><span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_VERBOSE<span class="o">]</span>
+<span class="w"> </span>--debug<span class="w">             </span>-d<span class="w">                       </span>Enable<span class="w"> </span>Debug<span class="w"> </span>mode<span class="w"> </span><span class="o">(</span>implies<span class="w"> </span><span class="sb">`</span>-vvv<span class="sb">`</span><span class="o">)</span><span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_DEBUG<span class="o">]</span>
+<span class="w"> </span>--color/--no-color<span class="w">  </span>-c<span class="w">                       </span>Use<span class="w"> </span>colors<span class="w"> </span>to<span class="w"> </span>beautify<span class="w"> </span>the<span class="w"> </span>output<span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_COLOR<span class="o">]</span>
+<span class="w"> </span>--glyph/--no-glyph<span class="w">  </span>-g<span class="w">                       </span>enable/disable<span class="w"> </span>Unicode<span class="w"> </span>glyphs<span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_ENCODING<span class="o">]</span>
+<span class="w"> </span>--exec-path<span class="w">         </span>-C<span class="w">        </span>DIRECTORY<span class="w">      </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_EXEC_PATH<span class="o">]</span>
+<span class="w"> </span>--version<span class="w">           </span>-V<span class="w">                       </span>Display<span class="w"> </span>current<span class="w"> </span>version
+<span class="w"> </span>--plugin-path<span class="w">       </span>-P<span class="w">        </span>PATH<span class="w">           </span>Default<span class="w"> </span>Plugin<span class="w"> </span>PATH<span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_PLUGIN_PATH<span class="o">]</span>
+<span class="w"> </span>--plugin<span class="w">            </span>-m<span class="w">        </span>TEXT<span class="w">           </span>Default<span class="w"> </span>plugin<span class="w"> </span>names<span class="w"> </span>to<span class="w"> </span>enables.
+<span class="w"> </span>--tui<span class="w">               </span>-t<span class="w">                       </span>Use<span class="w"> </span>a<span class="w"> </span>TUI-based<span class="w"> </span>interface.<span class="w"> </span><span class="o">[</span>env<span class="w"> </span>var:<span class="w"> </span>PCVS_TUI<span class="o">]</span>
+<span class="w"> </span>--help<span class="w">              </span>-help,-h<span class="w">                 </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+
+<span class="w">  </span>Commands
+<span class="w"> </span>bank<span class="w">                      </span>Persistent<span class="w"> </span>data<span class="w"> </span>repository<span class="w"> </span>management
+<span class="w"> </span>check<span class="w">                     </span>Ensure<span class="w"> </span>future<span class="w"> </span>input<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>compliant<span class="w"> </span>with<span class="w"> </span>standards
+<span class="w"> </span>clean<span class="w">                     </span>Remove<span class="w"> </span>artifacts<span class="w"> </span>generated<span class="w"> </span>from<span class="w"> </span>PCVS
+<span class="w"> </span>config<span class="w">                    </span>Manage<span class="w"> </span>Configurations
+<span class="w"> </span>convert<span class="w">                   </span>YAML<span class="w"> </span>to<span class="w"> </span>YAML<span class="w"> </span>converter
+<span class="w"> </span><span class="nb">exec</span><span class="w">                      </span>Running<span class="w"> </span>aspecific<span class="w"> </span><span class="nb">test</span>
+<span class="w"> </span>graph<span class="w">                     </span>Export<span class="w"> </span>graph<span class="w"> </span>from<span class="w"> </span>tests<span class="w"> </span>results.
+<span class="w"> </span>remote-run<span class="w">                </span>Internal<span class="w"> </span><span class="nb">command</span><span class="w"> </span>to<span class="w"> </span>re-run<span class="w"> </span>a<span class="w"> </span>PCVS<span class="w"> </span>instance.<span class="w"> </span>Should<span class="w"> </span>not<span class="w"> </span>be<span class="w"> </span>used<span class="w"> </span>directly
+<span class="w"> </span>report<span class="w">                    </span>Manage<span class="w"> </span>PCVS<span class="w"> </span>result<span class="w"> </span>reporting<span class="w"> </span>interface
+<span class="w"> </span>run<span class="w">                       </span>Run<span class="w"> </span>a<span class="w"> </span>validation
+<span class="w"> </span>scan<span class="w">                      </span>Analyze<span class="w"> </span>directories<span class="w"> </span>to<span class="w"> </span>build<span class="w"> </span>up<span class="w"> </span><span class="nb">test</span><span class="w"> </span>conf.<span class="w"> </span>files
+<span class="w"> </span>session<span class="w">                   </span>Manage<span class="w"> </span>multiple<span class="w"> </span>validations
+</pre></div>
+</div>
+</section>
+<section id="create-tests-descriptions">
+<span id="tuto-test-desc"></span><h2>Create tests descriptions<a class="headerlink" href="#create-tests-descriptions" title="Link to this heading"></a></h2>
+<p>Before using PCVS, let’s consider a provided test-suite in a <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory
+(<a class="reference download internal" download="" href="../_downloads/19e83f8640aaf0f818647b3e869c9988/all-reduce.c"><code class="xref download docutils literal notranslate"><span class="pre">all-reduce.c</span></code></a> &amp; <a class="reference download internal" download="" href="../_downloads/627978c189abf9627c27c440ba5d12d0/wave.c"><code class="xref download docutils literal notranslate"><span class="pre">wave.c</span></code></a> provided for convenience):
+With a directory like such:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tree<span class="w"> </span>tests
+tests
+├──<span class="w"> </span>coll
+│<span class="w">   </span>└──<span class="w"> </span>all-reduce.c
+├──<span class="w"> </span>pcvs.yml
+└──<span class="w"> </span>pt2pt
+<span class="w">    </span>└──<span class="w"> </span>wave.c
+</pre></div>
+</div>
+<p>PCVS needs rules to know how to parse the test-suite above to create tests.
+This will be done through <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> specification file.
+Such a file can be placed anywhere in the file tree.
+Consider putting it directly under the <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory for this example.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A test is the combination of a program, its arguments and the environment used to execute it.
+From PCVS’ point of view, a test file does not carry the whole test environment.
+Thus, <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> expects the user to describe programs to be used to build the test-suite.</p>
+</div>
+<p>A basic <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> file for our tests may look like this:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/te-scheme.yml</span>
+<span class="nt">all_reduce_test</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;coll/all-reduce.c&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">sources</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">binary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;all_reduce&quot;</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;all_reduce&quot;</span>
+<span class="nt">pt2pt_test</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">files</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;pt2pt/wave.c&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">sources</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">binary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;wave&quot;</span>
+<span class="w">      </span><span class="nt">ldflags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-lm&quot;</span>
+<span class="w">  </span><span class="nt">run</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;wave&quot;</span>
+</pre></div>
+</div>
+<p>This file specifies two root nodes referred as <em>Test Expressions</em> (TE) or <em>Test Descriptors</em> (TD).
+It contains subondes describing how to build programs.
+The <code class="docutils literal notranslate"><span class="pre">build</span></code> node gives information about how to build the program.
+<code class="docutils literal notranslate"><span class="pre">files</span></code> (a list <em>or</em> a string) contains the whole list of files required to build the program (in this case a C file).
+With no other information, PCVS will assume the program to be built with a compiler (no invocation to a build system here).
+A <code class="docutils literal notranslate"><span class="pre">run</span></code> subnode instructs PCVS to execute the program.
+This is the simplest way to integrate tests to PCVS.</p>
+<p>PCVS also supports building programs through Make, CMake &amp; Autotools, each system
+having its own set of keys to configure:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">build.make.target</span></code>: allow configuring a Make target to invoke.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">build.cmake</span></code>: for cmake configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">build.autotools.params</span></code>: configure script flags</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">build.autotools.autogen</span></code>: boolean whether to execute autogen.sh first.</p></li>
+</ul>
+<p>By default, a test is considered valid if its exit code is 0.
+The <code class="docutils literal notranslate"><span class="pre">validate</span></code> node allow modifying the validation process depending on
+return code, stdout content, execution time, etc…</p>
+<p>Many other options are available such as group, tags, flags, artifact, metrics, attributes, etc…
+For more detailed documentation on test setup, consult: <a class="reference internal" href="../ref/test-file.html#test-file"><span class="std std-ref">Test Specification</span></a>.
+For a complete list of nodes to be used in a <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code>, please consult <a class="reference internal" href="../ref/examples.html#te-format"><span class="std std-ref">Test nodes: The complete list</span></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Beware of tabulations, YAML indentations only supports spaces !</p>
+</div>
+<p>Proper YAML formats can be checked with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>check<span class="w"> </span>--directory<span class="w"> </span>tests
+</pre></div>
+</div>
+<p>Jobs can also be described using a <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file, which must return a
+yaml-structured character string describing a valid pcvs configuration as would
+a <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code>.</p>
+</section>
+<section id="create-a-configuration-profile">
+<span id="tuto-config"></span><h2>Create a configuration profile<a class="headerlink" href="#create-a-configuration-profile" title="Link to this heading"></a></h2>
+<p>Validation profiles are configuration files used at launch by <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">run</span></code>.
+A profile contains link to part of the whole PCVS configuration.
+This approach allow flexibility for complex configurations.
+A complete configuration is composed of 5 configurations:
+<code class="docutils literal notranslate"><span class="pre">compiler</span></code>, <code class="docutils literal notranslate"><span class="pre">criterion</span></code>, <code class="docutils literal notranslate"><span class="pre">group</span></code>, <code class="docutils literal notranslate"><span class="pre">machine</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">runtime</span></code>.
+For full configuration details, look at <a class="reference internal" href="../ref/config.html#config"><span class="std std-ref">Configurations</span></a>.</p>
+<p>To list all available default <code class="docutils literal notranslate"><span class="pre">profile</span></code> and <code class="docutils literal notranslate"><span class="pre">configuration</span></code>, use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>config<span class="w"> </span>list
+</pre></div>
+</div>
+<p>For this example, we will target a simple MPI implementation.
+To create the most basic profile able to run MPI programs,
+we may herit ours from the provided <code class="docutils literal notranslate"><span class="pre">mpi</span></code> configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>config<span class="w"> </span>create<span class="w"> </span>user:profile:myprofile<span class="w"> </span>--clone<span class="w"> </span>global:profile:mpi
+</pre></div>
+</div>
+<p>By specifying <code class="docutils literal notranslate"><span class="pre">user:profile</span></code>, it will save the profile under <code class="docutils literal notranslate"><span class="pre">~/.pcvs/profile</span></code> and
+make it available for the whole <code class="docutils literal notranslate"><span class="pre">$USER</span></code>, no matter the current working
+directory used when running PCVS. To learn more about profile scope, please see <a class="reference internal" href="../ref/config.html#config-scope"><span class="std std-ref">Scope</span></a>.</p>
+<p>This profile can be references with <code class="docutils literal notranslate"><span class="pre">user:profile:myprofile</span></code>
+(or <code class="docutils literal notranslate"><span class="pre">profile:myprofile</span></code> in short, where there are no possible conflicts).</p>
+<p>A profile can be edited if necessary with <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">config</span> <span class="pre">edit</span> <span class="pre">profile:myprofile</span></code>.
+It will open an <code class="docutils literal notranslate"><span class="pre">$EDITOR</span></code>.
+When exiting, the profile is validated to ensure coherency.
+In case it does not fulfill a proper format, a rejection file is crated in the current directory.
+Once fixed, the profile can be saved as a replacement with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>profile<span class="w"> </span>import<span class="w"> </span>newprofile<span class="w"> </span>--force<span class="w"> </span>--source<span class="w"> </span>user_profile_myprofile_rejected_0_.yml
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--force</span></code> option will overwrite any profile with the same name, if it exists.
+Please use this option with care.
+In case of a rejection, the import needs to be forced in order to replace the old one.</p>
+</div>
+<p>If profiles are edited directly, proper YAML formats can be checked before <code class="docutils literal notranslate"><span class="pre">pcvs</span></code> execution with:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>check<span class="w"> </span>--profiles
+</pre></div>
+</div>
+</section>
+<section id="execute-the-tests">
+<h2>Execute the tests<a class="headerlink" href="#execute-the-tests" title="Link to this heading"></a></h2>
+<p>PCVS relies on test specifications (<a class="reference internal" href="#tuto-test-desc"><span class="std std-ref">Create tests descriptions</span></a>) and execution profile
+(<a class="reference internal" href="#tuto-config"><span class="std std-ref">Create a configuration profile</span></a>) to create and execute a full benchmarks.</p>
+<p>To start PCVS, you must provide the profile &amp; the directory where tests are located:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pcvs<span class="w"> </span>run<span class="w"> </span>--profile<span class="w"> </span>myprofile<span class="w"> </span>./tests/
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A list of directories can also be given to the command.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">user:</span></code> prefix to the profile name may be removed as there is no
+name ambiguity, PCVS will detect the proper scope.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If no profile argument is provided, PCVS will look for a profile named <code class="docutils literal notranslate"><span class="pre">default</span></code>.</p>
+</div>
+<p>Once started, the validation process is logged under <code class="docutils literal notranslate"><span class="pre">$PWD/.pcvs-build</span></code> directory.
+If the directory already exists, it is cleaned up and reused.
+A lock is put in that directory to protect against concurrent PCVS execution in the same directory.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">run</span></code> command is run, PCVS will recursively scan the target directory,
+find any <code class="docutils literal notranslate"><span class="pre">pcvs.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file within the directory
+or its subdirectories to launch the corresponding tests.</p>
+<p>PCVS will:</p>
+<ul class="simple">
+<li><p>run <code class="docutils literal notranslate"><span class="pre">pcvs.setup</span></code> file to generate associated <code class="docutils literal notranslate"><span class="pre">pcvs.yaml</span></code> file.</p></li>
+<li><p>parse <code class="docutils literal notranslate"><span class="pre">pcvs.yaml</span></code> file to generate tests to run.</p></li>
+<li><p>build <code class="docutils literal notranslate"><span class="pre">all_reduce</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">wave</span></code> by compiling their corresponding c file
+using the compiler provided by the compiler configuration of <code class="docutils literal notranslate"><span class="pre">myprofile</span></code>.</p></li>
+<li><p>run the <code class="docutils literal notranslate"><span class="pre">all_reduce</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">wave</span></code> program as many times as describes by criterions.</p></li>
+</ul>
+</section>
+<section id="access-the-results">
+<h2>Access the results<a class="headerlink" href="#access-the-results" title="Link to this heading"></a></h2>
+<p>Results are stored in <code class="docutils literal notranslate"><span class="pre">$PWD/.pcvs-build/rawdata/*.json</span></code> by default.
+The default output directory may be changed with <code class="docutils literal notranslate"><span class="pre">pcvs</span> <span class="pre">run</span> <span class="pre">--output</span></code>.
+JSON files can directly process by third-party tools.
+The <a class="reference download internal" download="" href="../_downloads/adb2b1da40fcf36dbdc190080992a76d/test-result-scheme.yml"><code class="xref download docutils literal notranslate"><span class="pre">scheme</span></code></a>
+can be used to update the input parser with compliant output.</p>
+<p>PCVS comes with 2 way to visualize the results.
+A lightweight web server (using Flask) to serve results in a web browser.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># where pcvs run has been run:</span>
+$<span class="w"> </span>pcvs<span class="w"> </span>report
+<span class="c1"># OR you may specify the run path</span>
+$<span class="w"> </span>pcvs<span class="w"> </span>report<span class="w"> </span>&lt;path&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Browse to <a class="reference external" href="http://localhost:5000/">http://localhost:5000/</a> to see your results.</p>
+</div>
+<p>Or a tui using textual:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># to use the tui</span>
+$<span class="w"> </span>pcvs<span class="w"> </span>--tui<span class="w"> </span>report
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Parallel Computing Validation System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Full Installation Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020-2026, Commissariat a l&#39;Energie Atomique et aux Energies Alternatives.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

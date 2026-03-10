@@ -1,13 +1,13 @@
 .. _installation-guide:
 
-####################
- Installation Guide
-####################
+#########################
+ Full Installation Guide
+#########################
 
 System Prerequisites
 ####################
 
-PCVS requires **python3.5+** before being installed. We encourage users to use
+PCVS requires **python3.10+** before being installed. We encourage users to use
 virtual environment before installing PCVS, especially if targeting a
 single-user usage. To create a virtual environment, create & actiate it
 **before** using pip3. Please check
@@ -45,8 +45,8 @@ Here some quickstarts for each approach:
     # work...
     $ pyenv deactivate
 
-Installation from sources (recommended)
-#######################################
+Installation from sources
+#########################
 
 The source code is available on GitHub. To checkout the latest release:
 
@@ -69,7 +69,7 @@ An other way to install PCVS is through **PyPI** repositories.
     $ pip3 install pcvs<=0.8.0
 
 Dealing with offline networks
-=============================
+#############################
 
 In some scenarios, it may not be possible to access PyPI mirrors to download
 dependencies (or even PCVS itself). Procedures below will describe how
@@ -112,11 +112,11 @@ download (and should be taken care manually):
 
 .. code-block:: bash
 
-    $ pip3 download . -d ... --platform x86_64 --python-version 3.5.4 [--only-binary=:all:|--no-deps]
+    $ pip3 download . -d ... --platform x86_64 --python-version 3.10 [--only-binary=:all:|--no-deps]
 
 
 Important note
-==============
+##############
 
 * PCVS requires Click >= 8.0, latest versions changed a critical keyword (to
   support completion) not backward compatible. Furthermore, Flask also have a

@@ -1,6 +1,8 @@
-****************
-Validation setup
-****************
+.. _test-file:
+
+******************
+Test Specification
+******************
 
 Generalities
 ============
@@ -8,9 +10,8 @@ Generalities
 Setup files
 -----------
 
-Like profiles, setup configurations have nodes to describe different steps of
-the process. These nodes are split into subnodes to describe the course of
-the run.
+Setup configurations have nodes to describe different steps of the test.
+These nodes are split into subnodes to describe the course of the run.
 
 The validation configuration is specified using setup files. These files can be
 in the yml format (``pcvs.yml``), or be an executable files (``pcvs.setup``)
@@ -33,7 +34,7 @@ Example
     └── subdir2
         └── pcvs.yml
 
-Launching ```pcvs run exampletree`` will generate tests for subdir1/pcvs.yml
+Launching ``pcvs run exampletree`` will generate tests for subdir1/pcvs.yml
 **and** for subdir2/pcvs.yml. There is no need to put a setup configuration in
 the root of ``exampletree``, but it is possible to add a setup here.
 

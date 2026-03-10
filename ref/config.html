@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Configurations &mdash; PCVS 1.0.0 documentation</title>
+  <title>Configurations &mdash; PCVS 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -14,14 +14,14 @@
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Banks" href="bank.html" />
-    <link rel="prev" title="Validation setup" href="test-file.html" /> 
+    <link rel="prev" title="Test Specification" href="test-file.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,16 +46,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../basics/features.html">Feature Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/getting-started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Installation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/basic-use.html">Basic usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/tuto.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../basics/installation.html">Full Installation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../basics/issues.html">Known issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../basics/workflow.html">Common workflow</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test-file.html">Test Specification</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configurations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#generalities">Generalities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scope">Scope</a></li>
@@ -65,11 +62,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#configuration-description">Configuration description</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#compilers-configuration">Compilers configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#compilers-example">Compilers example</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#variants">variants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#variants">Variants</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#criterion-configuration">Criterion configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#series">Series</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#series-examples">Series Examples</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#group-configuration">Group configuration</a><ul>
@@ -121,7 +120,7 @@
            <div itemprop="articleBody">
              
   <section id="configurations">
-<h1>Configurations<a class="headerlink" href="#configurations" title="Link to this heading"></a></h1>
+<span id="config"></span><h1>Configurations<a class="headerlink" href="#configurations" title="Link to this heading"></a></h1>
 <section id="generalities">
 <h2>Generalities<a class="headerlink" href="#generalities" title="Link to this heading"></a></h2>
 <p>Configurations define settings for PCVS. There are 5 basic configurations files
@@ -137,7 +136,7 @@ which are:</p>
 The profile is the top level configuration used to run pcvs.</p>
 </section>
 <section id="scope">
-<h2>Scope<a class="headerlink" href="#scope" title="Link to this heading"></a></h2>
+<span id="config-scope"></span><h2>Scope<a class="headerlink" href="#scope" title="Link to this heading"></a></h2>
 <p>PCVS allows 3 scopes:</p>
 <ul class="simple">
 <li><dl class="simple">
@@ -222,7 +221,7 @@ Using <code class="docutils literal notranslate"><span class="pre">pcvs</span> <
 </div>
 </section>
 <section id="profile">
-<span id="profile-scope"></span><h2>Profile<a class="headerlink" href="#profile" title="Link to this heading"></a></h2>
+<h2>Profile<a class="headerlink" href="#profile" title="Link to this heading"></a></h2>
 <p>A PCVS <strong>profile</strong> is the root configuration block that link all configurations together
 and need to be provided to pcvs to run a test suite.
 A profile contain 5 references, to one of each of the configuration types.
@@ -242,14 +241,34 @@ File extensions are optionnals.</p>
 <h2>Configuration description<a class="headerlink" href="#configuration-description" title="Link to this heading"></a></h2>
 <section id="compilers-configuration">
 <h3>Compilers configuration<a class="headerlink" href="#compilers-configuration" title="Link to this heading"></a></h3>
-<p>The compiler node describes how to use a compiler, it includes the following nodes:
-* <code class="docutils literal notranslate"><span class="pre">program</span></code>: the name of the program to execute
-* <code class="docutils literal notranslate"><span class="pre">envs</span></code>: the env to export at build time for that compiler, useful if you are using a Makefile
-* <code class="docutils literal notranslate"><span class="pre">extension</span></code>: the source code extension match by the compilers.
-* <code class="docutils literal notranslate"><span class="pre">variants</span></code>: different version of the same compiler configuration entry.</p>
+<p>The compiler configuration describes how to use a compiler, it includes the following nodes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">program</span></code>: the name of the program to execute</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">envs</span></code>: the env to export at build time for that compiler, useful if you are using a Makefile</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">extension</span></code>: the source code extension match by the compilers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variants</span></code>: different version of the same compiler configuration entry.</p></li>
+</ul>
 <section id="compilers-example">
 <h4>Compilers example<a class="headerlink" href="#compilers-example" title="Link to this heading"></a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">compiler.compilers</span></code> block contains a collection of compiler configurations.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">compiler.compilers</span></code> block contains a collection of compiler configurations.
+The scheme is explained in the following</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compilers</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">&lt;name&gt;</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Name</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">executable&quot;</span>
+<span class="w">      </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Arguments&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;pass&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;the&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;compiler&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Environment&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;variables&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;set&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;when</span><span class="nv"> </span><span class="s">using</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">compiler&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Default</span><span class="nv"> </span><span class="s">set</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">extensions</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">use</span><span class="nv"> </span><span class="s">on&quot;</span>
+<span class="w">      </span><span class="nt">extension</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Regex</span><span class="nv"> </span><span class="s">describing</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">extension</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">file</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">compiler</span><span class="nv"> </span><span class="s">should</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">used&quot;</span>
+<span class="w">      </span><span class="c1"># Variants are optional sets of arguments and environment variables</span>
+<span class="w">      </span><span class="c1"># Some tests use those variants to have an agnostic way to influence the build</span>
+<span class="w">      </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">         </span><span class="nt">&lt;name&gt;</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Name</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">executable&quot;</span>
+<span class="w">            </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Arguments&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;pass&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;the&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;compiler&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">            </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Environment&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;variables&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;set&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;when</span><span class="nv"> </span><span class="s">using</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">compiler&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>The default compilers configuration may look like the following example</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">compilers</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">cc</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpicc</span>
@@ -282,34 +301,40 @@ File extensions are optionnals.</p>
 </div>
 </section>
 <section id="variants">
-<h4>variants<a class="headerlink" href="#variants" title="Link to this heading"></a></h4>
+<h4>Variants<a class="headerlink" href="#variants" title="Link to this heading"></a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">variants</span></code> block can contain any custom variant.
 The variant must have a <strong>name</strong>, and <strong>arguments</strong> as such:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">example_variant</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">additional arguments for the example variant</span>
 <span class="nt">openmp</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-fopenmp</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&#39;-fopenmp&#39;</span><span class="w"> </span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">envs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&#39;PCVS_CFLAGS=&quot;-fopenmp&quot;&#39;</span><span class="w"> </span><span class="p p-Indicator">]</span>
 <span class="nt">strict</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-Werror -Wall -Wextra</span>
+<span class="w">    </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&#39;-Werror&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;-Wall&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;-Wextra&#39;</span><span class="w"> </span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <p>In this example the variants “example_variant”, “openmp”, and “strict” have to be
 specified in the validation setup where the user wants to use them.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If multiple variants are requested by a test, the <code class="docutils literal notranslate"><span class="pre">args</span></code> and <code class="docutils literal notranslate"><span class="pre">envs</span></code> will be concatenated.
+Multiple variants does not produce multiple build configuration, you have to use different jobs for this purpose</p>
+</div>
 </section>
 </section>
 <section id="criterion-configuration">
 <h3>Criterion configuration<a class="headerlink" href="#criterion-configuration" title="Link to this heading"></a></h3>
-<p>The criterion node contains a collection of iterators that describe the tests.
+<p>The criterion configuration contains a collection of iterators that describe the tests.
 PCVS can iterate over custom parameters as such :</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">iterators </span><span class="p">:</span>
-<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">n_[iterator]</span><span class="w"> </span><span class="p p-Indicator">:</span>
-<span class="w">        </span><span class="nt">**subtitle** </span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string used to indicate the number of [iterator] in the test description</span>
-<span class="w">        </span><span class="nt">**values** </span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">values that [iterator] allowed to take</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;name&gt; </span><span class="p">:</span>
+<span class="w">    </span><span class="nt">&lt;iterator&gt; </span><span class="p">:</span>
+<span class="w">        </span><span class="nt">subtitle </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;String</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">indicate</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">&lt;iterator&gt;</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">test</span><span class="nv"> </span><span class="s">description&quot;</span>
+<span class="w">        </span><span class="nt">values </span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Values</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">&lt;iterator&gt;&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;is</span><span class="nv"> </span><span class="s">allowed</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">take&quot;</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <section id="example">
 <h4>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h4>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">iterators</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">criterions</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">n_core</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">subtitle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">C</span>
 <span class="w">        </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
@@ -319,31 +344,90 @@ PCVS can iterate over custom parameters as such :</p>
 values 1 and 2. The name <code class="docutils literal notranslate"><span class="pre">n_core</span></code> is arbitrary and has to be put in the
 validation setup file.</p>
 </section>
+<section id="series">
+<h4>Series<a class="headerlink" href="#series" title="Link to this heading"></a></h4>
+<p>When iterators are declared as <code class="docutils literal notranslate"><span class="pre">numeric</span></code> by the runtime,
+special syntaxes have been introduced to ease the definition of series of number.
+These are called sequences and can be used as a replacement of a single value.
+They map as dict instead of a single value.
+There is 3 types of sequences:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sequence</span></code> | <code class="docutils literal notranslate"><span class="pre">arithmeric</span></code>: to create an arithmetic sequence: <code class="docutils literal notranslate"><span class="pre">U(n+1)</span> <span class="pre">=</span> <span class="pre">U(n)</span> <span class="pre">+</span> <span class="pre">k</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multiplication</span></code> | <code class="docutils literal notranslate"><span class="pre">geometric</span></code>: to create a geometric sequence: <code class="docutils literal notranslate"><span class="pre">U(n+1)</span> <span class="pre">=</span> <span class="pre">U(n)</span> <span class="pre">*</span> <span class="pre">k</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">powerof</span></code>: to create a list within a range where values are power of k.</p></li>
+</ul>
+<p>Each operation comes with three parameters:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">from</span></code>: lowerbound (inclusive)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to</span></code>: upperbound (inclusive)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">of</span></code>: the stride/factor/power to apply</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">op</span></code>: type of operation:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">seq</span></code> | <code class="docutils literal notranslate"><span class="pre">ari</span></code> | <code class="docutils literal notranslate"><span class="pre">arithmetic</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mul</span></code> | <code class="docutils literal notranslate"><span class="pre">geo</span></code> | <code class="docutils literal notranslate"><span class="pre">geometric</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pow</span></code> | <code class="docutils literal notranslate"><span class="pre">powerof</span></code></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="series-examples">
+<h4>Series Examples<a class="headerlink" href="#series-examples" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">{op:</span> <span class="pre">seq,</span> <span class="pre">from:</span> <span class="pre">2,</span> <span class="pre">to:</span> <span class="pre">10,</span>&#160; <span class="pre">of:</span> <span class="pre">2}</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">4,</span> <span class="pre">6,</span> <span class="pre">8,</span> <span class="pre">10]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{op:</span> <span class="pre">mul,</span> <span class="pre">from:</span> <span class="pre">1,</span> <span class="pre">to:</span> <span class="pre">100,</span> <span class="pre">of:</span> <span class="pre">2}</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">4,</span> <span class="pre">8,</span> <span class="pre">16,</span> <span class="pre">32,</span> <span class="pre">64]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{op:</span> <span class="pre">pow,</span> <span class="pre">from:</span> <span class="pre">2,</span> <span class="pre">to:</span> <span class="pre">10,</span>&#160; <span class="pre">of:</span> <span class="pre">2}</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">9]</span></code> ==  <code class="docutils literal notranslate"><span class="pre">[2^2,</span> <span class="pre">3^2]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{op:</span> <span class="pre">pow,</span> <span class="pre">from:</span> <span class="pre">1,</span> <span class="pre">to:</span> <span class="pre">100,</span> <span class="pre">of:</span> <span class="pre">3}</span></code> –&gt; <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">8,</span> <span class="pre">27,</span> <span class="pre">64]</span></code> == <code class="docutils literal notranslate"><span class="pre">[1^3,</span> <span class="pre">2^3,</span> <span class="pre">3^3,</span> <span class="pre">4^3]</span></code></p></li>
+</ul>
+</section>
 </section>
 <section id="group-configuration">
 <h3>Group configuration<a class="headerlink" href="#group-configuration" title="Link to this heading"></a></h3>
-<p>The group node contains group definitions that describe tests. A group
-description can contain any node present in the Configuration basic blocks (CF
-<cite>Validation Setup</cite> section).</p>
+<p>The group configuration contains group definitions that describe tests.
+A group description is a test template that can contain any node present in the Test Configuration.
+(cf. <a class="reference internal" href="test-file.html#test-file"><span class="std std-ref">Test Specification</span></a>)</p>
 <section id="id1">
 <h4>Example<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
-<p>The following example allows disabling the <code class="docutils literal notranslate"><span class="pre">n_omp</span></code> criterion of the group <code class="docutils literal notranslate"><span class="pre">GRPMPI</span></code>.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">GRPMPI</span><span class="p">:</span>
+<p>The following scheme shows how group can be used to inherit part of the criterion and to restrict other.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;group_name&gt;</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># We can restrict some iterators</span>
 <span class="w">    </span><span class="nt">run</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">iterate</span><span class="p">:</span>
-<span class="w">            </span><span class="nt">n_omp</span><span class="p">:</span>
-<span class="w">                </span><span class="nt">**values**</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">            </span><span class="c1"># inherit whitelists the criterions to use</span>
+<span class="w">            </span><span class="c1"># if not defined, all the criterions are applied</span>
+<span class="w">            </span><span class="nt">inherit</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;Criterions&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;to&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;use&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;as</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">criterions</span><span class="nv"> </span><span class="s">configuration&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">            </span><span class="nt">&lt;iterator_name&gt;</span><span class="p">:</span>
+<span class="w">                </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;possible&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;values&quot;</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="machine-configuration">
 <h3>Machine configuration<a class="headerlink" href="#machine-configuration" title="Link to this heading"></a></h3>
-<p>The machine node describes the constraints of the physical machine.</p>
+<p>The machine configuration describes the constraints of the physical machine.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">machine</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number of accessible nodes</span>
-<span class="w">    </span><span class="nt">cores_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">number of accessible cores per node</span>
-<span class="w">    </span><span class="nt">concurrent_run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximum number of processes that can coexist</span>
+<span class="w">    </span><span class="nt">nodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w">               </span><span class="c1"># number of accessible nodes</span>
+<span class="w">    </span><span class="nt">cores_per_node</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span><span class="w">     </span><span class="c1"># number of accessible cores per node</span>
+<span class="w">    </span><span class="nt">concurrent_run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">      </span><span class="c1"># maximum number of processes that can coexist</span>
+<span class="w">    </span><span class="nt">build_job_threads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">   </span><span class="c1"># default number of workers for concurrent building (i.e. make -j)</span>
+<span class="w">    </span><span class="c1"># Machine level resource manager configuration</span>
+<span class="w">    </span><span class="nt">job_manager</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Configuration of the allocation command</span>
+<span class="w">        </span><span class="nt">allocate</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;salloc&#39;</span><span class="w"> </span><span class="c1"># name of the executable to allocate resources</span>
+<span class="w">            </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;-p</span><span class="nv"> </span><span class="s">partition&#39;</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># list of args to pass to the allocation command</span>
+<span class="w">            </span><span class="nt">wrapper</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Configuration of the run command</span>
+<span class="w">        </span><span class="nt">remote</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">program</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;srun&#39;</span><span class="w"> </span><span class="c1"># name of the executable to launch on allocated resources</span>
+<span class="w">            </span><span class="nt">args</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;-p</span><span class="nv"> </span><span class="s">partition&#39;</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># list of args to pass to the launch command</span>
+<span class="w">            </span><span class="nt">wrapper</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Configuration of the run in batch command</span>
+<span class="w">        </span><span class="nt">batch</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">program</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">args</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">wrapper</span><span class="p">:</span>
 </pre></div>
 </div>
 </section>
@@ -352,7 +436,7 @@ description can contain any node present in the Configuration basic blocks (CF
 <p><code class="docutils literal notranslate"><span class="pre">program</span></code> specify a wrapper for runtime tests, such as <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> for example.
 The <code class="docutils literal notranslate"><span class="pre">compiling.wrapper</span></code> specify a wrapper for test compilation.
 It can be used to run the compilation on another node using <code class="docutils literal notranslate"><span class="pre">srun</span></code> for example.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">criterions</span></code> node contains arguments passed to the launching command.
+<p>The <code class="docutils literal notranslate"><span class="pre">criterions</span></code> configuration contains arguments passed to the launching command.
 For example, if <code class="docutils literal notranslate"><span class="pre">prterun</span></code> takes the “-np” argument, which corresponds
 to the number of MPI threads, let’s say <code class="docutils literal notranslate"><span class="pre">n_mpi</span></code>,
 we will get the following runtime profile:</p>
@@ -394,7 +478,7 @@ will be loaded.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="test-file.html" class="btn btn-neutral float-left" title="Validation setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="test-file.html" class="btn btn-neutral float-left" title="Test Specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="bank.html" class="btn btn-neutral float-right" title="Banks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

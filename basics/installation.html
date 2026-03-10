@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation Guide &mdash; PCVS 1.0.0 documentation</title>
+  <title>Full Installation Guide &mdash; PCVS 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
@@ -14,14 +14,14 @@
     <link rel="shortcut icon" href="../_static/pcvs_favicon.ico"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Basic usage" href="basic-use.html" />
-    <link rel="prev" title="Getting Started" href="getting-started.html" /> 
+    <link rel="next" title="Known issues" href="issues.html" />
+    <link rel="prev" title="Tutorial" href="tuto.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,25 +46,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Basics</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="features.html">Feature Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation Guide</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="tuto.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Full Installation Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#system-prerequisites">System Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation-from-sources-recommended">Installation from sources (recommended)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation-from-pypi">Installation from PyPI</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dealing-with-offline-networks">Dealing with offline networks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#important-note">Important note</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-from-sources">Installation from sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-from-pypi">Installation from PyPI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dealing-with-offline-networks">Dealing with offline networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#important-note">Important note</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="basic-use.html">Basic usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="issues.html">Known issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="workflow.html">Common workflow</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Validation setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ref/test-file.html">Test Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/config.html">Configurations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/bank.html">Banks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ref/session.html">Sessions</a></li>
@@ -91,7 +86,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Installation Guide</li>
+      <li class="breadcrumb-item active">Full Installation Guide</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/basics/installation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -101,11 +96,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation-guide">
-<span id="id1"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading"></a></h1>
+  <section id="full-installation-guide">
+<span id="installation-guide"></span><h1>Full Installation Guide<a class="headerlink" href="#full-installation-guide" title="Link to this heading"></a></h1>
 <section id="system-prerequisites">
 <h2>System Prerequisites<a class="headerlink" href="#system-prerequisites" title="Link to this heading"></a></h2>
-<p>PCVS requires <strong>python3.5+</strong> before being installed. We encourage users to use
+<p>PCVS requires <strong>python3.10+</strong> before being installed. We encourage users to use
 virtual environment before installing PCVS, especially if targeting a
 single-user usage. To create a virtual environment, create &amp; actiate it
 <strong>before</strong> using pip3. Please check
@@ -139,8 +134,8 @@ $<span class="w"> </span>pyenv<span class="w"> </span>deactivate
 </pre></div>
 </div>
 </section>
-<section id="installation-from-sources-recommended">
-<h2>Installation from sources (recommended)<a class="headerlink" href="#installation-from-sources-recommended" title="Link to this heading"></a></h2>
+<section id="installation-from-sources">
+<h2>Installation from sources<a class="headerlink" href="#installation-from-sources" title="Link to this heading"></a></h2>
 <p>The source code is available on GitHub. To checkout the latest release:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cea-hpc/pcvs.git<span class="w"> </span>pcvs
 $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>./pcvs
@@ -157,8 +152,9 @@ $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </s
 $<span class="w"> </span>pip3<span class="w"> </span>install<span class="w"> </span>pcvs&lt;<span class="o">=</span><span class="m">0</span>.8.0
 </pre></div>
 </div>
+</section>
 <section id="dealing-with-offline-networks">
-<h3>Dealing with offline networks<a class="headerlink" href="#dealing-with-offline-networks" title="Link to this heading"></a></h3>
+<h2>Dealing with offline networks<a class="headerlink" href="#dealing-with-offline-networks" title="Link to this heading"></a></h2>
 <p>In some scenarios, it may not be possible to access PyPI mirrors to download
 dependencies (or even PCVS itself). Procedures below will describe how
 to download dep archives locally on a machine with internet access and then make them
@@ -194,12 +190,12 @@ only distributed versions (compiled one). To ‘accept’ it, you must specify
 <code class="docutils literal notranslate"><span class="pre">--only-binary=:all:</span></code> to force downloading distribution packages (but will
 fail if not provided) or <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> to exclude any dependencies to be
 download (and should be taken care manually):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>download<span class="w"> </span>.<span class="w"> </span>-d<span class="w"> </span>...<span class="w"> </span>--platform<span class="w"> </span>x86_64<span class="w"> </span>--python-version<span class="w"> </span><span class="m">3</span>.5.4<span class="w"> </span><span class="o">[</span>--only-binary<span class="o">=</span>:all:<span class="p">|</span>--no-deps<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip3<span class="w"> </span>download<span class="w"> </span>.<span class="w"> </span>-d<span class="w"> </span>...<span class="w"> </span>--platform<span class="w"> </span>x86_64<span class="w"> </span>--python-version<span class="w"> </span><span class="m">3</span>.10<span class="w"> </span><span class="o">[</span>--only-binary<span class="o">=</span>:all:<span class="p">|</span>--no-deps<span class="o">]</span>
 </pre></div>
 </div>
 </section>
 <section id="important-note">
-<h3>Important note<a class="headerlink" href="#important-note" title="Link to this heading"></a></h3>
+<h2>Important note<a class="headerlink" href="#important-note" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>PCVS requires Click &gt;= 8.0, latest versions changed a critical keyword (to
 support completion) not backward compatible. Furthermore, Flask also have a
@@ -221,14 +217,13 @@ may not be always provided. As a workaround for now:</p>
 </div>
 </section>
 </section>
-</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="basic-use.html" class="btn btn-neutral float-right" title="Basic usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tuto.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="issues.html" class="btn btn-neutral float-right" title="Known issues" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
