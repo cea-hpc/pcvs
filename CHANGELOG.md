@@ -5,7 +5,7 @@ track what changed from each release.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
 
-## [1.1.0] -- 2026-03
+## [1.1.0] -- 2026-03-10
 
 ### Added
 
