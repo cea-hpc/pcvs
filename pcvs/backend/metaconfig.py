@@ -41,7 +41,7 @@ class MetaConfig(Config):
     The internal_config is used to contain runtime information that should/could not be serialize.
     """
 
-    def __init__(self, d: dict = {}, internal_config: dict = {}):
+    def __init__(self, d: dict | None = None, internal_config: dict | None = None):
         """
         Init the object.
 
@@ -53,6 +53,10 @@ class MetaConfig(Config):
         It act as a global variables registry.
         Using it is bad practice and should be avoided.
         """
+        if d is None:
+            d = {}
+        if internal_config is None:
+            internal_config = {}
         super().__init__(d)
         self.__internal_config = internal_config
 

@@ -42,7 +42,7 @@ class Orchestrator:
     def __init__(self) -> None:
         """constructor method"""
         config_tree = GlobalConfig.root
-        # TODO: take metacong as argument and stop relying on global config
+        # TODO: make meta config an argument and stop relying on global config
         self._runners: list[RunnerAdapter] = []
         self._max_nodes = config_tree["machine"].get("nodes", 1)
         self._max_cores = config_tree["machine"].get("cores_per_node", 1)

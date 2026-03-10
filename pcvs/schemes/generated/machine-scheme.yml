@@ -8,6 +8,8 @@ properties:
     type: integer
   concurrent_run:
     type: integer
+  build_job_threads:
+    type: integer
   job_manager:
     type: object
     properties:
@@ -58,6 +60,8 @@ properties:
         cores_per_node:
           type: integer
         concurrent_run:
+          type: integer
+        build_job_threads:
           type: integer
         job_manager:
           type: object

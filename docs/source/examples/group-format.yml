@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/group-scheme.yml
 ---
 # Please here defines nodes like regular TEs
 # None of these templates will be unrolled
@@ -5,23 +6,16 @@
 GRPMPI:
   run:
     iterate:
-      n_omp:
-        values: null
+      inherit: ["n_mpi", "n_node", "n_core"]
+GRPMPI_NOTHREADS:
+  run:
+    iterate:
+      inherit: ["n_mpi", "n_node"]
 GRPOMP:
   run:
     iterate:
-      n_mpi:
-        values: null
-      n_node:
-        values: null
+      inherit: ["n_omp", "n_core"]
 GRPSERIAL:
   run:
     iterate:
-      n_core:
-        values: null
-      n_mpi:
-        values: null
-      n_node:
-        values: null
-      n_omp:
-        values: null
+      inherit: []

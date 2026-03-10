@@ -49,8 +49,10 @@ class Branch(Reference):
 class Commit(Reference):
     """Maps to a regular Git commit"""
 
-    def __init__(self, repo, obj, metadata: dict[str, Any] = {}):
+    def __init__(self, repo, obj, metadata: dict[str, Any] | None = None):
         super().__init__(repo)
+        if metadata is None:
+            metadata = {}
         self.cid = obj
         self.meta = metadata
 
@@ -68,14 +70,16 @@ class Commit(Reference):
 class Tree(Reference):
     """Maps to a git-lowlevel Tree object"""
 
-    def __init__(self, repo, tid, prefix="", children=[]):
+    def __init__(self, repo, tid, prefix="", children=None):
         super().__init__(repo)
+        if children is None:
+            children = []
         self.tid = tid
         self.prefix = prefix
         self.children = children
 
     @classmethod
-    def as_root(cls, repo: Any, hdl: Any, children: list = []) -> Self:
+    def as_root(cls, repo: Any, hdl: Any, children: list | None = None) -> Self:
         """Create a Tree and attach it with the git-specific handler (if any)
 
         :param repo: the repo handle
@@ -83,6 +87,8 @@ class Tree(Reference):
         :param children: Any prebuild children for this root node
         :return: the created Tree object
         """
+        if children is None:
+            children = []
         cls.hdl = hdl  # type: ignore
         return cls(repo=repo, tid=None, prefix="", children=children)
 

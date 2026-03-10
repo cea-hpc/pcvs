@@ -3,16 +3,16 @@
 GRPMPI:
   run:
     iterate:
-      inherite: ["n_mpi", "n_node", "n_core"]
+      inherit: ["n_mpi", "n_node", "n_core"]
 GRPMPI_NOTHREADS:
   run:
     iterate:
-      inherite: ["n_mpi", "n_node"]
+      inherit: ["n_mpi", "n_node"]
 GRPOMP:
   run:
     iterate:
-      inherite: ["n_omp", "n_core"]
+      inherit: ["n_omp", "n_core"]
 GRPSERIAL:
   run:
     iterate:
-      inherite: []
+      inherit: []

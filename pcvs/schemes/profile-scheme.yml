@@ -11,3 +11,4 @@ properties:
     type: string
   runtime:
     type: string
+additionalProperties: false

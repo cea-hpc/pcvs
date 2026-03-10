@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/validation-scheme.yml
 ---
 # global validation settings to keep CLI simple
 # this file is not a basic configuration block
@@ -15,7 +16,7 @@ dirs:
 simulated: false
 anonymize: false
 target_bank: 'bankTag@bankProject'
-reused_build: "another/build/directory/to/clone/from"
+reused_build: true
 author:
     name: "Who-run-the-test-suite"
     email: "johndoe@example.com"
@@ -29,7 +30,7 @@ scheduling:
     # in case of doubt, use '0'
     model: 2
     # which criterion is used as a pattern to schedule jobs
-    sched_on: "n_node"
+    based_on: "n_node"
 
 # Hob result should be produced
 result:

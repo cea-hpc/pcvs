@@ -113,7 +113,9 @@ patternProperties:
               target:
                 type: string
               jobs:
-                type: integer
+                OneOf:
+                  - type: integer
+                  - type: boolean
               args:
                 type: array
                 items:
@@ -142,6 +144,8 @@ patternProperties:
           cmake:
             type: object
             properties:
+              sub_build_dir:
+                type: string
               args:
                 type: array
                 items:
@@ -301,12 +305,12 @@ patternProperties:
                         type: string
                     additionalProperties: false
                 additionalProperties: false
-              inherite:
+              inherit:
                 type: array
                 items:
                   type: string
             patternProperties:
-              ^(?!program|inherite).*$:
+              ^(?!program|inherit).*$:
                 type: object
                 properties:
                   values:

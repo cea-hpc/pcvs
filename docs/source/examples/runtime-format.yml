@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/runtime-scheme.yml
 ---
 # program path to run any program (can be a name if in $PATH)
 program: "/path/to/command"
@@ -14,7 +15,7 @@ args: "--verbose"
 # - Type of network to enable inter process communication
 # A single test is a combination of one single value picked up from
 # these components.
-iterators:
+criterions:
     # please use a short, without-space names
     iterator_name:
         # option known by the runtime to handle a value of this component

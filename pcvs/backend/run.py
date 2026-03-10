@@ -438,7 +438,7 @@ def build_env_from_configuration(config: dict) -> dict:
             )
     for crit_name, criter in config["criterion"].items():
         env[f"PCVS_CRIT_{crit_name}".upper()] = to_str(criter["values"])
-    compiler_env = testing.tedesc.extract_compilers_envs()
+    compiler_env = testing.tedesc.extract_compilers_envs([])
     for e in compiler_env:
         k, v = e.split("=", 1)
         env[k] = v

@@ -527,12 +527,6 @@ class Series:
     A series can be seen as the Combination generator for a given :class:`TEDescriptor`
     """
 
-    # TODO: delete if unused
-    # @classmethod
-    # def register_sys_criterion(cls, system_criterion):
-    #    """copy/inherit the system-defined criterion (shortcut to global config)"""
-    #    cls.sys_iterators = system_criterion
-
     def __init__(self, dict_of_criterion: dict[str, Criterion]):
         """
         Build a series, by extracting the list of values.

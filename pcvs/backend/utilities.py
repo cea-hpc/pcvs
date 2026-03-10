@@ -189,8 +189,6 @@ def process_check_directory(directory: str, pf_name: str = "default.yml") -> dic
     token_bad = f"[red bold]{io.console.utf('fail')}[/]"
     token_unknown = f"[yellow bold]{io.console.utf('none')}[/]"
 
-    # with io.console.pager():
-    # with Live(table, refresh_per_second=4):
     for label, subtree, file in io.console.progress_iter([*setup_files, *yaml_files]):
         is_setup = (label, subtree, file) in setup_files
         setup_ok = token_ok if is_setup else token_unknown
@@ -221,7 +219,6 @@ def process_check_directory(directory: str, pf_name: str = "default.yml") -> dic
 
     io.console.print_rich(table)
     return errors
-    # TODO: format and return errors
 
 
 class BuildSystem:

@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/te-scheme.yml
 ---
 # This node will be ignored while unrolling tests
 # as node name starts with a dot "."
@@ -18,12 +19,15 @@
     # Only one build system is expected to be used at once among the following:
 
     autotools:
+      # Use autogen instead of autoreconf
+      autogen: true
       args: ['--disable-bootstrap']
       envs: []
     cmake:
-      # "vars" is a shortcut to "args: ["-D<var>"]"
-      vars: ['CMAKE_VERBOSE_MAKEFILE=ON']
-      args: []
+      # sub build directory relative to PCVS tests build directory
+      # It is mostly used when multiple configure have to be done using CMake
+      sub_build_dir: 'my_personal_build_dir'
+      args: ['-DCMAKE_BUILD_TYPE=Release']
       envs: []
     make:
       # default makefile target to invoke
@@ -32,6 +36,9 @@
       # unrolling. A list is available at the end of this file.
       args: ['MPICC=@COMPILER_CC@']
       envs: []
+      # Number of compilation jobs (-j option)
+      # It can be the number explicitly or true to use the number defined in the machine profile
+      jobs: true
     sources:
       # program binary (if needed)
       binary: "a.out"
@@ -45,6 +52,7 @@
     custom:
       # Really complex build scenario PCVS may not be able to handle
       program: "myscript.sh"
+      args: ['']
       envs: ["VAR1=value", "VAR2=value"]
     validate:
       # same as validate node bellow but to validate the build process
@@ -62,6 +70,7 @@
     # it indicates not support for a specific variant.
     # There is no preset variants, all of them can be declared by the profile.
     # It can be found under compiler.$LANG.variants
+    # The args and envs defined in the variants will be concatenated with the currents args and envs.
     variants:
       - openmp
       - accel
@@ -96,7 +105,7 @@
       # criterion values will be given by the "values" field
       # criterion label (used to generate test-name) will be given by "subtitle"
       # parameter position will be given by "type": "argument" or "environment"
-      # numeric attributes allow using sequence to generate values.
+      # numeric attributes allow using sequence to generate values (for more information see Series in configuration).
       # for instance, to generate only power of 2 values:
       #  => values: [{from: 0; to: 100, op: "mul": of: 2}]
       program:
@@ -107,7 +116,7 @@
           local: true
           type: "argument"
           values: ["-iter 1000", "-fast"]
-          subtitle: "lol"
+          subtitle: "i"
     # directory where program should be built
     cwd: "dir/to/build"
     # dependency scheme, same rules as build.depends_on.
@@ -194,7 +203,7 @@
   # A list of properties to enable specific features.
   # These attributes are common to build/run configurations
   # if a different set of attributes are required for build & run a single TE,
-  # feel free to create TWO nodes, with a dep on "build".
+  # feel free to create TWO nodes, with a dependency on "build".
   attributes:
     # control if the current benchmark program should be prefixed by
     # the runtime.program command (default: true)

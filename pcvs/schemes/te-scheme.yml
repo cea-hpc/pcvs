@@ -111,7 +111,7 @@ patternProperties:
               target:
                 type: string
               jobs:
-                type: integer
+                OneOf: [{type: integer}, {type: boolean}]
               args:
                 type: array
                 items: {type: string}
@@ -136,6 +136,8 @@ patternProperties:
           cmake:
             type: object
             properties:
+              sub_build_dir:
+                type: string # sub build dir relative to pcvs build_dir
               args:
                 type: array
                 items: {type: string}
@@ -232,10 +234,10 @@ patternProperties:
                         type: string
                     additionalProperties: false
                 additionalProperties: false
-              # whitelist of criterions to inherite
-              inherite: { type: array, items: {type: string}}
+              # whitelist of criterions to inherit
+              inherit: { type: array, items: {type: string}}
             patternProperties: # criterion values
-              "^(?!program|inherite).*$":
+              "^(?!program|inherit).*$":
                 type: object
                 properties:
                   values:

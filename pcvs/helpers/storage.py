@@ -34,7 +34,7 @@ class ConfigScope(Enum):
 
     def __str__(self) -> str:
         """Convert to str."""
-        return self.name
+        return self.name.lower()
 
     def __repr__(self) -> str:
         """Convert to str."""
@@ -78,7 +78,7 @@ class ConfigKind(Enum):
 
     def __str__(self) -> str:
         """Convert to str."""
-        return self.name
+        return self.name.lower()
 
     def __repr__(self) -> str:
         """Convert to str."""
@@ -289,7 +289,7 @@ class ConfigLocator:
             # config does not exist yet, but scope is not provided
             if should_exist is None or not should_exist:
                 return (
-                    "For a configuration that may not exist, specifying a scope is mendatory, "
+                    "For a configuration that may not exist, specifying a scope is mandatory, "
                     f"error parsing: '{user_token}'"
                 )
             # kind not provided, neither by token nor by function
@@ -304,7 +304,7 @@ class ConfigLocator:
             if scope is None:
                 if should_exist is None or not should_exist:
                     return (
-                        "For a configuration that may not exist, specifying a scope is mendatory, "
+                        "For a configuration that may not exist, specifying a scope is mandatory, "
                         f"error parsing: '{user_token}'"
                     )
             if kind is None:

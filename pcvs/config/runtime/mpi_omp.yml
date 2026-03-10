@@ -3,7 +3,7 @@
 program: mpirun
 criterions:
   n_mpi:
-    option: "-n"
+    option: "-n "
     numeric: true
     type: "argument"
     position: "after"
@@ -13,4 +13,4 @@ criterions:
     position: "after"
     type: "environment"
 
-plugin: "mpi_omp"
+defaultplugin: "mpi_omp"

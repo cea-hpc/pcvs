@@ -43,4 +43,4 @@ criterions:
     type: "argument"
 
 # the name of the plugin to filter valid criterion.
-plugin: "mpi_omp"
+defaultplugin: "mpi_omp"

@@ -117,7 +117,7 @@ repos:
           - --disable=duplicate-code # false positive in plugins examples
           - --disable=unidiomatic-typecheck # `type() is Type` is more strict that `isinstance`, bad check
           - --disable=unspecified-encoding
-          - --disable=keyword-arg-before-vararg,dangerous-default-value
+          - --disable=keyword-arg-before-vararg
           - --disable=global-variable-not-assigned,global-statement
           - --disable=broad-exception-caught
           - --disable=fixme

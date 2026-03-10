@@ -340,8 +340,7 @@ def cli_config_import(
         raise click.BadArgumentUsage(
             f"Configuration '{cd.full_name}' already exist! To override existing configuration use '-f'."
         )
-    conf.from_str(in_file.read())
-    conf.flush_to_disk()
+    conf.do_import(in_file.read())
 
 
 @cli_config.command(

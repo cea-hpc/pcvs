@@ -2,7 +2,7 @@
 Module for parsing configuration.
 
 - :class:`~ConfigFile`: a file on the disc, can be read, write, verify, edited, display ...
-- :class:`~YmlConfigFile`: inherite :class:`~ConfigFile` and add yaml parsing support.
+- :class:`~YmlConfigFile`: inherit :class:`~ConfigFile` and add yaml parsing support.
 - :class:`~Profile`: A :class:`~YmlConfigFile` that also contain multiples
   others :class:`~YmlConfigFile` that represent it's configuration.
 
@@ -162,10 +162,47 @@ class ConfigFile:
         edited_stream = click.edit(
             self._raw, extension=ConfigKind.get_file_ext(self._descriptor.kind), require_save=True
         )
+
+        def get_rejected_file_name(count: int) -> str:
+            return "_".join(
+                [
+                    str(self._descriptor.scope),
+                    str(self._descriptor.kind),
+                    self._descriptor.path.stem,
+                    f"rejected_{count}",
+                    self._descriptor.path.suffix,
+                ]
+            )
+
         if edited_stream is not None:
-            self._load(edited_stream)
-            self._check()
-            self._flush_to_disk()
+            try:
+                self._load(edited_stream)
+                self._check()
+                self._flush_to_disk()
+            except Exception as e:
+                i: int = 0
+                path: str = get_rejected_file_name(i)
+                while os.path.exists(path):
+                    i += 1
+                    path = get_rejected_file_name(i)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(edited_stream)
+                io.console.error(
+                    f"Failed to verify edited configuration, rejected configuration saved at {path}"
+                )
+                io.console.exception(e)
+
+    def do_import(self, config_str: str) -> None:
+        """
+        Import a config from a string.
+
+        :param config_str: the config to import
+        """
+        try:
+            self.from_str(config_str)
+            self.flush_to_disk()
+        except Exception as e:
+            io.console.exception(e)
 
     # Others
     def display(self) -> None:
@@ -179,7 +216,7 @@ class ConfigFile:
         io.console.print(self._flush())
 
     def validate(self) -> None:
-        """Validate a Config against it's shema."""
+        """Validate a Config against it's schema."""
         assert self.loaded
         self._check()
 

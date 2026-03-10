@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/te-scheme.yml
+all_reduce_test:
+  build:
+    files: ["coll/all-reduce.c"]
+    sources:
+      binary: "all_reduce"
+  run:
+    program: "all_reduce"
+pt2pt_test:
+  build:
+    files: ["pt2pt/wave.c"]
+    sources:
+      binary: "wave"
+      ldflags: "-lm"
+  run:
+    program: "wave"

@@ -12,12 +12,14 @@ class Config(dict):
     Config. These are then gathered in a :class:`~pcvs.backend.metaconfig.MetaConfig` object.
     """
 
-    def __init__(self, d: dict = {}):
+    def __init__(self, d: dict | None = None):
         """
         Init the object.
 
         :param d: items of the configuration
         """
+        if d is None:
+            d = {}
         super().__init__(**d)
 
     # recursive exportation to pure python dict for ruyaml representer

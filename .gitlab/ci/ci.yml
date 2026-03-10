@@ -1,5 +1,11 @@
 ---
 
+Env Sanitize:
+  stage: '.pre'
+  needs: []
+  script:
+    - rm -rf "${HOME}/.cache"
+
 .run:
   variables:
     CHILD_PIPELINE_NAME: '${CI_JOB_NAME}'

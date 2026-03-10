@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/cea-hpc/pcvs/refs/heads/master/pcvs/schemes/generated/compiler-scheme.yml
 ---
 # List of programs to be used to compile
 # a wide variety of programs
@@ -8,16 +9,16 @@
 # list objects, where more specialized content is appended
 # to the parent
 # C compiler
-cc:
+compilers:
+  cc:
     program: "/path/to/cc"
     args: ["-Wall", "-foption"]
     envs: ["MPI_CC=cc", "EXTRA_FLAGS=-foption"]
-    variant:
-        openmp:
-            args: ["-fopenmp"]
-        mpi:
-            program: "/path/to/mpicc"
-# available keys: cc, cxx, fc, f77, f90, f08, accl
+    variants:
+      openmp:
+        args: ["-fopenmp"]
+      mpi:
+        program: "/path/to/mpicc"
 # The drawback here is to duplicate variants for each compiler
 # please use YAML anchors (&, *) when possible:
 # cc:
@@ -33,7 +34,7 @@ cc:
 # Note, only a single can be specified but both can be used
 # at the same time
 package_manager:
-    spack:
-        - "name@version+variants"
-    module:
-        - "group/flavor/version"
+  spack:
+    - "name@version+variants"
+  module:
+    - "group/flavor/version"

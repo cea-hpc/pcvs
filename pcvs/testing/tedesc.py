@@ -53,11 +53,13 @@ def detect_compiler(build_info: dict) -> list[str] | None:
     return None
 
 
-def extract_compilers_envs() -> list[str]:
+def extract_compilers_envs(variants: list[str]) -> list[str]:
     """Extract compilers environment."""
     envs = []
     for _, compiler in GlobalConfig.root["compiler"]["compilers"].items():
         envs += compiler.get("envs", [])
+        for v in variants:
+            envs += compiler.get("variants", {}).get(v, {}).get("envs", [])
     return envs
 
 
@@ -243,9 +245,6 @@ class TEDescriptor:
 
         # compute local criterions relatively to system-wide's
         self._configure_criterions()
-        # apply retro-compatibility w/ old syntax
-        # TODO: verify that we can remove this without breaking
-        # self._compatibility_support(nodecontent.get("_compat", None))
 
     def get_binary_name(self) -> str:
         """
@@ -337,10 +336,10 @@ class TEDescriptor:
             test_crits = {}
             # browse declared criterions (system-wide)
             for k_sys, v_sys in self._sys_crit.items():
-                # if we do not inherite from this criterion, skip it
+                # if we do not inherit from this criterion, skip it
                 if (
-                    "inherite" in self._run["iterate"]
-                    and k_sys not in self._run["iterate"]["inherite"]
+                    "inherit" in self._run["iterate"]
+                    and k_sys not in self._run["iterate"]["inherit"]
                 ):
                     continue
                 # if key is overridden by the test
@@ -413,14 +412,21 @@ class TEDescriptor:
         """
         command = ["make"]
         basepath = self._srcdir
-
         # change makefile path if overridden by 'files'
         if "files" in self._build:
             basepath = os.path.dirname(self._build["files"][0])
             command.append("-f {}".format(" ".join(self._build["files"])))
 
-        envs = extract_compilers_envs()
-        jobs = self._build.get("make", {}).get("jobs", 1)
+        envs = extract_compilers_envs(self._build.get("variants", []))
+
+        threads_config: int | bool | None = self._build.get("make", {}).get("jobs")
+        jobs = 1
+        if isinstance(threads_config, bool):
+            if threads_config:
+                jobs = GlobalConfig.root["machine"].get("build_job_threads", jobs)
+        elif isinstance(threads_config, int):
+            jobs = threads_config
+
         # build the 'make' command
         command.append(f"-j {jobs}")
         command.append(
@@ -439,21 +445,29 @@ class TEDescriptor:
 
         :return: the command to be used, env to be imported & nb threads to run the test.
         """
+        envs = extract_compilers_envs(self._build.get("variants", []))
+
         command = ["cmake"]
         if "files" in self._build:
-            command.append(self._build["files"][0])
+            src_dir = self._build["files"][0]
         else:
-            command.append(self._srcdir)
+            src_dir = self._srcdir
+        command.append(f" -S {src_dir} ")
 
-        envs = extract_compilers_envs()
+        cmake_build_dir = self._buildir
+        sub_build_dir = self._build["cmake"].get("sub_build_dir")
+        if sub_build_dir is not None:
+            cmake_build_dir = os.path.join(cmake_build_dir, sub_build_dir)
+        command.append(f" -B {cmake_build_dir} ")
+
         command.append(
-            r"-G 'Unix Makefiles' " r"-DCMAKE_BINARY_DIR='{build}' ".format(build=self._buildir)
+            r" -G 'Unix Makefiles' " r"-DCMAKE_BINARY_DIR='{build}' ".format(build=self._buildir)
         )
 
         command += self._build["cmake"].get("args", [])
         envs += self._build["cmake"].get("envs", [])
 
-        self._build["files"] = [os.path.join(self._buildir, "Makefile")]
+        self._build["files"] = [os.path.join(cmake_build_dir, "Makefile")]
         tmp = self.__build_from_makefile()
         next_command = tmp[0]
         envs += tmp[1]
@@ -478,7 +492,7 @@ class TEDescriptor:
             autogen_path = os.path.join(os.path.dirname(configure_path), "autogen.sh")
             command.append("{} && ".format(autogen_path))
 
-        envs = extract_compilers_envs()
+        envs = extract_compilers_envs(self._build.get("variants", []))
 
         command.append(r"{configure} ".format(configure=configure_path))
 

@@ -282,9 +282,11 @@ class Series:
         self,
         run: Run,
         msg: str | None = None,
-        metadata: dict = {},
+        metadata: dict | None = None,
         timestamp: int | None = None,
     ) -> None:
+        if metadata is None:
+            metadata = {}
         assert isinstance(run, Run)
         root_tree = None
         msg = "New run" if not msg else msg

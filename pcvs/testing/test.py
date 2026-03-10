@@ -50,12 +50,12 @@ class Test:
         subtree: str = "nosubtree",
         user_suffix: str | None = None,
         command: str = "",
-        metrics: dict[str, dict[str, Any]] = {},
-        tags: list[str] = [],
-        artifacts: dict = {},
-        validation: dict = {},
-        mod_deps: list[PManager] = [],
-        job_deps: list[str] = [],
+        metrics: dict[str, dict[str, Any]] | None = None,
+        tags: list[str] | None = None,
+        artifacts: dict | None = None,
+        validation: dict | None = None,
+        mod_deps: list[PManager] | None = None,
+        job_deps: list[str] | None = None,
     ):
         """
         Construct a Test.
@@ -85,6 +85,14 @@ class Test:
         :param mod_deps: Package manager dependency (modules or spack).
         :param job_deps: Other jobs name that this test depends on (like compilation phases).
         """
+        # None args initializer
+        metrics = {} if metrics is None else metrics
+        tags = [] if tags is None else tags
+        artifacts = {} if artifacts is None else artifacts
+        validation = {} if validation is None else validation
+        mod_deps = [] if mod_deps is None else mod_deps
+        job_deps = [] if job_deps is None else job_deps
+
         # Basic Info Compute
         comb_str: str | None = comb.translate_to_str() if comb is not None else None
         fq_name: str = Test.compute_fq_name(label, subtree, te_name, user_suffix, comb_str)
@@ -923,5 +931,7 @@ def generate_local_variables(label: str, subprefix: str) -> tuple[str, str, str,
         os.path.join(GlobalConfig.root["validation"]["output"], "test_suite", label)
     )
     cur_buildir = os.path.normpath(os.path.join(base_buildir, subprefix))
-
+    io.console.nodebug(
+        f"src_dir: {base_srcdir}/{{{subprefix}}}, buildir: {base_buildir}/{{{subprefix}}}"
+    )
     return base_srcdir, cur_srcdir, base_buildir, cur_buildir

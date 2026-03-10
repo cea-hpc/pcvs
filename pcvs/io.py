@@ -1,3 +1,4 @@
+import atexit
 import enum
 import functools
 import logging
@@ -123,13 +124,20 @@ class PCVSConsole:
         self._singletask: TaskID | None = None
         self._live: Live | None = None
 
-        self._color = color
-        self._verbosity = Verbosity(min(Verbosity.NB_LEVELS - 1, verbose))
-        # self._debugfile = open(os.path.join(".", pcvs.NAME_DEBUG_FILE), "w", encoding="utf-8")
-        self._debugfile_path = os.path.join(".", pcvs.NAME_DEBUG_FILE)
+        # should we use color
+        self._color: bool = color
+        # verbosity level
+        self._verbosity: Verbosity = Verbosity(min(Verbosity.NB_LEVELS - 1, verbose))
+
+        # debug file path
+        self._debugfile_path: str = os.path.join(".", pcvs.NAME_DEBUG_FILE)
+        # should we delete debug file on exit
+        self._delete_debugfile_on_exit: bool = self._verbosity < Verbosity.DEBUG
+        atexit.register(self.delete_debug_file)
+
         self.job_summary_data_table: dict[str, dict[str, dict[str, int]]] = {}
         # https://rich.readthedocs.io/en/stable/appendix/colors.html#appendix-colors
-        theme = Theme(
+        theme: Theme = Theme(
             {
                 "debug": Style(color="white"),
                 "log": Style(color="white"),
@@ -139,21 +147,23 @@ class PCVSConsole:
             }
         )
         color_system = "auto" if self._color else None
-        self._stdout = Console(color_system=color_system, theme=theme)  # type: ignore
-        self._stderr = Console(color_system=color_system, theme=theme, stderr=True)  # type: ignore
+        self._stdout: Console = Console(color_system=color_system, theme=theme)  # type: ignore
+        self._stderr: Console = Console(color_system=color_system, theme=theme, stderr=True)  # type: ignore
 
         # logging management for debug file:
-        # Create logger
+        # Logger
         self._loghdl: Logger = logging.getLogger("pcvs")
         self._loghdl.setLevel(logging.DEBUG)
-        # Create formatter
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        # Formatter
+        formatter: logging.Formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s"
+        )
         # File handler
-        file_handler = logging.FileHandler(self._debugfile_path)
+        file_handler: logging.FileHandler = logging.FileHandler(self._debugfile_path)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         # TODO: replace rich logger with logging
-        # Console handler (optional)
+        # Console handler
         # console_handler = logging.StreamHandler()
         # console_handler.setLevel(logging.INFO)
         # console_handler.setFormatter(formatter)
@@ -161,11 +171,17 @@ class PCVSConsole:
         self._loghdl.addHandler(file_handler)
         # logger.addHandler(console_handler)
 
-        self._chars = SpecialChar(utf_support=self._stdout.encoding.startswith("utf"))
+        self._chars: SpecialChar = SpecialChar(utf_support=self._stdout.encoding.startswith("utf"))
 
         # Activate when needed
-        self._sched_debug = False
-        self._crit_debug = False
+        self._sched_debug: bool = False
+        self._crit_debug: bool = False
+
+    def delete_debug_file(self) -> None:
+        self.debug(f"deleting log file: {self._debugfile_path}")
+        if self._delete_debugfile_on_exit:
+            if os.path.isfile(self._debugfile_path):
+                os.remove(self._debugfile_path)
 
     # log file management
 
@@ -255,6 +271,8 @@ class PCVSConsole:
 
     def exception(self, e: Exception) -> None:
         """Print exceptions."""
+        # do not delete debug file if we have logged exceptions
+        self._delete_debugfile_on_exit = False
         self._stderr.print("\n")
         if self._verbosity >= Verbosity.DEBUG:
             self._stderr.print_exception(word_wrap=True, show_locals=True, extra_lines=16)

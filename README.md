@@ -1,4 +1,14 @@
-<div align="center"><img src="./docs/source/_static/pcvs_logo.png" width=300px></div>
+<div align="center">
+<!-- Try to fetch the image from LIHPC -->
+<object
+    type="image/png"
+    data="https://www-lihpc.cea.fr/images/software/pcvs_logo.png"
+    width=300px
+>
+<!-- If it fails (offline, forges...) use the file in the repo -->
+<img src="docs/source/_static/pcvs_logo.png" width=300px/>
+</object>
+</div>
 
 <div align="center"><h1> Parallel Computing Validation System </h1> </div>
 
@@ -46,12 +56,14 @@ $ coverage run
 
 Once installed, the program should be available as `pcvs`.
 
-> [!TIP] Some PCVS specific test-suite exists
+> [!TIP]
+> Some PCVS specific test-suite exists,
 > [PCVS-Benchmarks](https://github.com/cea-hpc/pcvs-benchmarks) is a curated set of HPC benchmarks and test suite with PCVS test descriptions
 
 ## Basic usage
 
-> [!NOTE] You can add autocompletion for PCVS commands to your favorite shell
+> [!NOTE]
+> You can add autocompletion for PCVS commands to your favorite shell
 >
 > ```sh
 > # ZSH support
