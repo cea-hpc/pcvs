@@ -532,6 +532,10 @@ class Test:
 
     def evaluate(self) -> None:
         """Evaluate test results to update the test state according to validation configuration."""
+        if GlobalConfig.root["validation"].get("simulated", False):
+            self._state = TestState.SUCCESS
+            return
+
         if self._has_hard_timeout:
             self._state = TestState.HARD_TIMEOUT
             return
