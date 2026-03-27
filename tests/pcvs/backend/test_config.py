@@ -17,6 +17,8 @@ def test_config_scopes():
                 assert len(confs) == 1
                 assert confs[0].path == Path(
                     os.path.join(
-                        scopes_to_paths[s], str(k).lower(), f"default{ConfigKind.get_file_ext(k)}"
+                        scopes_to_paths[s],
+                        str(k).lower(),
+                        f"default{ConfigKind.get_file_exts(k)[0]}",
                     )
                 )

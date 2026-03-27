@@ -28,9 +28,9 @@ def test_kind():
         assert ConfigKind.fromstr(kind_str) is not None
         assert kind in ConfigKind.all_kinds()
         if kind != ConfigKind.PLUGIN:
-            assert ConfigKind.get_file_ext(kind) == ".yml"
+            assert ConfigKind.get_file_exts(kind) == [".yml", ".yaml"]
         else:
-            assert ConfigKind.get_file_ext(kind) == ".py"
+            assert ConfigKind.get_file_exts(kind) == [".py"]
 
 
 def test_desc():

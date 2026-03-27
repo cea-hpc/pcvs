@@ -54,7 +54,7 @@ def dummy_profile_fs():
     """Create an isolated fs with GLOBAL configurations in LOCAL."""
     with isolated_fs() as tmp_dir:
         for k in ConfigKind.all_kinds():
-            ext = ConfigKind.get_file_ext(k)
+            ext = ConfigKind.get_file_exts(k)[0]
             src_path = os.path.join(PATH_INSTDIR, f"config/{str(k).lower()}/default{ext}")
             dst_path = os.path.join(tmp_dir, f".pcvs/{str(k).lower()}/default{ext}")
             os.makedirs(os.path.dirname(dst_path), exist_ok=True)

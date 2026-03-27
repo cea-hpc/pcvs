@@ -113,16 +113,16 @@ class ConfigKind(Enum):
         return all_kinds  # type: ignore
 
     @classmethod
-    def get_file_ext(cls, ck: Self) -> str:
+    def get_file_exts(cls, ck: Self) -> list[str]:
         """Get file type from ConfigType."""
         config_extensions = {
-            ConfigKind.PROFILE: ".yml",
-            ConfigKind.COMPILER: ".yml",
-            ConfigKind.RUNTIME: ".yml",
-            ConfigKind.MACHINE: ".yml",
-            ConfigKind.CRITERION: ".yml",
-            ConfigKind.GROUP: ".yml",
-            ConfigKind.PLUGIN: ".py",
+            ConfigKind.PROFILE: [".yml", ".yaml"],
+            ConfigKind.COMPILER: [".yml", ".yaml"],
+            ConfigKind.RUNTIME: [".yml", ".yaml"],
+            ConfigKind.MACHINE: [".yml", ".yaml"],
+            ConfigKind.CRITERION: [".yml", ".yaml"],
+            ConfigKind.GROUP: [".yml", ".yaml"],
+            ConfigKind.PLUGIN: [".py"],
         }
         return config_extensions[ck]
 
@@ -219,9 +219,9 @@ class ConfigLocator:
     def check_filename_ext(self, file_name: Path, kind: ConfigKind) -> Path:
         """Check of filename."""
         # check for missing extensions
-        extension = ConfigKind.get_file_ext(kind)
-        if file_name.suffix != extension:
-            file_name = file_name.with_suffix(extension)
+        extensions = ConfigKind.get_file_exts(kind)
+        if file_name.suffix not in extensions:
+            file_name = file_name.with_suffix(extensions[0])
         return file_name
 
     def parse_scope_and_kind_raise(
@@ -392,7 +392,7 @@ class ConfigLocator:
             config_path: Path = self.get_storage_path(file_name, kind, sc)
             io.console.debug(f"Looking for '{config_path}'.")
             config_path = self.check_filename_ext(config_path, kind)
-            if config_path.is_file() and config_path.suffix == ConfigKind.get_file_ext(kind):
+            if config_path.is_file() and config_path.suffix in ConfigKind.get_file_exts(kind):
                 io.console.debug(f"Found '{config_path}'.")
                 return ConfigDesc(config_path.stem, config_path, kind, sc)
         return None
@@ -407,7 +407,7 @@ class ConfigLocator:
             for root, _, files in os.walk(configs_dir):
                 for file in files:
                     config_path = Path(os.path.join(root, file))
-                    if config_path.is_file() and config_path.suffix == ConfigKind.get_file_ext(
+                    if config_path.is_file() and config_path.suffix in ConfigKind.get_file_exts(
                         kind
                     ):
                         configs.append(ConfigDesc(config_path.stem, config_path, kind, sc))
