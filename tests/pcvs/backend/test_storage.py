@@ -53,10 +53,13 @@ def test_locator() -> None:
     """Test ConfigLocator class."""
     with dummy_fs_with_configlocator_patch() as (cl, scopes_to_paths):
         # extension
-        assert cl.check_filename_ext(Path("test.yml"), ConfigKind.PROFILE) == Path("test.yml")
-        assert cl.check_filename_ext(Path("test"), ConfigKind.PROFILE) == Path("test.yml")
-        assert cl.check_filename_ext(Path("test.py"), ConfigKind.PLUGIN) == Path("test.py")
-        assert cl.check_filename_ext(Path("test"), ConfigKind.PLUGIN) == Path("test.py")
+        assert cl.check_filename_exts(Path("test.yml"), ConfigKind.PROFILE) == [Path("test.yml")]
+        assert cl.check_filename_exts(Path("test"), ConfigKind.PROFILE) == [
+            Path("test.yml"),
+            Path("test.yaml"),
+        ]
+        assert cl.check_filename_exts(Path("test.py"), ConfigKind.PLUGIN) == [Path("test.py")]
+        assert cl.check_filename_exts(Path("test"), ConfigKind.PLUGIN) == [Path("test.py")]
 
         # scope and kind
         # # 1 token
