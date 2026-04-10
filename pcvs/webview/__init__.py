@@ -25,6 +25,18 @@ def create_app(report: Report) -> Flask:
 
     app = Flask(__name__, template_folder=os.path.join(PATH_INSTDIR, "webview/templates"))
 
+    def sanitize_sid(sid: str) -> str:
+        if sid not in DATA_MANAGER.session_ids:
+            abort(404)
+        else:
+            return sid
+
+    def sanitize_selection(selection: str) -> str:
+        if selection not in ["tags", "labels", "status"]:
+            abort(404)
+        else:
+            return selection
+
     # app.config.from_object(...)
     @app.route("/about")
     def about() -> Response:
@@ -61,15 +73,14 @@ def create_app(report: Report) -> Flask:
         :param sid: session id
         :return: page content
         """
-        if sid not in DATA_MANAGER.session_ids:
-            abort(404)
+        sid = sanitize_sid(sid)
 
         labels = DATA_MANAGER.single_session_labels(sid)
         tags = DATA_MANAGER.single_session_tags(sid)
         jobs_cnt = DATA_MANAGER.single_session_job_cnt(sid)
 
         if "json" in request.args.get("render", []):
-            return jsonify(  # type: ignore
+            return jsonify(
                 {
                     "tag": len(tags),
                     "label": len(labels),
@@ -102,7 +113,7 @@ def create_app(report: Report) -> Flask:
 
         The response will depend on the request, which can be:
             * tags
-            * label
+            * labels
             * status
 
         Providing a GET ``render`` to ``json`` returns the raw JSON version.
@@ -111,13 +122,16 @@ def create_app(report: Report) -> Flask:
         :param selection: which listing to target
         :return: web content
         """
+        sid = sanitize_sid(sid)
+        selection = sanitize_selection(selection)
+
         if "json" in request.args.get("render", []):
             out = []
             infos = DATA_MANAGER.single_session_get_view(sid, selection, summary=True)
             assert infos is not None
             for k, v in infos.items():
                 out.append({"name": k, "count": v})
-            return jsonify(out)  # type: ignore
+            return jsonify(out)
 
         return Response(render_template("list_view.html", sid=sid, selection=selection))
 
@@ -136,16 +150,20 @@ def create_app(report: Report) -> Flask:
         :param selection: which view to target
         :return: web response
         """
-        out = []
-        request_item = request.args.get("name", None)
+        sid = sanitize_sid(sid)
+        selection = sanitize_selection(selection)
+        unsafe_request_item = request.args.get("name", None)
 
+        out = []
         if "json" in request.args.get("render", []):
             # special case
             if selection == "status":
-                job_list = DATA_MANAGER.single_session_status(sid, status_filter=request_item)
+                job_list = DATA_MANAGER.single_session_status(
+                    sid, unsafe_status_filter=unsafe_request_item
+                )
             else:
                 struct = DATA_MANAGER.single_session_get_view(
-                    sid, selection, subset=request_item, summary=False
+                    sid, selection, unsafe_subset=unsafe_request_item, summary=False
                 )
                 # jobs are returned split into 3 lists, depending on their status
                 # -> browse all three lists
@@ -160,57 +178,14 @@ def create_app(report: Report) -> Flask:
                 if cur is not None:
                     out.append(cur.to_json(strstate=True))
 
-            return jsonify(out)  # type: ignore
+            return jsonify(out)
 
         return Response(
             render_template(
-                "detailed_view.html", sid=sid, selection=selection, sel_item=request_item
+                "detailed_view.html", sid=sid, selection=selection, sel_item=unsafe_request_item
             ),
             200,
         )
-
-    @app.route("/submit/session_init", methods=["POST"])
-    def submit_new_session() -> Response:
-        """
-        Entry point to receive new session request.
-
-        :return: HTTP request status (massage, code)
-        """
-        json_session = request.get_json()
-        sid = json_session["sid"]
-        DATA_MANAGER.add_session(sid)
-
-        return Response("OK!", 200)
-
-    @app.route("/submit/session_fini", methods=["POST"])
-    def submit_end_session() -> Response:
-        """
-        Entry point to request a session end.
-
-        :return: HTTP request status (massage, code)
-        """
-        return Response("OK!", 200)
-
-    @app.route("/submit/test", methods=["POST"])
-    def submit() -> Response:
-        """
-        Entry point to receive test data.
-
-        :return: HTTP request status (massage, code)
-        """
-        json_str = request.get_json()
-
-        # test_sid = json_str["metadata"]["sid"]  # pylint: disable=unused-variable
-        test_obj = Test()
-        test_obj.from_json(json_str["test_data"], "Webview API INIT")
-
-        # TODO: implement insert test function and test management in data_manager
-        # ok = data_manager.insert_test(test_sid, test_obj)
-        ok = False
-
-        if not ok:
-            return Response("", 406)
-        return Response("OK!", 200)
 
     @app.errorhandler(404)
     def page_not_found(e: int) -> Response:  # pylint: disable=unused-argument

@@ -132,20 +132,24 @@ class Report:
         return d
 
     def single_session_status(
-        self, sid: str, status_filter: str | None = None
+        self, sid: str, unsafe_status_filter: str | None = None
     ) -> dict[str, list[str]] | list[str]:
         """
         Get per-session status infos
 
         :param sid: Session id to extract info from.
-        :param status_filter: optional status to filter in, defaults to None
+        :param unsafe_status_filter: optional status to filter in, defaults to None
+
+            .. warning::
+                Security: unsafe_status_filter is provided from webview user !
+
         :return: A dict of statuses (or a single list if the filter is used)
         """
         assert sid in self._sessions
         statuses = self._sessions[sid].results.status_view
-        if status_filter:
-            assert status_filter in statuses
-            status = statuses[status_filter]
+        if unsafe_status_filter:
+            assert unsafe_status_filter in statuses
+            status = statuses[unsafe_status_filter]
             assert isinstance(status, list)
             return status
         return statuses
@@ -210,7 +214,7 @@ class Report:
         return self._sessions[sid].results.map_id(jid)
 
     def single_session_get_view(
-        self, sid: str, name: str, subset: str | None = None, summary: bool = False
+        self, sid: str, name: str, unsafe_subset: str | None = None, summary: bool = False
     ) -> dict[str, dict] | None:
         """
         Get a specific view from a given session.
@@ -228,7 +232,11 @@ class Report:
 
         :param sid: Session ID
         :param name: view name
-        :param subset: only a selection of the view, defaults to None
+        :param unsafe_subset: only a selection of the view, defaults to None
+
+            .. warning::
+                Security: unsafe_subset is provided from webview user !
+
         :param summary: Should it be summarized, defaults to False
         :return: the result dict
         """
@@ -243,18 +251,12 @@ class Report:
         else:
             return None
 
-        if subset:
-            d = {k: v for k, v in d.items() if subset in k}
+        if unsafe_subset is not None:
+            d = {k: v for k, v in d.items() if unsafe_subset in k}
 
         if d and summary:
             return {k: self.dict_convert_list_to_cnt(v) for k, v in d.items()}
         return d
-
-    def __repr__(self) -> str:
-        return repr(self.__dict__)
-
-    def __rich_repr__(self) -> Iterable[tuple[str, Any]]:
-        return self.__dict__.items()
 
 
 def upload_buildir_results(
