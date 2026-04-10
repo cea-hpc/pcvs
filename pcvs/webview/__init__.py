@@ -5,6 +5,7 @@ from flask import Flask
 from flask import jsonify
 from flask import render_template
 from flask import request
+from flask import Response
 
 from pcvs import PATH_INSTDIR
 from pcvs.backend.report import Report
@@ -26,35 +27,35 @@ def create_app(report: Report) -> Flask:
 
     # app.config.from_object(...)
     @app.route("/about")
-    def about() -> str:
+    def about() -> Response:
         """Provide the about-us page.
 
         :return: webpage content
         """
-        return render_template("tbw.html")
+        return Response(render_template("tbw.html"))
 
     @app.route("/doc")
-    def doc() -> str:
+    def doc() -> Response:
         """Provide the doc page.
 
         :return: webpage content
         """
-        return render_template("tbw.html")
+        return Response(render_template("tbw.html"))
 
     @app.route("/welcome")
     @app.route("/main")
     @app.route("/")
-    def root() -> str:
+    def root() -> Response:
         """Provide the main page.
 
         :return: webpage content
         """
         if "json" in request.args.get("render", []):
-            return jsonify(list(DATA_MANAGER.session_infos()))  # type: ignore
-        return render_template("main.html")
+            return jsonify(list(DATA_MANAGER.session_infos()))
+        return Response(render_template("main.html"))
 
     @app.route("/run/<sid>")
-    def session_main(sid: str) -> str:
+    def session_main(sid: str) -> Response:
         """Provide the per-session main page
 
         :param sid: session id
@@ -76,25 +77,27 @@ def create_app(report: Report) -> Flask:
                     "config": DATA_MANAGER.single_session_config(sid),
                 }
             )
-        return render_template(
-            "session_main.html",
-            sid=sid,
-            rootdir=DATA_MANAGER.single_session_build_path(sid),
-            nb_tests=jobs_cnt,
-            nb_labels=len(labels),
-            nb_tags=len(tags),
+        return Response(
+            render_template(
+                "session_main.html",
+                sid=sid,
+                rootdir=DATA_MANAGER.single_session_build_path(sid),
+                nb_tests=jobs_cnt,
+                nb_labels=len(labels),
+                nb_tags=len(tags),
+            )
         )
 
     @app.route("/compare")
-    def compare() -> str:
+    def compare() -> Response:
         """Provide the archive comparison interface.
 
         :return: webpage content
         """
-        return render_template("tbw.html")
+        return Response(render_template("tbw.html"))
 
     @app.route("/run/<sid>/<selection>/list")
-    def get_list(sid: str, selection: str) -> str:
+    def get_list(sid: str, selection: str) -> Response:
         """Get a listing.
 
         The response will depend on the request, which can be:
@@ -116,10 +119,10 @@ def create_app(report: Report) -> Flask:
                 out.append({"name": k, "count": v})
             return jsonify(out)  # type: ignore
 
-        return render_template("list_view.html", sid=sid, selection=selection)
+        return Response(render_template("list_view.html", sid=sid, selection=selection))
 
     @app.route("/run/<sid>/<selection>/detail")
-    def get_details(sid: str, selection: str) -> tuple[str, int]:
+    def get_details(sid: str, selection: str) -> Response:
         """Get a detailed view of a component.
 
         The response will depend on the request, which can be:
@@ -147,7 +150,7 @@ def create_app(report: Report) -> Flask:
                 # jobs are returned split into 3 lists, depending on their status
                 # -> browse all three lists
                 if struct is None:
-                    return "Not Found !", 404
+                    return Response("Not Found !", 404)
                 job_list = []
                 for _, m in struct.items():
                     for _, s in m.items():
@@ -159,7 +162,7 @@ def create_app(report: Report) -> Flask:
 
             return jsonify(out)  # type: ignore
 
-        return (
+        return Response(
             render_template(
                 "detailed_view.html", sid=sid, selection=selection, sel_item=request_item
             ),
@@ -167,7 +170,7 @@ def create_app(report: Report) -> Flask:
         )
 
     @app.route("/submit/session_init", methods=["POST"])
-    def submit_new_session() -> tuple[str, int]:
+    def submit_new_session() -> Response:
         """
         Entry point to receive new session request.
 
@@ -177,19 +180,19 @@ def create_app(report: Report) -> Flask:
         sid = json_session["sid"]
         DATA_MANAGER.add_session(sid)
 
-        return "OK!", 200
+        return Response("OK!", 200)
 
     @app.route("/submit/session_fini", methods=["POST"])
-    def submit_end_session() -> tuple[str, int]:
+    def submit_end_session() -> Response:
         """
         Entry point to request a session end.
 
         :return: HTTP request status (massage, code)
         """
-        return "OK!", 200
+        return Response("OK!", 200)
 
     @app.route("/submit/test", methods=["POST"])
-    def submit() -> tuple[str, int]:
+    def submit() -> Response:
         """
         Entry point to receive test data.
 
@@ -206,18 +209,18 @@ def create_app(report: Report) -> Flask:
         ok = False
 
         if not ok:
-            return "", 406
-        return "OK!", 200
+            return Response("", 406)
+        return Response("OK!", 200)
 
     @app.errorhandler(404)
-    def page_not_found(e: int) -> str:  # pylint: disable=unused-argument
+    def page_not_found(e: int) -> Response:  # pylint: disable=unused-argument
         """
         404 Not found page handler.
 
         :param e: the caught error, only 404 here
         :return: web content
         """
-        return render_template("404.html")
+        return Response(render_template("404.html"))
 
     return app
 
