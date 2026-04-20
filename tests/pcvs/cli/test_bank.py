@@ -45,7 +45,7 @@ def test_list():
         res = click_call("bank", "init", "test", "test")
         res = click_call("bank", "list")
         assert res.exit_code == 0
-        assert res.stdout.find("TEST:") != -1
+        assert res.stdout.find("test:") != -1
 
 
 def test_show():

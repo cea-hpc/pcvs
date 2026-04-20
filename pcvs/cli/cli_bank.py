@@ -73,7 +73,7 @@ def cli_bank_list(ctx: click.Context) -> None:  # pylint: disable=unused-argumen
     """List known repositories, stored under ``PATH_BANK``."""
     io.console.print_header("Bank List")
     for label, path in pvBank.list_banks().items():
-        io.console.print_item(f"{label.upper()}: {path}")
+        io.console.print_item(f"{label}: {path}")
 
 
 @cli_bank.command(
