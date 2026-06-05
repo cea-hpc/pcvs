@@ -369,9 +369,10 @@ class GitByAPI(GitByGeneric):
                 self._repo = pygit2.init_repository(
                     self._path,
                     flags=(
-                        pygit2.GIT_REPOSITORY_INIT_MKPATH | pygit2.GIT_REPOSITORY_INIT_NO_REINIT
+                        pygit2.enums.RepositoryInitFlag.MKPATH
+                        | pygit2.enums.RepositoryInitFlag.NO_REINIT
                     ),
-                    mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP,
+                    mode=pygit2.enums.RepositoryInitMode.SHARED_GROUP,
                     bare=bare,
                 )
                 self._lock()
@@ -427,7 +428,7 @@ class GitByAPI(GitByGeneric):
         assert isinstance(commit, Reference)
         assert isinstance(branch, Branch)
 
-        pygit_obj = self.revparse(commit).cid.oid
+        pygit_obj = self.revparse(commit).cid.id
         ref = "refs/heads/{}".format(branch.name)
         if ref in self._repo.references:
             self._repo.references.delete(branch.name)
@@ -484,7 +485,7 @@ class GitByAPI(GitByGeneric):
         assert isinstance(rev, Commit)
         pygit_obj = rev.cid
 
-        for o in self._repo.walk(pygit_obj.oid, pygit2.GIT_SORT_REVERSE):
+        for o in self._repo.walk(pygit_obj.id, pygit2.enums.SortMode.REVERSE):
             yield self.__obj_to_commit(o)
 
     def list_files(self, rev: Reference | None = None, prefix: str = "") -> list[str]:
@@ -557,10 +558,10 @@ class GitByAPI(GitByGeneric):
             parent = self._set_or_head(parent)
             if isinstance(parent, Branch):
                 update_ref = "refs/heads/{}".format(parent.name)
-                parents = [self.revparse(parent).cid.oid]
+                parents = [self.revparse(parent).cid.id]
             elif isinstance(parent, Commit):
                 update_ref = None
-                parents = [parent.cid.oid]
+                parents = [parent.cid.id]
             else:
                 raise GitException.BadEntryError(
                     reason="Parent is unknown", dbg_info={"ref": parent}
@@ -607,10 +608,10 @@ class GitByAPI(GitByGeneric):
         if len(path) == 1:
             data_hash = pygit2.hash(str(data))
             if data_hash in self._repo:
-                data_obj = self._repo[data_hash].oid
+                data_obj = self._repo[data_hash].id
             else:
                 data_obj = self._repo.create_blob(str(data))
-            treebuild.insert(path[0], data_obj, pygit2.GIT_FILEMODE_BLOB)
+            treebuild.insert(path[0], data_obj, pygit2.enums.FileMode.BLOB)
             return treebuild.write()
 
         # otherwise, determine where the current subdir is going
@@ -620,8 +621,8 @@ class GitByAPI(GitByGeneric):
         try:
             # check if the subdir already exist in this bank subtree
             entry = tree[subtree_name]
-            assert entry.filemode == pygit2.GIT_FILEMODE_TREE
-            subtree = repo.get(entry.hex)
+            assert entry.filemode == pygit2.enums.FileMode.TREE
+            subtree = repo.get(str(entry.id))
             # YES it is found -> reuse this subtree
             sub_treebuild = repo.TreeBuilder(subtree)
         except KeyError:
@@ -632,7 +633,7 @@ class GitByAPI(GitByGeneric):
         # recursive call, as we didn't reach the subtree bottom
         subtree_oid = self.__insert_path(sub_treebuild, path[1:], data)
         # Pygit2 insert, to build the actual intermediate node
-        treebuild.insert(subtree_name, subtree_oid, pygit2.GIT_FILEMODE_TREE)
+        treebuild.insert(subtree_name, subtree_oid, pygit2.enums.FileMode.TREE)
         return treebuild.write()
 
     def gc(self):

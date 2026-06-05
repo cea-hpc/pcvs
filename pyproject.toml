@@ -15,7 +15,7 @@ dependencies = [
   "sh",
   "rich",
   "rich-click",
-  "pygit2<=1.14",
+  "pygit2<=1.19",
   "textual>=0.29.0",
   "matplotlib",
   "typing-extensions", # needed for backward compat with python10 and python11
