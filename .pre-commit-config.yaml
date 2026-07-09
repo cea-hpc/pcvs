@@ -46,7 +46,6 @@ repos:
         require_serial: true
         minimum_pre_commit_version: '3.2.0'
 
-      # TODO: Activate black once formatting has been done
       - id: 'black'
         name: 'black'
         description: 'Black: The uncompromising Python code formatter'

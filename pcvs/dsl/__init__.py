@@ -62,7 +62,7 @@ class Run:
     # TODO modify comportement to avoid recursive definition
     def __init__(
         self,
-        repo: git.GitByGeneric | None = None,
+        repo: git.Git | None = None,
         cid: git.Commit | None = None,
         from_series: Series | None = None,
     ):
@@ -150,7 +150,8 @@ class Run:
         data = self._repo.get_tree(tree=self._cid, prefix=jobname)
         if isinstance(data, git.Blob):
             res.from_json(
-                json.loads(str(data)), f"Validation from bank {self._cid} for job {jobname}"
+                json.loads(str(data)),
+                f"Validation from bank {self._cid} for job {jobname}",
             )
             return res
         return None
@@ -216,10 +217,10 @@ class Series:
     def __init__(self, branch: git.Branch):
         """TODO:"""
         self._hdl: git.Branch = branch
-        self._repo: git.GitByGeneric = branch.repo
+        self._repo: git.Git = branch.handler
 
     @property
-    def repo(self) -> git.GitByGeneric:
+    def repo(self) -> git.Git:
         return self._repo
 
     @property
@@ -301,7 +302,11 @@ class Series:
             root_tree = self._repo.insert_tree(k, v, root_tree)
         assert root_tree is not None
         self._repo.do_commit(
-            tree=root_tree, msg=commit_msg, parent=self._hdl, timestamp=timestamp, orphan=False
+            tree=root_tree,
+            msg=commit_msg,
+            parent=self._hdl,
+            timestamp=timestamp,
+            orphan=False,
         )
         # self._repo.gc()
 
@@ -311,7 +316,7 @@ class Bank:
 
     def __init__(self, path: str = "", head: str | None = None):
         self._path: str = path
-        self._repo: git.GitByGeneric = git.elect_handler(self._path)
+        self._repo: git.Git = git.elect_handler(self._path)
 
         self._repo.open()
         if head is not None:

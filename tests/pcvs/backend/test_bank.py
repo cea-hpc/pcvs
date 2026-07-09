@@ -64,3 +64,43 @@ def test_save_run(mock_repo_fs, dummy_run, capsys):  # pylint: disable=redefined
     repo = git.elect_handler(mock_repo_fs)
     repo.open()
     assert len(list(repo.branches())) == 3
+
+
+def test_diff_tree(mock_repo_fs):  # pylint: disable=redefined-outer-name
+    pcvs.io.init()
+    g = git.elect_handler(mock_repo_fs)
+    g.open()
+    g.set_identity("Test", "test@test.com", "Test", "test@test.com")
+
+    # First commit: add a single file
+    root = g.insert_tree("file1.txt", "content1")
+    c1 = g.do_commit(root, "first commit", orphan=True)
+    g.set_branch(git.Branch(g, "master"), c1)
+
+    # Second commit: add another file, modify existing one
+    root = g.insert_tree("file1.txt", "content1_modified")
+    root = g.insert_tree("file2.txt", "content2", root)
+    c2 = g.do_commit(root, "second commit", parent=git.Branch(g, "master"))
+
+    # diff between c1 and c2 returns content of changed files from dst_rev
+    contents = g.diff_tree(src_rev=c1, dst_rev=c2)
+    assert "content1_modified" in contents
+    assert "content2" in contents
+    assert len(contents) == 2
+
+    # filter by prefix
+    contents_filtered = g.diff_tree(prefix="file1", src_rev=c1, dst_rev=c2)
+    assert len(contents_filtered) == 1
+    assert contents_filtered[0] == "content1_modified"
+
+    # diff with no changes
+    contents_same = g.diff_tree(src_rev=c2, dst_rev=c2)
+    assert len(contents_same) == 0
+
+    # diff using branch as reference (master points to c2 after do_commit,
+    # so we diff c1 vs master which should show the same changes)
+    contents_branch = g.diff_tree(src_rev=c1, dst_rev=git.Branch(g, "master"))
+    assert "content1_modified" in contents_branch
+    assert "content2" in contents_branch
+
+    g.close()
