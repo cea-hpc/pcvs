@@ -333,7 +333,7 @@ def find_files_to_process(
                 subtree = os.path.relpath(root, path)
                 if "pcvs.setup" == f:
                     setup_files.append((label, subtree, f))
-                elif f in ("pcvs.yml", "pcvs.yml.in"):
+                elif f in ("pcvs.yml", "pcvs.yml.in", "pcvs.yaml", "pcvs.yaml.in"):
                     yaml_files.append((label, subtree, f))
     return (setup_files, yaml_files)
 
@@ -595,7 +595,7 @@ def anonymize_archive() -> None:
     outdir = GlobalConfig.root["validation"]["output"]
     for root, _, files in os.walk(outdir):
         for f in files:
-            if not f.endswith((".xml", ".json", ".yml", ".txt", ".md", ".html")):
+            if not f.endswith((".xml", ".json", ".yml", ".yaml", ".txt", ".md", ".html")):
                 continue
             with fileinput.FileInput(os.path.join(root, f), inplace=True, backup=".raw") as fh:
                 for line in fh:

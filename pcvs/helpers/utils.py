@@ -3,6 +3,7 @@ import os
 import shutil
 import signal
 import socket
+import tarfile
 import time
 from contextlib import contextmanager
 from shutil import SameFileError
@@ -350,15 +351,11 @@ def str_dict_as_envvar(d: dict[str, str]) -> str:
 
 
 def check_is_buildir(p: str) -> bool:
-    if not os.path.isdir(p):
-        return False
-    return NAME_BUILDFILE in os.listdir(p)
+    return os.path.isdir(p) and NAME_BUILDFILE in os.listdir(p)
 
 
 def check_is_archive(f: str) -> bool:
-    if not os.path.isfile(f):
-        return False
-    return os.path.basename(f).startswith("pcvsrun_")
+    return os.path.isfile(f) and tarfile.is_tarfile(f)
 
 
 def check_is_build_or_archive(x: str) -> bool:

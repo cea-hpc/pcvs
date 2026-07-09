@@ -160,7 +160,9 @@ class ConfigFile:
         assert self.exist
         self._load_from_disk()
         edited_stream = click.edit(
-            self._raw, extension=ConfigKind.get_file_ext(self._descriptor.kind), require_save=True
+            self._raw,
+            extension=ConfigKind.get_file_exts(self._descriptor.kind)[0],
+            require_save=True,
         )
 
         def get_rejected_file_name(count: int) -> str:

@@ -43,12 +43,13 @@ def cli_report(ctx: click.Context, paths: tuple[str, ...]) -> int:
         # attempt to resolve it.
         # Note that files are always kept, it ensure to the user to
         # provide a valid archive-formatted file
-        if utils.check_is_build_or_archive(prefix):
-            inputs.append(os.path.abspath(prefix))
-        elif utils.check_is_build_or_archive(os.path.join(prefix, NAME_BUILDIR)):
-            inputs.append(os.path.abspath(os.path.join(prefix, NAME_BUILDIR)))
+        for build in [prefix, os.path.join(prefix, NAME_BUILDIR)]:
+            if utils.check_is_build_or_archive(build):
+                io.console.debug(f"Adding build path / tarball from: {build}")
+                inputs.append(os.path.abspath(build))
+                break
         else:
-            raise click.BadArgumentUsage("{} is not a build directory.".format(prefix))
+            raise click.BadArgumentUsage(f"{prefix} is not a build directory nor an archive.")
 
     if ctx.obj["tui"]:
         if not TEXTUAL_AVAIL:

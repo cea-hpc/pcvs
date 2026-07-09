@@ -113,16 +113,16 @@ class ConfigKind(Enum):
         return all_kinds  # type: ignore
 
     @classmethod
-    def get_file_ext(cls, ck: Self) -> str:
+    def get_file_exts(cls, ck: Self) -> list[str]:
         """Get file type from ConfigType."""
         config_extensions = {
-            ConfigKind.PROFILE: ".yml",
-            ConfigKind.COMPILER: ".yml",
-            ConfigKind.RUNTIME: ".yml",
-            ConfigKind.MACHINE: ".yml",
-            ConfigKind.CRITERION: ".yml",
-            ConfigKind.GROUP: ".yml",
-            ConfigKind.PLUGIN: ".py",
+            ConfigKind.PROFILE: [".yml", ".yaml"],
+            ConfigKind.COMPILER: [".yml", ".yaml"],
+            ConfigKind.RUNTIME: [".yml", ".yaml"],
+            ConfigKind.MACHINE: [".yml", ".yaml"],
+            ConfigKind.CRITERION: [".yml", ".yaml"],
+            ConfigKind.GROUP: [".yml", ".yaml"],
+            ConfigKind.PLUGIN: [".py"],
         }
         return config_extensions[ck]
 
@@ -216,13 +216,20 @@ class ConfigLocator:
             cur = path
         return os.path.join(cur, subpath)
 
-    def check_filename_ext(self, file_name: Path, kind: ConfigKind) -> Path:
+    def check_filename_exts(self, file_name: Path, kind: ConfigKind) -> list[Path]:
         """Check of filename."""
         # check for missing extensions
-        extension = ConfigKind.get_file_ext(kind)
-        if file_name.suffix != extension:
-            file_name = file_name.with_suffix(extension)
-        return file_name
+        extensions = ConfigKind.get_file_exts(kind)
+
+        # extension already in filename
+        if file_name.suffix in extensions:
+            return [file_name]
+
+        # extension not already in file name
+        file_names: list[Path] = []
+        for extension in extensions:
+            file_names.append(file_name.with_suffix(extension))
+        return file_names
 
     def parse_scope_and_kind_raise(
         self,
@@ -283,7 +290,7 @@ class ConfigLocator:
     ) -> ConfigDesc | str:  # Config description and error
         """Parse [scope:[kind:]]label token."""
         # check for config scope & config kind
-        scope = None
+        scope: ConfigScope | None = None
         token = user_token.split(":")
         if len(token) == 1:
             # config does not exist yet, but scope is not provided
@@ -313,58 +320,37 @@ class ConfigLocator:
         else:
             return f"Fail to parse scope (and kind), too many ':' in path '{user_token}'"
 
+        # kind should be set at this point
         assert kind is not None
-
-        file_name = self.check_filename_ext(file_name, kind)
-
-        if should_exist is True:
-            return self.__get_existing_config(file_name, kind, scope)
-
-        if should_exist is None:
-            # May exist
+        if not should_exist:  # False or None
+            # scope should be defined if the file may or does not exits
+            # may be None if we are sure the file exist
             assert scope is not None
-            return self.__get_may_exist_config(file_name, kind, scope)
 
-        if should_exist is False:
-            # should not exist
-            assert scope is not None
-            return self.__get_not_existing_config(file_name, kind, scope)
-
-        return "Unreachable"
-
-    def __get_existing_config(
-        self, file_name: Path, kind: ConfigKind, scope: ConfigScope | None
-    ) -> ConfigDesc | str:
-        """Get a config, the config file must exist."""
-        exist_config: ConfigDesc | None = self.find_config(file_name, kind, scope)
-        if exist_config is None:
+        config: ConfigDesc | None = self.find_config(file_name, kind, scope)
+        if config is not None:
+            # we found a config
+            if should_exist is False:  # False but not None
+                return f"Config, '{config.full_name}' already exist !"
+            return config
+        # we did not found any existing config
+        if should_exist:
             return f"Config '{kind}:{file_name}' does not exist !"
-        return exist_config
+        assert scope is not None  # repeat of above constraint as linter isn't smart enough
+        return self.build_config_descriptor(file_name, kind, scope)
 
-    def __get_may_exist_config(
+    def build_config_descriptor(
         self, file_name: Path, kind: ConfigKind, scope: ConfigScope
-    ) -> ConfigDesc | str:
-        """Get a config, the config file may exist."""
-        # search for config
-        may_exist_config: ConfigDesc | None = self.find_config(file_name, kind, scope)
-        if may_exist_config is not None:
-            return may_exist_config
+    ) -> ConfigDesc:
+        """Build an arbitrary ConfigDesc from a file_name; kind and scope."""
+        # extension may not be defined, if not select 1 extension
+        file_name = self.check_filename_exts(file_name, kind)[0]
         config_path: Path = self.get_storage_path(file_name, kind, scope)
-        no_config: ConfigDesc = ConfigDesc(config_path.stem, config_path, kind, scope)
-        return no_config
-
-    def __get_not_existing_config(
-        self, file_name: Path, kind: ConfigKind, scope: ConfigScope
-    ) -> ConfigDesc | str:
-        """Get a config, the config file should not exist."""
-        config_path: Path = self.get_storage_path(file_name, kind, scope)
-        should_not_exist_config: ConfigDesc = ConfigDesc(config_path.stem, config_path, kind, scope)
-        if should_not_exist_config.exist:
-            return f"Config, '{should_not_exist_config.full_name}' already exist !"
-        return should_not_exist_config
+        config: ConfigDesc = ConfigDesc(config_path.stem, config_path, kind, scope)
+        return config
 
     def get_storage_dir(self, scope: ConfigScope, kind: ConfigKind | None = None) -> Path:
-        """Get config dir from config scope and config type."""
+        """Get config dir from config scope and optional config kind."""
         assert scope is not None
         config_dir: Path = Path(self._storage_scope_paths[scope])
         if kind:
@@ -372,7 +358,7 @@ class ConfigLocator:
         return config_dir
 
     def get_storage_path(self, file_name: Path, kind: ConfigKind, scope: ConfigScope) -> Path:
-        """Get config path from config label name, config type and config scope."""
+        """Get a config path from a config label name, config type and config scope."""
         assert file_name is not None
         assert scope is not None
         assert kind is not None
@@ -382,7 +368,7 @@ class ConfigLocator:
     def find_config(
         self, file_name: Path, kind: ConfigKind, scope: ConfigScope | None = None
     ) -> ConfigDesc | None:
-        """Get a config file description from it's name."""
+        """Get a config file description from it's name, kind and optional scope."""
         assert kind is not None
         scopes = ConfigScope.all_scopes() if scope is None else [scope]
         io.console.debug(
@@ -390,15 +376,16 @@ class ConfigLocator:
         )
         for sc in scopes:
             config_path: Path = self.get_storage_path(file_name, kind, sc)
-            io.console.debug(f"Looking for '{config_path}'.")
-            config_path = self.check_filename_ext(config_path, kind)
-            if config_path.is_file() and config_path.suffix == ConfigKind.get_file_ext(kind):
-                io.console.debug(f"Found '{config_path}'.")
-                return ConfigDesc(config_path.stem, config_path, kind, sc)
+            config_paths: list[Path] = self.check_filename_exts(config_path, kind)
+            for config_path in config_paths:
+                io.console.debug(f"Looking for '{config_path}'.")
+                if config_path.is_file():
+                    io.console.debug(f"Found '{config_path}'.")
+                    return ConfigDesc(config_path.stem, config_path, kind, sc)
         return None
 
     def list_configs(self, kind: ConfigKind, scope: ConfigScope | None = None) -> list[ConfigDesc]:
-        """List configs of type `ct` in scopes `cs`."""
+        """List configs of a kind in provided or all scopes."""
         assert kind is not None
         scopes = ConfigScope.all_scopes() if scope is None else [scope]
         configs: list[ConfigDesc] = []
@@ -407,14 +394,14 @@ class ConfigLocator:
             for root, _, files in os.walk(configs_dir):
                 for file in files:
                     config_path = Path(os.path.join(root, file))
-                    if config_path.is_file() and config_path.suffix == ConfigKind.get_file_ext(
+                    if config_path.is_file() and config_path.suffix in ConfigKind.get_file_exts(
                         kind
                     ):
                         configs.append(ConfigDesc(config_path.stem, config_path, kind, sc))
         return configs
 
     def list_all_configs(self, scope: ConfigScope | None = None) -> list[ConfigDesc]:
-        """List all configs types in all scopes."""
+        """List all configs kinds in all scopes."""
         configs: list[ConfigDesc] = []
         for ct in ConfigKind.all_kinds():
             configs += self.list_configs(ct, scope)
