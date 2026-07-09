@@ -4,6 +4,20 @@ All major changes to PCVS are documented here. Additional sections will help to
 track what changed from each release.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/)
+## [1.1.1] -- 2026-07-09
+
+### Fixed
+
+- **Bank**
+  - Add support for libgit2 up to libgit2-1.9.
+- **Orchestator**
+  - Fix interruption handler, test are now correctly saved when pcvs is interrupted with 'Ctrl+C'.
+- **Config**
+  - Fix config file with '.yaml' extension is now supported in addition to '.yml'.
+- **CLI**
+  - Fix `pcvs report` archive detection.
+  - Fix `pcvs bank list` command format.
+  - Fix dry-run tests are no longer validated against validation configuration and cannot fail any more.
 
 ## [1.1.0] -- 2026-03-10
 
