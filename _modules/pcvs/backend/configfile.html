@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pcvs.backend.configfile &mdash; PCVS 1.1.0 documentation</title>
+  <title>pcvs.backend.configfile &mdash; PCVS 1.1.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
 
@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="../../../_static/pcvs_favicon.ico"/>
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../_static/documentation_options.js?v=58fbf978"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -262,7 +262,9 @@
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">exist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_disk</span><span class="p">()</span>
         <span class="n">edited_stream</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">edit</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_ext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">),</span> <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw</span><span class="p">,</span>
+            <span class="n">extension</span><span class="o">=</span><span class="n">ConfigKind</span><span class="o">.</span><span class="n">get_file_exts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_descriptor</span><span class="o">.</span><span class="n">kind</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">require_save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">get_rejected_file_name</span><span class="p">(</span><span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
